@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WebSocket 채팅</title>
+    <style>
+        /* CSS styles for the chat message container */
+        #messageContainer {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        /* CSS styles for the input box */
+        #inputMessage {
+            width: 300px;
+            padding: 5px;
+        }
+
+        /* CSS styles for sent messages */
+        .sentMessage {
+            text-align: right;
+            margin-bottom: 10px;
+        }
+
+        /* CSS styles for received messages */
+        .receivedMessage {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="messageContainer"></div>
+    <input type="text" id="inputMessage" />
+    <button id="sendButton">전송</button>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080');
+
+        // 웹소켓 연결 이벤트 처리
+        socket.addEventListener('open', (event) => {
+            console.log('서버에 연결되었습니다');
+        });
+
+        // 서버로부터 메시지 수신 이벤트 처리
+        socket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            displayMessage(message);
+        });
+
+        // 키보드 이벤트 처리
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const inputMessage = document.getElementById('inputMessage');
+            const message = inputMessage.value;
+            inputMessage.value = '';
+            sendMessage(message);
+        });
+
+        // 메시지 전송
+        function sendMessage(message) {
+            const messageObj = {
+                content: message
+            };
+            socket.send(JSON.stringify(messageObj));
+        }
+
+        // 메시지 화면에 표시
+        function displayMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            let messageContent = '';
+
+            messageContent = message.content;
+            messageElement.textContent = messageContent;
+
+            // Add the appropriate class based on the message type
+            if (message.type === 'sent') {
+                messageElement.classList.add('sentMessage');
+            } else if (message.type === 'received') {
+                messageElement.classList.add('receivedMessage');
+            }
+
+            messageContainer.appendChild(messageElement);
+            // Scroll to the bottom of the container after adding a new message
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+    </script>
+</body>
+
+</html>

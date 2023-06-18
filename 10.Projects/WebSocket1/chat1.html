@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WebSocket 채팅</title>
+</head>
+
+<body>
+    <div id="messageContainer"></div>
+    <input type="text" id="inputMessage" />
+    <button id="sendButton">전송</button>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080');
+
+        // 웹소켓 연결 이벤트 처리
+        socket.addEventListener('open', (event) => {
+            console.log('서버에 연결되었습니다');
+        });
+
+        // 서버로부터 메시지 수신 이벤트 처리
+        socket.addEventListener('message', (event) => {
+            const message = JSON.parse(event.data);
+            displayMessage(message);
+        });
+
+        // 키보드 이벤트 처리
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const inputMessage = document.getElementById('inputMessage');
+            const message = inputMessage.value;
+            inputMessage.value = '';
+            sendMessage(message);
+        });
+
+        // 메시지 전송
+        function sendMessage(message) {
+            const messageObj = { type: 'chat', content: message };
+            socket.send(JSON.stringify(messageObj));
+        }
+
+        // ArrayBuffer를 Base64 문자열로 디코딩
+        function decodeMessageData(bufferData) {
+            const uint8Array = new Uint8Array(bufferData);
+            const decoder = new TextDecoder('utf-8');
+            const decodedMessage = decoder.decode(uint8Array);
+            return decodedMessage;
+        }
+
+        // 메시지 화면에 표시
+        function displayMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            let messageContent = '';
+
+            if (typeof message === 'string') {
+                messageContent = message;
+            } else if (typeof message === 'object' && message.type && message.content) {
+                const decodedMessage = decodeMessageData(message.content.data);
+                messageContent = `${message.type}: ${decodedMessage}`;
+            } else {
+                // 기타 객체인 경우 JSON.stringify() 사용
+                messageContent = `${message.type}: ${JSON.stringify(message.content)}`;
+            }
+
+            messageElement.textContent = messageContent;
+            messageContainer.appendChild(messageElement);
+        }
+
+    </script>
+</body>
+
+</html>
