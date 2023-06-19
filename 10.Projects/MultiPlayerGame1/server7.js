@@ -23,6 +23,7 @@ const clients = new Map(); // 클라이언트 관리를 위해 Map 사용
 const clientInfo = {
     ws: null, // WebSocket 연결 정보 (클라이언트 IP 등 관리)
     spaceshipPosition: { x: null, y: null }, // 우주선 위치
+    score: null, // 점수
 };
 
 
@@ -68,7 +69,11 @@ wss.on('listening', () => {
 // 클라이언트 연결 시 이벤트 처리
 wss.on('connection', (ws, req) => {
     const clientId = uuid.v4(); // 고유 ID 생성
-    const client = { ...clientInfo, ws: ws, spaceshipPosition: { ...clientInfo.spaceshipPosition } }; // 객체 병합을 통해 클라이언트 정보와 WebSocket 연결 추가
+    const client = { ...clientInfo, 
+        ws: ws, 
+        spaceshipPosition: { ...clientInfo.spaceshipPosition },
+        score: null,
+    }; // 객체 병합을 통해 클라이언트 정보와 WebSocket 연결 추가
     clients.set(clientId, client); // 클라이언트를 Map에 추가
 
     const clientIp = req.socket.remoteAddress;
@@ -87,7 +92,6 @@ wss.on('connection', (ws, req) => {
         if (data.type === "spaceshipPosition") {
             // 클라이언트의 우주선 위치 정보를 저장 (디버그용)
             client.spaceshipPosition = { x: data.x, y: data.y };
-
             // 클라이언트의 비행기 위치 정보를 다른 클라이언트에게 전달
             broadcast(JSON.stringify({ type: "spaceshipPosition", id: clientId, x: data.x, y: data.y }), ws);
         } else if (data.type === "bulletPosition") {
@@ -109,6 +113,9 @@ wss.on('connection', (ws, req) => {
 
             // 클라이언트로부터 받은 적군 생성 메시지를 다른 클라이언트에게 모두 전달
             sendCreateEnemyMessage(enemyMessage);
+        } else if (data.type === "scoreUpdated") {
+            client.score = data.score;
+            broadcast(JSON.stringify({ type: "scoreUpdated", id: clientId, score: data.score }), ws);
         }
     });
 
@@ -248,9 +255,10 @@ app.get('/clients', (req, res) => {
         id: clientId,
         ip: client.ws._socket.remoteAddress,
         position: client.spaceshipPosition,
+        score: client.score,
     }));
 
-    const formattedOutput = clientList.map(({ id, ip, position }) => `ID: ${id}, IP: ${ip}, POSITION: (${position.x}, ${position.y})`);
+    const formattedOutput = clientList.map(({ id, ip, position, score }) => `ID: ${id}, IP: ${ip}, SCORE: ${score}, POSITION: (${position.x}, ${position.y})`);
     const output = formattedOutput.join('\n');
 
     // res.json(clientList);

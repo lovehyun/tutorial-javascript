@@ -114,7 +114,8 @@ class OpponentShip {
                     bullet.destroy();
 
                     // 점수 카운팅
-                    this.score += 1;
+                    // this.score += 1;
+                    // NOTE: 서버에서 받아와서 갱신함
                 }
             });
         });
@@ -188,6 +189,7 @@ class Spaceship {
 
                     // 점수 카운팅
                     this.score += 1;
+                    sendScore(this.score);
                 }
             });
         });
@@ -278,7 +280,7 @@ function connectWebSocket(webSocketAddress) {
             } else if (message.type === "connectedClient") {
                 id = message.id;
                 if (!opponents.get(id)) {
-                    opponent = new OpponentShip(canvas.width-64, 20);
+                    const opponent = new OpponentShip(canvas.width-64, 20);
                     opponents.set(id, opponent); // 새로운 상대방 비행기 추가
                     console.log("new client: ", id);
                 }
@@ -292,6 +294,13 @@ function connectWebSocket(webSocketAddress) {
                 // 적군 생성 메시지를 받았을 때 적군을 화면에 그립니다.
                 const enemy = new Enemy(message.x, message.y);
                 enemyList.push(enemy);
+            } else if (message.type === "scoreUpdated") {
+                id = message.id;
+                // 상대방 점수를 받아 갱신
+                const opponent = opponents.get(id);
+                if (opponent) {
+                    opponent.score = message.score;
+                }
             }
         });
     });
@@ -318,6 +327,11 @@ async function sendSpaceshipPosition() {
 
 async function sendBulletPosition(x, y) {
     const message = { type: "bulletPosition", x, y };
+    socket.send(JSON.stringify(message));
+}
+
+async function sendScore(score) {
+    const message = { type: "scoreUpdated", score };
     socket.send(JSON.stringify(message));
 }
 
