@@ -259,7 +259,7 @@ let socket;
 function connectWebSocket(webSocketAddress) {
     return new Promise((resolve, reject) => {
         socket = new WebSocket(webSocketAddress);
-        
+
         // WebSocket이 연결되면 실행될 콜백 함수 등록
         socket.addEventListener("open", (event) => {
             console.log("Connected to server");
@@ -275,10 +275,18 @@ function connectWebSocket(webSocketAddress) {
                 updateSpaceshipPosition(message);
             } else if (message.type === "bulletPosition") {
                 updateBulletPosition(message);
+            } else if (message.type === "connectedClient") {
+                id = message.id;
+                if (!opponents.get(id)) {
+                    opponent = new OpponentShip(canvas.width-64, 20);
+                    opponents.set(id, opponent); // 새로운 상대방 비행기 추가
+                    console.log("new client: ", id);
+                }
             } else if (message.type === "disconnectedClient") {
-                if (opponents.get(message.id)) {
-                    opponents.delete(message.id);
-                    console.log("remove client: ", message.id);
+                id = message.id;
+                if (opponents.get(id)) {
+                    opponents.delete(id);
+                    console.log("remove client: ", id);
                 }
             } else if (message.type === "createEnemy") {
                 // 적군 생성 메시지를 받았을 때 적군을 화면에 그립니다.
@@ -341,7 +349,7 @@ function updateBulletPosition(message) {
 
 // 적군 생성 메시지를 서버로 보냅니다.
 function createEnemy() {
-    const message = { type: "createEnemy", start: 0, end: canvas.width };
+    const message = { type: "createEnemyRequest", start: 0, end: canvas.width };
     socket.send(JSON.stringify(message));
 }
 

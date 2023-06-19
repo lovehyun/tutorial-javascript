@@ -1,15 +1,20 @@
 // 5. 적군 생성
 // 7. HTML 파일 서빙 (익스프레스 통해서)
+// 7-1. 로그파일 생성
 
 const WebSocket = require('ws');
 const uuid = require('uuid');
+
 const express = require('express');
 const app = express();
 const path = require('path');
 
-const port = 8080;
+const { createLogger, format, transports } = require('winston');
+const moment = require('moment-timezone');
+
 
 // 웹소켓 서버 생성
+const port = 8080;
 const wss = new WebSocket.Server({ port: port });
 
 // 클라이언트 관리
@@ -18,13 +23,44 @@ const clients = new Map(); // 클라이언트 관리를 위해 Map 사용
 // 상대방 비행기 위치 정보 저장
 const spaceshipPositions = new Map();
 
+
+// ========================================================
+// 로깅 등 기본 서버 관리
+// ========================================================
+
+// 로그 레벨 설정
+let logLevel = process.env.LOG_LEVEL;
+if (!logLevel) {
+    if (process.env.NODE_ENV === 'production') {
+        logLevel = 'info';
+    } else {
+        logLevel = 'debug';
+    }
+}
+
+// 로그 포맷팅 설정
+const logger = createLogger({
+    level: logLevel, // 로그 레벨 설정
+    format: format.combine(
+        format.timestamp({ // 타임스탬프 타임존 추가
+            format: () => moment().tz('Asia/Seoul').format('YYYY-MM-DD HH:mm:ss.SSS')
+        }),
+        format.printf(({ timestamp, level, message }) => {
+            return `${timestamp} [${level}]: ${message}`;
+        })
+    ),
+    transports: [
+        new transports.Console() // 콘솔 출력 설정
+    ]
+});
+
 // ========================================================
 // 웹소켓 서버 엔드포인트
 // ========================================================
 
 // 서버 시작 시 이벤트 처리
 wss.on('listening', () => {
-    console.log(`WebSocket server started and listening on port ${port}`);
+    logger.info(`WebSocket server started and listening on port ${port}`)
 });
 
 // 클라이언트 연결 시 이벤트 처리
@@ -34,12 +70,15 @@ wss.on('connection', (ws, req) => {
 
     const clientIp = req.socket.remoteAddress;
     const shortClientId = clientId.substring(0, 8); // uuid 일부만 보기 위해 substring으로 잘라냄
-    console.log(`Client connected from:\t${clientIp}\tclientId:\t${clientId}`);
+    logger.info(`Client connected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
+
+    // 다른 클라이언트에게 연결 시작 메시지 전달
+    broadcast(JSON.stringify({ type: "connectedClient", id: clientId }), ws);
 
     // 클라이언트로부터 메시지 수신 시 이벤트 처리
     ws.on('message', (message) => {
         const data = JSON.parse(message);
-        console.log(`Received message from\t[${clientIp}, clientId:\t${shortClientId}]:`, data);
+        logger.debug(`Received from IP: ${clientIp}, ClientID: ${shortClientId}, MSG: ${JSON.stringify(data)}`);
 
         // 메시지 타입에 따라 처리
         if (data.type === "spaceshipPosition") {
@@ -48,13 +87,13 @@ wss.on('connection', (ws, req) => {
         } else if (data.type === "bulletPosition") {
             // 클라이언트의 총알 위치 정보를 다른 클라이언트에게 전달
             broadcast(JSON.stringify({ type: "bulletPosition", id: clientId, x: data.x, y: data.y }), ws);
-        } else if (data.type === "createEnemy") {
+        } else if (data.type === "createEnemyRequest") {
             // 서버에서 적군 생성 로직을 수행하고 생성된 적군 정보를 해당 클라이언트에게 전달
             const startX = data.start;
             const endX = data.end;
 
             enemyManager.createEnemy(startX, endX);
-            
+
             const enemy = enemyManager.enemyList[enemyManager.enemyList.length - 1]; // 마지막으로 생성된 적군 정보 가져오기
             const enemyMessage = JSON.stringify({
                 type: "createEnemy",
@@ -67,17 +106,17 @@ wss.on('connection', (ws, req) => {
         }
     });
 
-// 클라이언트와 연결 해제 시 이벤트 처리
-ws.on('close', () => {
-    console.log(`Client disconnected:\t${clientIp}\tclientId:\t${clientId}`);
+    // 클라이언트와 연결 해제 시 이벤트 처리
+    ws.on('close', () => {
+        logger.info(`Client disconnected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
 
-    // 접속 종료된 클라이언트 정보 삭제
-    clients.delete(clientId);
-    spaceshipPositions.delete(clientId);
+        // 접속 종료된 클라이언트 정보 삭제
+        clients.delete(clientId);
+        spaceshipPositions.delete(clientId);
 
-    // 다른 클라이언트에게 연결 종료 메시지 전달
-    broadcast(JSON.stringify({ type: "disconnectedClient", id: clientId }), ws);
-});
+        // 다른 클라이언트에게 연결 종료 메시지 전달
+        broadcast(JSON.stringify({ type: "disconnectedClient", id: clientId }), ws);
+    });
 });
 
 // 클라이언트에게 메시지 전송
@@ -86,7 +125,7 @@ function broadcast(message, sender) {
         if (client !== sender) {
             const clientIp = client._socket.remoteAddress;
             const shortId = id.substring(0, 8); // UUID 일부만 보기 위해 substring으로 잘라냄
-            console.log(`Sending message to\t[${clientIp}, clientId:\t${shortId}]:`, message);
+            logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message}`);
             client.send(message);
         }
     });
@@ -153,9 +192,16 @@ function randomInt(min, max) {
 // 익스프레스 서버 엔드포인트
 // ========================================================
 
-const webSocketAddress = process.env.WEBSOCKET_ADDRESS;
+let webSocketAddress = process.env.WEBSOCKET_ADDRESS;
 if (!webSocketAddress) {
-    console.error('WEBSOCKET_ADDRESS 환경 변수가 설정되지 않았습니다.');
+    logger.error('WEBSOCKET_ADDRESS 환경 변수가 설정되지 않았습니다.');
+    if (process.env.NODE_ENV === 'PRODUCTION') {
+        process.exit(1); // 프로세스 종료
+    } else {
+        const defaultWebSocketAddress = 'ws://127.0.0.1:8080';
+        logger.info(`WEBSOCKET_ADDRESS를 기본값으로 사용합니다. ${defaultWebSocketAddress}`);
+        webSocketAddress = defaultWebSocketAddress; // 기본값을 webSocketAddress에 할당
+    }
 }
 
 // 메인 클라이언트 게임 접속 페이지
@@ -168,7 +214,7 @@ app.get('/', (req, res) => {
 // 클라이언트에게 WebSocket 주소를 전달
 app.get('/config', (req, res) => {
     res.json({ webSocketAddress });
-    console.log(`Successfully configured the websocket address to client ${webSocketAddress}`)
+    logger.info(`Successfully configured the websocket address to client ${webSocketAddress}`)
 });
 
 // 클라이언트 정보 조회 엔드포인트
@@ -179,17 +225,17 @@ app.get('/clients', (req, res) => {
         position: spaceshipPositions.get(clientId),
     }));
 
-    const formattedOutput = clientList.map(({ id, ip, position }) => `ID: ${id}\tIP: ${ip}\tPOSITION: (${position ? position.x : '-'}, ${position ? position.y : '-'})`);
+    const formattedOutput = clientList.map(({ id, ip, position }) => `ID: ${id}, IP: ${ip}, POSITION: (${position ? position.x : '-'}, ${position ? position.y : '-'})`);
     const output = formattedOutput.join('\n');
 
     // res.json(clientList);
     res.send(output);
 });
 
-// 서버 시작
+// 익스프레스 서버 시작
 app.listen(3000, () => {
-    console.log('REST API server started on port 3000');
+    logger.info('REST API server started on port 3000');
 });
 
-// 서버 시작
-console.log(`WebSocket server is starting...`);
+// 게임 서버 시작 완료
+logger.info(`WebSocket server is now starting...`);

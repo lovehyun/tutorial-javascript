@@ -12,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2",
+    "moment-timezone": "^0.5.43",
     "uuid": "^9.0.0",
+    "winston": "^3.9.0",
     "ws": "^8.13.0"
   }
 }
