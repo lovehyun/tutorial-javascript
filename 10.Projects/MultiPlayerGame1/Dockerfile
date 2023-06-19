@@ -8,14 +8,14 @@ RUN npm install
 
 COPY . .
 
-# Install minify
-RUN npm install -g minify
+# Install uglify
+RUN npm install -g uglify-js
 
 # Minify the main client-side js file
-RUN minify game7.js -o game7.min.js
+RUN uglifyjs game7.js -o game7.min.js
 
 # Update HTML file
-RUN sed -i 's/game7.js/game7.min.js/g' index.html
+RUN sed -i 's/game7.js/game7.min.js/g' game.html
 
 # Node JS
 EXPOSE 3000

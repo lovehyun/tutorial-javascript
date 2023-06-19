@@ -20,8 +20,10 @@ const wss = new WebSocket.Server({ port: port });
 // 클라이언트 관리
 const clients = new Map(); // 클라이언트 관리를 위해 Map 사용
 
-// 상대방 비행기 위치 정보 저장
-const spaceshipPositions = new Map();
+const clientInfo = {
+    ws: null, // WebSocket 연결 정보 (클라이언트 IP 등 관리)
+    spaceshipPosition: { x: null, y: null }, // 우주선 위치
+};
 
 
 // ========================================================
@@ -31,7 +33,7 @@ const spaceshipPositions = new Map();
 // 로그 레벨 설정
 let logLevel = process.env.LOG_LEVEL;
 if (!logLevel) {
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === 'PRODUCTION') {
         logLevel = 'info';
     } else {
         logLevel = 'debug';
@@ -66,7 +68,8 @@ wss.on('listening', () => {
 // 클라이언트 연결 시 이벤트 처리
 wss.on('connection', (ws, req) => {
     const clientId = uuid.v4(); // 고유 ID 생성
-    clients.set(clientId, ws); // 클라이언트를 Map에 추가
+    const client = { ...clientInfo, ws: ws, spaceshipPosition: { ...clientInfo.spaceshipPosition } }; // 객체 병합을 통해 클라이언트 정보와 WebSocket 연결 추가
+    clients.set(clientId, client); // 클라이언트를 Map에 추가
 
     const clientIp = req.socket.remoteAddress;
     const shortClientId = clientId.substring(0, 8); // uuid 일부만 보기 위해 substring으로 잘라냄
@@ -82,6 +85,9 @@ wss.on('connection', (ws, req) => {
 
         // 메시지 타입에 따라 처리
         if (data.type === "spaceshipPosition") {
+            // 클라이언트의 우주선 위치 정보를 저장 (디버그용)
+            client.spaceshipPosition = { x: data.x, y: data.y };
+
             // 클라이언트의 비행기 위치 정보를 다른 클라이언트에게 전달
             broadcast(JSON.stringify({ type: "spaceshipPosition", id: clientId, x: data.x, y: data.y }), ws);
         } else if (data.type === "bulletPosition") {
@@ -112,7 +118,6 @@ wss.on('connection', (ws, req) => {
 
         // 접속 종료된 클라이언트 정보 삭제
         clients.delete(clientId);
-        spaceshipPositions.delete(clientId);
 
         // 다른 클라이언트에게 연결 종료 메시지 전달
         broadcast(JSON.stringify({ type: "disconnectedClient", id: clientId }), ws);
@@ -122,11 +127,12 @@ wss.on('connection', (ws, req) => {
 // 클라이언트에게 메시지 전송
 function broadcast(message, sender) {
     clients.forEach((client, id) => {
-        if (client !== sender) {
-            const clientIp = client._socket.remoteAddress;
+        ws = client.ws;
+        if (ws !== sender) { // 발신자를 제외하고 모든 사용자에게
+            const clientIp = ws._socket.remoteAddress;
             const shortId = id.substring(0, 8); // UUID 일부만 보기 위해 substring으로 잘라냄
             logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message}`);
-            client.send(message);
+            ws.send(message);
         }
     });
 }
@@ -140,9 +146,10 @@ function sendCreateEnemyMessage(message) {
 // 적군 생성 및 관리 서버
 // ========================================================
 class Enemy {
-    constructor() {
+    constructor(manager) {
         this.x = 0;
         this.y = 0;
+        this.manager = manager;
     }
 
     init(startX, endX) {
@@ -155,11 +162,21 @@ class Enemy {
         // 적을 아래로 이동시킵니다.
         this.y += 3;
 
-        // if (this.y >= canvas.height - 64) {
-        //     // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
-        //     gameOver = true;
-        //     console.log("gameover!");
-        // }
+        if (this.y >= canvas.height - 64) {
+            // TODO: 현재는 서버사이드에서 적군의 liveness 를 관리하지 않음.
+            //     // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
+            //     gameOver = true;
+            //     console.log("gameover!");
+            this.destroy();
+        }
+    }
+
+    destroy() {
+        this.manager.removeEnemy(this);
+
+        // 해당 객체의 참조를 제거하여 메모리에서 해제합니다.
+        this.x = null;
+        this.y = null;
     }
 }
 
@@ -170,8 +187,16 @@ class EnemyManager {
 
     createEnemy(startX, endX) {
         const enemy = new Enemy();
-        enemy.init(startX, endX);
+        enemy.init(startX, endX, this);
         this.enemyList.push(enemy);
+    }
+
+    removeEnemy(enemy) {
+        // 적군을 목록에서 제거합니다.
+        const index = this.enemyList.indexOf(enemy);
+        if (index !== -1) {
+            this.enemyList.splice(index, 1);
+        }
     }
 
     updateEnemies() {
@@ -220,12 +245,12 @@ app.get('/config', (req, res) => {
 // 클라이언트 정보 조회 엔드포인트
 app.get('/clients', (req, res) => {
     const clientList = Array.from(clients).map(([clientId, client]) => ({
-        id: clientId.substring(0, 8),
-        ip: client._socket.remoteAddress,
-        position: spaceshipPositions.get(clientId),
+        id: clientId,
+        ip: client.ws._socket.remoteAddress,
+        position: client.spaceshipPosition,
     }));
 
-    const formattedOutput = clientList.map(({ id, ip, position }) => `ID: ${id}, IP: ${ip}, POSITION: (${position ? position.x : '-'}, ${position ? position.y : '-'})`);
+    const formattedOutput = clientList.map(({ id, ip, position }) => `ID: ${id}, IP: ${ip}, POSITION: (${position.x}, ${position.y})`);
     const output = formattedOutput.join('\n');
 
     // res.json(clientList);
