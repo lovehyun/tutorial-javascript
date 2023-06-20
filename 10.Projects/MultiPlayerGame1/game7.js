@@ -7,19 +7,28 @@
 // 6-1. 화면 밖으로 나간 총알 삭제 처리
 // 6-2. 적군이 바닥에 닿으면 종료 처리
 // 7. 점수 처리
-// 7-1. 내 점수와 상대방 점수 각각 처리
+// 7-1. 내 점수와 상대방 점수 각각 처리 (그리고 하이스코어 처리)
 // 7-2. 웹소켓 환경변수 처리 (set WEBSOCKET_ADDRESS=ws://localhost:8080)
 
+// 캔바스 생성
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 
 canvas.width = 600;
 canvas.height = 700;
 
-document.body.appendChild(canvas);
+let gameContainer = document.getElementById("gameContainer");
+if (gameContainer) {
+    gameContainer.appendChild(canvas);
+} else {
+    document.body.appendChild(canvas);    
+}
 
+
+// 게임 데이터 저장
 let backgroundImage, gameOverImage;
 let gameOver = false;
+let highScore = 0;
 
 const spaceshipStartPosition = {
     x: canvas.width / 2 - 32,
@@ -295,12 +304,13 @@ function connectWebSocket(webSocketAddress) {
                 const enemy = new Enemy(message.x, message.y);
                 enemyList.push(enemy);
             } else if (message.type === "scoreUpdated") {
-                id = message.id;
+                id = message.id || null;
                 // 상대방 점수를 받아 갱신
                 const opponent = opponents.get(id);
                 if (opponent) {
                     opponent.score = message.score;
                 }
+                highScore = message.highScore;
             }
         });
     });
@@ -427,6 +437,7 @@ function render() {
 
     // 점수 출력
     ctx.fillText(`Score: ${spaceship.score}`, 20, 20);
+    ctx.fillText(`HighScore: ${highScore}`, canvas.width/2 - 100, 20);
     let index = 1;
     for (const [id, opponent] of opponents) {
         const scoreY = (index - 1) * 30 + 20;

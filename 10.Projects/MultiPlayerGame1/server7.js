@@ -23,9 +23,12 @@ const clients = new Map(); // 클라이언트 관리를 위해 Map 사용
 const clientInfo = {
     ws: null, // WebSocket 연결 정보 (클라이언트 IP 등 관리)
     spaceshipPosition: { x: null, y: null }, // 우주선 위치
-    score: null, // 점수
+    score: 0, // 점수
 };
 
+let highScore = 0;
+
+const announcement = [];
 
 // ========================================================
 // 로깅 등 기본 서버 관리
@@ -69,8 +72,9 @@ wss.on('listening', () => {
 // 클라이언트 연결 시 이벤트 처리
 wss.on('connection', (ws, req) => {
     const clientId = uuid.v4(); // 고유 ID 생성
-    const client = { ...clientInfo, 
-        ws: ws, 
+    const client = {
+        ...clientInfo,
+        ws: ws,
         spaceshipPosition: { ...clientInfo.spaceshipPosition },
         score: null,
     }; // 객체 병합을 통해 클라이언트 정보와 WebSocket 연결 추가
@@ -79,8 +83,12 @@ wss.on('connection', (ws, req) => {
     const clientIp = req.socket.remoteAddress;
     const shortClientId = clientId.substring(0, 8); // uuid 일부만 보기 위해 substring으로 잘라냄
     logger.info(`Client connected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
+    addAndDestroyAnnounce(`새로운 사용자가 서버에 접속하였습니다. IP: ${clientIp}, ID: ${shortClientId}`);
 
-    // 다른 클라이언트에게 연결 시작 메시지 전달
+    // 신규 접속자에게 highscore 점수 전달
+    unicast(JSON.stringify({ type: "scoreUpdated", highScore: highScore }), ws);
+
+    // 다른 클라이언트에게 나의 연결 시작 메시지 전달
     broadcast(JSON.stringify({ type: "connectedClient", id: clientId }), ws);
 
     // 클라이언트로부터 메시지 수신 시 이벤트 처리
@@ -115,13 +123,19 @@ wss.on('connection', (ws, req) => {
             sendCreateEnemyMessage(enemyMessage);
         } else if (data.type === "scoreUpdated") {
             client.score = data.score;
-            broadcast(JSON.stringify({ type: "scoreUpdated", id: clientId, score: data.score }), ws);
+
+            if (data.score > highScore) {
+                highScore = data.score; // highscore 업데이트
+            }
+            broadcast(JSON.stringify({ type: "scoreUpdated", id: clientId, score: data.score, highScore: highScore }), null);
         }
     });
 
     // 클라이언트와 연결 해제 시 이벤트 처리
     ws.on('close', () => {
         logger.info(`Client disconnected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
+        const shortClientId = clientId.substring(0, 8); // uuid 일부만 보기 위해 substring으로 잘라냄
+        addAndDestroyAnnounce(`사용자가 접속을 종료하였습니다. IP: ${clientIp}, ID: ${shortClientId}`);
 
         // 접속 종료된 클라이언트 정보 삭제
         clients.delete(clientId);
@@ -144,9 +158,26 @@ function broadcast(message, sender) {
     });
 }
 
+// 단일 클라이언트에게 메세지 전송
+function unicast(message, target) {
+    target.send(message);
+}
+
 // 클라이언트에게 적군 생성 메시지를 전송합니다.
 function sendCreateEnemyMessage(message) {
     broadcast(message, null); // null을 통해 모든 클라이언트에게 메시지 전달
+}
+
+// 클라이언트 공지사항 메세지 추가 및 삭제
+function addAndDestroyAnnounce(message) {
+    const default_remove_second = 5;
+    announcement.push(message);
+    setTimeout(() => {
+        const index = announcement.indexOf(message);
+        if (index !== -1) {
+            announcement.splice(index, 1);
+        }
+    }, default_remove_second * 1000);
 }
 
 // ========================================================
@@ -236,11 +267,12 @@ if (!webSocketAddress) {
     }
 }
 
+
 // 메인 클라이언트 게임 접속 페이지
 app.use(express.static('.'));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'game.html'));
+    res.sendFile(path.join(__dirname, 'game7.html'));
 });
 
 // 클라이언트에게 WebSocket 주소를 전달
@@ -258,12 +290,33 @@ app.get('/clients', (req, res) => {
         score: client.score,
     }));
 
-    const formattedOutput = clientList.map(({ id, ip, position, score }) => `ID: ${id}, IP: ${ip}, SCORE: ${score}, POSITION: (${position.x}, ${position.y})`);
-    const output = formattedOutput.join('\n');
+    const output = {
+        highScore: highScore,
+        clients: clientList,
+    }
+
+    const formattedOutput = JSON.stringify(output, null, 4);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(formattedOutput);
 
     // res.json(clientList);
-    res.send(output);
 });
+
+// 클라이언트 접속자 통계 엔드포인트
+app.get('/clients/stats/country', (req, res) => {
+    const sampleData = [
+        { country: 'Korea', count: 100 },
+    ];
+
+    res.json(sampleData);
+});
+
+// 클라이언트 접속자 공지 엔드포인트
+app.get('/clients/announce', (req, res) => {
+    // announcement 배열의 내용을 스트링 형태로 반환
+    res.send(announcement.join('\n'));
+});
+
 
 // 익스프레스 서버 시작
 app.listen(3000, () => {

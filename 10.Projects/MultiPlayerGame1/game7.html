@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Game!</title>
+    <style>
+        #gameContainer {
+            width: 600px;
+            height: 700px;
+            border: 1px solid black;
+            position: relative;
+        }
+
+        #announcement {
+            background-color: #f0f0f0;
+            max-height: 6em; /* 최대 줄 제한 */
+            overflow: auto; /* 스크롤바 표시 */
+            text-overflow: ellipsis; /* 생략 부호로 표시 */
+            white-space: pre-line; /* 줄바꿈 유지 */
+        }
+    </style>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('gameContainer');
+            const announcement = document.getElementById('announcement');
+            announcement.style.width = `${canvas.offsetWidth}px`;
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Multiplayer Game!</h1>
+    <div id="gameContainer"></div>
+    <div id="controllerContainer">
+        <button id="refreshButton">재시작</button>
+    </div>
+    <div id="announcement"></div>
+    <script src="game7.js"></script>
+    <script>
+        document.getElementById("refreshButton").addEventListener("click", function () {
+            location.reload();
+        });
+
+        // MOTD를 표시하는 함수
+        function displayMOTD(message) {
+            const announceElement = document.getElementById("announcement");
+            if (announceElement) {
+                announceElement.innerHTML = message.replace(/\n/g, "<br>");
+            }
+        }
+
+        // 서버로부터 MOTD를 가져오는 함수
+        function fetchMOTD() {
+            const host = window.location.host;
+            const url = `http://${host}/clients/announce`;
+            fetch(url)
+                .then(response => response.text())
+                .then(message => displayMOTD(message))
+                .catch(error => console.error(error));
+        }
+
+        // 페이지 로드 시 MOTD를 가져오고, 1초마다 업데이트
+        fetchMOTD();
+        setInterval(fetchMOTD, 1000);
+
+    </script>
+</body>
+
+</html>
