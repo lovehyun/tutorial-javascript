@@ -9,6 +9,7 @@
 // 7. 점수 처리
 // 7-1. 내 점수와 상대방 점수 각각 처리 (그리고 하이스코어 처리)
 // 7-2. 웹소켓 환경변수 처리 (set WEBSOCKET_ADDRESS=ws://localhost:8080)
+// 8. 스테이지 추가
 
 // 캔바스 생성
 const canvas = document.createElement("canvas");
@@ -29,6 +30,7 @@ if (gameContainer) {
 let backgroundImage, gameOverImage;
 let gameOver = false;
 let highScore = 0;
+let stage = 1;
 
 const spaceshipStartPosition = {
     x: canvas.width / 2 - 32,
@@ -198,7 +200,12 @@ class Spaceship {
 
                     // 점수 카운팅
                     this.score += 1;
-                    sendScore(this.score);
+                    // 점수에 따라 스테이지를 계산합니다.
+                    if (this.score >= stage * stage * 10) {
+                        stage++;
+                        console.log(`level up, score=${this.score}, stage=${stage}`);
+                    }
+                    sendScore(this.score, stage, gameOver);
                 }
             });
         });
@@ -227,7 +234,7 @@ class Enemy {
 
     update() {
         // 적을 아래로 이동시킵니다.
-        this.y += 2;
+        this.y += stage;
 
         if (this.y >= canvas.height - 64) {
             // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
@@ -340,13 +347,15 @@ function connectWebSocket(webSocketAddress) {
                 const enemy = new Enemy(message.x, message.y);
                 enemyList.push(enemy);
             } else if (message.type === "scoreUpdated") {
+                stage = message.stage;
+                highScore = message.highScore;
+
                 id = message.id || null;
                 // 상대방 점수를 받아 갱신
                 const opponent = opponents.get(id);
                 if (opponent) {
                     opponent.score = message.score;
                 }
-                highScore = message.highScore;
             }
         });
     });
@@ -377,8 +386,8 @@ async function sendBulletPosition(x, y) {
     socket.send(JSON.stringify(message));
 }
 
-async function sendScore(score) {
-    const message = { type: "scoreUpdated", score };
+async function sendScore(score, stage, gameover) {
+    const message = { type: "scoreUpdated", score, stage, gameover };
     socket.send(JSON.stringify(message));
 }
 
@@ -476,6 +485,7 @@ function render() {
     // 점수 출력
     ctx.fillText(`Score: ${spaceship.score}`, 20, 20);
     ctx.fillText(`HighScore: ${highScore}`, canvas.width / 2 - 100, 20);
+    ctx.fillText(`Stage: ${stage}`, canvas.width / 2 - 60, 40);
     let index = 1;
     for (const [id, opponent] of opponents) {
         const scoreY = (index - 1) * 30 + 20;

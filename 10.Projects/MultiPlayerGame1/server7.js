@@ -145,6 +145,13 @@ wss.on('connection', (ws, req) => {
     });
 });
 
+// 웹소켓 에러 시 이벤트 처리
+wss.on('error', (error) => {
+    // 웹소켓 에러 발생
+    logger.error(`WebSocket error: ${error}`);
+    addAndDestroyAnnounce(`웹소켓에 오류가 발생하여 현재 서비스가 불가능합니다.`);
+});
+
 // 클라이언트에게 메시지 전송
 function broadcast(message, sender) {
     clients.forEach((client, id) => {
@@ -292,6 +299,7 @@ app.get('/clients', (req, res) => {
 
     const output = {
         highScore: highScore,
+        wssClientsSize: wss.clients.size,
         clients: clientList,
     }
 
