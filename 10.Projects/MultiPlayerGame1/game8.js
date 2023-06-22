@@ -28,7 +28,7 @@ if (gameContainer) {
 
 // 게임 데이터 저장
 let backgroundImage, gameOverImage;
-let gameOver = false;
+let gameOver = 0;
 let highScore = 0;
 let stage = 1;
 
@@ -209,6 +209,11 @@ class Spaceship {
                 }
             });
         });
+
+        // GameOver 메세지 처리
+        if (gameOver) {
+            sendScore(this.score, stage, gameOver);
+        }
     }
 
     render() {
@@ -238,7 +243,7 @@ class Enemy {
 
         if (this.y >= canvas.height - 64) {
             // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
-            gameOver = true;
+            gameOver = 1;
             console.log("gameover!");
             this.destroy();
         }
@@ -464,15 +469,15 @@ async function update() {
         return;
     }
 
+    enemyList.forEach((enemy) => {
+        enemy.update(); // Enemy의 업데이트 메소드 호출
+    });
+
     opponents.forEach((opponent) => {
         opponent.update(); // 상대방의 비행기 업데이트 메소드 호출
     });
 
     spaceship.update(); // Spaceship의 업데이트 메소드 호출
-
-    enemyList.forEach((enemy) => {
-        enemy.update(); // Enemy의 업데이트 메소드 호출
-    });
 }
 
 function render() {

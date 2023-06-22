@@ -139,7 +139,6 @@ function handleClientMessage(req, clientId, message) {
 
         // 업데이트 score
         client.score = score;
-        client.gameover = gameover;
 
         // 업데이트 highscore
         if (score > highScore) {
@@ -148,8 +147,28 @@ function handleClientMessage(req, clientId, message) {
         }
 
         // 업데이트 stage
-        if (defaultGameRoom.getStage() != stage) {
+        if (defaultGameRoom.getStage() < stage) {
             defaultGameRoom.setStage(stage)
+        }
+
+        // 업데이트 gameover 및 모든 플레이어 종료 시 스테이지 초기화
+        client.gameover = gameover;
+        if (gameover) {
+            // 접속한 클라이언트가 모두 gameover인지 확인
+            let allClientsGameOver = true;
+            for (const [id, client] of clients) {
+                if (!client.gameover) {
+                    allClientsGameOver = false;
+                    break;
+                }
+            }
+            // 위의 코드를 한줄로 변경...
+            // const allClientsGameOver = Array.from(clients.values()).every((client) => client.gameover);
+
+            if (allClientsGameOver) {
+                // 접속한 모든 클라이언트가 gameover이면 stage를 1로 초기화
+                defaultGameRoom.setStage(1);
+            }
         }
 
         // 메세지 전달
@@ -169,22 +188,6 @@ function handleClientDisconnection(req, clientId) {
     if (clients.size === 0) {
         // 클라이언트 수가 0이 되었을 때 stage를 1로 초기화
         defaultGameRoom.setStage(1);
-    } else {
-        // 접속한 클라이언트가 모두 gameover인지 확인
-        let allClientsGameOver = true;
-        for (const [id, client] of clients) {
-            if (!client.gameover) {
-                allClientsGameOver = false;
-                break;
-            }
-        }
-        // 위의 코드를 한줄로 변경...
-        // const allClientsGameOver = Array.from(clients.values()).every((client) => client.gameover);
-
-        if (allClientsGameOver) {
-            // 접속한 모든 클라이언트가 gameover이면 stage를 1로 초기화
-            defaultGameRoom.setStage(1);
-        }
     }
     
     broadcast(JSON.stringify({ type: "disconnectedClient", id: clientId }), client.ws);
