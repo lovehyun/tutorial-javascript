@@ -152,21 +152,20 @@ class Bomb {
 
 let opponents = new Map(); // 상대방의 Spaceship 정보
 
-class OpponentShip {
-    constructor(x, y) {
+class Ship {
+    constructor(x, y, imageSrc) {
         this.x = x;
         this.y = y;
         this.score = 0;
         this.bulletList = [];
         this.bombList = [];
         this.image = new Image();
-        this.image.src = "images/ship2.png";
+        this.image.src = imageSrc;
     }
 
     createBullet(x, y, t) {
         // 총알을 생성합니다.
         const bullet = new Bullet(x + 25, y - 15, t, this);
-        bullet.setImage(2);
         this.bulletList.push(bullet);
     }
 
@@ -181,40 +180,20 @@ class OpponentShip {
     createBomb(x, y) {
         // 폭탄을 생성합니다.
         const bomb = new Bomb(x + 15, y - 20, this);
-        bomb.setImage(2);
         this.bombList.push(bomb);
     }
     
     removeBomb(bomb) {
-        // 폭탄을 목록에서 제거
+        // 폭탄을 목록에서 제거합니다.
         const index = this.bombList.indexOf(bomb);
-        if (index != -1) {
+        if (index !== -1) {
             this.bombList.splice(index, 1);
         }
     }
 
     update() {
-        // 총알 업데이트를 수행합니다.
-        this.bulletList.forEach((bullet) => {
-            bullet.update();
-
-            enemyList.forEach((enemy) => {
-                if (bullet.checkCollision(enemy)) {
-                    // 적과 충돌한 경우 총알과 적을 제거합니다.
-                    enemy.destroy();
-                    bullet.destroy();
-
-                    // 점수 카운팅
-                    // this.score += 1;
-                    // NOTE: 서버에서 받아와서 갱신함
-                }
-            });
-        });
-
-        // 폭탄 업데이트를 수행합니다.
-        this.bombList.forEach((bomb) => {
-            bomb.update();
-        });
+        // 각각 오버라이딩 해서 구현 필요
+        throw new Error("This method must be implemented by the child class.");
     }
 
     render() {
@@ -233,43 +212,9 @@ class OpponentShip {
     }
 }
 
-class Spaceship {
+class Spaceship extends Ship {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.score = 0;
-        this.bulletList = [];
-        this.bombList = [];
-        this.image = new Image();
-        this.image.src = "images/ship.png";
-    }
-
-    createBullet(x, y, t) {
-        // 총알을 생성합니다.
-        const bullet = new Bullet(x + 25, y - 15, t, this);
-        this.bulletList.push(bullet);
-    }
-
-    removeBullet(bullet) {
-        // 총알을 목록에서 제거합니다.
-        const index = this.bulletList.indexOf(bullet);
-        if (index !== -1) {
-            this.bulletList.splice(index, 1);
-        }
-    }
-
-    createBomb(x, y) {
-        // 폭탄을 생성합니다.
-        const bomb = new Bomb(x + 15, y - 20, this);
-        this.bombList.push(bomb);
-    }
-    
-    removeBomb(bomb) {
-        // 폭탄을 목록에서 제거
-        const index = this.bombList.indexOf(bomb);
-        if (index != -1) {
-            this.bombList.splice(index, 1);
-        }
+        super(x, y, "images/ship.png");
     }
 
     update() {
@@ -277,17 +222,17 @@ class Spaceship {
         let isSpaceshipMoving;
 
         if ("ArrowRight" in keyPressed) {
-            spaceship.x += 5;
+            this.x += 5;
             isSpaceshipMoving = true;
         } else if ("ArrowLeft" in keyPressed) {
-            spaceship.x -= 5;
+            this.x -= 5;
             isSpaceshipMoving = true;
         } else {
             isSpaceshipMoving = false;
         }
 
         // 우주선의 x 좌표를 화면 안으로 제한합니다.
-        spaceship.x = Math.max(0, Math.min(spaceship.x, canvas.width - 64));
+        this.x = Math.max(0, Math.min(this.x, canvas.width - 64));
 
         if (isSpaceshipMoving) {
             sendSpaceshipPosition();
@@ -302,7 +247,7 @@ class Spaceship {
                     // 적과 충돌한 경우 총알과 적을 제거합니다.
                     // enemy.destroy();
                     enemy.hit();
-                    bullet.destroy(this.bulletList);
+                    bullet.destroy();
 
                     // 점수 카운팅
                     this.score += 1;
@@ -315,30 +260,62 @@ class Spaceship {
                 }
             });
         });
-
+    
         // 폭탄 업데이트를 수행합니다.
         this.bombList.forEach((bomb) => {
             bomb.update();
         });
-
+        
         // GameOver 메세지 처리
         if (gameOver) {
             sendScore(this.score, stage, gameOver);
         }
     }
+}
 
-    render() {
-        // Spaceship의 그리기 로직을 구현합니다.
-        ctx.drawImage(this.image, this.x, this.y);
+class OpponentShip extends Ship {
+    constructor(x, y) {
+        super(x, y, "images/ship2.png");
+    }
 
-        // 총알을 그립니다.
+    // 메소드 오버라이딩
+    createBullet(x, y, t) {
+        // 총알을 생성합니다.
+        const bullet = new Bullet(x + 25, y - 15, t, this);
+        bullet.setImage(2);
+        this.bulletList.push(bullet);
+    }
+
+    // 메소드 오버라이딩
+    createBomb(x, y) {
+        // 폭탄을 생성합니다.
+        const bomb = new Bomb(x + 15, y - 20, this);
+        bomb.setImage(2);
+        this.bombList.push(bomb);
+    }
+
+    update() {
+        // 총알 업데이트를 수행합니다.
         this.bulletList.forEach((bullet) => {
-            ctx.drawImage(bullet.image, bullet.x, bullet.y);
+            bullet.update();
+
+            enemyList.forEach((enemy) => {
+                if (bullet.checkCollision(enemy)) {
+                    // 적과 충돌한 경우 총알과 적을 제거합니다.
+                    // enemy.destroy();
+                    enemy.hit();
+                    bullet.destroy();
+
+                    // 점수 카운팅
+                    // this.score += 1;
+                    // NOTE: 서버에서 받아와서 갱신함
+                }
+            });
         });
 
-        // 폭탄을 그립니다.
+        // 폭탄 업데이트를 수행합니다.
         this.bombList.forEach((bomb) => {
-            ctx.drawImage(bomb.image, bomb.x, bomb.y);
+            bomb.update();
         });
     }
 }
