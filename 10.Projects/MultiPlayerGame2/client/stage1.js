@@ -195,7 +195,8 @@ class Spaceship {
             enemyList.forEach((enemy) => {
                 if (bullet.checkCollision(enemy)) {
                     // 적과 충돌한 경우 총알과 적을 제거합니다.
-                    enemy.destroy();
+                    // enemy.destroy();
+                    enemy.hit();
                     bullet.destroy(this.bulletList);
 
                     // 점수 카운팅
@@ -233,20 +234,32 @@ class Enemy {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.isHit = false;
+        this.hitCount = 0; // 총알에 맞은 효과를 주기 위한 카운트
+        this.hitTimer = 0; // 맞은 후 사라지기 전까지 효과를 표시하기 위한 타이머
         this.image = new Image();
         this.image.src = "images/enemy.png";
+        this.fireImage = new Image();
+        this.fireImage.src = "images/fire.png";
     }
 
     update() {
         // 적을 아래로 이동시킵니다.
-        this.y += stage;
+        if (this.isHit) {
+            this.y += 1;
+            this.hitTimer -= this.hitCount;
+            if (this.hitTimer <= 0) {
+                this.destroy();
+            }
+        } else {
+            this.y += stage;
+        }
 
         if (this.y >= canvas.height - 64) {
             // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
             gameOver = true;
             console.log("gameover!");
-            this.destroy();
-        }
+        }    
     }
 
     destroy() {
@@ -268,7 +281,25 @@ class Enemy {
         // 적군을 그립니다.
         enemyList.forEach((enemy) => {
             ctx.drawImage(enemy.image, enemy.x, enemy.y);
+
+            if (enemy.isHit) {
+                ctx.drawImage(this.fireImage, enemy.x, enemy.y);
+                if (enemy.hitCount >= 2) {
+                    ctx.drawImage(this.fireImage, enemy.x+15, enemy.y+5)
+                }
+                if (enemy.hitCount >= 3) {
+                    ctx.drawImage(this.fireImage, enemy.x+7, enemy.y-8)
+                }
+            }    
         });
+    }
+
+    hit() {
+        // 총알에 맞았을때 호출되는 메서드
+        if (!this.isHit)
+            this.hitTimer = 60; // 1초동안 효과를 표시하기 위한 타이머 설정
+        this.isHit = true;
+        this.hitCount++;
     }
 }
 
