@@ -40,10 +40,19 @@ const spaceshipStartPosition = {
 // ========================================================
 // 각종 객체 생성
 // ========================================================
+const BulletType = {
+    STANDARD: 1,
+    LEFT: 2,
+    RIGHT: 3,
+    LEFT_FAST: 4,
+    RIGHT_FAST: 5,
+};
+
 class Bullet {
-    constructor(x, y, spaceship) {
+    constructor(x, y, t, spaceship) {
         this.x = x;
         this.y = y;
+        this.type = t; // 총알 유형
         this.image = new Image();
         this.image.src = "images/bullet.png";
         this.spaceship = spaceship;
@@ -60,6 +69,17 @@ class Bullet {
     update() {
         // 총알을 위로 이동시킵니다.
         this.y -= 7;
+
+        // 총알을 좌우로 이동시킵니다.
+        if (this.type == BulletType.LEFT) {
+            this.x -= 0.5;
+        } else if (this.type == BulletType.RIGHT) {
+            this.x += 0.5;
+        } else if (this.type == BulletType.LEFT_FAST) {
+            this.x -= 1;
+        } else if (this.type == BulletType.RIGHT_FAST) {
+            this.x += 1;
+        }
 
         if (this.y <= 0) {
             // 총알이 화면 위로 벗어나면 제거합니다.
@@ -86,21 +106,66 @@ class Bullet {
     }
 }
 
+class Bomb {
+    constructor(x, y, spaceship) {
+        this.x = x;
+        this.y = y;
+        this.m = 0;
+        this.image = new Image();
+        this.image.src = "images/bomb.png";
+        this.spaceship = spaceship;
+    }
+
+    setImage(num) {
+        if (num == 2) {
+            this.image.src = "images/bomb2.png";
+        } else {
+            this.image.src = "images/bomb.png";
+        }
+    }
+
+    update() {
+        // 폭탄을 위로 이동시킵니다.
+        this.y -= 1;
+        this.m += 1;
+        if (this.m >= 50) {
+            // 일정 이동 거리 이후에 폭탄이 터지면 총알을 생성합니다.
+            this.spaceship.createBullet(this.x, this.y - 5, BulletType.STANDARD);
+            this.spaceship.createBullet(this.x - 20, this.y, BulletType.LEFT);
+            this.spaceship.createBullet(this.x + 20, this.y, BulletType.RIGHT);
+            this.spaceship.createBullet(this.x - 40, this.y + 5, BulletType.LEFT_FAST);
+            this.spaceship.createBullet(this.x + 40, this.y + 5, BulletType.RIGHT_FAST);
+
+            this.destroy();
+        }
+    }
+
+    destroy() {
+        // 폭탄을 목록에서 찾아서 삭제합니다.
+        this.spaceship.removeBomb(this);
+
+        // 해당 객체의 참조를 제거하여 메모리에서 해제합니다.
+        this.x = null;
+        this.y = null;
+    }
+}
+
 let opponents = new Map(); // 상대방의 Spaceship 정보
 
 class OpponentShip {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.score = 0;
         this.bulletList = [];
+        this.bombList = [];
         this.image = new Image();
         this.image.src = "images/ship2.png";
-        this.score = 0;
     }
 
-    createBullet(x, y) {
+    createBullet(x, y, t) {
         // 총알을 생성합니다.
-        const bullet = new Bullet(x, y, this);
+        const bullet = new Bullet(x + 25, y - 15, t, this);
         bullet.setImage(2);
         this.bulletList.push(bullet);
     }
@@ -110,6 +175,21 @@ class OpponentShip {
         const index = this.bulletList.indexOf(bullet);
         if (index !== -1) {
             this.bulletList.splice(index, 1);
+        }
+    }
+
+    createBomb(x, y) {
+        // 폭탄을 생성합니다.
+        const bomb = new Bomb(x + 15, y - 20, this);
+        bomb.setImage(2);
+        this.bombList.push(bomb);
+    }
+    
+    removeBomb(bomb) {
+        // 폭탄을 목록에서 제거
+        const index = this.bombList.indexOf(bomb);
+        if (index != -1) {
+            this.bombList.splice(index, 1);
         }
     }
 
@@ -130,6 +210,11 @@ class OpponentShip {
                 }
             });
         });
+
+        // 폭탄 업데이트를 수행합니다.
+        this.bombList.forEach((bomb) => {
+            bomb.update();
+        });
     }
 
     render() {
@@ -140,6 +225,11 @@ class OpponentShip {
         this.bulletList.forEach((bullet) => {
             ctx.drawImage(bullet.image, bullet.x, bullet.y);
         });
+
+        // 폭탄을 그립니다.
+        this.bombList.forEach((bomb) => {
+            ctx.drawImage(bomb.image, bomb.x, bomb.y);
+        });
     }
 }
 
@@ -147,15 +237,16 @@ class Spaceship {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+        this.score = 0;
         this.bulletList = [];
+        this.bombList = [];
         this.image = new Image();
         this.image.src = "images/ship.png";
-        this.score = 0;
     }
 
-    createBullet(x, y) {
+    createBullet(x, y, t) {
         // 총알을 생성합니다.
-        const bullet = new Bullet(x, y, this);
+        const bullet = new Bullet(x + 25, y - 15, t, this);
         this.bulletList.push(bullet);
     }
 
@@ -164,6 +255,20 @@ class Spaceship {
         const index = this.bulletList.indexOf(bullet);
         if (index !== -1) {
             this.bulletList.splice(index, 1);
+        }
+    }
+
+    createBomb(x, y) {
+        // 폭탄을 생성합니다.
+        const bomb = new Bomb(x + 15, y - 20, this);
+        this.bombList.push(bomb);
+    }
+    
+    removeBomb(bomb) {
+        // 폭탄을 목록에서 제거
+        const index = this.bombList.indexOf(bomb);
+        if (index != -1) {
+            this.bombList.splice(index, 1);
         }
     }
 
@@ -211,6 +316,11 @@ class Spaceship {
             });
         });
 
+        // 폭탄 업데이트를 수행합니다.
+        this.bombList.forEach((bomb) => {
+            bomb.update();
+        });
+
         // GameOver 메세지 처리
         if (gameOver) {
             sendScore(this.score, stage, gameOver);
@@ -224,6 +334,11 @@ class Spaceship {
         // 총알을 그립니다.
         this.bulletList.forEach((bullet) => {
             ctx.drawImage(bullet.image, bullet.x, bullet.y);
+        });
+
+        // 폭탄을 그립니다.
+        this.bombList.forEach((bomb) => {
+            ctx.drawImage(bomb.image, bomb.x, bomb.y);
         });
     }
 }
@@ -336,6 +451,19 @@ async function fetchMOTD() {
     }
 }
 
+// 웹소켓 메세지 유형
+const MessageType = {
+    CLIENT_CONNECTED: "connectedClient",
+    CLIENT_DISCONNECTED: "disconnectedClient",
+    SPACESHIP_POSITION: "spaceshipPosition",
+    BULLET_POSITION: "bulletPosition",
+    BOMB_POSITION: "bombPosition",
+    CONNECTED_CLIENT: "connectedClient",
+    CREATE_ENEMY: "createEnemyRequest",
+    SCORE_UPDATED: "scoreUpdated",
+    PAUSE_STATUS: "pauseStatus",
+};
+
 // 웹소켓 실제 연결 함수
 function connectWebSocket(webSocketAddress) {
     return new Promise((resolve, reject) => {
@@ -361,28 +489,30 @@ function connectWebSocket(webSocketAddress) {
 
         socket.addEventListener("message", (event) => {
             const message = JSON.parse(event.data);
-            if (message.type === "spaceshipPosition") {
+            if (message.type === MessageType.SPACESHIP_POSITION) {
                 updateSpaceshipPosition(message);
-            } else if (message.type === "bulletPosition") {
+            } else if (message.type === MessageType.BULLET_POSITION) {
                 updateBulletPosition(message);
-            } else if (message.type === "connectedClient") {
+            } else if (message.type === MessageType.BOMB_POSITION) {
+                updateBombPosition(message);
+            } else if (message.type === MessageType.CONNECTED_CLIENT) {
                 id = message.id;
                 if (!opponents.get(id)) {
                     const opponent = new OpponentShip(canvas.width - 64, 20);
                     opponents.set(id, opponent); // 새로운 상대방 비행기 추가
                     console.log("new client: ", id);
                 }
-            } else if (message.type === "disconnectedClient") {
+            } else if (message.type === MessageType.CLIENT_DISCONNECTED) {
                 id = message.id;
                 if (opponents.get(id)) {
                     opponents.delete(id);
                     console.log("remove client: ", id);
                 }
-            } else if (message.type === "createEnemy") {
+            } else if (message.type === MessageType.CREATE_ENEMY) {
                 // 적군 생성 메시지를 받았을 때 적군을 화면에 그립니다.
                 const enemy = new Enemy(message.x, message.y);
                 enemyList.push(enemy);
-            } else if (message.type === "scoreUpdated") {
+            } else if (message.type === MessageType.SCORE_UPDATED) {
                 stage = message.stage;
                 highScore = message.highScore;
 
@@ -413,22 +543,27 @@ async function fetchDataAndConnect() {
 fetchDataAndConnect();
 
 async function sendSpaceshipPosition() {
-    const message = { type: "spaceshipPosition", id: "self", x: spaceship.x, y: spaceship.y };
+    const message = { type: MessageType.SPACESHIP_POSITION, id: "self", x: spaceship.x, y: spaceship.y };
     socket.send(JSON.stringify(message));
 }
 
 async function sendBulletPosition(x, y) {
-    const message = { type: "bulletPosition", x, y };
+    const message = { type: MessageType.BULLET_POSITION, x, y };
+    socket.send(JSON.stringify(message));
+}
+
+async function sendBombPosition(x, y) {
+    const message = { type: MessageType.BOMB_POSITION, x, y };
     socket.send(JSON.stringify(message));
 }
 
 async function sendScore(score, stage, gameover) {
-    const message = { type: "scoreUpdated", score, stage, gameover };
+    const message = { type: MessageType.SCORE_UPDATED, score, stage, gameover };
     socket.send(JSON.stringify(message));
 }
 
 async function sendPauseMessage(status) {
-    const message = { type: "pauseStatus", status };
+    const message = { type: MessageType.PAUSE_STATUS, status };
     socket.send(JSON.stringify(message));
 }
 
@@ -454,14 +589,23 @@ function updateBulletPosition(message) {
 
     const opponent = opponents.get(id);
     if (opponent) {
-        opponent.createBullet(x, y); // 상대방의 비행기에서 총알 생성
+        opponent.createBullet(x, y, BulletType.STANDARD); // 상대방의 비행기에서 총알 생성
+    }
+}
+
+function updateBombPosition(message) {
+    const { id, x, y } = message;
+
+    const opponent = opponents.get(id);
+    if (opponent) {
+        opponent.createBomb(x, y); // 상대방의 비행기에서 폭탄 생성
     }
 }
 
 // 적군 생성 메시지를 서버로 보냅니다.
 function createEnemy() {
     if (!isPaused) {
-        const message = { type: "createEnemyRequest", start: 0, end: canvas.width };
+        const message = { type: MessageType.CREATE_ENEMY, start: 0, end: canvas.width };
         socket.send(JSON.stringify(message));
     }
 }
@@ -490,12 +634,17 @@ function setupKeyboardListener() {
         delete keyPressed[event.key];
 
         if (event.key == " ") {
-            spaceship.createBullet(spaceship.x + 25, spaceship.y - 15);
-            sendBulletPosition(spaceship.x + 25, spaceship.y - 15);
+            spaceship.createBullet(spaceship.x, spaceship.y, BulletType.STANDARD);
+            sendBulletPosition(spaceship.x, spaceship.y);
         }
 
         if (event.key == "e") {
             createEnemy();
+        }
+
+        if (event.key == "b") {
+            spaceship.createBomb(spaceship.x, spaceship.y);
+            sendBombPosition(spaceship.x, spaceship.y);
         }
     });
 }

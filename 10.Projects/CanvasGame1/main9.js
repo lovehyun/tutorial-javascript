@@ -223,7 +223,7 @@ function setupKeyboardListener() {
         delete keyPressed[event.key];
 
         if (event.key == " ") {
-            createBullet(spaceshipX, spaceshipY);
+            createBullet(spaceshipX, spaceshipY, BulletType.STANDARD);
         }
 
         if (event.key == "b") {
