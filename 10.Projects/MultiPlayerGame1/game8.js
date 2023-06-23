@@ -28,7 +28,7 @@ if (gameContainer) {
 
 // 게임 데이터 저장
 let backgroundImage, gameOverImage;
-let gameOver = 0;
+let gameOver = false;
 let highScore = 0;
 let stage = 1;
 
@@ -243,7 +243,7 @@ class Enemy {
 
         if (this.y >= canvas.height - 64) {
             // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
-            gameOver = 1;
+            gameOver = true;
             console.log("gameover!");
             this.destroy();
         }
@@ -396,6 +396,11 @@ async function sendScore(score, stage, gameover) {
     socket.send(JSON.stringify(message));
 }
 
+async function sendPauseMessage(status) {
+    const message = { type: "pauseStatus", status };
+    socket.send(JSON.stringify(message));
+}
+
 function updateSpaceshipPosition(message) {
     const { id, x, y } = message;
     if (id === "self") {
@@ -424,8 +429,10 @@ function updateBulletPosition(message) {
 
 // 적군 생성 메시지를 서버로 보냅니다.
 function createEnemy() {
-    const message = { type: "createEnemyRequest", start: 0, end: canvas.width };
-    socket.send(JSON.stringify(message));
+    if (!isPaused) {
+        const message = { type: "createEnemyRequest", start: 0, end: canvas.width };
+        socket.send(JSON.stringify(message));
+    }
 }
 
 
@@ -525,6 +532,21 @@ async function autoCreateEnemy() {
         setTimeout(autoCreateEnemy, 1000);
     }
 }
+
+let isPaused = false;
+document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "hidden") {
+        // 게임 로직 일시 정지
+        isPaused = true
+        console.log('paused');
+        sendPauseMessage(isPaused);
+    } else if (document.visibilityState === "visible") {
+        // 게임 로직 재개
+        isPaused = false;
+        console.log('unpaused');
+        sendPauseMessage(isPaused);
+    }
+});
 
 function main() {
     if (!gameOver) {

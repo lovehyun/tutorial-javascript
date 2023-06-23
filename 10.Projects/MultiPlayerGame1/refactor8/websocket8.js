@@ -15,7 +15,8 @@ const clientInfo = {
     spaceshipPosition: { x: null, y: null }, // 우주선 위치
     score: 0, // 점수
     stage: 1, // 현재 스테이지
-    gameover: 0, // 게임 종료 상태
+    gameover: false, // 게임 종료 상태
+    isPaused: false, // 게임 중지 상태 (화면 visibility 에 따른)
 };
 
 
@@ -100,8 +101,8 @@ function handleClientConnection(req, clientId) {
     logger.info(`Client connected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
     addAndDestroyAnnounce(`새로운 사용자가 서버에 접속하였습니다. IP: ${clientIp}, ID: ${shortClientId}`);
 
-    unicast(JSON.stringify({ type: "scoreUpdated", stage: stage, highScore: highScore }), client.ws);
-    broadcast(JSON.stringify({ type: "connectedClient", id: clientId }), client.ws);
+    unicast({ type: "scoreUpdated", stage: stage, highScore: highScore }, client.ws);
+    broadcast({ type: "connectedClient", id: clientId }, client.ws);
 }
 
 function handleClientMessage(req, clientId, message) {
@@ -114,9 +115,9 @@ function handleClientMessage(req, clientId, message) {
 
     if (data.type === "spaceshipPosition") {
         client.spaceshipPosition = { x: data.x, y: data.y };
-        broadcast(JSON.stringify({ type: "spaceshipPosition", id: clientId, x: data.x, y: data.y }), client.ws);
+        broadcast({ type: "spaceshipPosition", id: clientId, x: data.x, y: data.y }, client.ws);
     } else if (data.type === "bulletPosition") {
-        broadcast(JSON.stringify({ type: "bulletPosition", id: clientId, x: data.x, y: data.y }), client.ws);
+        broadcast({ type: "bulletPosition", id: clientId, x: data.x, y: data.y }, client.ws);
     } else if (data.type === "createEnemyRequest") {
         // 서버에서 적군 생성 로직을 수행하고 생성된 적군 정보를 해당 클라이언트에게 전달
         const startX = data.start;
@@ -125,11 +126,7 @@ function handleClientMessage(req, clientId, message) {
         enemyManager.createEnemy(startX, endX);
 
         const enemy = enemyManager.enemyList[enemyManager.enemyList.length - 1]; // 마지막으로 생성된 적군 정보 가져오기
-        const enemyMessage = JSON.stringify({
-            type: "createEnemy",
-            x: enemy.x,
-            y: enemy.y
-        });
+        const enemyMessage = { type: "createEnemy", x: enemy.x, y: enemy.y };
         sendCreateEnemyMessage(enemyMessage);
     } else if (data.type === "scoreUpdated") {
         const score = data.score;
@@ -172,7 +169,9 @@ function handleClientMessage(req, clientId, message) {
         }
 
         // 메세지 전달
-        broadcast(JSON.stringify({ type: "scoreUpdated", id: clientId, score: score, stage: stage, highScore: highScore }), null);
+        broadcast({ type: "scoreUpdated", id: clientId, score: score, stage: stage, highScore: highScore }, null);
+    } else if (data.type === "pauseStatus") {
+        client.isPaused = data.status;
     }
 }
 
@@ -190,7 +189,7 @@ function handleClientDisconnection(req, clientId) {
         defaultGameRoom.setStage(1);
     }
     
-    broadcast(JSON.stringify({ type: "disconnectedClient", id: clientId }), client.ws);
+    broadcast({ type: "disconnectedClient", id: clientId }, client.ws);
 }
 
 // 클라이언트에게 적군 생성 메시지를 전송합니다.
@@ -200,26 +199,32 @@ function sendCreateEnemyMessage(message) {
 
 // 모든 클라이언트에게 메시지 전송
 function broadcast(message, sender) {
+    message_str = JSON.stringify(message);
     clients.forEach((client, id) => {
         const ws = client.ws;
-        if (ws !== sender) { // 발신자를 제외하고 모든 사용자에게
+        if (ws !== sender) { // 발신자를 제외하고 모든 사용자에게 메세지 전달
+            // 특정 메세지 타입은 게임을 중단중인 사용자에게는 보내지 않음
+            if (client.isPaused && ["bulletPosition", "createEnemy"].includes(message.type)) {
+                return; // foreach 건너뛰기
+            } 
             const clientIp = ws._socket.remoteAddress;
             const shortId = id.substring(0, 8); // UUID 일부만 보기 위해 substring으로 잘라냄
-            logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message}`);
-            ws.send(message);
+            logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message_str}`);
+            ws.send(message_str);
         }
     });
 }
 
 // 단일 클라이언트에게 메세지 전송
 function unicast(message, target) {
+    message_str = JSON.stringify(message)
     clients.forEach((client, id) => {
         const ws = client.ws;
         if (ws === target) {
             const clientIp = ws._socket.remoteAddress;
             const shortId = id.substring(0, 8); // UUID 일부만 보기 위해 substring으로 잘라냄
-            logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message}`);
-            ws.send(message);
+            logger.debug(`Sending to IP: ${clientIp}, ClientID: ${shortId}, ${message_str}`);
+            ws.send(message_str);
         }
     });
 }

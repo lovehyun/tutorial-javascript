@@ -55,6 +55,7 @@ app.get('/clients', (req, res) => {
         position: client.spaceshipPosition,
         score: client.score,
         gameover: client.gameover,
+        isPaused: client.isPaused,
     }));
 
     const output = {
