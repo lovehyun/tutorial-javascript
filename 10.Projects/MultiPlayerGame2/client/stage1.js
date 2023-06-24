@@ -615,7 +615,9 @@ async function sendScore(score, stage, gameover) {
 
 async function sendPauseMessage(status) {
     const message = { type: MessageType.PAUSE_STATUS, status };
-    socket.send(JSON.stringify(message));
+    if (typeof socket !== 'undefined' && socket.send) {
+        socket.send(JSON.stringify(message));
+    }
 }
 
 function updateSpaceshipPosition(message) {
@@ -768,14 +770,18 @@ let isPaused = false;
 document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === "hidden") {
         // 게임 로직 일시 정지
-        isPaused = true
-        console.log('paused');
-        sendPauseMessage(isPaused);
+        if (!isPaused) {
+            isPaused = true
+            console.log('paused');
+            sendPauseMessage(isPaused);
+        }
     } else if (document.visibilityState === "visible") {
         // 게임 로직 재개
-        isPaused = false;
-        console.log('unpaused');
-        sendPauseMessage(isPaused);
+        if (isPaused) {
+            isPaused = false;
+            console.log('unpaused');
+            sendPauseMessage(isPaused);
+        }
     }
 });
 
