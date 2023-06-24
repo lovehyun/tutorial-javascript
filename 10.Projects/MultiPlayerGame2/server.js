@@ -1,9 +1,5 @@
 // server.js
 
-// 5. 적군 생성
-// 7. HTML 파일 서빙 (익스프레스 통해서)
-// 7-1. 로그파일 생성
-
 const { wss, port, clients } = require('./server/websocket');
 const { announcement } = require('./server/clientinfo.js')
 const { logger } = require('./util/logger.js');

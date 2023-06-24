@@ -5,23 +5,25 @@
     <meta charset="UTF-8">
     <title>Game!</title>
     <style>
+        body, html {
+            height: 95%;
+            margin: 0;
+            padding: 0;
+        }
+
         #gameContainer {
-            width: 600px;
-            height: 700px;
+            width: 95%;
+            height: 85%;
             border: 1px solid black;
             position: relative;
         }
 
         #announcement {
             background-color: #f0f0f0;
-            max-height: 6em;
-            /* 최대 줄 제한 */
-            overflow: auto;
-            /* 스크롤바 표시 */
-            text-overflow: ellipsis;
-            /* 생략 부호로 표시 */
-            white-space: pre-line;
-            /* 줄바꿈 유지 */
+            max-height: 6em; /* 최대 줄 제한 */
+            overflow: auto; /* 스크롤바 표시 */
+            text-overflow: ellipsis; /* 생략 부호로 표시 */
+            white-space: pre-line; /* 줄바꿈 유지 */
         }
     </style>
     <script>

@@ -1,3 +1,5 @@
+// message_type.js
+
 const MessageType = {
     CLIENT_CONNECTED: "connectedClient",
     CLIENT_DISCONNECTED: "disconnectedClient",

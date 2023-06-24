@@ -1,22 +1,13 @@
-// 1. 동일한 비행기를 서버와 통신하며 이동하도록 구현
-// 2. 각자의 비행기를 서버를 통해 각각 이동하도록 구현
-// 3. 상대방의 비행기를 1대가 아닌 2대 이상으로 통신 가능하도록 구현
-// 4. 각자 다 미사일 발사 및 상대 화면에 전송
-// 5. 적군 생성 (서버로부터 생성된 적군 클라이언트에서 처리)
-// 6. 총알로 적 Hit 처리
-// 6-1. 화면 밖으로 나간 총알 삭제 처리
-// 6-2. 적군이 바닥에 닿으면 종료 처리
-// 7. 점수 처리
-// 7-1. 내 점수와 상대방 점수 각각 처리 (그리고 하이스코어 처리)
-// 7-2. 웹소켓 환경변수 처리 (set WEBSOCKET_ADDRESS=ws://localhost:8080)
-// 8. 스테이지 추가
+// stage1.js
 
+// ========================================================
 // 캔바스 생성
+// ========================================================
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = 600;
-canvas.height = 700;
+// canvas.width = 600;
+// canvas.height = 700;
 
 let gameContainer = document.getElementById("gameContainer");
 if (gameContainer) {
@@ -25,6 +16,40 @@ if (gameContainer) {
     document.body.appendChild(canvas);
 }
 
+// 화면 크기에 맞게 캔버스 크기 조정
+function resizeCanvas() {
+    const screenWidth = window.innerWidth * 0.95;
+    const screenHeight = window.innerHeight * 0.77;
+
+    // 캔버스 크기를 화면 크기에 맞게 조정 - 폭이 너무 크거나 너무 작지 않게 조정
+    // console.log("Screen size (w, h): ", screenWidth, screenHeight);
+    if (screenWidth > screenHeight) {
+        canvas.width = screenHeight;
+    } else if (screenWidth < screenHeight / 3 ) {
+        canvas.width = screenHeight / 3;
+    } else {
+        canvas.width = screenWidth;
+    }
+    canvas.height = screenHeight;
+
+    spaceshipStartPosition = {
+        x: canvas.width / 2 - 32,
+        y: canvas.height - 64,
+    };
+
+    console.log("Canvas resized (w, h): ", canvas.width, canvas.height);
+}
+
+// 초기화 및 리사이즈 이벤트 처리
+function initialize() {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    spaceship = Spaceship.getInstance(spaceshipStartPosition.x, spaceshipStartPosition.y);
+}
+
+// ========================================================
+// 각종 객체 생성
+// ========================================================
 
 // 게임 데이터 저장
 let backgroundImage, gameOverImage;
@@ -32,14 +57,9 @@ let gameOver = false;
 let highScore = 0;
 let stage = 1;
 
-const spaceshipStartPosition = {
-    x: canvas.width / 2 - 32,
-    y: canvas.height - 64,
-};
+let spaceshipStartPosition = { x: 0, y: 0 };
+let spaceship = null;
 
-// ========================================================
-// 각종 객체 생성
-// ========================================================
 const BulletType = {
     STANDARD: 1,
     LEFT: 2,
@@ -370,8 +390,6 @@ class OpponentShip extends Ship {
     }
 }
 
-const spaceship = Spaceship.getInstance(spaceshipStartPosition.x, spaceshipStartPosition.y);
-
 class Enemy {
     constructor(x, y) {
         this.x = x;
@@ -430,7 +448,7 @@ class Enemy {
             }
         } else {
             this.isExploding = true;
-            this.explosionTimer = 30; // 폭발 효과 타이머 설정 (대략 0.5초?)
+            this.explosionTimer = 20; // 폭발 효과 타이머 설정 (대략 0.5초?)
         }
     }
 
@@ -820,6 +838,7 @@ function main() {
     }
 }
 
+initialize();
 loadImage();
 setupKeyboardListener();
 setupTouchListener();

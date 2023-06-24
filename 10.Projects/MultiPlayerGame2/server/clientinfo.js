@@ -1,3 +1,5 @@
+// clientinfo.js
+
 // 클라이언트 관리
 const clients = new Map(); // 클라이언트 관리를 위해 Map 사용
 
