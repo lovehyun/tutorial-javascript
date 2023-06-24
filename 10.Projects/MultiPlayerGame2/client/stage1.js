@@ -702,6 +702,24 @@ function setupKeyboardListener() {
     });
 }
 
+function setupTouchListener() {
+    // canvas에 터치 이벤트를 등록합니다.
+    canvas.addEventListener("touchstart", function (event) {
+        event.preventDefault();
+        var touch = event.touches[0];
+        var touchX = touch.clientX;
+        var touchY = touch.clientY;
+
+        // 터치한 위치를 기반으로 원하는 동작을 수행합니다.
+        // 화면을 누르면 무조건 슈팅
+        spaceship.createBullet(spaceship.x, spaceship.y, BulletType.STANDARD);
+        sendBulletPosition(spaceship.x, spaceship.y);
+
+        spaceship.x = touchX;
+        sendSpaceshipPosition();
+    });
+}
+
 async function update() {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
         await new Promise((resolve) => setTimeout(resolve, 1000)); // WebSocket 연결이 열릴 때까지 1s 동안 기다립니다.
@@ -804,5 +822,6 @@ function main() {
 
 loadImage();
 setupKeyboardListener();
+setupTouchListener();
 autoCreateEnemy(); // 첫번째 적 생성
 main();
