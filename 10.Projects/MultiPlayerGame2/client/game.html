@@ -22,6 +22,21 @@
             text-overflow: ellipsis; /* 생략 부호로 표시 */
             white-space: pre-line; /* 줄바꿈 유지 */
         }
+
+        #controllerContainer {
+            display: flex;
+            align-items: center;
+        }
+
+        h1 {
+            margin-right: 20px;
+        }
+
+        #refreshButton {
+            width: 100px;
+            height: 40px;
+            font-size: 20px;
+        }
     </style>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -33,11 +48,11 @@
 </head>
 
 <body>
-    <h1>Multiplayer Game!</h1>
-    <div id="gameContainer"></div>
     <div id="controllerContainer">
+        <h1>Multiplayer Game!</h1>
         <button id="refreshButton">재시작</button>
     </div>
+    <div id="gameContainer"></div>
     <div id="announcement"></div>
     <script src="stage1.js"></script>
     <script>
