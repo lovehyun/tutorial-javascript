@@ -214,7 +214,37 @@ class Ship {
 
 class Spaceship extends Ship {
     constructor(x, y) {
+        // 싱글톤 객체로 생성합니다.
+        if (Spaceship.instance) {
+            return Spaceship.instance;
+        }
+
         super(x, y, "images/ship.png");
+
+        // 생명 처리를 위한 추가 필드를 생성합니다.
+        this.lifeimage = new Image();
+        this.lifeimage.src = "images/heart.png";
+        this.extraLife = 2;
+
+        Spaceship.instance = this;
+    }
+
+    static getInstance(x, y) {
+        // 싱글톤 객체를 반환하는 정적 메서드입니다.
+        if (arguments.length === 0) {
+            if (!Spaceship.instance) {
+                throw new Error("Instance has not been created yet.");
+            }
+            return Spacehip.instance;
+        } else if (arguments.length === 2) {
+            if (Spaceship.instance) {
+                throw new Error("Instance has already been created.");
+            } else {
+                return new Spaceship(x, y);
+            }
+        } else {
+            throw new Error("Invalid number of arguments.");
+        }
     }
 
     update() {
@@ -271,6 +301,26 @@ class Spaceship extends Ship {
             sendScore(this.score, stage, gameOver);
         }
     }
+
+    // 생명 처리를 위해 상속 객체를 오버라이딩 하여 기능을 확장합니다.
+    render() {
+        super.render();
+
+        for (let i = 0; i < this.extraLife; i++) {
+            ctx.drawImage(this.lifeimage, i * 30 + 20, 30);
+        };
+    }
+
+    hitByEnemy(damage) {
+        this.extraLife -= damage;
+        console.log("hitByEnemy!")
+
+        // 생명이 모두 다 감소하면 종료 처리합니다.
+        if (this.extraLife < 0) {
+            gameOver = true;
+            console.log("gameover!");
+        }
+    }
 }
 
 class OpponentShip extends Ship {
@@ -320,7 +370,7 @@ class OpponentShip extends Ship {
     }
 }
 
-const spaceship = new Spaceship(spaceshipStartPosition.x, spaceshipStartPosition.y);
+const spaceship = Spaceship.getInstance(spaceshipStartPosition.x, spaceshipStartPosition.y);
 
 class Enemy {
     constructor(x, y) {
@@ -333,6 +383,10 @@ class Enemy {
         this.image.src = "images/enemy.png";
         this.fireImage = new Image();
         this.fireImage.src = "images/fire.png";
+        this.explosionImage = new Image();
+        this.isExploding = false;
+        this.explosionImage.src = "images/explosion.png";
+        this.explosionTimer = 0; // 폭발 효과 표시를 위한 타이머
     }
 
     update() {
@@ -348,9 +402,8 @@ class Enemy {
         }
 
         if (this.y >= canvas.height - 64) {
-            // 적이 화면 아래로 벗어나면 게임 오버 처리합니다.
-            gameOver = true;
-            console.log("gameover!");
+            // 적이 화면 아래로 벗어나면 폭발 효과를 줍니다.
+            this.explosion();
         }    
     }
 
@@ -366,14 +419,28 @@ class Enemy {
         this.y = null;
     }
 
-    render() {
-        // Enemy의 그리기 로직을 구현합니다.
-        ctx.drawImage(this.image, this.x, this.y);
+    explosion() {
+        // 이미 폭발 처리중이면 대기시간 후 삭제 로직을 구현합니다.
+        if (this.isExploding) {
+            this.explosionTimer -= 1;
+            if (this.explosionTimer < 0) {
+                this.destroy();
+                // 실제 대미지 적용
+                spaceship.hitByEnemy(1);
+            }
+        } else {
+            this.isExploding = true;
+            this.explosionTimer = 30; // 폭발 효과 타이머 설정 (대략 0.5초?)
+        }
+    }
 
+    render() {
         // 적군을 그립니다.
         enemyList.forEach((enemy) => {
+            // 적군 ship 을 그립니다.
             ctx.drawImage(enemy.image, enemy.x, enemy.y);
 
+            // 맞은 효과를 그립니다.
             if (enemy.isHit) {
                 ctx.drawImage(this.fireImage, enemy.x, enemy.y);
                 if (enemy.hitCount >= 2) {
@@ -382,14 +449,21 @@ class Enemy {
                 if (enemy.hitCount >= 3) {
                     ctx.drawImage(this.fireImage, enemy.x+7, enemy.y-8)
                 }
-            }    
+            }
+
+            // 공격 효과를 그립니다.
+            if (enemy.explosionTimer > 0) {
+                if (enemy.isExploding) {
+                    ctx.drawImage(enemy.explosionImage, enemy.x + 8, canvas.height - 48);
+                }
+            }
         });
     }
 
     hit() {
         // 총알에 맞았을때 호출되는 메서드
         if (!this.isHit)
-            this.hitTimer = 60; // 1초동안 효과를 표시하기 위한 타이머 설정
+            this.hitTimer = 60; // 대략 1초동안 효과를 표시하기 위한 타이머 설정
         this.isHit = true;
         this.hitCount++;
     }
