@@ -6,8 +6,11 @@
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d");
 
-// canvas.width = 600;
-// canvas.height = 700;
+let dynamicCanvas = true;
+const DEFAULT_CANVAS_WIDTH = 600;
+const DEFAULT_CANVAS_HEIGHT = 720;
+
+let canvas_size = { w: 0, h: 0, sf: 1, scaledW: 0, scaledH: 0 }
 
 let gameContainer = document.getElementById("gameContainer");
 if (gameContainer) {
@@ -18,26 +21,52 @@ if (gameContainer) {
 
 // 화면 크기에 맞게 캔버스 크기 조정
 function resizeCanvas() {
-    const screenWidth = window.innerWidth * 0.95;
-    const screenHeight = window.innerHeight * 0.77;
+    let scaledW = 0;
+    let scaledH = 0;
+    let scaleFactor = 1.0;
 
-    // 캔버스 크기를 화면 크기에 맞게 조정 - 폭이 너무 크거나 너무 작지 않게 조정
-    // console.log("Screen size (w, h): ", screenWidth, screenHeight);
-    if (screenWidth > screenHeight) {
-        canvas.width = screenHeight;
-    } else if (screenWidth < screenHeight / 3 ) {
-        canvas.width = screenHeight / 3;
+    if (dynamicCanvas) {
+        // 원하는 최대 해상도 (기본 600 x 720 으로 배율 통해 맞춤)
+        const screenWidth = window.innerWidth * 0.95;
+        const screenHeight = window.innerHeight * 0.75;
+
+        // 캔버스 크기를 화면 크기에 맞게 자동 조정
+        sf_width = screenWidth / DEFAULT_CANVAS_WIDTH;
+        sf_height = screenHeight / DEFAULT_CANVAS_HEIGHT;
+
+        if (sf_width > sf_height) {
+            canvas.height = screenHeight;
+            scaleFactor = sf_height;
+            canvas.width = canvas.height / 1.2;
+        } else {
+            canvas.width = screenWidth;
+            scaleFactor = sf_width;
+            canvas.height = canvas.width * 1.2;
+        }        
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(scaleFactor, 0, 0, scaleFactor, 0, 0);
+
+        scaledW = Math.floor(canvas.width / scaleFactor);
+        scaledH = Math.floor(canvas.height / scaleFactor);
     } else {
-        canvas.width = screenWidth;
+        canvas.width = DEFAULT_CANVAS_WIDTH;
+        canvas.height = DEFAULT_CANVAS_HEIGHT;
+        scaledW = DEFAULT_CANVAS_WIDTH;
+        scaledH = DEFAULT_CANVAS_HEIGHT;
     }
-    canvas.height = screenHeight;
+
+    canvas_size = { 
+        w: canvas.width, h: canvas.height, sf: scaleFactor,
+        scaledW: scaledW, scaledH: scaledH
+    }
 
     spaceshipStartPosition = {
-        x: canvas.width / 2 - 32,
-        y: canvas.height - 64,
+        x: canvas_size.w / canvas_size.sf / 2 - 32,
+        y: canvas_size.h / canvas_size.sf - 64,
     };
 
-    console.log("Canvas resized (w, h): ", canvas.width, canvas.height);
+    console.log("Canvas resized (w, h, sf): ", canvas_size);
 }
 
 // 초기화 및 리사이즈 이벤트 처리
@@ -282,10 +311,10 @@ class Spaceship extends Ship {
         }
 
         // 우주선의 x 좌표를 화면 안으로 제한합니다.
-        this.x = Math.max(0, Math.min(this.x, canvas.width - 64));
+        this.x = Math.max(0, Math.min(this.x, canvas_size.scaledW - 64));
 
         if (isSpaceshipMoving) {
-            sendSpaceshipPosition();
+            sendSpaceshipPosition(this.x, this.y);
         }
 
         // 총알 업데이트를 수행합니다.
@@ -419,7 +448,7 @@ class Enemy {
             this.y += stage;
         }
 
-        if (this.y >= canvas.height - 64) {
+        if (this.y >= canvas_size.scaledH - 64) {
             // 적이 화면 아래로 벗어나면 폭발 효과를 줍니다.
             this.explosion();
         }    
@@ -472,7 +501,7 @@ class Enemy {
             // 공격 효과를 그립니다.
             if (enemy.explosionTimer > 0) {
                 if (enemy.isExploding) {
-                    ctx.drawImage(enemy.explosionImage, enemy.x + 8, canvas.height - 48);
+                    ctx.drawImage(enemy.explosionImage, enemy.x + 8, canvas_size.scaledH - 48);
                 }
             }
         });
@@ -565,32 +594,13 @@ function connectWebSocket(webSocketAddress) {
             } else if (message.type === MessageType.BOMB_POSITION) {
                 updateBombPosition(message);
             } else if (message.type === MessageType.CONNECTED_CLIENT) {
-                id = message.id;
-                if (!opponents.get(id)) {
-                    const opponent = new OpponentShip(canvas.width - 64, 20);
-                    opponents.set(id, opponent); // 새로운 상대방 비행기 추가
-                    console.log("new client: ", id);
-                }
+                updateOpponentshipConnection(message);
             } else if (message.type === MessageType.CLIENT_DISCONNECTED) {
-                id = message.id;
-                if (opponents.get(id)) {
-                    opponents.delete(id);
-                    console.log("remove client: ", id);
-                }
+                updateOpponentshipDisconnection(message);
             } else if (message.type === MessageType.CREATE_ENEMY) {
-                // 적군 생성 메시지를 받았을 때 적군을 화면에 그립니다.
-                const enemy = new Enemy(message.x, message.y);
-                enemyList.push(enemy);
+                updateCreateEnemy(message);
             } else if (message.type === MessageType.SCORE_UPDATED) {
-                stage = message.stage;
-                highScore = message.highScore;
-
-                id = message.id || null;
-                // 상대방 점수를 받아 갱신
-                const opponent = opponents.get(id);
-                if (opponent) {
-                    opponent.score = message.score;
-                }
+                updateScore(message);
             }
         });
     });
@@ -611,18 +621,29 @@ async function fetchDataAndConnect() {
 // 접속 수행
 fetchDataAndConnect();
 
-async function sendSpaceshipPosition() {
-    const message = { type: MessageType.SPACESHIP_POSITION, id: "self", x: spaceship.x, y: spaceship.y };
+
+// ========================================================
+// 각종 데이터 송수신 처리 함수
+// ========================================================
+
+async function sendSpaceshipPosition(x, y) {
+    const x_scale = Math.floor(x);
+    const y_scale = Math.floor(y);
+    const message = { type: MessageType.SPACESHIP_POSITION, id: "self", x: x_scale, y: y_scale };
     socket.send(JSON.stringify(message));
 }
 
 async function sendBulletPosition(x, y) {
-    const message = { type: MessageType.BULLET_POSITION, x, y };
+    const x_scale = Math.floor(x);
+    const y_scale = Math.floor(y);
+    const message = { type: MessageType.BULLET_POSITION, x: x_scale, y: y_scale };
     socket.send(JSON.stringify(message));
 }
 
 async function sendBombPosition(x, y) {
-    const message = { type: MessageType.BOMB_POSITION, x, y };
+    const x_scale = Math.floor(x);
+    const y_scale = Math.floor(y);
+    const message = { type: MessageType.BOMB_POSITION, x: x_scale, y: y_scale };
     socket.send(JSON.stringify(message));
 }
 
@@ -638,11 +659,19 @@ async function sendPauseMessage(status) {
     }
 }
 
+function sendCreateEnemy() {
+    if (!isPaused) {
+        const message = { type: MessageType.CREATE_ENEMY, start: 0, end: canvas_size.scaledW };
+        socket.send(JSON.stringify(message));
+    }
+}
+
 function updateSpaceshipPosition(message) {
     const { id, x, y } = message;
+
     if (id === "self") {
-        spaceship.x = message.x; // 나의 비행기 위치 업데이트
-        spaceship.y = message.y;
+        spaceship.x = x; // 나의 비행기 위치 업데이트
+        spaceship.y = y;
     } else {
         let opponent = opponents.get(id);
         if (!opponent) {
@@ -657,7 +686,6 @@ function updateSpaceshipPosition(message) {
 
 function updateBulletPosition(message) {
     const { id, x, y } = message;
-
     const opponent = opponents.get(id);
     if (opponent) {
         opponent.createBullet(x, y, BulletType.STANDARD); // 상대방의 비행기에서 총알 생성
@@ -666,19 +694,47 @@ function updateBulletPosition(message) {
 
 function updateBombPosition(message) {
     const { id, x, y } = message;
-
     const opponent = opponents.get(id);
     if (opponent) {
         opponent.createBomb(x, y); // 상대방의 비행기에서 폭탄 생성
     }
 }
 
-// 적군 생성 메시지를 서버로 보냅니다.
-function createEnemy() {
-    if (!isPaused) {
-        const message = { type: MessageType.CREATE_ENEMY, start: 0, end: canvas.width };
-        socket.send(JSON.stringify(message));
+function updateOpponentshipConnection(message) {
+    const id = message.id;
+    if (!opponents.get(id)) {
+        const opponent = new OpponentShip(canvas_size.scaledW - 64, 20); // 우측 상단에 신규 상대방 표시
+        opponents.set(id, opponent); // 새로운 상대방 비행기 추가
+        console.log("new client: ", id);
     }
+}
+
+function updateOpponentshipDisconnection(message) {
+    const id = message.id;
+    if (opponents.get(id)) {
+        opponents.delete(id);
+        console.log("remove client: ", id);
+    }
+}
+
+function updateCreateEnemy(message) {
+    const { x, y } = message;
+    // 적군 생성 메시지를 받았을 때 적군을 화면에 그립니다.
+    const enemy = new Enemy(x, y);
+    enemyList.push(enemy);
+}
+
+function updateScore(message) {
+    const id = message.id || null;
+    // 상대방 점수를 받아 갱신
+    const opponent = opponents.get(id);
+    if (opponent) {
+        opponent.score = message.score;
+    }
+
+    // 글로벌 변수 업데이트
+    stage = message.stage;
+    highScore = message.highScore;
 }
 
 
@@ -710,7 +766,7 @@ function setupKeyboardListener() {
         }
 
         if (event.key == "e") {
-            createEnemy();
+            sendCreateEnemy();
         }
 
         if (event.key == "b") {
@@ -734,7 +790,7 @@ function setupTouchListener() {
         sendBulletPosition(spaceship.x, spaceship.y);
 
         spaceship.x = touchX;
-        sendSpaceshipPosition();
+        sendSpaceshipPosition(spaceship.x, spaceship.y);
     });
 }
 
@@ -759,18 +815,18 @@ async function update() {
 function render() {
     // 화면을 그립니다.
     // ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(backgroundImage, 0, 0, canvas_size.scaledW, canvas_size.scaledH);
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
 
     // 점수 출력
     ctx.fillText(`Score: ${spaceship.score}`, 20, 20);
-    ctx.fillText(`HighScore: ${highScore}`, canvas.width / 2 - 100, 20);
-    ctx.fillText(`Stage: ${stage}`, canvas.width / 2 - 60, 40);
+    ctx.fillText(`HighScore: ${highScore}`, canvas_size.scaledW / 2 - 100, 20);
+    ctx.fillText(`Stage: ${stage}`, canvas_size.scaledW / 2 - 60, 40);
     let index = 1;
     for (const [id, opponent] of opponents) {
         const scoreY = (index - 1) * 30 + 20;
-        ctx.fillText(`Opponent${index}: ${opponent.score}`, canvas.width - 200, scoreY);
+        ctx.fillText(`Opponent${index}: ${opponent.score}`, canvas_size.scaledW - 200, scoreY);
         index++;
     }
 
@@ -796,7 +852,7 @@ async function autoCreateEnemy() {
     }
 
     if (!gameOver) {
-        createEnemy(); // 적 생성
+        sendCreateEnemy(); // 적 생성
         // 1초마다 자동으로 적 생성
         setTimeout(autoCreateEnemy, 1000);
     }
@@ -829,10 +885,10 @@ function main() {
         requestAnimationFrame(main);
     } else {
         // 게임이 종료되면 게임 오버 화면을 그립니다.
-        const imageWidth = canvas.width * 2 / 3;
-        const imageHeight = canvas.height * 2 / 3;
-        const imageX = (canvas.width - imageWidth) / 2;
-        const imageY = (canvas.height - imageHeight) / 2;
+        const imageWidth = canvas_size.scaledW * 2 / 3;
+        const imageHeight = canvas_size.scaledH * 2 / 3;
+        const imageX = (canvas_size.scaledW - imageWidth) / 2;
+        const imageY = (canvas_size.scaledH - imageHeight) / 2;
 
         ctx.drawImage(gameOverImage, imageX, imageY, imageWidth, imageHeight);
     }
