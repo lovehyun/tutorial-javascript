@@ -4,6 +4,7 @@ import { canvas_size, isPaused } from "./canvas.js";
 import { setHighScore, setStage, opponents, enemyList } from "./gamedata.js";
 import { Enemy } from "../resources/Enemy.js";
 import { OpponentShip } from "../resources/Opponentship.js";
+import { BulletType } from "../resources/Bullet.js";
 
 
 // ========================================================
