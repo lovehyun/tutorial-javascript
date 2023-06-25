@@ -2,6 +2,8 @@
 
 import { enemyList } from "../common/gamedata.js";
 import { Ship } from "./Ship.js";
+import { Bullet } from "./Bullet.js";
+import { Bomb } from "./Bomb.js";
 
 
 export class OpponentShip extends Ship {
