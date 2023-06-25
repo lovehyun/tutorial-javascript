@@ -1,9 +1,9 @@
 // server.js
 
-const { wss, port, clients } = require('./server/websocket');
-const { announcement } = require('./server/clientinfo.js')
-const { logger } = require('./util/logger.js');
-const { defaultGameRoom } = require('./server/gamemanager');
+const { wss, port, clients } = require('./server/modules/websocket');
+const { announcement } = require('./server/modules/clientinfo.js')
+const { logger } = require('./server/util/logger.js');
+const { defaultGameRoom } = require('./server/modules/gamemanager');
 
 const express = require('express');
 const app = express();
