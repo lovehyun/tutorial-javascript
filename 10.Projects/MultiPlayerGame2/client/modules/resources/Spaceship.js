@@ -107,9 +107,9 @@ export class Spaceship extends Ship {
         };
     }
 
-    hitByEnemy(damage) {
+    hitByEnemy(x, y, damage) {
         this.extraLife -= damage;
-        console.log("hitByEnemy!")
+        console.log(`hitByEnemy! coord(x:${x}, y:${y})`)
 
         // 생명이 모두 다 감소하면 종료 처리
         if (this.extraLife < 0) {

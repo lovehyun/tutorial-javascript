@@ -12,6 +12,9 @@ const clientInfo = {
     isPaused: false, // 게임 중지 상태 (화면 visibility 에 따른)
 };
 
+// 클라이언트 접속 통계 정보
+const clientStats = new Map();
+
 // ========================================================
 // 사용자 전달 메세지 관리
 // ========================================================
@@ -31,4 +34,4 @@ function addAndDestroyAnnounce(message) {
     }, default_remove_second * 1000);
 }
 
-module.exports = { clients, clientInfo, announcement, addAndDestroyAnnounce }
+module.exports = { clients, clientInfo, clientStats, announcement, addAndDestroyAnnounce }

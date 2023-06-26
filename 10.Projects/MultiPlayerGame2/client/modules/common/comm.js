@@ -46,7 +46,7 @@ function displayMOTD(message) {
 // 서버로부터 MOTD를 가져오는 함수
 async function fetchMOTD() {
     const host = window.location.host;
-    const url = `http://${host}/clients/announce`;
+    const url = `http://${host}/api/clients/announce`;
     try {
         const response = await fetch(url);
         const message = await response.text();
@@ -57,7 +57,7 @@ async function fetchMOTD() {
 }
 
 // 웹소켓 실제 연결 함수
-function connectWebSocket(webSocketAddress) {
+async function connectWebSocket(webSocketAddress) {
     return new Promise((resolve, reject) => {
         socket = new WebSocket(webSocketAddress);
 
@@ -67,11 +67,12 @@ function connectWebSocket(webSocketAddress) {
             isConnected = true;
             // 페이지 로드 시 MOTD를 가져오고, 1초마다 업데이트
             fetchMOTD();
-            setInterval(function () {
+            setInterval(async function () {
                 if (isConnected) {
-                    fetchMOTD();
+                    await fetchMOTD();
                 }
             }, 1000);
+            resolve(); // 연결 완료 시점에 Primise 를 resolve 처리
         });
 
         socket.addEventListener("close", (event) => {
@@ -117,43 +118,50 @@ export async function fetchDataAndConnect() {
 // 각종 데이터 송수신 처리 함수
 // ========================================================
 
-export async function sendSpaceshipPosition(x, y) {
+async function socket_send(message) {
+    if (!socket) {
+        console.error("Socket is not available.");
+        return;
+    }
+
+    socket.send(JSON.stringify(message));
+}
+
+export function sendSpaceshipPosition(x, y) {
     const x_scale = Math.floor(x);
     const y_scale = Math.floor(y);
     const message = { type: MessageType.SPACESHIP_POSITION, id: "self", x: x_scale, y: y_scale };
-    socket.send(JSON.stringify(message));
+    socket_send(message);
 }
 
-export async function sendBulletPosition(x, y) {
+export function sendBulletPosition(x, y) {
     const x_scale = Math.floor(x);
     const y_scale = Math.floor(y);
     const message = { type: MessageType.BULLET_POSITION, x: x_scale, y: y_scale };
-    socket.send(JSON.stringify(message));
+    socket_send(message);
 }
 
-export async function sendBombPosition(x, y) {
+export function sendBombPosition(x, y) {
     const x_scale = Math.floor(x);
     const y_scale = Math.floor(y);
     const message = { type: MessageType.BOMB_POSITION, x: x_scale, y: y_scale };
-    socket.send(JSON.stringify(message));
+    socket_send(message);
 }
 
-export async function sendScore(score, stage, gameover) {
+export function sendScore(score, stage, gameover) {
     const message = { type: MessageType.SCORE_UPDATED, score, stage, gameover };
-    socket.send(JSON.stringify(message));
+    socket_send(message);
 }
 
-export async function sendPauseMessage(status) {
+export function sendPauseMessage(status) {
     const message = { type: MessageType.PAUSE_STATUS, status };
-    if (typeof socket !== 'undefined' && socket.send) {
-        socket.send(JSON.stringify(message));
-    }
+    socket_send(message);
 }
 
 export function sendCreateEnemy() {
     if (!isPaused) {
         const message = { type: MessageType.CREATE_ENEMY, start: 0, end: canvas_size.scaledW };
-        socket.send(JSON.stringify(message));
+        socket_send(message);
     }
 }
 

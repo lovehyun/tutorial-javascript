@@ -72,6 +72,8 @@ export function resizeCanvas() {
 
         scaledW = Math.floor(canvas.width / scaleFactor);
         scaledH = Math.floor(canvas.height / scaleFactor);
+
+        draw_scale_demo();
     } else {
         canvas.width = DEFAULT_CANVAS_WIDTH;
         canvas.height = DEFAULT_CANVAS_HEIGHT;
@@ -85,4 +87,28 @@ export function resizeCanvas() {
     }
 
     console.log("Canvas resized (w, h, sf): ", canvas_size);
+}
+
+function draw_scale_demo() {   
+    // 가로 선 그리기
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.strokeStyle = 'red';
+    ctx.stroke();
+
+    // 세로 선 그리기
+    ctx.beginPath();
+    ctx.moveTo(canvas.width, 0);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+
+    // 레이블링
+    ctx.font = '14px Arial';
+    ctx.fillStyle = 'red';
+    ctx.fillText(`Width: ${canvas.width}`, 10, canvas.height - 10);
+
+    ctx.fillStyle = 'blue';
+    ctx.fillText(`Height: ${canvas.height}`, canvas.width - 80, 20);
 }

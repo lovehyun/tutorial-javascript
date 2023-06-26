@@ -1,6 +1,6 @@
 // server.js
 
-const { wss, port, clients } = require('./server/modules/websocket');
+const { wss, port, clients, getClientStats } = require('./server/modules/websocket');
 const { announcement } = require('./server/modules/clientinfo.js')
 const { logger } = require('./server/util/logger.js');
 const { defaultGameRoom } = require('./server/modules/gamemanager');
@@ -31,9 +31,10 @@ if (!webSocketAddress) {
 // 익스프레스 서버 엔드포인트
 // ========================================================
 
-// 메인 클라이언트 게임 접속 페이지
+// 정적 컨텐츠 제공 폴더 (html/css/js)
 app.use(express.static('./client'));
 
+// 메인 클라이언트 게임 접속 페이지
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './client/game.html'));
 });
@@ -44,8 +45,13 @@ app.get('/config', (req, res) => {
     logger.info(`Successfully configured the websocket address to client ${webSocketAddress}`)
 });
 
+// 사용자 접속 통계 조회 페이지
+app.get('/stats', (req, res) => {
+    res.sendFile(path.join(__dirname, './client/stat.html'));
+});
+
 // 클라이언트 정보 조회 엔드포인트
-app.get('/clients', (req, res) => {
+app.get('/api/clients', (req, res) => {
     const clientList = Array.from(clients).map(([clientId, client]) => ({
         id: clientId,
         ip: client.ws._socket.remoteAddress,
@@ -70,16 +76,18 @@ app.get('/clients', (req, res) => {
 });
 
 // 클라이언트 접속자 통계 엔드포인트
-app.get('/clients/stats/country', (req, res) => {
-    const sampleData = [
-        { country: 'Korea', count: 100 },
-    ];
+app.get('/api/clients/stats', (req, res) => {
+    const stats = getClientStats();
 
-    res.json(sampleData);
+    const formattedOutput = JSON.stringify(stats, null, 4);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(formattedOutput);
+
+    // res.json(stats);
 });
 
 // 클라이언트 접속자 공지 엔드포인트
-app.get('/clients/announce', (req, res) => {
+app.get('/api/clients/announce', (req, res) => {
     // announcement 배열의 내용을 스트링 형태로 반환
     res.send(announcement.join('\n'));
 });

@@ -6,3 +6,6 @@ node_modules/
 
 # 웹팩 결과물 파일
 dist/
+
+# 개발중인 폴더 제외
+TODO/

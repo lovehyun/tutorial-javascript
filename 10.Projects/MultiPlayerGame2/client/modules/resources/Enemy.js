@@ -57,9 +57,9 @@ export class Enemy {
         if (this.isExploding) {
             this.explosionTimer -= 1;
             if (this.explosionTimer < 0) {
-                this.destroy();
                 // 실제 대미지 적용
-                spaceship.hitByEnemy(1);
+                spaceship.hitByEnemy(this.x, this.y, 1);
+                this.destroy();
             }
         } else {
             this.isExploding = true;
@@ -95,9 +95,10 @@ export class Enemy {
 
     hit() {
         // 총알에 맞았을때 호출되는 메서드
-        if (!this.isHit)
+        if (!this.isHit) {
+            this.isHit = true;
             this.hitTimer = 60; // 대략 1초동안 효과를 표시하기 위한 타이머 설정
-        this.isHit = true;
+        }
         this.hitCount++;
     }
 }

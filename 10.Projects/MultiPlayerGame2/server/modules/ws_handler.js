@@ -1,9 +1,9 @@
 // ws_handler.js
 
-const MessageType = require('./message_type.js');
+const { MessageType } = require('./message_type.js');
 
 const { logger } = require('../util/logger')
-const { clients, addAndDestroyAnnounce } = require('./clientinfo')
+const { clients, clientStats, addAndDestroyAnnounce } = require('./clientinfo')
 const { enemyManager, defaultGameRoom } = require('./gamemanager');
 
 
@@ -50,10 +50,23 @@ function handleClientDisconnection(req, clientId) {
     const client = clients.get(clientId);
     const clientIp = req.socket.remoteAddress;
     const shortClientId = clientId.substring(0, 8);
+    const session = client.session[0];
 
     logger.info(`Client disconnected: (ClientIP: ${clientIp}, ClientID: ${clientId})`);
     addAndDestroyAnnounce(`사용자가 접속을 종료하였습니다. IP: ${clientIp}, ID: ${shortClientId}`);
 
+    // 접속자 정보 업데이트
+    if (session) {
+        session.endTime = new Date();
+        session.score = client.score;
+
+        const stats = clientStats.get(clientIp);
+        const sessionIndex = stats.sessions.findIndex(session => session.id === clientId);
+        if (sessionIndex !== -1) {
+            stats.sessions[sessionIndex] = session;
+        }
+    }
+    
     clients.delete(clientId);
     if (clients.size === 0) {
         // 클라이언트 수가 0이 되었을 때 stage를 1로 초기화

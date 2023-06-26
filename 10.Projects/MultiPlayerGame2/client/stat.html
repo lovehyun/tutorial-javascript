@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Game!</title>
+    <style>
+        body, html {
+            margin: 10;
+            padding: 10;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div id="controllerContainer">
+        <h1>Multiplayer Game Stats!</h1>
+        <button id="refreshButton">Refresh</button>
+    </div>
+    <div id="clientStatsContainer">
+        <canvas id="clientStatsChart"></canvas>
+        <canvas id="clientScoreChart"></canvas>
+    </div>
+    <script src="modules/stats/clientstats.js"></script>
+    <script>
+        document.getElementById("refreshButton").addEventListener("click", function () {
+            location.reload();
+        });
+    </script>
+</body>
+
+</html>

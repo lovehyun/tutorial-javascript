@@ -12,4 +12,4 @@ const MessageType = {
     PAUSE_STATUS: "pauseStatus",
 };
 
-module.exports = MessageType;
+module.exports = { MessageType };
