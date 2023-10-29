@@ -9,3 +9,4 @@ dist/
 
 # 개발중인 폴더 제외
 TODO/
+TEMP/
