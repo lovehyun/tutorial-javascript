@@ -21,6 +21,11 @@ person.age = 31;
 
 console.log(person); // 모든 속성과 값이 있는 객체 출력
 
+// 추가한 속성 삭제
+delete person.location
+
+console.log(person);
+
 
 // 4. 객체 메소드(Method) 추가
 let car = {

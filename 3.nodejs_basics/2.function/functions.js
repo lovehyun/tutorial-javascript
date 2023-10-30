@@ -1,3 +1,6 @@
+// Global variable vs Local Variable
+// Global scope vs Block scope
+
 // 1. 함수 선언과 호출
 // 함수 선언
 function greet() {
@@ -7,6 +10,13 @@ function greet() {
 // 함수 호출
 greet(); // "안녕하세요!" 출력
 
+// 함수 덮으쓰기 (주의!! 권장하지 않음)
+// function greet() {
+//     console.log('안녕! 어떻게 지내세요?');
+// }
+// greet(); // '안녕! 어떻게 지내세요?'가 출력됩니다.
+
+  
 // 2. 매개변수(Parameter)와 인수(Argument)
 // 매개변수를 받는 함수
 function greetByName(name) {

@@ -6,7 +6,8 @@
 
 // 1. Date
 // 현재 날짜와 시간 가져오기
-const today = new Date();
+// const today = Date(); // 현재 날짜의 toString() 이 호출된 값.
+const today = new Date(); // 현재 날짜의 객체 자체
 console.log(today);
 
 
@@ -20,9 +21,9 @@ console.log(minNumber); // 5
 
 
 // 3. String
-// 문자열 길이 가져오기
+// 문자열 길이 가져오기 - length = 속성(property)
 const text = 'Hello, World!';
 console.log(text.length); // 13
 
-// 문자열 메서드 (예: 대문자 변환)
+// 문자열 메서드 (예: 대문자 변환) - toUpperCase() = 메소드(method)
 console.log(text.toUpperCase()); // HELLO, WORLD!

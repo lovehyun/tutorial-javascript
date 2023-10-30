@@ -54,3 +54,6 @@ num--; // 후위 감소 연산자: num = num - 1;
 console.log(num); // 5 출력
 
 
+// Quiz
+// 아래 표현의 결과는? (true)
+console.log(5 + 2 === 7 && 4 > 5 || 'Hi' === 'Hi');
