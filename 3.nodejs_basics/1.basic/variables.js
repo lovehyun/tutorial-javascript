@@ -9,10 +9,16 @@ let pi = 3.14;
 let sum = a + pi;
 console.log(sum);
 
+// 상수 (Constants)
+const gravity = 9.81;
+// gravity = 10; // 상수는 재할당할 수 없음 (에러 발생)
+
+
 // 2. 문자열 변수 (String Variables)
 let name = "John Doe";
 let greeting = "Hello, " + name;
 console.log(greeting);
+
 
 // 3. 불린형 변수 (Boolean Variables)
 let isLogged = true;
@@ -24,6 +30,7 @@ if (isLogged) {
   console.log("로그인이 필요합니다.");
 }
 
+
 // 4. 배열 (Arrays)
 let numbers = [1, 2, 3, 4, 5];
 console.log(numbers[2]); // 배열의 세 번째 요소 출력
@@ -32,6 +39,7 @@ console.log(numbers[2]); // 배열의 세 번째 요소 출력
 for (let i = 0; i < numbers.length; i++) {
   console.log(numbers[i]);
 }
+
 
 // 5. 객체 (Objects)
 let person = {
@@ -42,11 +50,8 @@ let person = {
 
 console.log(person.name); // 객체의 속성 값 출력
 
-// 6. 상수 (Constants)
-const gravity = 9.81;
-// gravity = 10; // 상수는 재할당할 수 없음 (에러 발생)
 
-// 7. 변수의 범위 (Variable Scope)
+// 6. 변수의 범위 (Variable Scope)
 let globalVar = "전역 변수";
 
 function scopeExample() {

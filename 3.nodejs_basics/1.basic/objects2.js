@@ -19,6 +19,10 @@ console.log(maxNumber); // 20
 const minNumber = Math.min(10, 20, 5);
 console.log(minNumber); // 5
 
+console.log(Math.round(4.6)); // 5
+console.log(Math.floor(4.6)); // 4
+console.log(Math.ceil(4.2)); // 5
+
 
 // 3. String
 // 문자열 길이 가져오기 - length = 속성(property)
@@ -27,3 +31,4 @@ console.log(text.length); // 13
 
 // 문자열 메서드 (예: 대문자 변환) - toUpperCase() = 메소드(method)
 console.log(text.toUpperCase()); // HELLO, WORLD!
+console.log(text.toLowerCase()); // 'hello, world!'
