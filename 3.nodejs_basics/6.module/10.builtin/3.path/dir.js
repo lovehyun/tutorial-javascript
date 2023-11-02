@@ -12,5 +12,38 @@ fs.readdir(directoryPath, (err, files) => {
     files.forEach(file => {
         const filePath = path.join(directoryPath, file);
         console.log('파일:', filePath);
+        checkFile(filePath);
+        // checkFileSync(filePath);
     });
 });
+
+
+// 파일 유형 확인
+function checkFile(filePath) {
+    fs.stat(filePath, (err, stats) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        if (stats.isFile()) {
+            console.log('이것은 파일입니다.');
+        } else if (stats.isDirectory()) {
+            console.log('이것은 디렉토리입니다.');
+        } else {
+            console.log('이것은 다른 유형의 파일입니다.');
+        }
+    });
+}
+
+function checkFileSync(filePath) {
+    const stats = fs.statSync(filePath);
+
+    if (stats.isFile()) {
+        console.log('이것은 파일입니다.');
+    } else if (stats.isDirectory()) {
+        console.log('이것은 디렉토리입니다.');
+    } else {
+        console.log('이것은 다른 유형의 파일입니다.');
+    }
+}

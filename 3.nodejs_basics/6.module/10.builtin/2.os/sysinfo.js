@@ -1,3 +1,4 @@
+// https://nodejs.org/docs/latest-v18.x/api/os.html
 // 1. 운영 체제의 호스트 이름 가져오기 (Get Hostname of the Operating System)
 const os = require('os');
 

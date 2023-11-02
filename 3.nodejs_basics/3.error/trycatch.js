@@ -1,3 +1,5 @@
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+
 // 1. 기본 문법
 // const result = someUndefinedVariable * 2;
 

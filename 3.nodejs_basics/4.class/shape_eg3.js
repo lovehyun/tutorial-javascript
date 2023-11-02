@@ -65,7 +65,7 @@ const triangle = new Triangle(4, 3);
 const trapezium = new Trapezium(4, 6, 5);
 const circle = new Circle(3);
 
-console.log(square); // 출력: Square - Area: 25
-console.log(triangle); // 출력: Triangle - Area: 6
-console.log(trapezium); // 출력: Trapezium - Area: 25
-console.log(circle); // 출력: Circle - Area: 28.274333882308138
+console.log(square.toString()); // 출력: Square - Area: 25
+console.log(triangle.toString()); // 출력: Triangle - Area: 6
+console.log(trapezium.toString()); // 출력: Trapezium - Area: 25
+console.log(circle.toString()); // 출력: Circle - Area: 28.274333882308138

@@ -110,10 +110,13 @@ customer1.placeOrder(); // "태식 고객이 주문을 완료했습니다." 출�
 
 
 console.log('-----');
-// 함수에서 다형성 활용
+// 함수에서 다형성 활용 - 하나의 인터페이스로 여러 클래스 처리
 function introduce(people) {
     for (const person of people) {
         person.greet();
+    }
+    for (let i = 0; i < people.length; i++) {
+        console.log(i)
     }
 }
 

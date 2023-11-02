@@ -1,3 +1,5 @@
+// https://nodejs.org/docs/latest-v18.x/api/
+// https://nodejs.org/docs/latest-v18.x/api/fs.html
 const fs = require('fs');
 
 // 파일 읽기
