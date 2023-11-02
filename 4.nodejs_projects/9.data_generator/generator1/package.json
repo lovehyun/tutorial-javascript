@@ -1,8 +1,8 @@
 {
-  "name": "data_generator",
+  "name": "generator1",
   "version": "1.0.0",
   "description": "",
-  "main": "generator1.js",
+  "main": "generator3.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
