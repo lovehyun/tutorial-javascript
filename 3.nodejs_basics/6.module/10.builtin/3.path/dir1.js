@@ -18,7 +18,7 @@ fs.readdir(directoryPath, (err, files) => {
 });
 
 
-// 파일 유형 확인
+// 파일 유형 확인 - 비동기
 function checkFile(filePath) {
     fs.stat(filePath, (err, stats) => {
         if (err) {
@@ -36,6 +36,7 @@ function checkFile(filePath) {
     });
 }
 
+// 파일 유형 확인 - 동기
 function checkFileSync(filePath) {
     const stats = fs.statSync(filePath);
 

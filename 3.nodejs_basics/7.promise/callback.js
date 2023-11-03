@@ -13,6 +13,7 @@ function displayGreeting(greeting) {
 greet('예제', displayGreeting);
 
 
+
 // 2. 콜백 예제2
 function add(a, b, callback) {
     const sum = a + b;
@@ -26,3 +27,23 @@ function displayResult(result) {
 
 // add 함수 호출 후 displayResult 함수를 콜백으로 전달
 add(5, 3, displayResult);
+
+
+
+// 3. 콜백 예제3 (비동기)
+// 비동기적으로 더하기 함수
+function addAsync(a, b, callback) {
+    setTimeout(() => {
+        const result = a + b;
+        callback(result);
+    }, 1000); // 1초 뒤에 실행
+}
+
+// 콜백 함수
+function callbackFunction(result) {
+    console.log('결과는:', result);
+}
+
+// 함수 호출
+addAsync(5, 10, callbackFunction);
+console.log("함수 호출 후"); // 이 줄은 비동기 함수 호출과 동시에 실행됨
