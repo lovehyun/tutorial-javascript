@@ -24,17 +24,6 @@ doSomething()
     });
 */
 
-// 콜백헬 예제
-// asyncOperation1(function (response1) {
-//     asyncOperation2(response1, function (response2) {
-//         asyncOperation3(response2, function (response3) {
-//             asyncOperation4(response3, function (response4) {
-//                 // ... 계속해서 콜백 함수가 중첩됨
-//             });
-//         });
-//     });
-// });
-
 function asyncOperation1(response, callback) {
     setTimeout(function () {
         console.log('Operation 1 completed');
