@@ -29,8 +29,22 @@ function displayResult(result) {
 add(5, 3, displayResult);
 
 
+// 3. 콜백 예제2-3
+function add(a, b, callback) {
+    const sum = a + b;
+    callback(a, b, sum);
+}
 
-// 3. 콜백 예제3 (비동기)
+function displayResult2(a, b, result) {
+    console.log(`${a} 와 ${b} 의 합산 결과: ${result}`);
+}
+
+// add 함수 호출 후 displayResult 함수를 콜백으로 전달
+add(5, 3, displayResult);
+
+
+
+// 4. 콜백 예제3 (비동기)
 // 비동기적으로 더하기 함수
 function addAsync(a, b, callback) {
     setTimeout(() => {
