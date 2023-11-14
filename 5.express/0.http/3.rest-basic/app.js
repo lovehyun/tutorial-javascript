@@ -5,7 +5,13 @@
 const http = require('http');
 const fs = require('fs').promises;
 const path = require('path');
+
+// 객체 디스트럭처링
 const { parse } = require('querystring');
+// const parse = require('querystring').parse;
+// 또는
+// const querystring = require('querystring');
+// const parse = querystring.parse;
 
 
 const users = {};
