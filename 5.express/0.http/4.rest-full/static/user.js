@@ -2,8 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
     const username = document.getElementById('username');
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    form.addEventListener('submit', async (ev) => {
+        // 폼의 기본 기능 비활성화 - 페이지 재로딩 등
+        ev.preventDefault();
 
         const name = username.value;
 

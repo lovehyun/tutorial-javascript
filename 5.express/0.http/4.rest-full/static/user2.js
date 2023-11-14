@@ -6,8 +6,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 페이지 로딩 시 백엔드의 /users API 호출하여 테이블 생성
     await updateTable();
 
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
 
         const name = username.value;
 

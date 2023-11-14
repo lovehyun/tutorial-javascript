@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Node 웹서버</title>
+    </head>
+    <body>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/user">User</a>
+        </nav>
+        <section>
+            <h1>Hello Node!</h1>
+            <p>Hello Server1!</p>
+        </section>
+        <section>
+            <h1>Users!</h1>
+            <form id="form" action="/user" method="post">
+                <input text="text" id="username" name="name"></input>
+                <button type="submit">Submit</button>
+            </form>
+
+             <!-- 여기에 테이블을 보여줄 div 추가 -->
+            <div id="userTable"></div>
+        </section>
+        <script src="static/user.js"></script>
+    </body>
+</html>

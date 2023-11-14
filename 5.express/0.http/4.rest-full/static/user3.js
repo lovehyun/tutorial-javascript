@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 폼 제출 이벤트 핸들러 함수
-    async function handleSubmitForm(e) {
-        e.preventDefault();
+    async function handleSubmitForm(ev) {
+        ev.preventDefault();
 
         const name = username.value;
 
