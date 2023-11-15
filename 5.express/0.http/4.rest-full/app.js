@@ -1,6 +1,6 @@
-// cmd: curl -X POST 127.0.0.1:8080/user -H "Content-Type: application/json" -d "{\"name\":\"aaa\"}"
-// bash: curl -X POST 127.0.0.1:8080/user -H 'Content-Type: application/json' -d '{"name":"aaa"}'
-
+// JSON데이터 전송(cmd) : curl -X POST 127.0.0.1:8080/user -H "Content-Type: application/json" -d "{\"name\":\"aaa\"}"
+// JSON데이터 전송(bash): curl -X POST 127.0.0.1:8080/user -H 'Content-Type: application/json' -d '{"name":"aaa"}'
+// PlainText 전송: curl -X POST 127.0.0.1:3000/user -H "Content-Type: text/plain" -d "name=aaa"
 
 const http = require('http');
 const fs = require('fs').promises;
@@ -12,15 +12,6 @@ http.createServer(async (req, res) => {
     try {
         console.log(req.method, req.url);
         
-        // Step3. 정적 파일 요청 처리
-        if (req.method === 'GET' && req.url.startsWith('/static/')) {
-            const filePath = path.join(__dirname, req.url);
-            const data = await fs.readFile(filePath);
-            const contentType = getContentType(filePath);
-            res.writeHead(200, { 'Content-Type': contentType });
-            return res.end(data);
-        }
-
         // Step1. 기본 경로
         if (req.method === 'GET') {
             if (req.url === '/') {
@@ -31,31 +22,27 @@ http.createServer(async (req, res) => {
                 const data = await fs.readFile('./about.html');
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 return res.end(data);
+            // Step3. 정적 파일 요청 처리
+            // Step4. 동적 이미지 요청 핸들링
+            // Step3&4 통합 리펙토링
+            } else if (req.url.startsWith('/static/') || req.url.startsWith('/image/')) {
+                const urlPath = req.url.startsWith('/static/') ? req.url : req.url.replace('/image/', './static/');
+                const filePath = path.join(__dirname, urlPath);
+                try {
+                    const data = await fs.readFile(filePath);
+                    const contentType = getContentType(filePath);
+                    res.writeHead(200, { 'Content-Type': contentType });
+                    return res.end(data);
+                } catch (error) {
+                    res.writeHead(404);
+                    return res.end('Not Found');
+                }
             } else if (req.url === '/user') { // Step6. user 요청 처리 로직 완성
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 return res.end(JSON.stringify(users));
-            } else if (req.url === '/image') {
-                const data = await fs.readFile('./static/cats.jpg');
-                res.writeHead(200, { 'Content-Type': 'image/jpg' });
-                return res.end(data);
             } else {
-                 // Step4. 동적 이미지 요청 핸들링
-                const imageMatch = req.url.match(/^\/image\/(.+)$/);
-                if (imageMatch) {
-                    const imageName = imageMatch[1];
-                    const imagePath = path.join(__dirname, './static/', imageName);
-                    try {
-                        const imageData = await fs.readFile(imagePath);
-                        console.log(imageData);
-                        const contentType = getContentType(imagePath);
-                        console.log(contentType);
-                        res.writeHead(200, { 'Content-Type': contentType });
-                        return res.end(imageData);
-                    } catch (error) {
-                        res.writeHead(404);
-                        return res.end('Not Found');
-                    }
-                }
+                res.writeHead(404);
+                return res.end('Not Found');
             }
         // Step2. 기본 CRUD 백엔드 완성
         } else if (req.method === 'POST') {
