@@ -119,7 +119,10 @@ async function deleteUser(userId) {
 }
 
 // --------------------------------------------------------
-// 사용자 처리 - 외부 fetch (TODO: user_utils.js 로 분리)
+// 사용자 처리 - 외부 fetch 
+// TODO: user_utils.js 로 분리
+// - 아래 모든 함수에 export 으로 붙이고 (extern async function),
+// - 여기에서 import { getUsers, addUser, updateUser, deleteUserById } from './user_utils.js';
 // --------------------------------------------------------
 
 // 사용자 정보를 받아오는 함수
@@ -151,7 +154,6 @@ async function addUser(name) {
         throw new Error(`등록 실패: ${errorMessage}`);
     }
 }
-
 
 // 사용자 정보를 업데이트하는 함수
 async function updateUser(userId, data) {
