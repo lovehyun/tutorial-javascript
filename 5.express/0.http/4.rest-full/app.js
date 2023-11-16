@@ -78,7 +78,8 @@ http.createServer(async (req, res) => {
                     try {
                         console.log('PUT Body: ', body);
                         users[key] = JSON.parse(body).name;
-                        return res.end(JSON.stringify(users));
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        return res.end(JSON.stringify(users)); // 결과를 원하면?? 아니면 '수정 성공' 반환해도 무방.
                     } catch (error) {
                         console.error('PUT 요청 처리 중 오류 발생: ', error)
                         res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -91,7 +92,8 @@ http.createServer(async (req, res) => {
                 try {
                     const key = req.url.split('/')[2];
                     delete users[key];
-                    return res.end(JSON.stringify(users));
+                    res.writeHead(204); // 삭제하고 더이상 줄 내용이 없음. No Content.
+                    return res.end();
                 }  catch (error) {
                     console.error('DELETE 요청 처리 중 오류 발생: ', error)
                     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
