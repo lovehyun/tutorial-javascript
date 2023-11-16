@@ -1,3 +1,5 @@
+import { getUsers, addUser, updateUser, deleteUserById } from './user3_utils.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('form');
     const username = document.getElementById('username');
@@ -115,70 +117,5 @@ async function deleteUser(userId) {
             console.error('삭제 중 오류 발생:', error);
             alert('삭제 중 오류가 발생했습니다.');
         }
-    }
-}
-
-// --------------------------------------------------------
-// 사용자 처리 - 외부 fetch 
-// TODO: user_utils.js 로 분리
-// - 아래 모든 함수에 export 으로 붙이고 (extern async function),
-// - 여기에서 import { getUsers, addUser, updateUser, deleteUserById } from './user_utils.js';
-// --------------------------------------------------------
-
-// 사용자 정보를 받아오는 함수
-async function getUsers() {
-    try {
-        const response = await fetch('/user');
-        if (!response.ok) {
-            throw new Error('사용자 정보 불러오기 실패');
-        }
-        return response.json();
-    } catch (error) {
-        console.error('사용자 정보 불러오기 실패:', error);
-        throw error; // 에러를 다시 호출자에게 전파
-    }
-}
-
-// 사용자 추가 함수
-async function addUser(name) {
-    const response = await fetch('/user', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name }),
-    });
-
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`등록 실패: ${errorMessage}`);
-    }
-}
-
-// 사용자 정보를 업데이트하는 함수
-async function updateUser(userId, data) {
-    const response = await fetch(`/user/${userId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`수정 실패: ${errorMessage}`);
-    }
-}
-
-// 사용자 정보를 삭제하는 함수
-async function deleteUserById(userId) {
-    const response = await fetch(`/user/${userId}`, {
-        method: 'DELETE',
-    });
-
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(`삭제 실패: ${errorMessage}`);
     }
 }
