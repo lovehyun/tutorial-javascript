@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 사용자 정보 수정 함수
-    window.editUser = async (userId) => {
+    async function editUser(userId) {
         const newName = prompt('수정할 이름을 입력하세요.');
         if (newName !== null) {
             try {
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // 사용자 정보 삭제 함수
-    window.deleteUser = async (userId) => {
+    async function deleteUser(userId) {
         const confirmDelete = confirm('정말로 삭제하시겠습니까?');
         if (confirmDelete) {
             try {
