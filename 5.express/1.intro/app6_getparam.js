@@ -8,8 +8,14 @@ app.get('/', (req, res) => {
 });
 
 // 라우트 파라미터
-app.get('/users/:id', (req, res) => {
+app.get('/user/:id', (req, res) => {
     res.send(`사용자 ID: ${req.params.id}`);
+});
+
+// 사용자 프로필에 대한 라우트
+app.get('/users/:id/profile', (req, res) => {
+    const userId = req.params.id;
+    res.send(`사용자 ID ${userId}의 프로필 페이지`);
 });
 
 // 쿼리 파라미터

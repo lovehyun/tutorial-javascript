@@ -3,7 +3,7 @@ const app = express();
 const port = 3000;
 
 // myLogger 미들웨어 함수
-var myLogger = function (req, res, next) {
+function myLogger(req, res, next) {
     console.log('LOGGED');
     next();
 };

@@ -7,15 +7,15 @@ app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
 
-app.post('/', function (req, res) {
+app.post('/', (req, res) => {
     res.send('Got a POST request');
 });
 
-app.put('/user', function (req, res) {
+app.put('/user', (req, res) => {
     res.send('Got a PUT request at /user');
 });
 
-app.delete('/user', function (req, res) {
+app.delete('/user', (req, res) => {
     res.send('Got a DELETE request at /user');
 });
 
