@@ -34,7 +34,8 @@ app.get('/', (req, res) => {
 
 app.get('/message', (req, res) => {
     // Flash 메시지를 템플릿에 전달
-    res.render('index', { messages: req.flash() });
+    // res.render('index', { messages: req.flash() });
+    res.render('index3', { messages: req.flash() });
 });
 
 const port = 3000;

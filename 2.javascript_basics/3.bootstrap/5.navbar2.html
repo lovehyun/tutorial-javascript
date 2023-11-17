@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <title>Bootstrap Navigation Bar Example</title>
+        <style>
+            /* 추가된 CSS: 네비게이션 바의 스타일을 커스터마이징하는 부분 */
+            .navbar-nav .nav-item {
+                position: relative; /* 네비게이션 바의 각 메뉴 아이템에 대한 포지션 설정 */
+            }
+            .nav-link:hover + .navbar-nav .nav-item .nav-link {
+                display: block; /* 메뉴 항목에 호버 시 서브 메뉴를 보이도록 함 */
+            }
+            .navbar-nav .nav-item .nav-submenu {
+                display: none; /* 서브 메뉴 숨김 */
+                position: absolute; /* 포지션 설정 */
+                left: 0; /* 왼쪽으로 배치 */
+                top: 100%; /* 상단에서 아래로 표시되도록 조정 */
+            }
+            .navbar-nav .nav-item:hover .nav-submenu {
+                display: block; /* 메뉴 항목에 호버 시 서브 메뉴를 보이도록 함 */
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">MyLogo</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <!-- 네비게이션 바의 각 메뉴 항목들 -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">About</a>
+                        </li>
+                        <!-- 서비스 1의 드롭다운 메뉴 -->
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="navbarDropdown1"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Services 1
+                            </a>
+                            <ul class="dropdown-menu nav-submenu" aria-labelledby="navbarDropdown1">
+                                <li><a class="dropdown-item" href="#">Submenu Item 1-1</a></li>
+                                <li><a class="dropdown-item" href="#">Submenu Item 1-2</a></li>
+                            </ul>
+                        </li>
+                        <!-- 서비스 2의 드롭다운 메뉴 -->
+                        <li class="nav-item dropdown">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="navbarDropdown2"
+                                role="button"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                            >
+                                Services 2
+                            </a>
+                            <ul class="dropdown-menu nav-submenu" aria-labelledby="navbarDropdown2">
+                                <li><a class="dropdown-item" href="#">Submenu Item 2-1</a></li>
+                                <li><a class="dropdown-item" href="#">Submenu Item 2-2</a></li>
+                            </ul>
+                        </li>
+                        <!-- 연락처 메뉴 항목 -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
