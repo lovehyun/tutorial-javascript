@@ -1,9 +1,21 @@
 {
+  "name": "myboard",
+  "version": "0.9.0",
+  "description": "bbs board example",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app"
+  },
+  "author": "shpark",
+  "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^9.1.1",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "nunjucks": "^3.2.4",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
