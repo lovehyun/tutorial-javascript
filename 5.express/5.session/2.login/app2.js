@@ -51,6 +51,20 @@ app.get('/profile', (req, res) => {
     }
 });
 
+// 로그아웃 라우트
+app.get('/logout', (req, res) => {
+    // 세션에서 사용자 정보를 삭제
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('세션 삭제 오류:', err);
+            res.status(500).json({ message: '로그아웃 실패' });
+        } else {
+            res.json({ message: '로그아웃 성공!' });
+        }
+    });
+});
+
+// 서버 시작
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

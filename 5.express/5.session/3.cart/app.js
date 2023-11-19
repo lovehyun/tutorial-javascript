@@ -16,6 +16,12 @@ app.use(
     })
 );
 
+// 세션 정보 출력 미들웨어
+// app.use((req, res, next) => {
+//     console.log('Session Information:', req.session);
+//     next();
+// });
+
 // 정적 파일 제공 (public 폴더)
 app.use(express.static(path.join(__dirname, 'public')));
 

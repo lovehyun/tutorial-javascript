@@ -1,0 +1,25 @@
+<!-- views/index.html -->
+{% extends "layout.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block head %}
+    <style>
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h2>Welcome to the Home Page</h2>
+    <p>This is the home page content.</p>
+
+    <h2>Login</h2>
+    <form action="/api/login" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required />
+        <br />
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+        <br />
+        <input type="submit" value="로그인" />
+    </form>
+{% endblock %}
