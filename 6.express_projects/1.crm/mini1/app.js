@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
 
     // data.csv 파일을 읽어오고 각 행의 데이터를 가공
     // https://nodejs.org/docs/latest-v18.x/api/fs.html#fscreatereadstreampath-options
-    fs.createReadStream('data.csv', { encoding: 'utf8' })
+    fs.createReadStream('data2.csv', { encoding: 'utf8' })
         .pipe(csv())
         .on('data', (row) => {
             // 각 열의 키와 값을 정제하여 새로운 객체에 저장

@@ -11,11 +11,13 @@ nunjucks.configure('views', {
     express: app,
 });
 
-let data = []; // 데이터를 저장할 배열
+let data = [];
 
 // 파일을 읽어 데이터를 메모리에 로드하는 함수
 function loadDataIntoMemory() {
-    fs.createReadStream('data.csv', 'utf-8')
+    const readStream = fs.createReadStream('data.csv', 'utf-8');
+    
+    readStream
         .pipe(csv())
         .on('data', (row) => {
             data.push(row);
@@ -35,19 +37,30 @@ app.get('/', (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const itemsPerPage = 10;
 
-    const fieldnames = Object.keys(data[0] || {}); // handle case when data is empty
+    const fieldnames = Object.keys(data[0] || {});
     const totalItems = data.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const paginatedData = data.slice(startIndex, endIndex);
 
-    res.render('index2.html', {
+    res.render('index3.html', {
         fieldnames,
         data: paginatedData,
         page,
         total_pages: totalPages,
     });
+});
+
+app.get('/user/:id', (req, res) => {
+    const userId = req.params.id;
+    const user = data.find((row) => row.Id === userId);
+
+    if (user) {
+        res.render('user_detail3.html', { user });
+    } else {
+        res.status(404).send('User not found');
+    }
 });
 
 app.listen(port, () => {

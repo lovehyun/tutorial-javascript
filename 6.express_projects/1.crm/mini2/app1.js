@@ -21,10 +21,11 @@ app.get('/', (req, res) => {
 
     // Read CSV file
     const data = [];
+    
     fs.createReadStream('data.csv', 'utf-8')
         .pipe(csv())
         .on('data', (row) => {
-            console.log(row);
+            // console.log(row);
             data.push(row);
         })
         .on('end', () => {
