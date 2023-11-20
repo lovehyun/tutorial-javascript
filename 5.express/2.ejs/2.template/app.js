@@ -5,6 +5,10 @@ const app = express();
 // EJS를 뷰 엔진으로 설정
 app.set('view engine', 'ejs');
 
+// <% 로직 %>
+// <%= 변수명 %>
+// <%# 주석 %>
+
 app.get('/', (req, res) => {
     res.render('index', { title: 'Express 앱', message: 'EJS를 사용 중입니다.' });
 });

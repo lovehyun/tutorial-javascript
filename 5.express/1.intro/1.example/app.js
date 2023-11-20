@@ -17,6 +17,10 @@ const users = {};
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/image', express.static(path.join(__dirname, 'image')));
 
+// res.send 시의 기본값은 'text/html; charset=utf-8'
+// res.json 시의 기본값은 'application/json'
+// 변경 시 res.type('text/plain');
+
 // 기본 경로
 app.get('/', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'index.html'));
@@ -49,7 +53,8 @@ app.put('/user/:id', (req, res) => {
     try {
         const id = req.params.id;
         users[id] = req.body.name;
-        res.json(users);
+        // res.json(users);
+        res.status(200).send('수정 성공');
     } catch (error) {
         console.error('PUT 요청 처리 중 오류 발생: ', error);
         res.status(500).send('서버 내부 오류');
