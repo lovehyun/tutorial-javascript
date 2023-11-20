@@ -15,6 +15,25 @@ nunjucks.configure('views', {
 
 app.use(express.static('public'));
 
+// --> 성능 개선을 위한 측정
+// curl -w '\nTime taken: %{time_total}s\n' http://localhost:3000
+// Middleware to measure response time
+app.use((req, res, next) => {
+    const start = Date.now();
+
+    // Attach a listener for when the response is finished
+    res.on('finish', () => {
+        const end = Date.now();
+        const duration = end - start;
+
+        console.log(`Request to ${req.path} took ${duration} ms`);
+    });
+
+    // Pass the request to the next middleware
+    next();
+});
+// <-- 성능 개선을 위한 측정
+
 app.get('/', (req, res) => {
     const page = req.query.page || 1;
     const perPage = 10;
