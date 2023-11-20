@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
     const fieldnames = [];
 
     fs.createReadStream('data.csv', 'utf-8')
-        .pipe(csv.parse({ headers: true, ignoreEmpty: true }))
+        .pipe(csv.parse({ headers: true, trim: true, ignoreEmpty: true }))
         .on('headers', (headers) => {
             fieldnames.push(...headers);
         })

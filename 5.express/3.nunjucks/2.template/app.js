@@ -10,6 +10,7 @@ nunjucks.configure('views', {
 
 // app.set('view engine', 'njk');
 app.set('view engine', 'html');
+// app.set('views', __dirname + '/your_custom_directory');
 
 app.get('/', (req, res) => {
     res.render('index', { title: 'Express 앱', message: 'Nunjucks를 사용 중입니다.' });

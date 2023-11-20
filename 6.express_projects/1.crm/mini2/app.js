@@ -9,42 +9,43 @@ const port = 3000;
 
 // Configure Nunjucks template engine
 nunjucks.configure('views', {
-  autoescape: true,
-  express: app
+    autoescape: true,
+    express: app,
 });
 
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  const page = req.query.page || 1;
-  const perPage = 10;
+    const page = req.query.page || 1;
+    const perPage = 10;
 
-  // Read CSV file
-  const data = [];
-  fs.createReadStream('data.csv', 'utf-8')
-    .pipe(csv())
-    .on('data', (row) => {
-      data.push(row);
-    })
-    .on('end', () => {
-      // Calculate total pages
-      const totalPages = Math.ceil(data.length / perPage);
+    // Read CSV file
+    const data = [];
+    fs.createReadStream('data.csv', 'utf-8')
+        .pipe(csv())
+        .on('data', (row) => {
+            console.log(row);
+            data.push(row);
+        })
+        .on('end', () => {
+            // Calculate total pages
+            const totalPages = Math.ceil(data.length / perPage);
 
-      // Calculate start and end indices for the current page
-      const startIndex = (page - 1) * perPage;
-      const endIndex = startIndex + perPage;
+            // Calculate start and end indices for the current page
+            const startIndex = (page - 1) * perPage;
+            const endIndex = startIndex + perPage;
 
-      // Extract rows for the current page
-      const currentPageRows = data.slice(startIndex, endIndex);
+            // Extract rows for the current page
+            const currentPageRows = data.slice(startIndex, endIndex);
 
-      res.render('index.html', {
-        data: currentPageRows,
-        page: parseInt(page),
-        total_pages: totalPages
-      });
-    });
+            res.render('index.html', {
+                data: currentPageRows,
+                page: parseInt(page),
+                total_pages: totalPages,
+            });
+        });
 });
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 });
