@@ -41,5 +41,11 @@
             </tr>
         {% endfor %}
     </table>
+
+    <!-- JavaScript를 사용하여 콘솔에 출력하는 스크립트 추가 -->
+    <script>
+        var data = {{ data | dump | safe }};
+        console.log(data);
+    </script>
 </body>
 </html>

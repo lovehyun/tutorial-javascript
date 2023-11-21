@@ -1,4 +1,5 @@
 // npm install express nunjucks csv-parser
+// nodemon -e html,js app.js
 const express = require('express');
 const nunjucks = require('nunjucks');
 const fs = require('fs');
@@ -14,7 +15,6 @@ nunjucks.configure('views', {
     express: app
 });
 
-// 방법1.
 app.get('/', (req, res) => {
     // 데이터를 저장할 배열
     const data = [];

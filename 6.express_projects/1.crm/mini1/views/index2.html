@@ -27,17 +27,17 @@
         <thead>
             <tr>
                 {% for fieldname in fieldnames %}
-                <th>{{ fieldname }}</th>
+                    <th>{{ fieldname }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
             {% for row in data %}
-            <tr>
-                {% for fieldname in fieldnames %}
-                <td>{{ row[fieldname] }}</td>
-                {% endfor %}
-            </tr>
+                <tr>
+                    {% for fieldname in fieldnames %}
+                        <td>{{ row[fieldname] }}</td>
+                    {% endfor %}
+                </tr>
             {% endfor %}
         </tbody>
     </table>

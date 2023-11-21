@@ -36,6 +36,7 @@ app.get('/', (req, res) => {
     const itemsPerPage = 10;
 
     const fieldnames = Object.keys(data[0] || {}); // handle case when data is empty
+    
     const totalItems = data.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (page - 1) * itemsPerPage;
