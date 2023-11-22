@@ -19,4 +19,4 @@ TEMP/
 package-lock.json
 
 # 민감정보 (credentials)
-.env
+**/.env
