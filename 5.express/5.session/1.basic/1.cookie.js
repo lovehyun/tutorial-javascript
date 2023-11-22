@@ -1,3 +1,6 @@
+// curl --cookie-jar cookie.txt http://localhost:3000/
+// curl --cookie cookie.txt http://localhost:3000/
+
 const http = require('http');
 
 const server = http.createServer((req, res) => {

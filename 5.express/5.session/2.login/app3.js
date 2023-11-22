@@ -15,11 +15,14 @@ app.use(
         secret: 'your-secret-key',
         resave: false,
         saveUninitialized: true,
+        cookie: {
+            maxAge: 60000, // 세션의 유효 시간을 밀리초 단위로 설정 (60초 = 1분)
+        },
     })
 );
 
 // 정적 파일 제공
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
 // 간단한 메모리 기반 사용자 데이터
 const users = [
@@ -65,9 +68,28 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// 루트 엔드포인트로 접근 시 login2.html을 제공
+// 현재 로그인 상태 확인 라우트
+app.get('/check-login', (req, res) => {
+    const user = req.session.user;
+
+    if (user) {
+        res.json({ username: user.username });
+    } else {
+        res.status(401).json({ message: '인증되지 않은 사용자' });
+    }
+});
+
+app.get('/user-activity', (req, res) => {
+    // 세션의 만료 시간을 갱신
+    req.session.touch();
+    // console.log(req.session);
+
+    res.json({ message: 'User activity recorded.' });
+});
+
+// 루트 엔드포인트로 접근 시 login3.html을 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login2.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login3.html'));
 });
 
 // 서버 시작

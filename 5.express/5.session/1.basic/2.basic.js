@@ -13,7 +13,7 @@ const port = 3000;
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-    // 클라이언트에게 쿠키 설정 - 1분 (60000ms) 동안 유효한 쿠키
+    // 클라이언트에게 쿠키 설정 - 1분 (60000ms = 60초) 동안 유효한 쿠키
     res.cookie('mycookie', 'test', { maxAge: 60000 });
 
     // 응답 전송
