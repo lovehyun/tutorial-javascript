@@ -1,0 +1,24 @@
+<!-- views/dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dashboard</title>
+    </head>
+    <body>
+        <h1>Welcome to Dashboard</h1>
+        <h2>User info:</h2>
+        <p>Name: {{ user.name }}, Email: {{ user.email }}</p>
+
+        {% if messages.success %}
+            <div style="color: green">{{ messages.success[0] }}</div>
+        {% endif %} 
+        {% if messages.error %}
+            <div style="color: red">{{ messages.error[0] }}</div>
+        {% endif %}
+
+        <a href="/logout">Logout</a>
+    </body>
+</html>

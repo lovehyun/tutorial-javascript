@@ -1,0 +1,80 @@
+<!-- views/index.html -->
+
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Login Page</title>
+    </head>
+    <body>
+        <h1>Login Page</h1>
+
+        {% if messages.success %}
+            <div style="color: green;">{{ messages.success[0] }}</div>
+        {% endif %}
+        {% if messages.error %}
+            <div style="color: red;">{{ messages.error[0] }}</div>
+        {% endif %}
+            
+        <!-- 로컬 로그인 -->
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+            <br />
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+            <br />
+            <button type="submit">Local Login</button>
+            <!-- 폼의 application/x-www-form-urlencoded 대신 application/json 으로 변경 -->
+            <!-- <button type="button" onclick="login()">Local Login</button> -->
+        </form>
+
+        <hr />
+
+        <!-- 구글 로그인 -->
+        <a href="/auth/google">
+            <img src="google-logo.png" alt="Google Login" />
+        </a>
+
+        <hr />
+
+        <!-- 카카오 로그인 -->
+        <a href="/auth/kakao">
+            <img src="kakao-logo.png" alt="Kakao Login" />
+        </a>
+        
+        <script>
+            function login() {
+                // 폼 데이터 가져오기
+                const formData = {
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                };
+    
+                // Fetch 요청 생성
+                fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 로그인 성공 또는 서버에서 전송한 데이터 처리
+                    console.log('Login successful:', data);
+                })
+                .catch(error => {
+                    // 오류 처리
+                    console.error('Login failed:', error);
+                });
+            }
+        </script>
+    </body>
+</html>
