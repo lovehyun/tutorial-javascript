@@ -13,14 +13,17 @@ const googleStrategyCallback = (req, accessToken, refreshToken, profile, done) =
     // return done(null, profile);
 
     // 유저 정보를 찾습니다.
-    let user = users.find((u) => u.email === profile.email);
+    let user = users.find((u) => u.email === profile.emails[0].value);
+    // console.log(profile);
 
     // 유저가 존재하지 않으면 새로 생성합니다.
     if (!user) {
         user = {
-            email: profile.email,
-            name: profile.name,
-            picture: profile.picture,
+            id: profile.id,
+            username: profile.id,
+            email: profile.emails[0].value,
+            name: profile.displayName,
+            picture: profile.photos[0].value,
             provider: 'google',
         };
         users.push(user);
@@ -44,6 +47,13 @@ passport.use(
         googleStrategyCallback
     )
 );
+
+// SerializeUser 함수 수정 (필요시)
+passport.serializeUser((user, done) => {
+    done(null, user.id); // 여기서는 사용자 식별자(id)를 전달
+});
+
+// DeserializeUser 함수는 기존과 동일하게 유지
 
 // Google 로그인 콜백 라우터 설정
 module.exports = (app) => {
