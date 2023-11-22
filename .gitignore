@@ -17,3 +17,6 @@ TEMP/
 
 # 패키지 파일 (임시 제외)
 package-lock.json
+
+# 민감정보 (credentials)
+.env
