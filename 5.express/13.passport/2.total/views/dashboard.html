@@ -9,15 +9,23 @@
     </head>
     <body>
         <h1>Welcome to Dashboard</h1>
-        <h2>User info:</h2>
-        <p>Name: {{ user.name }}, Email: {{ user.email }}</p>
-
         {% if messages.success %}
             <div style="color: green">{{ messages.success[0] }}</div>
         {% endif %} 
         {% if messages.error %}
             <div style="color: red">{{ messages.error[0] }}</div>
         {% endif %}
+
+        <h2>User info:</h2>
+        <ul>
+            {% for key, value in user %}
+                {% if key != 'password' %}
+                    <li>{{ key }}: {{ value }}</li>
+                {% else %}
+                    <li>{{ key }}: ********</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
 
         <a href="/logout">Logout</a>
     </body>

@@ -48,8 +48,8 @@ passport.serializeUser((user, done) => {
     done(null, user.id);
 });
 
-passport.deserializeUser((id, done) => {
-    const user = users.find((u) => u.id === id);
+passport.deserializeUser((obj, done) => {
+    const user = users.find((u) => u.username === obj);
     done(null, user);
 });
 
@@ -65,7 +65,8 @@ app.get('/logout', (req, res) => {
 
 // 대시보드 라우터 설정
 app.get('/dashboard', (req, res) => {
-    res.render('dashboard', { user: req.user, messages: req.flash() });
+    console.log(req.flash());
+    res.render('dashboard', { user: req.user, messages: req.flash() }); // 성공 플래시는 passport 에서 전달해주지 않아 동작하지 않음.
 });
 
 // 루트 라우터 설정
