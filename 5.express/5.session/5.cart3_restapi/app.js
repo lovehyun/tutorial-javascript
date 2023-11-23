@@ -2,7 +2,6 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const nunjucks = require('nunjucks');
 
 const app = express();
 const port = 3000;
@@ -17,10 +16,8 @@ app.use(
     })
 );
 
-nunjucks.configure('views', {
-    autoescape: true,
-    express: app,
-});
+// 정적 파일 제공
+app.use(express.static('public'));
 
 // 사용자 데이터
 const users = [
@@ -35,26 +32,36 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
+// --->
+// 메인 라우트
 app.get('/', (req, res) => {
     const user = req.session.user;
-    res.render('index.html', { user });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
 app.get('/cart', (req, res) => {
-    res.render('cart.html', { user: req.session.user });
+    res.sendFile(path.join(__dirname, 'public', 'cart.html'));
 });
 
 app.get('/products', (req, res) => {
-    res.render('products.html', { user: req.session.user });
+    res.sendFile(path.join(__dirname, 'public', 'products.html'));
 });
+// 메인 라우트
+// <---
 
+// --->
+// REST-APIs
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find((u) => u.username === username && u.password === password);
 
     if (user) {
         req.session.user = user;
-        res.redirect('/');
+        res.json({ message: '로그인 성공' });
     } else {
         res.status(401).json({ message: '로그인 실패' });
     }
@@ -67,16 +74,22 @@ app.get('/api/logout', (req, res) => {
             console.error('세션 삭제 오류:', err);
             res.status(500).json({ message: '로그아웃 실패' });
         } else {
-            // 변경: 로그아웃 성공 시 리다이렉트 URL을 클라이언트에게 제공
+            // 로그아웃 성공 시 리다이렉트 URL을 클라이언트에게 제공
             res.json({ message: '로그아웃 성공', redirectUrl: '/' });
         }
     });
 });
 
 app.use('/api/check-login', (req, res) => {
-    const loggedIn = req.session.user ? true : false;
-    res.json({ loggedIn });
+    const user = req.session.user;
+
+    if (user) {
+        res.json({ username: user.username });
+    } else {
+        res.status(401).json({ message: '인증되지 않은 사용자' });
+    }
 });
+
 
 app.get('/api/products', (req, res) => {
     res.json(products);
@@ -154,10 +167,12 @@ app.delete('/api/cart/:productId', (req, res) => {
     res.json({ cart, totalAmount: calculateTotalAmount(cart) });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
 function calculateTotalAmount(cart) {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
 }
+// REST-APIs
+// <---
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
