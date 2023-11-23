@@ -17,10 +17,29 @@ app.use(
 );
 
 // 세션 정보 출력 미들웨어
-// app.use((req, res, next) => {
-//     console.log('Session Information:', req.session);
-//     next();
-// });
+app.use((req, res, next) => {
+    // 현재 세션 출력
+    // console.log('Session Information:', req.session);
+
+    // 전체 세션 모두 출력
+    const sessionStore = req.sessionStore;
+    const allSessions = sessionStore.sessions;
+
+    // 모든 세션 정보를 가져오기
+    // console.log('Session Info: ', allSessions);
+    
+    // 모든 세션 정보를 파싱해서 출력하기
+    Object.keys(allSessions).forEach(sessionId => {
+        const sessionData = JSON.parse(allSessions[sessionId]);
+        
+        console.log('Session ID: ', sessionId);
+        console.log('Session Data: ', sessionData);
+        console.log('-----------------------------');
+    });
+
+    next();
+});
+
 
 // 정적 파일 제공 (public 폴더)
 app.use(express.static(path.join(__dirname, 'public')));
@@ -32,15 +51,16 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
-// 장바구니 라우트
-app.get('/cart', (req, res) => {
-    const cart = req.session.cart || [];
-    res.json(cart);
-});
 
 // 상품 목록 라우트
 app.get('/products', (req, res) => {
     res.json(products);
+});
+
+// 장바구니 라우트
+app.get('/cart', (req, res) => {
+    const cart = req.session.cart || [];
+    res.json(cart);
 });
 
 // 상품을 장바구니에 추가하는 라우트

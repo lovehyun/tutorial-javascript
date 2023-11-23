@@ -16,6 +16,34 @@ app.use(
     })
 );
 
+// 세션 정보 출력 미들웨어
+// app.use((req, res, next) => {
+//     console.log('Session Information:', req.session);
+//     next();
+// });
+
+// --> 성능 개선을 위한 측정
+// curl -w '\nTime taken: %{time_total}s\n' http://localhost:3000
+// Middleware to measure response time
+app.use((req, res, next) => {
+    const start = Date.now();
+
+    // Attach a listener for when the response is finished
+    res.on('finish', () => {
+        const end = Date.now();
+        const duration = end - start;
+
+        console.log(`Request to ${req.path} took ${duration} ms`);
+    });
+
+    // Pass the request to the next middleware
+    next();
+});
+// <-- 성능 개선을 위한 측정
+
+// 정적 파일 제공 (public 폴더)
+app.use(express.static(path.join(__dirname, 'public')));
+
 // 간단한 메모리 기반 상품과 장바구니 데이터
 const products = [
     { id: 1, name: 'Product 1', price: 2000 },
@@ -125,11 +153,6 @@ app.post('/remove-from-cart/:productId', (req, res) => {
 // index.html을 반환하는 라우트 추가
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'products.html'));
-});
-
-// cart.html을 반환하는 라우트 추가
-app.get('/cart.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'cart.html'));
 });
 
 app.listen(port, () => {

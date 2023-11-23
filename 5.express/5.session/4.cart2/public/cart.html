@@ -4,33 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Shopping Cart</title>
-        <style>
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-
-            th,
-            td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-
-            th {
-                background-color: #f2f2f2;
-            }
-
-            button {
-                cursor: pointer;
-            }
-
-            .quantity {
-                width: 30px;
-                text-align: center;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="/static/styles.css">
     </head>
     <body>
         <h2>장바구니</h2>
@@ -47,64 +21,6 @@
             <tbody></tbody>
         </table>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
-                displayCart(cart);
-
-                // 테이블에 장바구니 정보를 출력하는 함수
-                function displayCart(cart) {
-                    const cartTableBody = document.querySelector('#cartTable tbody');
-                    // 기존 테이블 내용을 비우고 새로운 내용으로 업데이트
-                    cartTableBody.innerHTML = '';
-
-                    cart.forEach((item) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${item.id}</td>
-                            <td>${item.name}</td>
-                            <td>${item.price}</td>
-                            <td>
-                                <span class="quantity" id="quantity-${item.id}">${item.quantity}</span>
-                                <button onclick="increaseQuantity(${item.id})">+</button>
-                                <button onclick="decreaseQuantity(${item.id})">-</button>
-                            </td>
-                            <td><button onclick="removeFromCart(${item.id})">Remove</button></td>
-                            `;
-                        cartTableBody.appendChild(row);
-                    });
-                }
-
-                // 상품 수량을 증가시키는 함수
-                window.increaseQuantity = function (productId) {
-                    updateQuantity(productId, 1);
-                };
-
-                // 상품 수량을 감소시키는 함수
-                window.decreaseQuantity = function (productId) {
-                    updateQuantity(productId, -1);
-                };
-
-                // 상품 수량을 업데이트하는 함수
-                function updateQuantity(productId, change) {
-                    fetch(`/update-quantity/${productId}?change=${change}`, { method: 'POST' })
-                        .then((response) => response.json())
-                        .then((cart) => {
-                            sessionStorage.setItem('cart', JSON.stringify(cart));
-                            displayCart(cart);
-                        });
-                }
-
-                // 상품을 장바구니에서 제거하는 함수
-                window.removeFromCart = function (productId) {
-                    fetch(`/remove-from-cart/${productId}`, { method: 'POST' })
-                        .then((response) => response.json())
-                        .then((cart) => {
-                            sessionStorage.setItem('cart', JSON.stringify(cart));
-                            displayCart(cart);
-                        });
-                };
-            });
-        </script>
+        <script src="/static/cart.js"></script>
     </body>
 </html>

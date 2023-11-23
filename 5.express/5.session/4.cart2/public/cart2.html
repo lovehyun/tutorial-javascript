@@ -4,41 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Shopping Cart</title>
-        <style>
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-
-            th,
-            td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-            }
-
-            th {
-                background-color: #f2f2f2;
-            }
-
-            button {
-                cursor: pointer;
-            }
-
-            .quantity {
-                width: 30px;
-                text-align: center;
-            }
-
-            tfoot tr {
-                background-color: #f2f2f2;
-            }
-
-            .total {
-                font-weight: bold;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="/static/styles2.css">
     </head>
     <body>
         <h2>장바구니</h2>
@@ -65,102 +31,6 @@
             </tfoot>
         </table>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                fetch('/cart')
-                    .then((response) => response.json())
-                    .then((cartData) => displayCart(cartData));
-
-                function displayCart(cartData) {
-                    const cart = cartData.cart || [];
-                    const cartTableBody = document.querySelector('#cartTable tbody');
-                    const totalAmountSpan = document.querySelector('#totalAmount');
-
-                    // 초기화
-                    cartTableBody.innerHTML = '';
-                    emptyCartMessageRow.style.display = 'none';
-
-                    if (cart.length === 0) {
-                        emptyCartMessageRow.style.display = 'table-row';
-                    }
-                    
-                    let totalAmount = 0;
-
-                    cart.forEach((item) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${item.id}</td>
-                            <td>${item.name}</td>
-                            <td>${item.price}</td>
-                            <td>
-                                <span class="quantity" id="quantity-${item.id}">${item.quantity}</span>
-                                <button onclick="increaseQuantity(${item.id})">+</button>
-                                <button onclick="decreaseQuantity(${item.id})">-</button>
-                            </td>
-                            <td><button onclick="removeFromCart(${item.id})">Remove</button></td>
-                            `;
-                        cartTableBody.appendChild(row);
-                        totalAmount += item.price * item.quantity;
-                    });
-
-                    //totalAmountSpan.textContent = totalAmount.toFixed(2);
-                    totalAmountSpan.textContent = totalAmount;
-                }
-
-                window.increaseQuantity = function (productId) {
-                    updateQuantity(productId, 1);
-                };
-
-                window.decreaseQuantity = function (productId) {
-                    updateQuantity(productId, -1);
-                };
-
-                function updateQuantity(productId, change) {
-                    fetch(`/update-quantity/${productId}?change=${change}`, { method: 'POST' })
-                        .then((response) => response.json())
-                        .then((cartData) => {
-                            sessionStorage.setItem('cart', JSON.stringify(cartData.cart));
-                            displayCart(cartData);
-                        });
-                }
-
-                window.removeFromCart = function (productId) {
-                    fetch(`/remove-from-cart/${productId}`, { method: 'POST' })
-                        .then((response) => response.json())
-                        .then((cartData) => {
-                            sessionStorage.setItem('cart', JSON.stringify(cartData.cart));
-                            displayCart(cartData);
-                        });
-                };
-
-                // 참고: 위에서 지정한 전역 보다는 로컬로 설정하기...
-                // <td>
-                //     <span class="quantity" id="quantity-${item.id}">${item.quantity}</span>
-                //     <button class="increase" data-product-id="${item.id}">+</button>
-                //     <button class="decrease" data-product-id="${item.id}">-</button>
-                // </td>
-                // <td><button class="remove" data-product-id="${item.id}">Remove</button></td>
-                
-                // 각 버튼에 이벤트 리스너를 등록
-                // document.querySelectorAll('.increase').forEach(btn => {
-                //     btn.addEventListener('click', function () {
-                //     updateQuantity(parseInt(this.getAttribute('data-product-id')), 1);
-                //     });
-                // });
-
-                // document.querySelectorAll('.decrease').forEach(btn => {
-                //     btn.addEventListener('click', function () {
-                //     updateQuantity(parseInt(this.getAttribute('data-product-id')), -1);
-                //     });
-                // });
-
-                // document.querySelectorAll('.remove').forEach(btn => {
-                //     btn.addEventListener('click', function () {
-                //     removeFromCart(parseInt(this.getAttribute('data-product-id')));
-                //     });
-                // });
-
-            });
-        </script>
+        <script src="/static/cart2.js"></script>
     </body>
 </html>

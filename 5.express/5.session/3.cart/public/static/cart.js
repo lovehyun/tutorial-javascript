@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then((response) => response.json())
             .then((data) => {
                 alert(data.message);
+                // alert(JSON.stringifys(data.cart));
                 // 서버에서 업데이트된 장바구니 정보를 가져와 테이블에 출력
                 fetch('/cart')
                     .then((response) => response.json())
