@@ -46,7 +46,7 @@ passport.use(
 
 // SerializeUser 함수 수정 (필요시)
 passport.serializeUser((user, done) => {
-    done(null, user.username); // 여기서는 사용자 식별자(id)를 전달
+    done(null, user.id); // 여기서는 사용자 식별자(id)를 전달
 });
 
 // DeserializeUser 함수는 기존과 동일하게 유지

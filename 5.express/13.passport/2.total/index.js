@@ -49,7 +49,7 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((obj, done) => {
-    const user = users.find((u) => u.username === obj);
+    const user = users.find((u) => u.id === obj);
     done(null, user);
 });
 
