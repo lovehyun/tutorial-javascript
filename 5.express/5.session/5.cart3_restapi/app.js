@@ -36,7 +36,7 @@ const products = [
 // 메인 라우트
 app.get('/', (req, res) => {
     const user = req.session.user;
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'home.html'));
 });
 
 app.get('/home', (req, res) => {
