@@ -24,7 +24,7 @@ button {
     text-align: center;
 }
 
-tfoot tr {
+tfoot tr:first-child {
     background-color: #f2f2f2;
 }
 
@@ -35,12 +35,6 @@ tfoot tr {
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-}
-
-#payButton {
-    float: right;
-    margin-top: 10px;
-    margin-right: 20px;
 }
 
 /* 상품 이미지 컬럼에 대한 스타일 */

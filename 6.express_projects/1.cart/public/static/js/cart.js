@@ -6,6 +6,62 @@ document.addEventListener('DOMContentLoaded', function () {
     getCartFromAPI();
     getCartFromSessionStorage();
     // getCartFromLocalStorage();
+    
+    window.increaseQuantity = function (productId) {
+        updateQuantity(productId, 1);
+    };
+
+    window.decreaseQuantity = function (productId) {
+        updateQuantity(productId, -1);
+    };
+
+    window.payButton = function () {
+        // 결제 정보 가져오기
+        const paymentInfo = getCartFromSessionStorage();
+
+        // 여기서 결제 정보를 서버로 전송
+        fetch('/api/payment/toss-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paymentInfo),
+        })
+            .then(response => response.json())
+            .then(data => {
+                // 서버에서 받은 응답을 팝업으로 표시
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('토스 결제 API 호출 에러:', error);
+            });
+    }
+
+    window.removeFromCart = function (productId) {
+        fetch(`/api/cart/${productId}`, { method: 'DELETE' })
+            .then(async (response) => {
+                if (response.status === 200) {
+                    return response.json();
+                } else if (response.status === 204) {
+                    return {}; // 빈 객체 반환
+                } else {
+                    throw new Error('Failed to delete item from cart');
+                }
+            })
+            .then((data) => {
+                // 세션 스토리지에 저장
+                sessionStorage.setItem('cart', JSON.stringify(data));
+                // 로컬 스토리지에 저장
+                // localStorage.setItem('cart', JSON.stringify(data));
+                
+                displayCart(data);
+            })
+            .catch((error) => {
+                // 오류 처리 로직 추가
+                console.error('상품 삭제 실패:', error);
+            });
+    };
+    
 });
 
 function getCartFromAPI() {
@@ -39,12 +95,14 @@ function getCartFromSessionStorage() {
     // 2. 로컬 세션저장소에서 가져온다.
     const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
     displayCart(cart);
+    return cart;
 }
 
 function getCartFromLocalStorage() {
     // 3. 로컬 저장소에서 가져온다.
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
     displayCart(cart);
+    return cart;
 }
 
 function displayCart(cartData) {
@@ -85,14 +143,6 @@ function displayCart(cartData) {
     totalAmountSpan.textContent = totalAmount;
 }
 
-window.increaseQuantity = function (productId) {
-    updateQuantity(productId, 1);
-};
-
-window.decreaseQuantity = function (productId) {
-    updateQuantity(productId, -1);
-};
-
 function updateQuantity(productId, change) {
     fetch(`/api/cart/${productId}?change=${change}`, { method: 'PUT' })
         .then((response) => response.json())
@@ -105,28 +155,3 @@ function updateQuantity(productId, change) {
             displayCart(data);
         });
 }
-
-window.removeFromCart = function (productId) {
-    fetch(`/api/cart/${productId}`, { method: 'DELETE' })
-        .then(async (response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else if (response.status === 204) {
-                return {}; // 빈 객체 반환
-            } else {
-                throw new Error('Failed to delete item from cart');
-            }
-        })
-        .then((data) => {
-            // 세션 스토리지에 저장
-            sessionStorage.setItem('cart', JSON.stringify(data));
-            // 로컬 스토리지에 저장
-            // localStorage.setItem('cart', JSON.stringify(data));
-            
-            displayCart(data);
-        })
-        .catch((error) => {
-            // 오류 처리 로직 추가
-            console.error('상품 삭제 실패:', error);
-        });
-};
