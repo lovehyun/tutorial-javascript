@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/cart">Cart</a></li>
+            <div id="user-info" style="display: none;">
+                <!-- 사용자 정보와 로그아웃 버튼이 여기에 들어갑니다 -->
+            </div>
+        </ul>
+    </nav>
+
+    <h2>Welcome to the Home Page</h2>
+    <p>This is the home page content.</p>
+
+    <div id="loginFormContainer">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            
+            <button type="submit" id="login">Login</button>
+        </form>
+    </div>
+
+    <div id="profile" style="display:none">
+        <h2>Welcome, <span id="usernameSpan"></span>!</h2>
+    </div>
+
+    <script type="module" src="/static/home.js"></script>
+</body>
+</html>
