@@ -67,6 +67,7 @@ function displayCart(cartData) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${item.id}</td>
+            <td><img src="/static/images/${item.image}" class="cart-icon"></td>
             <td>${item.name}</td>
             <td>${item.price}</td>
             <td>

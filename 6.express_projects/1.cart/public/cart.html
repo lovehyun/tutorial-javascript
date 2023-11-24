@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart Page</title>
-    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/styles.css">
 </head>
 <body>
     <nav>
@@ -23,6 +23,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Image</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Quantity</th>
@@ -32,16 +33,18 @@
         <tbody></tbody>
         <tfoot>
             <tr id="emptyCartMessageRow" style="display: none">
-                <td colspan="5" style="background-color: #fff; text-align: center">장바구니가 비었습니다.</td>
+                <td colspan="6" style="background-color: #fff; text-align: center">장바구니가 비었습니다.</td>
             </tr>
             <tr>
-                <td colspan="3"></td>
+                <td colspan="4"></td>
                 <td>Total:</td>
                 <td id="totalAmount" class="total"></td>
             </tr>
         </tfoot>
     </table>
 
-    <script type="module" src="/static/cart.js"></script>
+    <button id="payButton">결제하기</button>
+
+    <script type="module" src="/static/js/cart.js"></script>
 </body>
 </html>

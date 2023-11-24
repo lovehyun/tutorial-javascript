@@ -37,6 +37,24 @@ body {
     font-family: Arial, sans-serif;
 }
 
+#payButton {
+    float: right;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+/* 상품 이미지 컬럼에 대한 스타일 */
+.product-image {
+    max-width: 120px;
+    max-height: 100px;
+}
+
+/* 장바구니 아이콘 이미지에 대한 스타일 */
+.cart-icon {
+    max-width: 40px;
+    max-height: 40px;
+}
+
 /* navbar */
 nav {
     background-color: #333;
