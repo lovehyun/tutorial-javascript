@@ -12,14 +12,19 @@
     <h2>Welcome to the Home Page</h2>
     <p>This is the home page content.</p>
 
-    <h2>Login</h2>
-    <form action="/api/login" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required />
-        <br />
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required />
-        <br />
-        <input type="submit" value="로그인" />
-    </form>
+    {% if user %}
+        <h2>Welcome, {{ user.username }}!</h2>
+        <!-- 로그인한 사용자에게 보여질 내용 -->
+    {% else %}
+        <h2>Login</h2>
+        <form action="/api/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+            <br />
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+            <br />
+            <input type="submit" value="로그인" />
+        </form>
+    {% endif %}
 {% endblock %}

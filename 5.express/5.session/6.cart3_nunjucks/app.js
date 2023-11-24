@@ -22,6 +22,9 @@ nunjucks.configure('views', {
     express: app,
 });
 
+// 정적 파일 제공
+app.use('/static', express.static('public'));
+
 // 사용자 데이터
 const users = [
     { id: 1, username: 'user1', password: 'password1' },
