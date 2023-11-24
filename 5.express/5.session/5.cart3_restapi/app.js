@@ -95,12 +95,26 @@ app.get('/api/products', (req, res) => {
     res.json(products);
 });
 
-app.get('/api/cart', (req, res) => {
+// 미들웨어: 로그인 여부 확인
+function checkLogin(req, res, next) {
+    const user = req.session.user;
+
+    if (user) {
+        // 로그인된 경우 다음 미들웨어로 이동
+        next();
+    } else {
+        // 로그인되지 않은 경우
+        res.status(401).json({ message: '로그인이 필요합니다.', redirectUrl: '/' });
+    }
+}
+
+// '/cart' 라우트에 미들웨어 적용
+app.get('/api/cart', checkLogin, (req, res) => {
     const cart = req.session.cart || [];
     res.json({ cart, totalAmount: calculateTotalAmount(cart) });
 });
 
-app.post('/api/cart/:productId', (req, res) => {
+app.post('/api/cart/:productId', checkLogin, (req, res) => {
     const productId = parseInt(req.params.productId);
     const product = products.find((p) => p.id === productId);
 
@@ -126,7 +140,7 @@ app.post('/api/cart/:productId', (req, res) => {
     res.json({ message: '상품이 장바구니에 추가되었습니다.', cart, totalAmount: calculateTotalAmount(cart) });
 });
 
-app.put('/api/cart/:productId', (req, res) => {
+app.put('/api/cart/:productId', checkLogin, (req, res) => {
     const productId = parseInt(req.params.productId);
     const change = parseInt(req.query.change);
 
@@ -147,7 +161,7 @@ app.put('/api/cart/:productId', (req, res) => {
     res.json({ cart, totalAmount: calculateTotalAmount(cart) });
 });
 
-app.delete('/api/cart/:productId', (req, res) => {
+app.delete('/api/cart/:productId', checkLogin, (req, res) => {
     const productId = parseInt(req.params.productId);
 
     if (isNaN(productId)) {

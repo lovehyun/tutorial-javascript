@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
     <link rel="stylesheet" type="text/css" href="/static/styles.css">
-    <script src="/static/checkuser.js" defer></script>
 </head>
 <body>
     <nav>
@@ -32,7 +31,7 @@
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required><br>
             
-            <button type="button" onclick="login()">Login</button>
+            <button type="submit" id="login">Login</button>
         </form>
     </div>
 
@@ -40,6 +39,6 @@
         <h2>Welcome, <span id="usernameSpan"></span>!</h2>
     </div>
 
-    <script src="/static/home.js"></script>
+    <script type="module" src="/static/home.js"></script>
 </body>
 </html>
