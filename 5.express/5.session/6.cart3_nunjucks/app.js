@@ -35,23 +35,13 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
+// --->
+// 메인 라우트
 app.get('/', (req, res) => {
     const user = req.session.user;
     res.render('home.html', { user });
 });
 
-// 미들웨어: 로그인 여부 확인
-function checkLogin(req, res, next) {
-    if (req.session.user) {
-        // 로그인한 경우 다음 미들웨어로 이동
-        next();
-    } else {
-        // 로그인하지 않은 경우 로그인 페이지로 리다이렉트
-        res.redirect('/');
-    }
-}
-
-// app.get('/cart', checkLogin, (req, res) => {
 app.get('/cart', (req, res) => {
     res.render('cart.html', { user: req.session.user });
 });
@@ -59,7 +49,11 @@ app.get('/cart', (req, res) => {
 app.get('/products', (req, res) => {
     res.render('products.html', { user: req.session.user });
 });
+// 메인 라우트
+// <---
 
+// --->
+// REST-APIs
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = users.find((u) => u.username === username && u.password === password);
@@ -166,10 +160,12 @@ app.delete('/api/cart/:productId', (req, res) => {
     res.json({ cart, totalAmount: calculateTotalAmount(cart) });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
 function calculateTotalAmount(cart) {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
 }
+// REST-APIs
+// <---
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});

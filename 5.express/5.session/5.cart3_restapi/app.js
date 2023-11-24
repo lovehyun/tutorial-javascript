@@ -158,7 +158,7 @@ app.put('/api/cart/:productId', checkLogin, (req, res) => {
     item.quantity = Math.max(1, item.quantity + change);
 
     req.session.cart = cart;
-    res.json({ cart, totalAmount: calculateTotalAmount(cart) });
+    res.json({ message: '수량이 변경되었습니다.', cart, totalAmount: calculateTotalAmount(cart) });
 });
 
 app.delete('/api/cart/:productId', checkLogin, (req, res) => {
@@ -178,6 +178,8 @@ app.delete('/api/cart/:productId', checkLogin, (req, res) => {
     cart = cart.filter((_, index) => index !== itemIndex);
     req.session.cart = cart;
 
+    // res.status(204).send(); // No content
+    // 잔여 cart 내용을 회신하여 프런트에서 세션 스토리지에 저장
     res.json({ cart, totalAmount: calculateTotalAmount(cart) });
 });
 

@@ -107,7 +107,15 @@ function updateQuantity(productId, change) {
 
 window.removeFromCart = function (productId) {
     fetch(`/api/cart/${productId}`, { method: 'DELETE' })
-        .then((response) => response.json())
+        .then(async (response) => {
+            if (response.status === 200) {
+                return response.json();
+            } else if (response.status === 204) {
+                return {}; // 빈 객체 반환
+            } else {
+                throw new Error('Failed to delete item from cart');
+            }
+        })
         .then((data) => {
             // 세션 스토리지에 저장
             sessionStorage.setItem('cart', JSON.stringify(data));
