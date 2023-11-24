@@ -8,13 +8,11 @@ const port = 3000;
 const db = sqlite('mydatabase.db');
 
 // 테이블 생성 (사용자 정보를 저장하는 예시 테이블)
-db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        email TEXT
-    )
-`);
+db.exec(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    email TEXT
+)`);
 
 // 루트 경로에 대한 예시 핸들러 - 모든 사용자 조회
 app.get('/users', (req, res) => {
