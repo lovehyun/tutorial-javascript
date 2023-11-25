@@ -1,0 +1,24 @@
+{
+  "name": "my-project",
+  "version": "0.1.0",
+  "description": "My React Intro project.",
+  "author": "shpark",
+  "scripts": {
+    "start": "npm run start-client && npm run start-server",
+    "start-client": "cd client && npm start",
+    "start-server": "cd server && npm start",
+    "build": "cd client && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/repo.git"
+  },
+  "keywords": ["react", "express", "web"]
+}
