@@ -14,7 +14,7 @@ const data = [
 
 app.use(morgan('dev'));
 
-// CORS 허용 설정
+// CORS 허용 설정 - 수동으로 직접 설정
 // app.use((req, res, next) => {
 //     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
 //     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
