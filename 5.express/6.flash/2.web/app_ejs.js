@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const flash = require('express-flash');
+const flash = require('connect-flash');
 const ejs = require('ejs');
 
 const app = express();
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 
 app.get('/message', (req, res) => {
     // Flash 메시지를 템플릿에 전달
-    res.render('index', { messages: req.flash() });
+    res.render('message', { messages: req.flash() });
 });
 
 const port = 3000;

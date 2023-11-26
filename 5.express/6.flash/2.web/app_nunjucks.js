@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const flash = require('express-flash');
+const flash = require('connect-flash');
 const nunjucks = require('nunjucks');
 
 const app = express();
@@ -26,6 +26,7 @@ nunjucks.configure('views', {
 // app.set('view engine', 'njk');
 app.set('view engine', 'html');
 
+// --> 예제1/2/3
 app.get('/', (req, res) => {
     // Flash 메시지 설정
     req.flash('info', 'Welcome to the homepage!');
@@ -34,9 +35,11 @@ app.get('/', (req, res) => {
 
 app.get('/message', (req, res) => {
     // Flash 메시지를 템플릿에 전달
-    // res.render('index', { messages: req.flash() });
-    res.render('index3', { messages: req.flash() });
+    res.render('message', { messages: req.flash() });
+    // res.render('message2', { messages: req.flash() });
+    // res.render('message3', { messages: req.flash() });
 });
+// <-- 예제1/2/3
 
 const port = 3000;
 app.listen(port, () => {

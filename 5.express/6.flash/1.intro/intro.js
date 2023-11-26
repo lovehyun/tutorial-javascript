@@ -1,8 +1,12 @@
+// curl -L http://localhost:3000 -i --cookie-jar cookie.txt 
+// express-flash 구버전 (express 3.x), connect-flash 신버전 (express 4.x)
+
 const express = require('express');
 const session = require('express-session');
 const flash = require('express-flash');
 
 const app = express();
+const port = 3000;
 
 // 세션 설정
 app.use(
@@ -23,11 +27,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/message', (req, res) => {
-    // Flash 메시지 표시
+    // Flash 메시지 표시 (info 유형 가져오기)
     res.send(req.flash('info'));
 });
 
-const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });

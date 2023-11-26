@@ -11,13 +11,13 @@
             <h1>Express Flash Example</h1>
 
             {% if messages %} {% for message in messages %}
-            <div class="alert alert-{{ message.type }} alert-dismissible fade show" role="alert">
-                {{ message.text }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="alert alert-{{ message.type }} alert-dismissible fade show" role="alert">
+                    {{ message.text }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endfor %} {% endif %}
 
-            <form action="/login" method="post">
+            <form action="/login2" method="post">
                 <label for="username">Username:</label>
                 <input id="username" class="form-control" type="text" name="username" required />
                 <label for="password">Password:</label>

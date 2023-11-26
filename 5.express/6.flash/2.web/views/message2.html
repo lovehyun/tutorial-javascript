@@ -13,23 +13,10 @@
             <h1 class="mb-4">Flash Message Example</h1>
 
             {% if messages.info %}
-            <!-- Bootstrap의 알림(alert) 스타일을 적용 -->
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                {{ messages.info }}
-
-                <!-- 닫기 버튼 -->
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <!-- 자동 닫힘을 위한 JavaScript 코드 -->
-            <script>
-                // 5초 후에 알림이 사라지도록 설정
-                setTimeout(function () {
-                    document.querySelector('.alert').remove();
-                }, 5000);
-            </script>
+                <!-- Bootstrap의 알림(alert) 스타일을 적용 -->
+                <div class="alert alert-info" role="alert">{{ messages.info }}</div>
             {% else %}
-            <p>No flash message</p>
+                <p>No flash message</p>
             {% endif %}
         </div>
 

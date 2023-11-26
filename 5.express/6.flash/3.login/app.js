@@ -31,12 +31,39 @@ app.use(flash());
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index2', { messages: req.flash('messages') });
+    // res.render('login');
+    res.render('login2', { messages: req.flash('messages') });
+    // res.render('login3', { messages: req.flash('messages') });
 });
 
+
+// --> 예제1
 app.post('/login', (req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+    const { username, password } = req.body;
+
+    if (username === 'user' && password === 'pass') {
+        req.flash('success', 'Login successful!');
+    } else {
+        req.flash('error', 'Login failed. Please check your username and password.');
+    }
+
+    res.redirect('/login');
+});
+
+app.get('/login', (req, res) => {
+    const successMessages = req.flash('success');
+    const errorMessages = req.flash('error');
+
+    res.render('login', { successMessages, errorMessages });
+});
+// <-- 예제1
+
+
+// --> 예제2/3
+app.post('/login2', (req, res) => {
+    // const username = req.body.username;
+    // const password = req.body.password;
+    const { username, password } = req.body;
 
     // Check login credentials (dummy check for example)
     if (username === 'user' && password === 'pass') {
@@ -51,6 +78,8 @@ app.post('/login', (req, res) => {
 
     res.redirect('/');
 });
+// <-- 예제2/3
+
 
 // Start server
 const PORT = process.env.PORT || 3000;

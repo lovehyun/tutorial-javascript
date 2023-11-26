@@ -1,6 +1,9 @@
+// curl http://localhost:3000/login -X POST -d username=user -d password=pass --cookie-jar cookie.txt
+// curl http://localhost:3000/ --cookie cookie.txt
+
 const express = require('express');
 const session = require('express-session');
-const flash = require('express-flash');
+const flash = require('connect-flash'); // 별도 설치는 불필요 (express-session 과 함께 동작)
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -26,7 +29,7 @@ app.get('/', (req, res) => {
     const successMessages = req.flash('success');
     const errorMessages = req.flash('error');
 
-    res.render('index', { successMessages, errorMessages });
+    res.json({ successMessages, errorMessages });
 });
 
 app.listen(port, () => {
