@@ -2,6 +2,7 @@
 node_modules/
 
 # 로그파일
+logs/
 *.log
 
 # 웹팩 결과물 파일
@@ -21,3 +22,4 @@ package-lock.json
 
 # 민감정보 (credentials)
 **/.env
+cookie.txt
