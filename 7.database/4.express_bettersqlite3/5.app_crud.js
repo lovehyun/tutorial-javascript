@@ -4,6 +4,9 @@ const sqlite = require('better-sqlite3');
 const app = express();
 const port = 3000;
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 // SQLite 데이터베이스 연결 (파일이 없으면 새로 생성됨)
 const db = sqlite('mydatabase.db');
 

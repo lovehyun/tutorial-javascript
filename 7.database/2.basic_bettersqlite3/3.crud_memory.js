@@ -13,8 +13,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
 
 // 샘플 데이터 추가
 const insertSampleData = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
-insertSampleData.run('john_doe', 'john.doe@example.com');
-insertSampleData.run('jane_doe', 'jane.doe@example.com');
+insertSampleData.run('user1', 'user1@example.com');
+insertSampleData.run('user2', 'user2@example.com');
 
 // 모든 사용자 조회
 const allUsers = db.prepare('SELECT * FROM users').all();
@@ -22,8 +22,8 @@ console.log('All Users:', allUsers);
 
 // 새로운 사용자 생성
 const newUser = {
-    username: 'bob_smith',
-    email: 'bob.smith@example.com',
+    username: 'user3',
+    email: 'user3@example.com',
 };
 
 const insert = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
@@ -33,8 +33,8 @@ console.log('User added with ID:', insertResult.lastInsertRowid);
 // 사용자 정보 업데이트
 const updateUser = {
     id: 1,
-    username: 'updated_user',
-    email: 'updated.user@example.com',
+    username: 'user001',
+    email: 'user001@example.com',
 };
 
 const update = db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?');

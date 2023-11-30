@@ -109,11 +109,16 @@ app.get('/users/:userId', (req, res) => {
 // 상품 조회 엔드포인트
 app.get('/products', (req, res) => {
     const { name } = req.query;
+    
+    // 따옴표 삭제 함수
+    function removeQuotes(value) {
+        return value.replace(/["']/g, "");
+    }
 
     if (name) {
         // 상품명으로 검색
         const query = db.prepare('SELECT * FROM products WHERE name LIKE ?');
-        const rows = query.all(`%${name}%`);
+        const rows = query.all(`%${removeQuotes(name)}%`);
 
         res.json(rows);
     } else {

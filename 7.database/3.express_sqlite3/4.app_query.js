@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
@@ -20,64 +21,26 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
-function initializeDatabase() {
+function initializeDatabase_fromFile() {
     return new Promise((resolve, reject) => {
-        // 사용자 테이블 생성
-        db.run(`CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            username TEXT,
-            password TEXT
-        )`, function () {
-            // 사용자 데이터가 없을 때만 초기화
-            db.get('SELECT COUNT(*) AS count FROM users', (err, row) => {
-                if (err) {
-                    reject(err);
-                    return;
+        // init_data.sql 파일 읽기
+        const sql = fs.readFileSync('init_database.sql', 'utf8');
+
+        // 파일 내의 SQL 쿼리 실행
+        db.exec(sql, (err) => {
+            if (err) {
+                // 중복된 키 에러(SQLITE_CONSTRAINT)인 경우에만 처리
+                if (err.errno === 19 && err.code === 'SQLITE_CONSTRAINT') {
+                    console.warn('Database already initialized. Skipping initialization.');
+                    resolve();
+                } else {
+                    console.error('Error initializing database:', err);
+                    reject();
                 }
-
-                if (row && row.count === 0) {
-                    // 사용자 데이터 삽입
-                    const stmt = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
-
-                    db.serialize(() => {
-                        users.forEach((user) => {
-                            stmt.run(user.id, user.username, user.password);
-                        });
-
-                        stmt.finalize();
-                    });
-                }
-            });
-        });
-
-        // 상품 테이블 생성
-        db.run(`CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY,
-            name TEXT,
-            price INTEGER
-        )`, function () {
-            // 상품 데이터가 없을 때만 초기화
-            db.get('SELECT COUNT(*) AS count FROM products', (err, row) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-
-                if (row && row.count === 0) {
-                    // 상품 데이터 삽입
-                    const stmt = db.prepare('INSERT INTO products (id, name, price) VALUES (?, ?, ?)');
-
-                    db.serialize(() => {
-                        products.forEach((product) => {
-                            stmt.run(product.id, product.name, product.price);
-                        });
-
-                        stmt.finalize();
-                    });
-                }
-
+            } else {
+                console.log('Database initialized successfully');
                 resolve();
-            });
+            }
         });
     });
 }
@@ -161,6 +124,44 @@ app.get('/products', (req, res) => {
     }
 });
 
+app.get('/products2', (req, res) => {
+    const { name, price } = req.query;
+
+    // 따옴표 삭제 함수
+    function removeQuotes(value) {
+        return value.replace(/["']/g, "");
+    }
+
+    // 쿼리를 동적으로 생성하는 함수
+    function buildQuery() {
+        let query = 'SELECT * FROM products';
+
+        if (name && price) {
+            // 이름과 가격이 모두 제공되는 경우
+            query += ` WHERE name LIKE '%${removeQuotes(name)}%' AND price = ${price}`;
+        } else if (name) {
+            // 이름만 제공되는 경우
+            query += ` WHERE name LIKE '%${removeQuotes(name)}%'`;
+        } else if (price) {
+            // 가격만 제공되는 경우
+            query += ` WHERE price = ${price}`;
+        }
+
+        return query;
+    }
+
+    // 동적으로 생성된 쿼리 실행
+    const query = buildQuery();
+    db.all(query, (err, rows) => {
+        if (err) {
+            res.send('Error querying products');
+            return;
+        }
+
+        res.json(rows);
+    });
+});
+
 // 상품 상세 정보 조회 엔드포인트
 app.get('/products/:productId', (req, res) => {
     const productId = req.params.productId;
@@ -181,7 +182,7 @@ app.get('/products/:productId', (req, res) => {
 
 async function startServer() {
     try {
-        await initializeDatabase();
+        await initializeDatabase_fromFile();
 
         // 서버 시작
         app.listen(port, () => {

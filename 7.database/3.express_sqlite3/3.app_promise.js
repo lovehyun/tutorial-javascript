@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
+const fs = require('fs');
 
 const app = express();
 const port = 3000;
@@ -82,6 +83,30 @@ function initializeDatabase() {
     });
 }
 
+function initializeDatabase_fromFile() {
+    return new Promise((resolve, reject) => {
+        // init_data.sql 파일 읽기
+        const sql = fs.readFileSync('init_database.sql', 'utf8');
+
+        // 파일 내의 SQL 쿼리 실행
+        db.exec(sql, (err) => {
+            if (err) {
+                // 중복된 키 에러(SQLITE_CONSTRAINT)인 경우에만 처리
+                if (err.errno === 19 && err.code === 'SQLITE_CONSTRAINT') {
+                    console.warn('Database already initialized. Skipping initialization.');
+                    resolve();
+                } else {
+                    console.error('Error initializing database:', err);
+                    reject();
+                }
+            } else {
+                console.log('Database initialized successfully');
+                resolve();
+            }
+        });
+    });
+}
+
 // 루트 경로에 대한 예시 핸들러
 app.get('/', (req, res) => {
     res.send('Welcome to the Express API!');
@@ -117,7 +142,8 @@ app.get('/products', (req, res) => {
 
 async function startServer() {
     try {
-        await initializeDatabase();
+        // await initializeDatabase();
+        await initializeDatabase_fromFile();
 
         // 서버 시작
         app.listen(port, () => {

@@ -1,6 +1,6 @@
 const express = require('express');
-// const sqlite3 = require('sqlite3').verbose();
-const sqlite3 = require('sqlite3');
+const sqlite3 = require('sqlite3').verbose();
+// const sqlite3 = require('sqlite3');
 
 const app = express();
 const port = 3000;
@@ -21,28 +21,34 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
-// 테이블 생성 (사용자 및 상품 정보를 저장하는 테이블)
-db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT,
-    password TEXT
-)`);
+// 초기 데이터베이스 초기화 함수
+function initializeDatabase() {
+    // 테이블 생성 (사용자 및 상품 정보를 저장하는 테이블)
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT,
+        password TEXT
+    )`);
 
-db.run(`CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    price INTEGER
-)`);
+    db.run(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        price INTEGER
+    )`);
 
-// 사용자 데이터 삽입
-users.forEach((user) => {
-    db.run('INSERT INTO users (id, username, password) VALUES (?, ?, ?)', [user.id, user.username, user.password]);
-});
+    // 사용자 데이터 삽입
+    users.forEach((user) => {
+        db.run('INSERT INTO users (id, username, password) VALUES (?, ?, ?)', [user.id, user.username, user.password]); //, (err) => {}
+    });
 
-// 상품 데이터 삽입
-products.forEach((product) => {
-    db.run('INSERT INTO products (id, name, price) VALUES (?, ?, ?)', [product.id, product.name, product.price]);
-});
+    // 상품 데이터 삽입
+    products.forEach((product) => {
+        db.run('INSERT INTO products (id, name, price) VALUES (?, ?, ?)', [product.id, product.name, product.price]); // , (err) => {}
+    });
+}
+
+// 데이터베이스 초기화
+initializeDatabase();
 
 // 루트 경로에 대한 예시 핸들러
 app.get('/', (req, res) => {

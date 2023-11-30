@@ -11,18 +11,21 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
 )`);
 
 // 모든 사용자 조회
-const allUsers = db.prepare('SELECT * FROM users').all();
-console.log('All Users:', allUsers);
+// const allUsers = db.prepare('SELECT * FROM users').all();
+// console.log('All Users:', allUsers);
+const allUsers = db.prepare('SELECT * FROM users');
+const allUsersResult = allUsers.all();
+console.log('All Users:', allUsersResult);
 
 // 특정 사용자 조회
 const userId = 1;
-const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+const user = db.prepare('SELECT * FROM users WHERE id = ?').get();
 console.log('User with ID', userId, ':', user);
 
 // 새로운 사용자 생성
 const newUser = {
-    username: 'john_doe',
-    email: 'john.doe@example.com',
+    username: 'user1',
+    email: 'user1@example.com',
 };
 
 const insert = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
@@ -32,8 +35,8 @@ console.log('User added with ID:', insertResult.lastInsertRowid);
 // 사용자 정보 업데이트
 const updateUser = {
     id: 1,
-    username: 'updated_user',
-    email: 'updated.user@example.com',
+    username: 'user001',
+    email: 'user001@example.com',
 };
 
 const update = db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?');

@@ -20,30 +20,44 @@ const products = [
     { id: 3, name: 'Product 3', price: 1500 },
 ];
 
-// 테이블 생성 (사용자 및 상품 정보를 저장하는 테이블)
-db.exec(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT,
-    password TEXT
-)`);
+// 초기 데이터베이스 초기화 함수
+function initializeDatabase() {
+    // 테이블 생성 (사용자 및 상품 정보를 저장하는 테이블)
+    db.exec(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT,
+        password TEXT
+    )`);
 
-db.exec(`CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    price INTEGER
-)`);
+    db.exec(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        price INTEGER
+    )`);
 
-// 사용자 데이터 삽입
-const insertUser = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
-users.forEach((user) => {
-    insertUser.run(user.id, user.username, user.password);
-});
+    // 사용자 데이터 삽입
+    const insertUser = db.prepare('INSERT INTO users (id, username, password) VALUES (?, ?, ?)');
+    users.forEach((user) => {
+        try {
+            insertUser.run(user.id, user.username, user.password);
+        } catch (error) {
+            // 오류 무시
+        }
+    });
 
-// 상품 데이터 삽입
-const insertProduct = db.prepare('INSERT INTO products (id, name, price) VALUES (?, ?, ?)');
-products.forEach((product) => {
-    insertProduct.run(product.id, product.name, product.price);
-});
+    // 상품 데이터 삽입
+    const insertProduct = db.prepare('INSERT INTO products (id, name, price) VALUES (?, ?, ?)');
+    products.forEach((product) => {
+        try {
+            insertProduct.run(product.id, product.name, product.price);
+        } catch (error) {
+            // 오류 무시
+        }
+    });
+}
+
+// 데이터베이스 초기화
+initializeDatabase();
 
 // 루트 경로에 대한 예시 핸들러
 app.get('/', (req, res) => {
