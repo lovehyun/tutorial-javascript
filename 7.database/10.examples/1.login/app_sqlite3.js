@@ -1,6 +1,5 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
-const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3000;
@@ -14,7 +13,7 @@ db.serialize(() => {
 });
 
 // 미들웨어 설정
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // 라우트 - 홈 페이지

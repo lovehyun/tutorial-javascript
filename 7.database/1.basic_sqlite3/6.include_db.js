@@ -1,6 +1,6 @@
 const sqlite3 = require('sqlite3');
 
-const db = new sqlite3.Database('mydb4.db');
+const db = new sqlite3.Database('mydatabase.db');
 
 function createTable() {
     return new Promise((resolve, reject) => {

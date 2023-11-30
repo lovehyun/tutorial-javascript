@@ -1,10 +1,9 @@
-// npm install express express-session sqlite3 connect-sqlite3 body-parser
+// npm install express express-session sqlite3 connect-sqlite3
 
 const express = require('express');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const sqlite3 = require('sqlite3');
-const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3000;
@@ -26,7 +25,7 @@ app.use(
 );
 
 // 미들웨어 설정
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // 라우트 - 홈 페이지

@@ -1,4 +1,4 @@
-const Database = require('./database');
+const Database = require('./7.include_db');
 
 async function main() {
     const db = new Database('mydatabase.db');

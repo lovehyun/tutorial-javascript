@@ -10,8 +10,8 @@ db.serialize(() => {
 
     // 파라미터화된 쿼리 사용
     const stmt = db.prepare('INSERT INTO users VALUES (?, ?)');
-    stmt.run(1, 'John Doe');
-    stmt.run(2, 'Jane Doe');
+    stmt.run(1, 'user1');
+    stmt.run(2, 'user2');
     stmt.finalize();
 
     // SELECT 쿼리 실행
