@@ -150,8 +150,27 @@ app.get('/products2', (req, res) => {
         return query;
     }
 
+    function buildQuery2() {
+        let query = 'SELECT * FROM products';
+        const conditions = [];
+    
+        if (name) {
+            conditions.push(`name LIKE '%${removeQuotes(name)}%'`);
+        }
+    
+        if (price) {
+            conditions.push(`price = ${price}`);
+        }
+    
+        if (conditions.length > 0) {
+            query += ` WHERE ${conditions.join(' AND ')}`;
+        }
+    
+        return query;
+    }
+
     // 동적으로 생성된 쿼리 실행
-    const query = buildQuery();
+    const query = buildQuery2();
     db.all(query, (err, rows) => {
         if (err) {
             res.send('Error querying products');
