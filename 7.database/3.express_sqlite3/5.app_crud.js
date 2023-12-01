@@ -1,5 +1,5 @@
-// curl -X POST 127.0.0.1:3000/users -d username=user1 -d email=user1@example.com
-// curl -X PUT 127.0.0.1:3000/users/1 -d username=user001 -d email=user001@aaa.com
+// curl -X POST 127.0.0.1:3000/users -d username=user3 -d password=password3
+// curl -X PUT 127.0.0.1:3000/users/2 -d username=user002 -d password=password002
 // curl -X DELETE 127.0.0.1:3000/users/1
 
 const express = require('express');
@@ -18,7 +18,7 @@ const db = new sqlite3.Database('mydatabase.db');
 db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT,
-    email TEXT
+    password TEXT
 )`);
 
 // 루트 경로에 대한 예시 핸들러 - 모든 사용자 조회
@@ -48,9 +48,9 @@ app.get('/users/:id', (req, res) => {
 
 // 새로운 사용자 생성
 app.post('/users', (req, res) => {
-    const { username, email } = req.body;
+    const { username, password: passwsord } = req.body;
 
-    db.run('INSERT INTO users (username, email) VALUES (?, ?)', [username, email], function (err) {
+    db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, passwsord], function (err) {
         if (err) {
             console.error(err.message);
             res.status(500).send('Internal Server Error');
@@ -61,10 +61,12 @@ app.post('/users', (req, res) => {
 });
 
 // 사용자 정보 업데이트
+/*
 app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
-    const { username, email } = req.body;
-    db.run('UPDATE users SET username = ?, email = ? WHERE id = ?', [username, email, userId], (err) => {
+    const { username, password: password } = req.body;
+    
+    db.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [username, password, userId], (err) => {
         if (err) {
             console.error(err.message);
             res.status(500).send('Internal Server Error');
@@ -72,6 +74,46 @@ app.put('/users/:id', (req, res) => {
         }
         res.send('User updated successfully');
     });
+});
+*/
+
+// 사용자 정보 업데이트 - 개선된 버전 (변경된 필드만 업데이트)
+app.put('/users/:id', (req, res) => {
+    const userId = req.params.id;
+    const { username, password } = req.body;
+
+    if (!username && !password) {
+        res.status(400).send('Either username or password is required');
+        return;
+    }
+
+    const updateFields = {};
+    const updateValues = [];
+
+    if (username) {
+        updateFields.username = username;
+        updateValues.push(username);
+    }
+
+    if (password) {
+        updateFields.password = password;
+        updateValues.push(password);
+    }
+
+    updateValues.push(userId);
+
+    const placeholders = Object.keys(updateFields).map(field => `${field} = ?`).join(', ');
+
+    const query = `UPDATE users SET ${placeholders} WHERE id = ?`;
+
+    db.run(query, updateValues, (err) => {
+        if (err) {
+            console.error(err.message);
+            res.status(500).send('Internal Server Error');
+            return;
+        }
+        res.send('User updated successfully');
+    });    
 });
 
 // 사용자 삭제
