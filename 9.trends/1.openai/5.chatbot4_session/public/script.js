@@ -26,8 +26,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (userInput.trim() === '') return;
 
-        showLoadingIndicator();
         appendMessage('user', userInput);
+        showLoadingIndicator();
+        scrollToBottom();
 
         try {
             const chatGPTResponse = await getChatGPTResponse(sessionId, userInput);
