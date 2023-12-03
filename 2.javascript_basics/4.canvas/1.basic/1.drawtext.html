@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Text Example</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="textCanvas" width="400" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById('textCanvas');
+        const context = canvas.getContext('2d');
+
+        // 텍스트 스타일 지정
+        context.font = '30px Arial'; // 폰트 크기 및 종류
+        context.fillStyle = '#0095DD'; // 텍스트 색상
+
+        // 텍스트 그리기
+        context.fillText('Hello, Canvas!', 50, 100);
+
+        // 다른 텍스트 스타일 적용
+        context.font = 'italic 40px Times New Roman';
+        context.fillStyle = 'red';
+        context.fillText('Styled Text', 50, 160);
+    </script>
+</body>
+</html>

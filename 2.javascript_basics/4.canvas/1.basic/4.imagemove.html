@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Image Movement</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="imageCanvas" width="400" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const context = canvas.getContext('2d');
+
+        const player = {
+            x: 150,
+            y: 100,
+            speed: 10,
+        };
+
+        const image = new Image();
+        image.src = 'ship.png'; // 이미지 파일 경로
+        image.onload = function () {
+            draw();
+        };
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 플레이어 이미지 그리기
+            context.drawImage(image, player.x, player.y, image.width, image.height);
+
+            requestAnimationFrame(draw);
+        }
+
+        // 키보드 이벤트 처리
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    player.x -= player.speed;
+                    break;
+                case 'ArrowRight':
+                    player.x += player.speed;
+                    break;
+            }
+        });
+
+        // Start animation
+        draw();
+    </script>
+</body>
+</html>

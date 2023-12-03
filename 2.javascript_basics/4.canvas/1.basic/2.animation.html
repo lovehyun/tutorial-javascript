@@ -1,0 +1,21 @@
+<canvas id="animationCanvas" width="400" height="200"></canvas>
+<script>
+    const canvas = document.getElementById('animationCanvas');
+    const context = canvas.getContext('2d');
+    let x = 0;
+
+    function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = '#FF0000';
+        context.fillRect(x, 50, 50, 50);
+
+        x += 5;
+        if (x > canvas.width) {
+            x = 0;
+        }
+
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+</script>

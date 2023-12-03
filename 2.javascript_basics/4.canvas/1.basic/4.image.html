@@ -1,0 +1,12 @@
+<canvas id="imageCanvas" width="640" height="640"></canvas>
+<script>
+    const canvas = document.getElementById('imageCanvas');
+    const context = canvas.getContext('2d');
+
+    const image = new Image();
+    image.src = 'ship.png'; // 이미지 파일 경로
+    image.onload = function () {
+        context.drawImage(image, 0, 0);
+        // context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    };
+</script>

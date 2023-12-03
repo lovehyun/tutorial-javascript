@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Animation Example</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="animationCanvas" width="400" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById('animationCanvas');
+        const context = canvas.getContext('2d');
+
+        const ball = {
+            x: 50,
+            y: 50,
+            radius: 20,
+            dx: 2, // 이동 속도
+            dy: 1,
+        };
+
+        function drawBall() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = '#0095DD';
+            context.fill();
+            context.closePath();
+
+            // 공을 이동시킴
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // 캔버스 경계에서 반사하도록 함
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                ball.dx = -ball.dx;
+            }
+
+            if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
+                ball.dy = -ball.dy;
+            }
+
+            requestAnimationFrame(drawBall);
+        }
+
+        drawBall();
+    </script>
+</body>
+</html>

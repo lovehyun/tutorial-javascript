@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Example</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="myCanvas" width="400" height="200"></canvas>
+
+    <script>
+        // Canvas 요소 가져오기
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d'); // 2D 그래픽 컨텍스트 얻기
+
+        // 사각형 그리기
+        context.fillStyle = '#FF0000'; // 색상 설정 (빨간색)
+        context.fillRect(50, 50, 100, 80); // (x, y, width, height)
+
+        // 선 그리기
+        context.strokeStyle = '#0000FF'; // 선 색상 설정 (파란색)
+        context.lineWidth = 2; // 선 두께 설정
+        context.beginPath();
+        context.moveTo(200, 50); // 시작점 설정
+        context.lineTo(300, 130); // 끝점 설정
+        context.stroke(); // 실제로 그리기
+
+        // 원 그리기
+        context.fillStyle = '#00FF00'; // 색상 설정 (녹색)
+        context.beginPath();
+        context.arc(350, 100, 30, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
+        context.fill(); // 실제로 그리기
+    </script>
+</body>
+</html>

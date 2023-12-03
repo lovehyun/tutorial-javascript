@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Text Styles</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="textStylesCanvas" width="500" height="300"></canvas>
+
+    <script>
+        const canvas = document.getElementById('textStylesCanvas');
+        const context = canvas.getContext('2d');
+
+        // 텍스트 그리기 함수
+        function drawText(font, style, text, x, y) {
+            context.font = font;
+            context.fillStyle = style;
+            context.fillText(text, x, y);
+        }
+
+        // 다양한 폰트와 스타일 속성의 텍스트 그리기
+        drawText('30px Arial', '#0095DD', 'Arial Regular', 20, 40);
+        drawText('italic 30px Arial', '#FF0000', 'Arial Italic', 20, 80);
+        drawText('bold 30px Times New Roman', '#0000FF', 'Times New Roman Bold', 20, 120);
+        drawText('30px Verdana', '#008000', 'Verdana Regular', 20, 160);
+        drawText('italic bold 30px Impact', '#800080', 'Impact Italic Bold', 20, 200);
+    </script>
+</body>
+</html>

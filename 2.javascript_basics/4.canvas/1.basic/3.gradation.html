@@ -1,0 +1,17 @@
+<canvas id="gradientCanvas" width="400" height="200"></canvas>
+<script>
+    const canvas = document.getElementById('gradientCanvas');
+    const context = canvas.getContext('2d');
+
+    // 그라데이션 추가
+    const gradient = context.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, 'red');
+    gradient.addColorStop(1, 'blue');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 텍스트 추가
+    context.font = '30px Arial';
+    context.fillStyle = '#FFFFFF';
+    context.fillText('Canvas Text', 50, 100);
+</script>

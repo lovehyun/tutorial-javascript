@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radial Gradient Example</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="radialGradientCanvas" width="400" height="200"></canvas>
+
+    <script>
+        const canvas = document.getElementById('radialGradientCanvas');
+        const context = canvas.getContext('2d');
+
+        // 원형 그라데이션 생성
+        const radialGradient = context.createRadialGradient(200, 100, 10, 200, 100, 100);
+        radialGradient.addColorStop(0, 'red');
+        radialGradient.addColorStop(0.5, 'green');
+        radialGradient.addColorStop(1, 'blue');
+
+        // 그라데이션을 적용한 원 그리기
+        context.fillStyle = radialGradient;
+        context.arc(200, 100, 50, 0, Math.PI * 2);
+        context.fill();
+    </script>
+</body>
+</html>

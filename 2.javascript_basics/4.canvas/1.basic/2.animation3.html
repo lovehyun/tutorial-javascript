@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Ball Animation</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="bouncingCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('bouncingCanvas');
+        const context = canvas.getContext('2d');
+
+        const ball = {
+            x: 50,
+            y: 50,
+            radius: 20,
+            dx: 2, // 이동 속도
+            dy: 0, // 초기 수직 속도
+            gravity: 0.2, // 중력
+            bounce: 0.7, // 튕김 계수
+        };
+
+        function drawBall() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.beginPath();
+            context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            context.fillStyle = '#0095DD';
+            context.fill();
+            context.closePath();
+
+            // 중력 적용
+            ball.dy += ball.gravity;
+
+            // 공을 이동시킴
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // 캔버스 경계에서 튕기도록 함
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
+                ball.dx = -ball.dx;
+            }
+
+            if (ball.y + ball.radius > canvas.height) {
+                ball.y = canvas.height - ball.radius;
+                ball.dy = -ball.dy * ball.bounce; // 튕김
+
+                // 속도가 일정 이하로 떨어지면 멈추도록 함
+                if (Math.abs(ball.dy) < 0.1) {
+                    ball.dy = 0;
+                }
+            }
+
+            requestAnimationFrame(drawBall);
+        }
+
+        drawBall();
+    </script>
+</body>
+</html>
