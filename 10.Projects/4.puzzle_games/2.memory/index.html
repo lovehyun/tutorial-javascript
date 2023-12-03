@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            grid-gap: 5px;
+        }
+
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            background-color: #ddd;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .card.hidden {
+            visibility: hidden;
+        }
+    </style>
+    <title>Memory Puzzle Game</title>
+</head>
+<body>
+    <div id="board"></div>
+
+    <script>
+        const board = document.getElementById('board');
+        const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8];
+        let selectedCards = [];
+        let totalMoves = 0;
+
+        // Shuffle the card values
+        function shuffleCards() {
+            for (let i = cardValues.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cardValues[i], cardValues[j]] = [cardValues[j], cardValues[i]];
+            }
+        }
+
+        // Initialize the game board
+        function initializeBoard() {
+            shuffleCards();
+            renderBoard();
+        }
+
+        // Render the game board
+        function renderBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < cardValues.length; i++) {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.index = i;
+                card.textContent = ' ';
+                card.addEventListener('click', () => flipCard(card));
+                board.appendChild(card);
+            }
+        }
+
+        // Flip a card
+        function flipCard(card) {
+            if (selectedCards.length < 2 && card.textContent === ' ') {
+                const index = parseInt(card.dataset.index);
+                card.textContent = cardValues[index];
+                setTimeout(() => {
+                    selectedCards.push({ value: cardValues[index], index });
+                    if (selectedCards.length === 2) {
+                        totalMoves++;
+                        checkMatch();
+                    }
+                }, 500);
+            }
+        }
+
+        // Check if the selected cards match
+        function checkMatch() {
+            const [card1, card2] = selectedCards;
+
+            if (card1.value === card2.value) {
+                // Matched, hide cards
+                document.querySelectorAll('.card').forEach(cardElement => {
+                    if (cardElement.textContent === card1.value.toString()) {
+                        cardElement.classList.add('hidden');
+                    }
+                });
+            } else {
+                // Not matched, flip back
+                document.querySelectorAll('.card').forEach(cardElement => {
+                    if (cardElement.textContent !== '') {
+                        setTimeout(() => {
+                            cardElement.textContent = ' ';
+                        }, 500);
+                    }
+                });
+            }
+
+            selectedCards = [];
+        }
+
+        // Initialize the game on page load
+        window.onload = initializeBoard;
+    </script>
+</body>
+</html>
