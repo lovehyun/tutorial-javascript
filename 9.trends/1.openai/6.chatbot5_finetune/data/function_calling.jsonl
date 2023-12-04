@@ -1,0 +1,18 @@
+{
+    "messages": [
+        {"role": "user", "content": "What is the weather in San Francisco?"},
+        {"role": "assistant", "function_call": {"name": "get_current_weather", "arguments": "{\"location\": \"San Francisco, USA\", \"format\": \"celcius\"}"}
+    ],
+    "functions": [{
+        "name": "get_current_weather",
+        "description": "Get the current weather",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "The city and country, eg. San Francisco, USA"},
+                "format": {"type": "string", "enum": ["celsius", "fahrenheit"]}
+            },
+            "required": ["location", "format"]
+        }
+    }]
+}
