@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="items">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">type</th>
+                        <th scope="col">name</th>
+                        <th scope="col">unit_price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pagination.items %}
+                        <tr id={{ item.Id }}>
+                            <td> {{ item.Id }} </td>
+                            <td> {{ item.Type }} </td>
+                            <td> {{ item.Name }} </td>
+                            <td> {{ item.UnitPrice }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <ul class="pagination">
+            {% if pagination.currentPage > 1 %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage - 1 }}">Previous</a></li>
+            {% endif %}
+            
+            {% for page in range(1, pagination.totalPages + 1) %}
+                <li class="page-item {% if page == pagination.currentPage %}active{% endif %}">
+                    <a class="page-link" href="/items?page={{ page }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            
+            {% if pagination.currentPage < pagination.totalPages %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage + 1 }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}

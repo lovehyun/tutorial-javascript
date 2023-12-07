@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="orders">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">ordered_at</th>
+                        <th scope="col">store_id</th>
+                        <th scope="col">user_id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in pagination.items %}
+                        <tr id={{ order.Id }}>
+                            <td> {{ order.Id }} </td>
+                            <td> {{ order.OrderAt }} </td>
+                            <td> {{ order.StoreId }} </td>
+                            <td> {{ order.UserId }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if pagination %}
+        {% set total_pages = pagination.totalPages %}
+        {% for page in range(1, total_pages + 1) %}
+            <a href="/orders?page={{ page }}">{{ page }}</a>
+        {% endfor %}
+    {% endif %}
+
+{% endblock %}
