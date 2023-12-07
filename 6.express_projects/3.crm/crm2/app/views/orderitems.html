@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="order_items">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">order_id</th>
+                        <th scope="col">item_id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order_item in pagination.items %}
+                        <tr id={{ order_item.Id }}>
+                            <td> {{ order_item.Id }} </td>
+                            <td> {{ order_item.OrderId }} </td>
+                            <td> {{ order_item.ItemId }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <ul class="pagination">
+            {% if pagination.currentPage > 1 %}
+                <li class="page-item"><a class="page-link" href="?page=1">&lt;&lt;</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage - 1 }}">&lt;</a></li>
+            {% endif %}
+
+            {% for page in range(pagination.currentPage - 5, pagination.currentPage + 6) %}
+                {% if page > 0 and page <= pagination.totalPages %}
+                    <li class="page-item {% if page == pagination.currentPage %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.currentPage < pagination.totalPages %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage + 1 }}">&gt;</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.totalPages }}">&gt;&gt;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
