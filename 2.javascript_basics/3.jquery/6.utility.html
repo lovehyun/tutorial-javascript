@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Utility Examples</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            /* 스타일은 예제를 보기 편하게 하기 위한 것으로 필수는 아닙니다. */
+            body {
+                font-family: Arial, sans-serif;
+            }
+            ul {
+                list-style: none;
+                padding: 0;
+            }
+            li {
+                margin-bottom: 5px;
+            }
+            .fruit {
+                color: green;
+            }
+            .vegetable {
+                color: orange;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>jQuery each Example</h2>
+        <ul id="myList">
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+        </ul>
+
+        <h2>jQuery grep Example</h2>
+        <ul id="myList2">
+            <li class="fruit">Apple</li>
+            <li class="vegetable">Carrot</li>
+            <li class="fruit">Banana</li>
+            <li class="vegetable">Broccoli</li>
+        </ul>
+
+        <h2>jQuery extend Example</h2>
+        <script>
+            $(document).ready(function () {
+                // each 메서드 예제
+                $('#myList li').each(function (index, element) {
+                    console.log('Index: ' + index + ', Text: ' + $(element).text());
+                });
+
+                // grep 메서드 예제
+                var fruits = $.grep($('#myList2 li'), function (element, index) {
+                    return $(element).hasClass('fruit');
+                });
+                console.log(fruits);
+
+                // extend 메서드 예제
+                var object1 = { apple: 0, banana: { weight: 52, price: 100 }, cherry: 97 };
+                var object2 = { banana: { price: 200 }, durian: 100 };
+                var result = $.extend({}, object1, object2);
+                console.log(result);
+            });
+        </script>
+    </body>
+</html>

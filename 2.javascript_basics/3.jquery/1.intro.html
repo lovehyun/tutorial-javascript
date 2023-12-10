@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Example</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <h1 id="myHeading">Hello, jQuery!</h1>
+        <button id="changeTextBtn">Change Text</button>
+
+        <script>
+            // jQuery를 사용하여 문서가 준비되면 실행
+            $(document).ready(function () {
+                // 버튼을 클릭하면 제목의 텍스트 변경
+                $('#changeTextBtn').click(function () {
+                    $('#myHeading').text('Text Changed!');
+                });
+            });
+
+
+            /*
+            // 문서가 준비되면 실행되는 이벤트
+            document.addEventListener('DOMContentLoaded', function () {
+                // 버튼 클릭 시 실행되는 함수 바로 정의
+                document.getElementById('changeTextBtn').addEventListener('click', function () {
+                    document.getElementById('myHeading').textContent = 'Text Changed!';
+                });
+            });
+            */
+        </script>
+    </body>
+</html>

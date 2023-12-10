@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery DOM Manipulation Example</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <h1>Shopping List</h1>
+        <ul id="shoppingList">
+            <li>Bread</li>
+            <li>Milk</li>
+            <li>Eggs</li>
+        </ul>
+        <input type="text" id="newItem" placeholder="Add a new item" />
+        <button id="addItemBtn">Add Item</button>
+
+        <script>
+            $(document).ready(function () {
+                // 버튼 클릭 시 실행되는 함수
+                $('#addItemBtn').click(function () {
+                    // 입력 필드에서 새로운 아이템 가져오기
+                    var newItem = $('#newItem').val();
+
+                    // 새로운 아이템이 비어있지 않은 경우에만 추가
+                    if (newItem !== '') {
+                        // 리스트에 새로운 아이템 추가
+                        $('#shoppingList').append('<li>' + newItem + '</li>');
+
+                        // 입력 필드 비우기
+                        $('#newItem').val('');
+                    }
+                });
+            });
+
+            /*
+            document.addEventListener('DOMContentLoaded', function () {
+                // 버튼 클릭 시 실행되는 함수
+                var addItemBtn = document.getElementById('addItemBtn');
+
+                addItemBtn.addEventListener('click', function () {
+                    // 입력 필드에서 새로운 아이템 가져오기
+                    var newItemInput = document.getElementById('newItem');
+                    var newItemValue = newItemInput.value;
+
+                    // 새로운 아이템이 비어있지 않은 경우에만 추가
+                    if (newItemValue.trim() !== '') {
+                        // 리스트에 새로운 아이템 추가
+                        var shoppingList = document.getElementById('shoppingList');
+                        var newItemElement = document.createElement('li');
+                        newItemElement.textContent = newItemValue;
+
+                        shoppingList.appendChild(newItemElement);
+
+                        // 입력 필드 비우기
+                        newItemInput.value = '';
+                    }
+                });
+            });
+            */
+        </script>
+    </body>
+</html>

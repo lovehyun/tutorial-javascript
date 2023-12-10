@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Animation Example</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            #mySquare1 {
+                width: 100px;
+                height: 100px;
+                background-color: lightblue;
+                display: none; /* 초기에는 숨겨진 상태 */
+            }
+            #mySquare2 {
+                width: 100px;
+                height: 100px;
+                background-color: lightblue;
+                display: none; /* 초기에는 숨겨진 상태 */
+            }
+        </style>
+    </head>
+    <body>
+        <div id="mySquare1"></div>
+        <button id="toggleBtn">Toggle1</button>
+
+        <div id="mySquare2"></div>
+        <button id="toggleBtn2">Toggle2</button>
+
+        <script>
+            $(document).ready(function () {
+                var myElement1 = $('#mySquare1');
+                var myElement2 = $('#mySquare2');
+
+                // 버튼 클릭 시 실행되는 함수
+                $('#toggleBtn').click(function () {
+                    // toggle 메서드를 사용하여 요소의 가시성을 토글
+                    myElement1.toggle(1000); // 1초 동안 나타내거나 숨김
+                });
+
+                // 버튼 클릭 시 실행되는 함수
+                $('#toggleBtn2').click(function () {
+                    // 사각형을 토글하는 페이드 애니메이션
+                    myElement2.fadeToggle(1000); // 1초 동안 페이드 인/아웃
+                });
+            });
+        </script>
+    </body>
+</html>

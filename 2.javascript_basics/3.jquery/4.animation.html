@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Multiple Animations Example</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            .animated-box {
+                width: 100px;
+                height: 100px;
+                margin: 10px;
+                display: inline-block;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="box1" class="animated-box" style="background-color: lightblue"></div>
+        <div id="box2" class="animated-box" style="background-color: lightgreen"></div>
+        <div id="box3" class="animated-box" style="background-color: lightcoral"></div>
+
+        <script>
+            $(document).ready(function () {
+                // box1 클릭 시 fadeIn 애니메이션
+                $('#box1').click(function () {
+                    $(this).fadeOut().fadeIn();
+                });
+
+                // box2 클릭 시 slideDown 애니메이션
+                $('#box2').click(function () {
+                    $(this).slideUp().slideDown();
+                });
+
+                // box3 클릭 시 animate 애니메이션
+                $('#box3').click(function () {
+                    $(this).animate(
+                        {
+                            opacity: 0.5,
+                            width: '50%',
+                        },
+                        1000
+                    );
+                });
+            });
+        </script>
+    </body>
+</html>

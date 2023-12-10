@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>jQuery Event Handling Example</title>
+        <!-- jQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            #myDiv {
+                width: 200px;
+                height: 200px;
+                background-color: lightblue;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="myDiv"><span id="displayText">Hover me</span></div>
+        <button id="changeColorBtn">Change Color</button>
+
+        <script>
+            $(document).ready(function () {
+                var myDiv = $("#myDiv");
+                var displayText = $("#displayText");
+
+                // 버튼 클릭 시 실행되는 함수
+                $('#changeColorBtn').click(function () {
+                    // 배경색을 랜덤하게 변경
+                    var randomColor = getRandomColor();
+                    $('#myDiv').css('background-color', randomColor);
+                });
+
+                // 랜덤한 색상을 생성하는 함수
+                function getRandomColor() {
+                    var letters = '0123456789ABCDEF';
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+                }
+
+                // 마우스가 요소에 진입했을 때 실행되는 함수
+                myDiv.hover(
+                    function () {
+                        var currentColor = myDiv.css('background-color');
+                        displayText.text('Current Color: ' + currentColor);
+                        displayText.css("color", "white");
+                    },
+                    function () {
+                        displayText.text('Hover me'); // 마우스가 요소를 벗어날 때 텍스트 제거
+                        displayText.css("color", "black");
+                    }
+                );
+            });
+
+            /*
+            document.addEventListener('DOMContentLoaded', function () {
+                var changeColorBtn = document.getElementById('changeColorBtn');
+                var myDiv = document.getElementById('myDiv');
+
+                // 버튼 클릭 시 실행되는 함수
+                changeColorBtn.addEventListener('click', function () {
+                    // 배경색을 랜덤하게 변경
+                    var randomColor = getRandomColor();
+                    myDiv.style.backgroundColor = randomColor;
+                });
+
+                // 랜덤한 색상을 생성하는 함수
+                function getRandomColor() {
+                    var letters = '0123456789ABCDEF';
+                    var color = '#';
+                    for (var i = 0; i < 6; i++) {
+                        color += letters[Math.floor(Math.random() * 16)];
+                    }
+                    return color;
+                }
+            });
+            */
+        </script>
+    </body>
+</html>
