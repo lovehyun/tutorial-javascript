@@ -10,9 +10,15 @@
     <body>
         <div class="container">
             <h1>Hello, Bootstrap!</h1>
-            <button class="btn btn-primary">Click me</button>
+            <button class="btn btn-primary" id="myButton">Click me</button>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Click me 버튼 클릭 이벤트 핸들러 추가
+            document.getElementById('myButton').addEventListener('click', function() {
+                alert('Button Clicked!');
+            });
+        </script>
     </body>
 </html>
