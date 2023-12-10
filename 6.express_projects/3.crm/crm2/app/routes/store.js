@@ -37,9 +37,8 @@ router.get('/:store_id', async (req, res) => {
         const storeId = req.params.store_id;
         
         const store = new Store();
-
+        
         const queryStore = `SELECT * FROM stores WHERE id = ?`;
-
         const store_data = await store.executeQuery(queryStore, [ storeId ]);
 
         if (!store_data) {
