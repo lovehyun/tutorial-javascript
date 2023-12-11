@@ -25,8 +25,6 @@ router.get('/', async (req, res) => {
             totalPages: Math.ceil(totalCount / perPage),
         };
 
-        console.log(pagination.iterPages);
-
         res.render('orderitems', { pagination });
     } catch (error) {
         console.error(error);
