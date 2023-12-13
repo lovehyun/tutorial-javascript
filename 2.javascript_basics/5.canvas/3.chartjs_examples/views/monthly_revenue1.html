@@ -1,0 +1,23 @@
+<!-- views/monthly_revenue1.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Revenue</title>
+</head>
+<body>
+    <h1>Monthly Revenue</h1>
+    <table>
+        <tr>
+            <th>Year-Month</th>
+            <th>Monthly Revenue</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.YearMonth }}</td>
+            <td>{{ row.MonthlyRevenue }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!-- views/monthly_revenue3.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Revenue</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Monthly Revenue</h1>
+    <table>
+        <tr>
+            <th>Year-Month</th>
+            <th>Monthly Revenue</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.YearMonth }}</td>
+            <td>{{ row.MonthlyRevenue }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <canvas id="revenueChart"></canvas>
+
+    <script>
+        var labels = {{ labels | safe }};
+        var revenues = {{ revenues | safe }};
+
+        // 차트 그리기
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Monthly Revenue',
+                    data: revenues,
+                    fill: false,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Revenue</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Monthly Revenue</h1>
+    <canvas id="revenueChart"></canvas>
+
+    <script>
+        // 차트 데이터 가져오기
+        fetch('/chart_data')
+            .then(response => response.json())
+            .then(chartData => {
+                // 차트 그리기
+                var ctx = document.getElementById('revenueChart').getContext('2d');
+                var revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    // type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Monthly Revenue',
+                            data: chartData.revenues,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+    </script>
+</body>
+</html>
