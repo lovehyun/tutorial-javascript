@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bar Graph Example</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="barGraphCanvas" width="400" height="200"></canvas>
+
+        <script>
+            // 예제 데이터
+            const graphData = {
+                A: 10,
+                B: 20,
+                C: 40,
+                D: 60,
+                E: 80,
+            };
+
+            // 그래프 그리기 함수 호출
+            drawBarGraph(graphData);
+
+            function drawBarGraph(data) {
+                const canvas = document.getElementById('barGraphCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // 그래프 영역 초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 바 그래프 그리기
+                const barWidth = 30;
+                let startX = 20;
+
+                for (const key in data) {
+                    const barHeight = data[key];
+                    ctx.fillStyle = 'blue';
+                    ctx.fillRect(startX, canvas.height - barHeight - 20, barWidth, barHeight);
+
+                    // x축에 텍스트 쓰기
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(key, startX + barWidth / 2 - 10, canvas.height - 5);
+
+                    startX += 50; // 간격 조절
+                }
+            }
+        </script>
+    </body>
+</html>

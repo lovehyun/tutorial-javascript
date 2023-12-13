@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Line Graph Example</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="lineGraphCanvas" width="400" height="200"></canvas>
+
+        <script>
+            // 예제 데이터
+            const graphData = {
+                A: 10,
+                B: 20,
+                C: 40,
+                D: 60,
+                E: 80,
+            };
+
+            // 그래프 그리기 함수 호출
+            drawLineGraph(graphData);
+
+            function drawLineGraph(data) {
+                const canvas = document.getElementById('lineGraphCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // 그래프 영역 초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 선 그래프 그리기
+                ctx.beginPath();
+                ctx.strokeStyle = 'green';
+                ctx.lineWidth = 2;
+
+                const keys = Object.keys(data);
+
+                if (keys.length > 0) {
+                    const startX = 20;
+                    const startY = canvas.height - data[keys[0]];
+
+                    ctx.moveTo(startX, startY);
+
+                    for (let i = 0; i < keys.length; i++) {
+                        const key = keys[i];
+                        const x = startX + i * 50;
+                        const y = canvas.height - data[key];
+                        ctx.lineTo(x, y);
+
+                        // x축에 텍스트 쓰기
+                        ctx.fillStyle = 'black';
+                        ctx.fillText(key, x - 10, canvas.height - 5);
+                    }
+
+                    ctx.stroke();
+                }
+                ctx.closePath();
+            }
+
+            function drawLineGraph2(data) {
+                const canvas = document.getElementById('lineGraphCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // 그래프 영역 초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 선 그래프 그리기
+                ctx.beginPath();
+                ctx.strokeStyle = 'green';
+                ctx.lineWidth = 2;
+
+                const keys = Object.keys(data);
+
+                if (keys.length > 0) {
+                    const startX = 50;
+                    const startY = canvas.height - data[keys[0]];
+
+                    ctx.moveTo(startX, startY);
+
+                    // Y 축 눈금 및 숫자 추가
+                    const numTicks = 5; // 원하는 눈금 개수
+                    const tickSpacing = canvas.height / numTicks;
+
+                    // Y 축 눈금 및 숫자 추가
+                    const fixedYTicks = [20, 40, 60, 80, 100];
+
+                    for (let i = 0; i < fixedYTicks.length; i++) {
+                        const tickY = canvas.height - (fixedYTicks[i] * canvas.height) / 100;
+
+                        // Y 축에 눈금 그리기
+                        ctx.moveTo(startX - 5, tickY);
+                        ctx.lineTo(startX, tickY);
+                        ctx.stroke();
+
+                        // Y 축에 숫자 쓰기
+                        ctx.fillStyle = 'black';
+                        ctx.fillText(fixedYTicks[i], startX - 30, tickY + 5);
+                    }
+
+                    for (let i = 0; i < keys.length; i++) {
+                        const key = keys[i];
+                        const x = startX + i * 50;
+                        const y = canvas.height - (data[key] * canvas.height) / 100;
+                        ctx.lineTo(x, y);
+
+                        // x축에 텍스트 쓰기
+                        ctx.fillStyle = 'black';
+                        ctx.fillText(key, x - 10, canvas.height - 5);
+                    }
+
+                    ctx.stroke();
+                }
+                ctx.closePath();
+            }
+        </script>
+    </body>
+</html>

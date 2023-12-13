@@ -1,88 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>회사 조직도</title>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <style>
-    /* 선택적으로 스타일링을 할 수 있습니다. */
-    .node circle {
-      fill: #fff;
-      stroke: steelblue;
-      stroke-width: 2px;
-    }
-    .node text {
-      font-size: 12px;
-    }
-    path.link {
-      fill: none;
-      stroke: #ccc;
-      stroke-width: 1.5px;
-    }
-  </style>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>회사 조직도</title>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+        <style>
+            /* 선택적으로 스타일링을 할 수 있습니다. */
+            .node circle {
+                fill: #fff;
+                stroke: steelblue;
+                stroke-width: 2px;
+            }
+            .node text {
+                font-size: 12px;
+            }
+            path.link {
+                fill: none;
+                stroke: #ccc;
+                stroke-width: 1.5px;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            // 조직도 데이터를 정의합니다.
+            const orgData = {
+                name: 'CEO',
+                children: [
+                    {
+                        name: 'CTO',
+                        children: [{ name: 'Backend Team Lead' }, { name: 'Frontend Team Lead' }],
+                    },
+                    {
+                        name: 'CFO',
+                        children: [{ name: 'Finance Manager' }, { name: 'Accountant' }],
+                    },
+                ],
+            };
 
-<script>
-  // 조직도 데이터를 정의합니다.
-  const orgData = {
-    "name": "CEO",
-    "children": [
-      {
-        "name": "CTO",
-        "children": [
-          {"name": "Backend Team Lead"},
-          {"name": "Frontend Team Lead"}
-        ]
-      },
-      {
-        "name": "CFO",
-        "children": [
-          {"name": "Finance Manager"},
-          {"name": "Accountant"}
-        ]
-      }
-    ]
-  };
+            // 트리 맵을 생성합니다.
+            const treeMap = d3.tree().size([600, 300]);
+            const nodes = d3.hierarchy(orgData);
+            const treeData = treeMap(nodes);
 
-  // 트리 맵을 생성합니다.
-  const treeMap = d3.tree().size([600, 300]);
-  const nodes = d3.hierarchy(orgData);
-  const treeData = treeMap(nodes);
+            // SVG 요소를 생성합니다.
+            const svg = d3
+                .select('body')
+                .append('svg')
+                .attr('width', 800)
+                .attr('height', 600)
+                .append('g')
+                .attr('transform', 'translate(50, 20)');
 
-  // SVG 요소를 생성합니다.
-  const svg = d3.select('body').append('svg')
-    .attr('width', 800)
-    .attr('height', 600)
-    .append('g')
-    .attr('transform', 'translate(50, 20)');
+            // 링크를 그립니다.
+            svg.selectAll('path.link')
+                .data(treeData.links())
+                .enter()
+                .append('path')
+                .attr('class', 'link')
+                .attr(
+                    'd',
+                    d3
+                        .linkHorizontal()
+                        .x((d) => d.y)
+                        .y((d) => d.x)
+                );
 
-  // 링크를 그립니다.
-  svg.selectAll('path.link')
-    .data(treeData.links())
-    .enter().append('path')
-    .attr('class', 'link')
-    .attr('d', d3.linkHorizontal()
-      .x(d => d.y)
-      .y(d => d.x));
+            // 노드를 그립니다.
+            const node = svg
+                .selectAll('g.node')
+                .data(treeData.descendants())
+                .enter()
+                .append('g')
+                .attr('class', 'node')
+                .attr('transform', (d) => `translate(${d.y},${d.x})`);
 
-  // 노드를 그립니다.
-  const node = svg.selectAll('g.node')
-    .data(treeData.descendants())
-    .enter().append('g')
-    .attr('class', 'node')
-    .attr('transform', d => `translate(${d.y},${d.x})`);
-
-  // 원을 그리고 텍스트를 추가합니다.
-  node.append('circle')
-    .attr('r', 5);
-  node.append('text')
-    .attr('dy', '0.31em')
-    .attr('x', d => d.children ? -8 : 8)
-    .style('text-anchor', d => d.children ? 'end' : 'start')
-    .text(d => d.data.name);
-</script>
-
-</body>
+            // 원을 그리고 텍스트를 추가합니다.
+            node.append('circle').attr('r', 5);
+            node.append('text')
+                .attr('dy', '0.31em')
+                .attr('x', (d) => (d.children ? -8 : 8))
+                .style('text-anchor', (d) => (d.children ? 'end' : 'start'))
+                .text((d) => d.data.name);
+        </script>
+    </body>
 </html>

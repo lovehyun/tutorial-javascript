@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pie Chart Example</title>
+        <style>
+            canvas {
+                border: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas id="pieChartCanvas" width="400" height="400"></canvas>
+
+        <script>
+            // 예제 데이터
+            const graphData = {
+                A: 10,
+                B: 20,
+                C: 40,
+                D: 60,
+                E: 80,
+            };
+
+            // 그래프 그리기 함수 호출
+            drawPieChart(graphData);
+
+            function drawPieChart(data) {
+                const canvas = document.getElementById('pieChartCanvas');
+                const ctx = canvas.getContext('2d');
+
+                // 그래프 영역 초기화
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // 파이 차트 그리기
+                const total = Object.values(data).reduce((acc, value) => acc + value, 0);
+                let startAngle = 0;
+
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = Math.min(canvas.width, canvas.height) / 2 - 30; // 반지름을 조정하여 여백을 만듦
+
+                const legendSpacing = 20; // 레전드의 간격 설정
+                let legendY = 10; // 초기 레전드의 y 축 위치
+
+                for (const key in data) {
+                    const value = data[key];
+                    const sliceAngle = (value / total) * 2 * Math.PI;
+
+                    ctx.beginPath();
+                    ctx.fillStyle = getRandomColor(); // 랜덤 색상 함수 호출
+                    ctx.moveTo(canvas.width / 2, canvas.height / 2);
+                    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                    ctx.fill();
+                    ctx.closePath();
+
+                    // 레전드 표시
+                    ctx.fillRect(canvas.width - 100, legendY, 10, 10);
+                    ctx.fillText(
+                        `${key} (${((value / total) * 100).toFixed(1)}%)`,
+                        canvas.width - 80,
+                        legendY + 10
+                    );
+
+                    startAngle += sliceAngle;
+                    legendY += legendSpacing;
+                }
+            }
+
+            function getRandomColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+        </script>
+    </body>
+</html>
