@@ -1,4 +1,6 @@
 // npm install puppeteer
+// Puppeteer는 Chrome이나 Chromium 브라우저를 제어하여 웹 페이지를 스크래핑하거나 자동화하는 데 사용됩니다. 
+// 주로 웹 페이지 스크린샷을 찍거나 페이지의 DOM을 조작하는 등의 작업을 수행할 수 있습니다.
 
 const puppeteer = require('puppeteer');
 
