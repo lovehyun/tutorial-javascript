@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>음성 인식 (STT) 예제</title>
+    </head>
+    <body>
+        <button id="startButton">음성 입력 시작</button>
+        <p id="result">음성 결과가 여기에 나타납니다.</p>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const startButton = document.getElementById('startButton');
+                const resultElement = document.getElementById('result');
+
+                // Web Speech API를 지원하는지 확인
+                if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+
+                    // 인식 시작 이벤트
+                    startButton.addEventListener('click', () => {
+                        recognition.start();
+                        resultElement.textContent = '음성 입력 중...';
+                    });
+
+                    // 인식 결과 이벤트
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        resultElement.textContent = `음성 결과: ${transcript}`;
+                    };
+
+                    // 인식 종료 이벤트
+                    recognition.onend = () => {
+                        resultElement.textContent += '\n음성 입력이 종료되었습니다.';
+                    };
+
+                    // 에러 처리 이벤트
+                    recognition.onerror = (event) => {
+                        resultElement.textContent = '오류 발생: ' + event.error;
+                    };
+                } else {
+                    // Web Speech API를 지원하지 않는 경우 메시지 표시
+                    resultElement.textContent = '죄송합니다. 이 브라우저는 Web Speech API를 지원하지 않습니다.';
+                }
+            });
+        </script>
+    </body>
+</html>

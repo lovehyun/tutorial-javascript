@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>음성 출력 예제</title>
+    </head>
+    <body>
+        <button id="speakButton">음성으로 인사하기</button>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const speakButton = document.getElementById('speakButton');
+
+                // Web Speech API 지원 여부 확인
+                if ('speechSynthesis' in window) {
+                    const synthesis = window.speechSynthesis;
+
+                    // 음성으로 말하기 함수
+                    const speakText = (text) => {
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        synthesis.speak(utterance);
+                    };
+
+                    // 음성으로 인사하기 버튼 클릭 이벤트
+                    speakButton.addEventListener('click', () => {
+                        speakText('안녕하세요');
+                    });
+                } else {
+                    // Web Speech API를 지원하지 않는 경우 메시지 표시
+                    alert('죄송합니다. 이 브라우저는 Text-to-Speech를 지원하지 않습니다.');
+                }
+            });
+        </script>
+    </body>
+</html>
