@@ -17,37 +17,31 @@
 
         <script>
             // Leaflet을 사용하여 지도 생성
-            var map = L.map('map').setView([37.5199, 126.9406], 14); // 서울 63빌딩 좌표로 지도 중심 설정
+            var map = L.map('map').setView([37.5199, 126.9406], 13); // 서울 63빌딩 좌표로 지도 중심 설정
 
             // OpenStreetMap 타일 레이어 추가
             L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
             }).addTo(map);
 
-            // 출발지와 도착지 좌표 설정 (서울 63빌딩 -> 남산타워)
-            var origin_latitude = 37.5199;
-            var origin_longitude = 126.9406;
-            var destination_latitude = 37.5512;
-            var destination_longitude = 126.9882;
+            // 경유지 목록 (이름과 좌표)
+            var waypoints = [
+                { name: '63빌딩', lat: 37.5199, long: 126.9406 },
+                { name: '남산타워', lat: 37.5512, long: 126.9882 },
+                { name: '롯데월드', lat: 37.5113, long: 127.0985 },
+            ];
 
             // 라우팅 컨트롤 생성
             var control = L.Routing.control({
-                waypoints: [
-                    L.latLng(origin_latitude, origin_longitude),
-                    L.latLng(destination_latitude, destination_longitude),
-                ],
+                waypoints: waypoints.map((wp) => L.latLng(wp.lat, wp.long)),
                 plan: L.Routing.plan(
-                    [
-                        L.latLng(origin_latitude, origin_longitude),
-                        L.latLng(destination_latitude, destination_longitude),
-                    ],
+                    waypoints.map((wp) => L.latLng(wp.lat, wp.long)),
                     {
-                        // 마커는 활성화 안해도 기본적으로 표시됨 (이때는 draggable: false)
+                        // 마커 추가
                         createMarker: function (i, wp) {
-                            // i(인덱스), waypoint, n(전체개수)
-                            return L.marker(wp.latLng, {
-                                draggable: true,
-                            });
+                            var marker = L.marker(wp.latLng, { draggable: false });
+                            marker.bindPopup(waypoints[i].name);
+                            return marker;
                         },
                     }
                 ),

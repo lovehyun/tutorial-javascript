@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OpenStreetMap 경로 탐색</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.css" />
+        <style>
+            #map {
+                height: 600px;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
+        <div>
+            <label for="start">출발지:</label>
+            <input type="text" id="start" placeholder="예: 63빌딩"/>
+            <br />
+            <label for="end">도착지:</label>
+            <input type="text" id="end" placeholder="예: 남산타워"/>
+            <br />
+            <button onclick="findRoute()">경로 찾기</button>
+        </div>
+        <div id="map"></div>
+
+        <script>
+            var map = L.map('map').setView([37.5665, 126.9784], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            function findRoute() {
+                var start = document.getElementById('start').value;
+                var end = document.getElementById('end').value;
+
+                // 출발지와 도착지 주소를 좌표로 변환
+                var startCoord, endCoord;
+
+                // 출발지 좌표 변환
+                fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + start)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        startCoord = [data[0].lat, data[0].lon];
+
+                        // 도착지 좌표 변환
+                        return fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + end);
+                    })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        endCoord = [data[0].lat, data[0].lon];
+
+                        // 출발지와 도착지에 마커 추가
+                        L.marker(startCoord).addTo(map).bindPopup('출발지: ' + start).openPopup();
+                        L.marker(endCoord).addTo(map).bindPopup('도착지: ' + end).openPopup();
+
+                        // 경로 표시
+                        var route = L.polyline([startCoord, endCoord], { color: 'blue' }).addTo(map);
+                        map.fitBounds(route.getBounds());
+                    })
+                    .catch((error) => console.error('Error:', error));
+            }
+        </script>
+    </body>
+</html>

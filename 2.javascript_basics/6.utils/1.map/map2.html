@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>OpenStreetMap 경로 탐색</title>
+        <title>OpenStreetMap 지리적 데이터 시각화</title>
         <style>
             #map {
                 height: 600px;
@@ -10,15 +10,6 @@
         </style>
     </head>
     <body>
-        <div>
-            <label for="start">출발지:</label>
-            <input type="text" id="start" />
-            <br />
-            <label for="end">도착지:</label>
-            <input type="text" id="end" />
-            <br />
-            <button onclick="findRoute()">경로 찾기</button>
-        </div>
         <div id="map"></div>
 
         <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
@@ -32,20 +23,27 @@
                 maxZoom: 18,
             }).addTo(map);
 
-            function findRoute() {
-                var start = document.getElementById('start').value;
-                var end = document.getElementById('end').value;
+            // 서울 관광지 데이터
+            var touristSpots = [
+                {
+                    name: '경복궁',
+                    location: [37.578, 126.977],
+                },
+                {
+                    name: '명동',
+                    location: [37.5635, 126.981],
+                },
+                {
+                    name: '남산 타워',
+                    location: [37.5515, 126.988],
+                },
+                // 추가 관광지 정보...
+            ];
 
-                // 경로 탐색 로직 구현
-                // 서울을 기준으로 출발지와 도착지 사이의 최적 경로를 탐색하여 지도에 표시
-
-                // 예시: 출발지와 도착지 좌표를 하드코딩하여 경로 표시
-                var startCoord = [37.5665, 126.9784];
-                var endCoord = [37.4979, 127.0276];
-
-                var route = L.polyline([startCoord, endCoord], { color: 'blue' }).addTo(map);
-                map.fitBounds(route.getBounds());
-            }
+            // 관광지 마커 표시
+            touristSpots.forEach(function (spot) {
+                L.marker(spot.location).addTo(map).bindPopup(spot.name);
+            });
         </script>
     </body>
 </html>
