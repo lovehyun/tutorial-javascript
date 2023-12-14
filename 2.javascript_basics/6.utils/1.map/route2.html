@@ -39,7 +39,7 @@
                     {
                         // 마커 추가
                         createMarker: function (i, wp) {
-                            var marker = L.marker(wp.latLng, { draggable: false });
+                            var marker = L.marker(wp.latLng, { draggable: true });
                             marker.bindPopup(waypoints[i].name);
                             return marker;
                         },
