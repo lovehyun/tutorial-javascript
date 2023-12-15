@@ -77,7 +77,9 @@
                 })
                     .then((response) => {
                         if (!response.ok) {
-                            throw new Error('서버 응답 오류');
+                            return response.json().then((data) => {
+                                throw new Error(`${data.message}`);
+                            });
                         }
                         return response.json();
                     })
@@ -88,7 +90,7 @@
                     })
                     .catch((error) => {
                         console.error('Error:', error);
-                        document.getElementById('verificationResult').innerText = error.message;
+                        document.getElementById('verificationResult').innerText = `오류: ${error.message}`;
                     });
             }
         </script>
