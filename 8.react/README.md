@@ -107,3 +107,12 @@ http-server ./build -p 3000
 ```
 
 이제 http://localhost:3000 (또는 사용하는 포트)에서 앱이 사용자에게 제공됩니다.
+
+
+## 앱 통합 배포
+
+express 로 개발된 앱에서 react의 프런트엔드를 서빙하려면 아래와 같은 방법으로 코드의 빌드 파일을 복사해 줍니다.
+
+```
+cp -r your-react-app/build your-express-server/public
+```
