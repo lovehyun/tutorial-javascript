@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #puzzle {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-gap: 5px;
+            background-color: #ddd;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <title>Number Puzzle Game</title>
+</head>
+<body>
+    <div id="puzzle"></div>
+
+    <script>
+        const puzzleContainer = document.getElementById('puzzle');
+        const puzzleSize = 3;
+        const emptyCell = puzzleSize * puzzleSize;
+
+        let puzzleState = [];
+
+        // Shuffle the puzzle by making 100 random moves
+        function shufflePuzzle() {
+            for (let i = 0; i < 100; i++) {
+                const emptyIndex = puzzleState.indexOf(null);
+                const neighbors = getValidNeighbors(emptyIndex);
+                const randomNeighbor = neighbors[Math.floor(Math.random() * neighbors.length)];
+
+                if (randomNeighbor !== undefined) {
+                    [puzzleState[emptyIndex], puzzleState[randomNeighbor]] = [puzzleState[randomNeighbor], puzzleState[emptyIndex]];
+                }
+            }
+        }
+
+        // Get valid neighbors of the empty cell
+        function getValidNeighbors(emptyIndex) {
+            const neighbors = [];
+
+            const row = Math.floor(emptyIndex / puzzleSize);
+            const col = emptyIndex % puzzleSize;
+
+            // Check left neighbor
+            if (col > 0) {
+                neighbors.push(emptyIndex - 1);
+            }
+            // Check right neighbor
+            if (col < puzzleSize - 1) {
+                neighbors.push(emptyIndex + 1);
+            }
+            // Check top neighbor
+            if (row > 0) {
+                neighbors.push(emptyIndex - puzzleSize);
+            }
+            // Check bottom neighbor
+            if (row < puzzleSize - 1) {
+                neighbors.push(emptyIndex + puzzleSize);
+            }
+
+            return neighbors;
+        }
+
+        // Render the puzzle on the HTML
+        function renderPuzzle() {
+            puzzleContainer.innerHTML = '';
+            puzzleState.forEach((number, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = number !== null ? number : '';
+                cell.addEventListener('click', () => moveCell(index));
+                puzzleContainer.appendChild(cell);
+            });
+        }
+
+        // Initialize the puzzle
+        function initializePuzzle() {
+            puzzleState = [];
+            for (let i = 1; i < emptyCell; i++) {
+                puzzleState.push(i);
+            }
+            puzzleState.push(null); // The last cell is initially empty
+            shufflePuzzle();
+            renderPuzzle();
+        }
+
+        // Check if the move is valid
+        function isMoveValid(clickedIndex, emptyIndex) {
+            const rowClicked = Math.floor(clickedIndex / puzzleSize);
+            const colClicked = clickedIndex % puzzleSize;
+            const rowEmpty = Math.floor(emptyIndex / puzzleSize);
+            const colEmpty = emptyIndex % puzzleSize;
+
+            return (
+                (rowClicked === rowEmpty && Math.abs(colClicked - colEmpty) === 1) ||
+                (colClicked === colEmpty && Math.abs(rowClicked - rowEmpty) === 1)
+            );
+        }
+
+        // Move a cell if possible
+        function moveCell(index) {
+            const emptyIndex = puzzleState.indexOf(null);
+            if (isMoveValid(index, emptyIndex)) {
+                [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
+                renderPuzzle();
+
+                if (isPuzzleSolved()) {
+                    setTimeout(() => {
+                        alert('Congratulations! You solved the puzzle!');
+                        initializePuzzle();
+                    }, 0);
+                }
+            }
+        }
+
+        // Check if the puzzle is solved
+        function isPuzzleSolved() {
+            for (let i = 0; i < puzzleState.length - 1; i++) {
+                if (puzzleState[i] !== i + 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Initialize the puzzle on page load
+        window.onload = initializePuzzle;
+    </script>
+</body>
+</html>
