@@ -1,9 +1,19 @@
 const WebSocket = require('ws');
+const express = require('express');
+const path = require('path');
 
 const port = 8080;
+const express_port = 3000;
+
+const app = express();
+
 
 // 웹소켓 서버 생성
 const wss = new WebSocket.Server({ port: port });
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'chat2_design.html'));
+});
 
 // 서버 시작 시 이벤트 처리
 wss.on('listening', () => {
@@ -20,11 +30,15 @@ wss.on('connection', (ws, req) => {
         const messageString = message.toString('utf8');
         console.log(`Received message from [${clientIp}]: `, messageString);
 
+        // 파싱하여 content 추출
+        const parsedMessage = JSON.parse(messageString);
+        const content = parsedMessage.content;
+
         // 모든 클라이언트에게 메시지 전송
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
                 const messageType = client === ws ? 'sent' : 'received';
-                const messageObj = { type: messageType, content: messageString };
+                const messageObj = { type: messageType, content: content };
                 client.send(JSON.stringify(messageObj));
             }
         });
@@ -39,3 +53,8 @@ wss.on('connection', (ws, req) => {
 
 // 서버 시작
 console.log(`WebSocket server is starting...`);
+
+// Start the HTTP server
+app.listen(express_port, () => {
+    console.log(`WebSocket server is running on http://localhost:${express_port}`);
+});

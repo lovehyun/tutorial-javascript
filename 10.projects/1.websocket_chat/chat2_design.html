@@ -49,6 +49,7 @@
         // 서버로부터 메시지 수신 이벤트 처리
         socket.addEventListener('message', (event) => {
             const message = JSON.parse(event.data);
+            console.log(message);
             displayMessage(message);
         });
 
