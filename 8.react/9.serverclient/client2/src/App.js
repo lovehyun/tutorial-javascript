@@ -16,7 +16,7 @@ function App() {
             .catch((error) => {
                 console.error('Error fetching data:', error);
             });
-    }, []);
+    }, []); // 의존성변수
 
     const handleButtonClick = () => {
         setCount(count + 1);

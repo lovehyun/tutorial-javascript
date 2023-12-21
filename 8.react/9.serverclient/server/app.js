@@ -1,8 +1,11 @@
 const express = require('express');
+const morgan = require('morgan');
 const cors = require('cors');
 
 const app = express();
 const port = 5000;
+
+app.use(morgan('dev'));
 
 // CORS 미들웨어 추가 - 모든 크로스 도메인 허용
 app.use(cors());

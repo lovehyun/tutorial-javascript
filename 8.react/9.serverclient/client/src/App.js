@@ -11,7 +11,7 @@ function App() {
             .then((response) => response.json())
             .then((data) => setData(data.message))
             .catch((error) => console.error('Error fetching data:', error));
-    }, []);
+    }, []); // 의존성변수
 
     return (
         <div>

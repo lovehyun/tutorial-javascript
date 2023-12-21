@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 // npm install react-icons
+// https://react-icons.github.io/react-icons/
 import { AiOutlineDelete } from 'react-icons/ai';
 import { FaTrash } from 'react-icons/fa';
 import './TodoApp.css'; // 스타일 파일을 불러옵니다.

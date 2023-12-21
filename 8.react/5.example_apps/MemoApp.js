@@ -29,6 +29,25 @@ const MemoApp = () => {
         />
         <button onClick={addMemo}>추가</button>
       </div>
+
+      {/* <ul>
+      {
+        (() => {
+          const memoElements = [];
+          for (let index = 0; index < memoList.length; index++) {
+            const memo = memoList[index];
+            memoElements.push(
+              <li key={index}>
+                {memo}
+                <button onClick={() => deleteMemo(index)}>삭제</button>
+              </li>
+            );
+          }
+          return memoElements;
+        })()
+      }
+      </ul> */}
+
       <ul>
         {memoList.map((memo, index) => (
           <li key={index}>
