@@ -29,10 +29,17 @@ wss.on('connection', (ws, req) => {
     ws.on('message', (message) => {
         const messageString = message.toString('utf8');
         console.log(`Received message from [${clientIp}]: `, messageString);
+        let content = "";
 
         // 파싱하여 content 추출
-        const parsedMessage = JSON.parse(messageString);
-        const content = parsedMessage.content;
+        try {
+            const parsedMessage = JSON.parse(messageString);
+            content = parsedMessage.content;
+        } catch {
+            // 유효하지 않은 JSON 형식인 경우 에러 처리
+            console.error('Invalid JSON format:', error);
+            return;
+        }
 
         // 모든 클라이언트에게 메시지 전송
         wss.clients.forEach((client) => {
