@@ -20,6 +20,9 @@ wss.on('connection', (ws, req) => {
         const messageString = message.toString('utf8');
         console.log(`Received message from [${clientIp}]: `, messageString);
 
+        // 현재 클라이언트에게 메시지 전송
+        // ws.send(JSON.stringify({ type: 'chat', content: message }));
+
         // 모든 클라이언트에게 메시지 전송
         wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {

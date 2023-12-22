@@ -28,15 +28,15 @@ app.ws('/chat', (ws, req) => {
         // 파싱하여 content와 세션 ID 추출
         const parsedMessage = JSON.parse(messageString);
         const content = parsedMessage.content;
-        const sessionId = parsedMessage.sessionId;
+        const username = parsedMessage.username;
 
         // 세션 ID 설정 (한 번만 설정하면 됨)
-        if (sessionId && !wsClients.has(sessionId)) {
-            wsClients.set(sessionId, ws);
-            broadcastMessage(`[${sessionId}] entered the chat.`);
+        if (username && !wsClients.has(username)) {
+            wsClients.set(username, ws);
+            broadcastMessage(`[${username}] entered the chat.`);
         }
         
-        console.log(`Received message from [${clientIp}]: `, sessionId);
+        console.log(`Received message from [${clientIp}]: `, username);
 
         // 모든 클라이언트에게 메시지 전송
         if (parsedMessage.type !== 'session') {
@@ -46,7 +46,7 @@ app.ws('/chat', (ws, req) => {
                     const messageObj = {
                         type: messageType,
                         content: content,
-                        sender: clientId === sessionId ? 'me' : sessionId,
+                        sender: clientId === username ? 'me' : username,
                     };
                     client.send(JSON.stringify(messageObj));
                 }
