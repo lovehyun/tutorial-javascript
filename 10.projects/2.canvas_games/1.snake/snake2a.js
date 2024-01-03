@@ -7,7 +7,10 @@ const snakeSpeed = 200; // 뱀 이동 속도 (밀리초)
 let snake = [
     { x: 0, y: 0 }, // 초기 뱀 위치
 ];
+
 let direction = 'right'; // 뱀 초기 이동 방향
+let directionBuffer = []; // 키 입력 버퍼
+
 let food = generateFood(); // 초기 음식 생성
 let gameover = false; // 게임 오버 여부
 
@@ -20,6 +23,9 @@ function draw() {
         context.fillStyle = '#F00';
         context.font = '30px Arial';
         context.fillText('Game Over', 80, canvasSize / 2);
+        // 재시작 코드 추가
+        context.font = '20px Arial';
+        context.fillText('Retry? (Press Y)', 80, canvasSize / 2 + 40);
         return;
     }
 
@@ -50,6 +56,13 @@ function drawFood() {
 // 뱀 이동 함수
 function moveSnake() {
     const head = { ...snake[0] };
+
+    // 버퍼에 입력이 있을 때만 방향 변경
+    if (directionBuffer.length > 0) {
+        console.log(directionBuffer);
+        direction = directionBuffer.shift();
+    }
+
     switch (direction) {
         case 'up':
             head.y -= 1;
@@ -133,32 +146,49 @@ document.addEventListener('keydown', handleKeyPress);
 // 키 입력에 따른 방향 전환 함수
 function handleKeyPress(event) {
     if (gameover) {
-        resetGame(); // 게임 오버 상태에서 키 입력 시 게임 재시작
+        // 재시작 추가
+        if (event.key.toLowerCase() === 'y') {
+            resetGame();
+        }
         return;
+    }
+
+    // 버그해결 - 제한된 시간 내에만 키 입력을 처리
+    if (directionBuffer.length >= 2) {
+        console.log('key buffer full: ', directionBuffer);
+        return;
+    }
+
+    let previousKeyPress = direction;
+    if (directionBuffer.length > 0) {
+        previousKeyPress = directionBuffer[directionBuffer.length - 1];
     }
 
     switch (event.key) {
         case 'ArrowUp':
-            if (direction !== 'down') {
-                direction = 'up';
+            if (previousKeyPress !== 'down') {
+                directionBuffer.push('up');
             }
             break;
         case 'ArrowDown':
-            if (direction !== 'up') {
-                direction = 'down';
+            if (previousKeyPress !== 'up') {
+                directionBuffer.push('down');
             }
             break;
         case 'ArrowLeft':
-            if (direction !== 'right') {
-                direction = 'left';
+            if (previousKeyPress !== 'right') {
+                directionBuffer.push('left');
             }
             break;
         case 'ArrowRight':
-            if (direction !== 'left') {
-                direction = 'right';
+            if (previousKeyPress !== 'left') {
+                directionBuffer.push('right');
             }
             break;
+        default:
+            console.log('Unknown key:', event.key);
     }
+    console.log(event.key);
 }
 
 // 일정 시간마다 화면 그리기 함수 호출
