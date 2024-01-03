@@ -20,23 +20,6 @@ let paddleX = (canvas.width - paddleWidth) / 2;
 let rightPressed = false;
 let leftPressed = false;
 
-// 블록 초기화
-const brickRowCount = 3;
-const brickColumnCount = 5;
-const brickWidth = 75;
-const brickHeight = 20;
-const brickPadding = 10;
-const brickOffsetTop = 30;
-const brickOffsetLeft = 30;
-
-const bricks = [];
-for (let c = 0; c < brickColumnCount; c++) {
-    bricks[c] = [];
-    for (let r = 0; r < brickRowCount; r++) {
-        bricks[c][r] = { x: 0, y: 0, status: 1 };
-    }
-}
-
 // 키보드 이벤트 처리
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keyup', keyUpHandler);
@@ -59,26 +42,6 @@ function keyUpHandler(e) {
     }
 }
 
-// 충돌 감지
-function collisionDetection() {
-    for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowCount; r++) {
-            const b = bricks[c][r];
-            if (b.status === 1) {
-                if (
-                    x > b.x &&
-                    x < b.x + brickWidth &&
-                    y > b.y &&
-                    y < b.y + brickHeight
-                ) {
-                    dy = -dy;
-                    b.status = 0;
-                }
-            }
-        }
-    }
-}
-
 // 공 그리기
 function drawBall() {
     context.beginPath();
@@ -97,25 +60,6 @@ function drawPaddle() {
     context.closePath();
 }
 
-// 블록 그리기
-function drawBricks() {
-    for (let c = 0; c < brickColumnCount; c++) {
-        for (let r = 0; r < brickRowCount; r++) {
-            if (bricks[c][r].status === 1) {
-                const brickX = c * (brickWidth + brickPadding) + brickOffsetLeft;
-                const brickY = r * (brickHeight + brickPadding) + brickOffsetTop;
-                bricks[c][r].x = brickX;
-                bricks[c][r].y = brickY;
-                context.beginPath();
-                context.rect(brickX, brickY, brickWidth, brickHeight);
-                context.fillStyle = '#0095DD';
-                context.fill();
-                context.closePath();
-            }
-        }
-    }
-}
-
 // 게임 오버 표시
 function gameOver() {
     context.font = '30px Arial';
@@ -127,10 +71,8 @@ function gameOver() {
 function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawBricks();
     drawBall();
     drawPaddle();
-    collisionDetection();
 
     // 벽과 공의 충돌 감지
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
