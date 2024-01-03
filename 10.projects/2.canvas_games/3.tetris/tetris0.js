@@ -27,7 +27,6 @@ const tetrisBlocks = [
 let currentBlock;
 let currentX;
 let currentY;
-let gameOverFlag = false;
 
 // 현재 게임 상태를 화면에 그리는 함수입니다.
 function drawBlock(x, y, block) {
@@ -63,11 +62,6 @@ function draw() {
 
 // 새로운 블록을 생성하는 함수입니다.
 function spawnBlock() {
-    // 게임 종료 상태이면 함수를 종료합니다.
-    if (gameOverFlag) {
-        return;
-    }
-
     // 랜덤한 인덱스로부터 테트리스 블록을 선택하여 현재 블록으로 설정합니다.
     const randomIndex = Math.floor(Math.random() * tetrisBlocks.length);
     currentBlock = tetrisBlocks[randomIndex];
@@ -75,32 +69,14 @@ function spawnBlock() {
     // 블록의 시작 위치를 설정합니다.
     currentX = Math.floor((cols - currentBlock[0].length) / 2);
     currentY = 0;
-
-    // 충돌이 발생하면 게임 오버 처리합니다.
-    if (collision()) {
-        gameOver();
-    }
-}
-
-// 게임 오버 상태로 설정하고 콘솔에 메시지를 출력하는 함수입니다.
-function gameOver() {
-    gameOverFlag = true;
-    console.log('Game Over');
 }
 
 // 키보드 입력을 처리하는 함수입니다.
 document.addEventListener('keydown', handleKeyPress);
 
 function handleKeyPress(event) {
-    // 게임 오버 상태이면 함수를 종료합니다.
-    if (gameOverFlag) {
-        return;
-    }
-
     // 키 입력에 따라 블록을 이동하거나 회전시킵니다.
-    if (event.key === 'ArrowDown') {
-        moveBlockDown2();
-    } else if (event.key === 'ArrowLeft') {
+    if (event.key === 'ArrowLeft') {
         moveBlockLeft();
     } else if (event.key === 'ArrowRight') {
         moveBlockRight();
@@ -120,24 +96,8 @@ function moveBlockDown() {
     // 충돌이 발생하면 블록을 한 칸 위로 옮겨서 병합하고 가득 찬 줄을 체크한 후 새로운 블록을 생성합니다.
     if (collision()) {
         currentY -= 1;
-        mergeBlock();
-        checkFullLines();
         spawnBlock();
     }
-}
-
-// 블록을 화면 아래까지 이동시키는 함수입니다.
-function moveBlockDown2() {
-    // 블록이 화면 아래까지 이동할 수 있을 때까지 이동합니다.
-    while (!collision()) {
-        currentY += 1;
-    }
-
-    // 블록을 마지막으로 그린 위치로 되돌리고 병합하고 가득 찬 줄을 체크한 후 새로운 블록을 생성합니다.
-    currentY -= 1;
-    mergeBlock();
-    checkFullLines();
-    spawnBlock();
 }
 
 // 블록을 왼쪽으로 이동시키는 함수입니다.
@@ -226,18 +186,6 @@ function collision() {
     return false;
 }
 
-// 블록을 게임 보드에 병합하는 함수입니다.
-function mergeBlock() {
-    for (let i = 0; i < currentBlock.length; i++) {
-        for (let j = 0; j < currentBlock[i].length; j++) {
-            if (currentBlock[i][j]) {
-                // 블록이 있는 위치를 게임 보드에 1로 설정하여 병합합니다.
-                gameBoard[currentY + i][currentX + j] = 1;
-            }
-        }
-    }
-}
-
 // 게임 보드를 화면에 그리는 함수입니다.
 function drawGameBoard() {
     for (let i = 0; i < rows; i++) {
@@ -253,17 +201,6 @@ function drawGameBoard() {
     }
 }
 
-// 가득 찬 줄을 확인하고 제거하는 함수입니다.
-function checkFullLines() {
-    for (let i = rows - 1; i >= 0; i--) {
-        if (gameBoard[i].every(cell => cell)) {
-            // 해당 줄이 모두 차 있으면 삭제하고 윗 줄을 한 칸씩 내립니다.
-            gameBoard.splice(i, 1);
-            gameBoard.unshift(Array(cols).fill(0));
-        }
-    }
-}
-
 // 초당 프레임 수를 정의합니다.
 const framesPerSecond = 1;
 
@@ -272,10 +209,8 @@ function update() {
     draw();
     moveBlockDown();
 
-    // 게임 종료 상태가 아니면 일정 시간 간격으로 업데이트를 반복합니다.
-    if (!gameOverFlag) {
-        setTimeout(update, 1000 / framesPerSecond);
-    }
+    // 일정 시간 간격으로 업데이트를 반복합니다.
+    setTimeout(update, 1000 / framesPerSecond);
 }
 
 // 초기 게임 업데이트를 시작합니다.

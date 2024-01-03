@@ -255,13 +255,46 @@ function drawGameBoard() {
 
 // 가득 찬 줄을 확인하고 제거하는 함수입니다.
 function checkFullLines() {
+    let linesToRemove = []; // 한줄 이상 동시에 지우지 못하는 버그 해결
+
     for (let i = rows - 1; i >= 0; i--) {
         if (gameBoard[i].every(cell => cell)) {
-            // 해당 줄이 모두 차 있으면 삭제하고 윗 줄을 한 칸씩 내립니다.
-            gameBoard.splice(i, 1);
-            gameBoard.unshift(Array(cols).fill(0));
+            // 해당 줄이 모두 차 있으면 제거할 줄 목록에 추가합니다.
+            linesToRemove.push(i);
         }
     }
+
+    // 제거할 줄이 있다면 차례대로 제거합니다.
+    if (linesToRemove.length > 0) {
+        console.log(linesToRemove);
+        removeLines(linesToRemove);
+    }
+}
+
+// 특정 줄들을 제거하고 윗 줄을 한 칸씩 내리는 함수입니다.
+async function removeLines(linesToRemove) {
+    const delay = 200; // 각 호출 간의 지연 시간 (ms)
+
+    // 각 줄에 대해 차례대로 처리합니다.
+    for (let i = 0; i < linesToRemove.length; i++) {
+        console.log('Deleting line ', linesToRemove[i]);
+        // 해당 줄을 삭제합니다. (먼저 지운 줄로 인해 다음 줄은 1칸씩 아래로 밀림)
+        gameBoard.splice(linesToRemove[i] + i, 1);
+
+        // 맨 위에 빈 줄을 추가합니다.
+        gameBoard.unshift(Array(cols).fill(0));
+
+        // 화면을 그립니다.
+        draw();
+        
+        // 일정 시간을 기다립니다.
+        await wait(delay);
+    }
+}
+
+// 주어진 시간(ms) 동안 코드의 실행을 중단시키는 동기 함수입니다.
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // 초당 프레임 수를 정의합니다.
