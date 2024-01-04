@@ -88,23 +88,38 @@ function drawRope2() {
 // 로프 그리기 함수 - 곡선
 function drawRope3() {
     const ropeY = characterY - ropeLength;
-    const controlPointOffsetX = 10; // 제어점의 X 오프셋 조절
-    const controlPointOffsetY = 20; // 제어점의 Y 오프셋 조절
-    const curveCount = Math.floor(ropeLength / 20) + 1; // 현재 높이에 따른 커브 수 계산
+    const controlPointOffsetX = 20; // 제어점의 X 오프셋 조절
+    const controlPointOffsetY1 = 30; // 첫 번째 제어점의 Y 오프셋 조절
+    const controlPointOffsetY2 = 60; // 두 번째 제어점의 Y 오프셋 조절
 
     ctx.beginPath();
-    ctx.moveTo(ropeX, characterY);
 
-    for (let i = 1; i <= curveCount; i++) {
-        // 현재 커브에 해당하는 제어점 계산
-        const offsetX = controlPointOffsetX * (i % 2 === 0 ? 1 : -1);
-        const offsetY = controlPointOffsetY * (i % 2 === 0 ? 1 : -1);
+    // 시작점 초기화
+    let startX = characterX + characterWidth / 2;
+    let startY = ropeY;
 
-        // 커브 그리기
-        ctx.quadraticCurveTo(ropeX + offsetX, ropeY - (i * 20) + offsetY, ropeX, ropeY - (i * 20));
+    for (let i = 0; i < 10; i++) { // 10개의 S자 반복
+        // 곡선 제어점 및 끝점 설정
+        const cp1x = startX - controlPointOffsetX;
+        const cp1y = startY + controlPointOffsetY1;
+        const endX1 = startX;
+        const endY1 = startY + 50;
+
+        const cp2x = startX + controlPointOffsetX;
+        const cp2y = startY + controlPointOffsetY2;
+        const endX2 = startX;
+        const endY2 = startY + 100;
+
+        // S 커브 그리기
+        ctx.moveTo(startX, startY);
+        ctx.quadraticCurveTo(cp1x, cp1y, endX1, endY1);
+        ctx.quadraticCurveTo(cp2x, cp2y, endX2, endY2);
+
+        // 다음 커브의 시작점을 이전 커브의 끝점으로 업데이트
+        startX = endX2;
+        startY = endY2;
     }
 
-    ctx.strokeStyle = '#000';
     ctx.stroke();
     ctx.closePath();
 }
