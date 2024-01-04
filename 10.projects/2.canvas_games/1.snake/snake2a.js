@@ -1,5 +1,6 @@
 const canvas = document.getElementById('snakeCanvas'); // 캔버스 요소 가져오기
 const context = canvas.getContext('2d'); // 2D 그래픽 컨텍스트 가져오기
+
 const blockSize = 20; // 블록 크기
 const canvasSize = 300; // 캔버스 크기
 const snakeSpeed = 200; // 뱀 이동 속도 (밀리초)

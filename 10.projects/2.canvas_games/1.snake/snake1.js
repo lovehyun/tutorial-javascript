@@ -1,5 +1,6 @@
 const canvas = document.getElementById('snakeCanvas'); // 캔버스 요소 가져오기
 const context = canvas.getContext('2d'); // 2D 그래픽 컨텍스트 가져오기
+
 const blockSize = 20; // 블록 크기
 const canvasSize = 300; // 캔버스 크기
 const snakeSpeed = 200; // 뱀 이동 속도 (밀리초)
@@ -88,6 +89,16 @@ function checkCollision() {
 // 뱀과 자기 자신 충돌 체크 함수
 function isSnakeCollision() {
     const head = snake[0];
+    
+    // let isCollision = false;
+    // snake.forEach((segment, index) => {
+    //     if (index > 0 && segment.x === head.x && segment.y === head.y) {
+    //         isCollision = true;
+    //     }
+    // });
+
+    // return isCollision;
+
     return snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
 }
 
@@ -116,6 +127,17 @@ function generateFood() {
 
 // 음식이 뱀 위에 있는지 체크 함수
 function isFoodOnSnake(foodPosition) {
+    // let isOnSnake = false;
+
+    // snake.forEach(segment => {
+    //     if (segment.x === foodPosition.x && segment.y === foodPosition.y) {
+    //         isOnSnake = true;
+    //     }
+    // });
+
+    // return isOnSnake;
+
+    // 위 내용을 한줄로 처리
     return snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y);
 }
 
