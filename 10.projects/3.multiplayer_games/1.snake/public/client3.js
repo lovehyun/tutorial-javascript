@@ -10,12 +10,31 @@ socket.addEventListener('open', (event) => {
     initGame();
 });
 
+// 게임오버 처리 함수
+function handleGameOver() {
+    // 여기에 게임오버 화면을 표시하고, retry 여부를 물어보고 처리하는 로직을 추가하세요.
+
+    // 예시: 간단한 게임오버 화면을 alert로 표시하고 retry 여부 물어보기
+    const retry = window.confirm('Game Over! Retry?');
+    
+    if (retry) {
+        // 클라이언트가 retry를 선택한 경우, 다시 초기화하고 게임을 재시작
+        initGame();
+    }
+}
+
 socket.addEventListener('message', (event) => {
     const receivedData = JSON.parse(event.data);
     // console.log('Received game data from server:', receivedData);
-    const clientsData = receivedData;
-    drawGame(clientsData);
-    updateScore(clientsData.clients);
+
+    if (receivedData.type === 'gameover') {
+        // 게임오버 메시지를 받았을 때의 처리
+        handleGameOver();
+    } else {
+        drawGame(receivedData);
+    }
+
+    updateScore(receivedData.clients);
 });
 
 // socket.addEventListener('message', (event) => {

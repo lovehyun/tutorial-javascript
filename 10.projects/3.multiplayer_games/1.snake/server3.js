@@ -122,7 +122,9 @@ function generateRandomColor() {
 // 게임 로직: 뱀 이동 함수
 function moveSnake(clientId) {
     const client = clients.get(clientId);
-    const head = { ...client.data.snake[0] };
+    const head = { ...client.data?.snake[0] };
+
+    if (!head) return;
 
     // 방향에 따라 뱀의 머리 위치 업데이트
     switch (client.data.direction) {
@@ -157,6 +159,39 @@ function moveSnake(clientId) {
     }
 
     client.data.snake.unshift(head); // 뱀의 머리 추가
+}
+
+// 게임 로직: 충돌 체크 함수
+function collisionCheck(clientId) {
+    const client = clients.get(clientId);
+    const head = client.data.snake[0];
+
+    // 자신의 몸에 부딛쳤는지 체크
+    if (client.data.snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
+        // 자신의 몸에 부딛쳤을 때의 처리
+        handleCollision(clientId);
+    }
+
+    // 다른 뱀과 부딛쳤는지 체크
+    clients.forEach((otherClient, otherClientId) => {
+        if (otherClientId !== clientId) {
+            if (otherClient.data.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+                // 다른 뱀에 부딛쳤을 때의 처리
+                handleCollision(clientId);
+            }
+        }
+    });
+}
+
+// 게임 로직: 충돌 처리 함수
+function handleCollision(clientId) {
+    const client = clients.get(clientId);
+
+    // 클라이언트에게 gameover 메시지 전송
+    const socket = client.socket;
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'gameover' }));
+    }
 }
 
 // 게임 로직: 무작위로 음식 생성 함수
@@ -206,6 +241,7 @@ function gameLoop() {
     clients.forEach((client, clientId) => {
         moveSnake(clientId); // 뱀 이동
         checkFood(clientId); // 음식 체크 및 처리
+        collisionCheck(clientId); // 충돌 체크
     });
 
     broadcastGameData(); // 게임 상태 전파
