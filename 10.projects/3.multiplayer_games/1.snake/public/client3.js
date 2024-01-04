@@ -1,5 +1,7 @@
 const canvas = document.getElementById('snakeCanvas');
 const context = canvas.getContext('2d');
+const playerInfoCanvas = document.getElementById('playerInfoCanvas');
+const playerInfoContext = playerInfoCanvas.getContext('2d');
 
 const socket = new WebSocket('ws://localhost:3000');
 
@@ -13,6 +15,7 @@ socket.addEventListener('message', (event) => {
     // console.log('Received game data from server:', receivedData);
     const clientsData = receivedData;
     drawGame(clientsData);
+    updateScore(clientsData.clients);
 });
 
 // socket.addEventListener('message', (event) => {
@@ -77,6 +80,31 @@ function drawGame(clientsData) {
                 context.fillRect(segment.x * blockSize, segment.y * blockSize, blockSize, blockSize);
             });
         }
+    });
+}
+
+function updateScore(clients) {
+    // Clear playerInfoCanvas
+    playerInfoContext.clearRect(0, 0, playerInfoCanvas.width, playerInfoCanvas.height);
+
+    // Set font style
+    playerInfoContext.font = '14px Arial';
+
+    // 각 플레이어의 점수를 가져와서 표시
+    clients.forEach((clientData, index) => {
+        const client = clientData.data;
+        const playerScore = client.score || 0;
+
+        // Set player color
+        playerInfoContext.fillStyle = client.snakeColor;
+
+        // Draw player color rectangle
+        playerInfoContext.fillRect(10, index * 50 + 10, 20, 20);
+
+        // Set player name and score
+        playerInfoContext.fillStyle = '#000';
+        playerInfoContext.fillText(`Player ${clientData.clientId}`, 40, index * 50 + 25);
+        playerInfoContext.fillText(`Score: ${playerScore}`, 40, index * 50 + 45);
     });
 }
 
