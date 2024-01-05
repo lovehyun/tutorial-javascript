@@ -39,7 +39,7 @@ wss.on('connection', (ws) => {
 
     ws.on('message', (message) => {
         const data = JSON.parse(message);
-        console.log(data);
+        console.log(`${clientId}: ${message}`);
 
         // 키보드 입력 처리
         if (data.type === 'keypress') {
@@ -90,6 +90,7 @@ function resetGame(clientId) {
         direction: 'right', // 초기 이동 방향
         snakeColor: generateRandomColor(), // 랜덤 색상 생성
         score: 0, // 클라이언트 점수
+        gameover: false,
     }
 
     // 최초 서버 초기화 시에만 호출
@@ -122,10 +123,8 @@ function generateRandomColor() {
 // 게임 로직: 뱀 이동 함수
 function moveSnake(clientId) {
     const client = clients.get(clientId);
-    const head = { ...client.data?.snake[0] };
-
-    if (!head) return;
-
+    const head = { ...client.data.snake[0] };
+    
     // 방향에 따라 뱀의 머리 위치 업데이트
     switch (client.data.direction) {
         case 'up':
@@ -169,15 +168,21 @@ function collisionCheck(clientId) {
     // 자신의 몸에 부딛쳤는지 체크
     if (client.data.snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)) {
         // 자신의 몸에 부딛쳤을 때의 처리
+        client.data.gameover = true;
         handleCollision(clientId);
     }
 
     // 다른 뱀과 부딛쳤는지 체크
     clients.forEach((otherClient, otherClientId) => {
         if (otherClientId !== clientId) {
+            if (!otherClient.data) return;
+
             if (otherClient.data.snake.some(segment => segment.x === head.x && segment.y === head.y)) {
                 // 다른 뱀에 부딛쳤을 때의 처리
+                client.data.gameover = true;
+                // otherClient.data.gameover = true;
                 handleCollision(clientId);
+                // handleCollision(otherClientId);
             }
         }
     });
@@ -190,6 +195,7 @@ function handleCollision(clientId) {
     // 클라이언트에게 gameover 메시지 전송
     const socket = client.socket;
     if (socket.readyState === WebSocket.OPEN) {
+        console.log(`${clientId}: {type: 'gameover'}`);
         socket.send(JSON.stringify({ type: 'gameover' }));
     }
 }
@@ -239,9 +245,16 @@ function checkFood(clientId) {
 function gameLoop() {
     // 각 클라이언트에 대해 게임 로직 적용
     clients.forEach((client, clientId) => {
-        moveSnake(clientId); // 뱀 이동
-        checkFood(clientId); // 음식 체크 및 처리
-        collisionCheck(clientId); // 충돌 체크
+        if (!client.data) {
+            console.log('client not initialized, ', clientId);
+        } else {
+            // 종료된 플레이어는 이동 중지
+            if (client.data.gameover) return;
+
+            moveSnake(clientId); // 뱀 이동
+            checkFood(clientId); // 음식 체크 및 처리
+            collisionCheck(clientId); // 충돌 체크
+        }
     });
 
     broadcastGameData(); // 게임 상태 전파

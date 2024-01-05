@@ -3,7 +3,11 @@ const context = canvas.getContext('2d');
 const playerInfoCanvas = document.getElementById('playerInfoCanvas');
 const playerInfoContext = playerInfoCanvas.getContext('2d');
 
-const socket = new WebSocket('ws://localhost:3000');
+const currentHostname = window.location.hostname;
+const currentPort = window.location.port;
+const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+const socket = new WebSocket(`${wsProtocol}://${currentHostname}:${currentPort}`);
 
 socket.addEventListener('open', (event) => {
     console.log('Connected to the WebSocket server');
