@@ -15,6 +15,7 @@ let dy = -2; // y 방향 이동 속도
 const paddleHeight = 10;
 const paddleWidth = 100;
 let paddleX = (canvas.width - paddleWidth) / 2;
+const paddleSpeed = 7;
 
 // 키보드 입력 상태 설정
 let rightPressed = false;
@@ -123,27 +124,23 @@ function gameOver() {
     context.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
 }
 
-// 게임 그리기
-function draw() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawBricks();
-    drawBall();
-    drawPaddle();
-    collisionDetection();
+function moveBall() {
+    // 공의 위치 업데이트
+    x += dx;
+    y += dy;
 
     // 벽과 공의 충돌 감지
-    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+    if (x > canvas.width - ballRadius || x < ballRadius) {
         dx = -dx;
     }
 
     // 천장과 공의 충돌 감지
-    if (y + dy < ballRadius) {
+    if (y < ballRadius) {
         dy = -dy; // y 방향 이동 속도의 부호를 반대로 변경하여 방향을 변경
-    } else if (y + dy > canvas.height - ballRadius) {
+    } else if (y > canvas.height - ballRadius) {
         // 패들과 공의 충돌 감지
         if (x > paddleX && x < paddleX + paddleWidth) {
-            if (y + dy > canvas.height - paddleHeight) {
+            if (y > canvas.height - paddleHeight) {
                 dy = -dy; // 공의 이동 방향을 반대로 변경하여 튕기도록 함
             }
         } else {
@@ -154,17 +151,29 @@ function draw() {
             return; // 게임 종료
         }
     }
+}
 
+function movePaddle() {
     // 패들 이동
     if (rightPressed && paddleX < canvas.width - paddleWidth) {
-        paddleX += 7;
+        paddleX += paddleSpeed;
     } else if (leftPressed && paddleX > 0) {
-        paddleX -= 7;
+        paddleX -= paddleSpeed;
     }
+}
 
-    // 공의 위치 업데이트
-    x += dx;
-    y += dy;
+// 게임 그리기
+function draw() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawBricks();
+    drawBall();
+    drawPaddle();
+
+    moveBall();
+    movePaddle();
+    
+    collisionDetection();
 
     // 애니메이션 프레임 요청
     requestAnimationFrame(draw);
