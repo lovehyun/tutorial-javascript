@@ -23,11 +23,6 @@ let gameLoopInterval; // 타이머ID
 // 정적 파일을 제공하기 위해 express.static 미들웨어를 사용합니다.
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 모든 경로에 대해 / 로 리다이렉트
-app.use('*', (req, res, next) => {
-    res.redirect('/');
-});
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'snake2.html'));
 });
