@@ -3,19 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가사 검색 결과</title>
+    <title>노래 검색 결과</title>
     <style>
         body {
             font-family: 'Nanum Gothic', sans-serif;
         }
 
-        h2 {
-            text-align: center;
+        h1, h2 {
             margin-top: 20px;
         }
 
         form {
-            text-align: center;
             margin-bottom: 20px;
         }
 
@@ -43,12 +41,13 @@
     </style>
 </head>
 <body>
-    <h2>가사 검색 결과</h2>
+    <h1>가사로 노래찾기</h1>
     <form onsubmit="event.preventDefault(); searchLyrics();">
         <label for="queryInput">가사 입력:</label>
         <input type="text" id="queryInput" required>
         <button type="submit">검색</button>
     </form>
+    <h2>가사 검색 결과</h2>
     <table id="resultsTable">
         <thead>
             <tr>
