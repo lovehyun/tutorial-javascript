@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>CORS Test</title>
+    </head>
+    <body>
+        <div id="result-container"></div>
+        <script>
+            const resultContainer = document.getElementById('result-container');
+            // const apiUrl = 'https://your-backend-server.com/api/data';
+            const apiUrl = 'http://localhost:3000/api/data';
+
+            fetch(apiUrl)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Network response was not ok: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log('Server response:', data);
+                    resultContainer.textContent = data.message;
+                })
+                .catch((error) => {
+                    console.error('Error during fetch:', error);
+                });
+        </script>
+    </body>
+</html>
