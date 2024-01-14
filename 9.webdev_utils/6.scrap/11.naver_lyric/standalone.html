@@ -41,12 +41,13 @@
 
         .lyrics-row {
             overflow: hidden;
-            max-height: 3em; /* Adjust this value based on the number of lines you want to show initially */
-            transition: max-height 0.3s ease;
+            max-height: 3em; /* 초기 높이 */
+            cursor: pointer;
         }
 
         .lyrics-row.expanded {
-            max-height: none;
+            max-height: 100em; /* none 으로 하면 max인데, transition 이 적용되지 않음 */
+            transition: max-height 2.0s ease;
         }
     </style>
 </head>
@@ -67,7 +68,7 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Results will be inserted here dynamically -->
+            <!-- 결과가 출력될 곳 -->
         </tbody>
     </table>
     <script>
@@ -90,24 +91,28 @@
                     titleCell.innerHTML = title.outerHTML;
                     artistCell.textContent = artist.textContent;
 
-                    // Highlight matching parts in the lyrics
-                    // 퀴즈2
+                    // 퀴즈4 - a링크 새창에서 열기로 변경
+                    const originalTitleLink = titleCell.querySelector('a');
+                    originalTitleLink.setAttribute('target', '_blank');
+
+                    // 퀴즈2 - 가사 하이라이트
                     const highlightedLyrics = highlightMatchingLyrics(lyrics.innerHTML, query);
                     
-                    // 퀴즈3
+                    // 퀴즈3 - 가사 접고 펴기 div 추가
+                    // lyricsCell.innerHTML = `${highlightedLyrics}`;
                     lyricsCell.innerHTML = `<div class="lyrics-row">${highlightedLyrics}</div>`;
                 }
             });
         }
 
-        // Function to update the table with search results
+        // 검색 결과 업데이트 함수
         function updateTable(results, query) {
             // console.log("API Response:", results);
 
             const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = ''; // Clear existing rows
             
-            const result1 = results.current.html; // Assuming the array of results is under the 'current' property
+            const result1 = results.current.html; // 검색 결과
             parseSongContents(result1, query, tableBody);
 
             // 퀴즈1 -->
@@ -139,15 +144,14 @@
 
 
         // --> 퀴즈2
-        // Function to highlight matching parts in the lyrics
+        // 가사 중 검색 결과 하이라이트
         function highlightMatchingLyrics(lyrics, query) {
-            if (!query) return lyrics; // Added to handle empty query
-            const regex = new RegExp(query, 'gi');
+            const regex = new RegExp(query, 'gi'); // global + case-insensitive
             return lyrics.replace(regex, match => `<mark>${match}</mark>`);
         }
         // <-- 퀴즈2
 
-        // Function to handle form submission
+        // 검색 결과 수행
         async function searchLyrics() {
             const query = document.getElementById('queryInput').value;
 
