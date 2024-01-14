@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환율 계산기</title>
+    <style>
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        select, input {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>환율 계산기</h2>
+    <form id="exchangeForm">
+        <label for="amount">금액:</label>
+        <input type="number" id="amount" required>
+        <br>
+        <label for="fromCurrency">환전전 통화:</label>
+        <select id="fromCurrency">
+            <option value="KRW">KRW</option>
+            <option value="JPY">JPY</option>
+            <option value="USD">USD</option>
+        </select>
+        <label for="toCurrency">환전할 통화:</label>
+        <select id="toCurrency">
+            <option value="KRW">KRW</option>
+            <option value="JPY">JPY</option>
+            <option value="USD">USD</option>
+        </select>
+        <button type="button" onclick="calculateExchange()">환전</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        async function calculateExchange() {
+            const amount = document.getElementById('amount').value;
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+
+            try {
+                const response = await fetch(`https://m.search.naver.com/p/csearch/content/qapirender.nhn?key=calculator&pkid=141&q=환율&where=m&u1=keb&u3=${fromCurrency}&u4=${toCurrency}&u2=${amount}`);
+                const data = await response.json();
+                console.log(data);
+
+                const inputAmount = data?.country[0]?.value.replace(/,/g, '');
+                const convertedAmount = data?.country[1]?.value.replace(/,/g, '');
+
+                if (inputAmount && convertedAmount) {
+                    const exchangeRate = (convertedAmount / inputAmount).toFixed(2);
+                    console.log(inputAmount, convertedAmount, exchangeRate);
+
+                    document.getElementById('result').innerHTML = `
+                        <p>환율: 1 ${fromCurrency} = ${exchangeRate} ${toCurrency}</p>
+                        <p>환전된 금액: ${convertedAmount} ${toCurrency}</p>
+                    `;
+                } else {
+                    throw new Error('Input amount or converted amount not available.');
+                }
+            } catch (error) {
+                console.error('Error fetching exchange rate:', error.message);
+                document.getElementById('result').innerHTML = '<p>환율 조회에 실패했습니다.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
