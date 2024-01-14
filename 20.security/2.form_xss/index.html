@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>XSS 취약 코드</title>
+    </head>
+    <body>
+        <h2>불안전한 XSS 취약 코드</h2>
+        <form action="/save" method="post">
+            <label for="content">내용:</label>
+            <input type="text" id="content" name="content" required />
+            <br />
+            <button type="submit">저장</button>
+        </form>
+    </body>
+</html>
