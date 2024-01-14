@@ -54,6 +54,7 @@
             <tr>
                 <th>제목</th>
                 <th>아티스트</th>
+                <th>가사</th>
             </tr>
         </thead>
         <tbody>
@@ -62,7 +63,7 @@
     </table>
     <script>
         // Function to update the table with search results
-        function updateTable(results) {
+        function updateTable(results, query) {
             const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = ''; // Clear existing rows
 
@@ -70,6 +71,7 @@
                 const row = tableBody.insertRow();
                 const titleCell = row.insertCell(0);
                 const artistCell = row.insertCell(1);
+                const lyricsCell = row.insertCell(2);
 
                 // Create a hyperlink with the stored link
                 const link = document.createElement('a')
@@ -80,7 +82,19 @@
                 // titleCell.textContent = result.title;
                 artistCell.textContent = result.artist;
 
+                // lyricsCell.innerHTML = result.lyrics;
+
+                // Highlight matching parts in the lyrics
+                const highlightedLyrics = highlightMatchingLyrics(result.lyrics, query);
+                lyricsCell.innerHTML = highlightedLyrics;
             });
+        }
+
+        // Function to highlight matching parts in the lyrics
+        function highlightMatchingLyrics(lyrics, query) {
+            if (!query) return lyrics; // Added to handle empty query
+            const regex = new RegExp(query, 'gi');
+            return lyrics.replace(regex, match => `<mark>${match}</mark>`);
         }
     </script>
     <script>
@@ -91,7 +105,7 @@
             try {
                 const response = await fetch(`http://localhost:3000/api/search-lyrics?query=${encodeURIComponent(query)}`);
                 const data = await response.json();
-                updateTable(data);
+                updateTable(data, query);
             } catch (error) {
                 console.error('Error fetching search results:', error.message);
             }

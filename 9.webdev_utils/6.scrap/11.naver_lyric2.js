@@ -44,7 +44,7 @@ const processLyricsInfo = (html) => {
 
     $('li[role="tab"]').each((index, element) => {
         const title = $(element).find('.music_title a').text().trim();
-        const artist = $(element).find('.music_detail a').text().trim();
+        const artist = $(element).find('.music_detail a').eq(0).text().trim();
 
         results.push({
             title,
