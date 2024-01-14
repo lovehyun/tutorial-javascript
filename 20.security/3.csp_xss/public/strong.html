@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>XSS 안전 코드 (CSP 적용)</title>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self'" />
+    </head>
+    <body>
+        <h2>안전한 XSS 방지 코드 (CSP 적용)</h2>
+        <script>
+            // 사용자 입력이 실행되지 않도록 CSP에 의해 차단됨
+            const userInput = 'alert("XSS Attack!");';
+            document.write(userInput);
+        </script>
+    </body>
+</html>

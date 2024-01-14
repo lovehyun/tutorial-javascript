@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Weak HTML</title>
+    </head>
+    <body>
+        <h2>Weak HTML</h2>
+
+        <script>
+            // 취약한 코드: 사용자 입력을 쿼리 매개변수로 받아와서 실행
+            const fetchData = async () => {
+                try {
+                    const response = await fetch('/api/data?data=%3Cscript%3Ealert("XSS Attack!")%3C/script%3E');
+                    const data = await response.text();
+                    
+                    // document.write(data);
+
+                    const div = document.createElement('div');
+                    div.innerHTML = data;
+                    document.body.appendChild(div);
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+
+            fetchData();
+        </script>
+    </body>
+</html>

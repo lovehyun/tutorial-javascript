@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>XSS 취약 코드 (CSP 미적용)</title>
+    </head>
+    <body>
+        <h2>취약한 XSS 취약 코드 (CSP 미적용)</h2>
+        <script>
+            // 사용자 입력이 직접 실행될 수 있는 취약한 코드
+            const userInput = 'alert("XSS Attack!");';
+            document.write(userInput);
+        </script>
+    </body>
+</html>
