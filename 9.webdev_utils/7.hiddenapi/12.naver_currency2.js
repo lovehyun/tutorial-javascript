@@ -24,6 +24,7 @@ function getExchangeRate(params) {
 }
 
 const common_params = { key: 'calculator', pkid: '141', q: '환율', where: 'm', u1: 'keb' }
+
 // JPY로 변환
 const jpy_params = { ...common_params, u3: 'JPY', u4: 'KRW', u2: 100 };
 getExchangeRate(jpy_params)
