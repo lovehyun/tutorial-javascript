@@ -1,0 +1,43 @@
+<!-- main.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Main Page</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+    </head>
+    <body>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">Main Page</div>
+                        <div class="card-body">
+                            <h3 id="welcomeMessage"></h3>
+                            <!-- 추가적인 내용을 이곳에 포함시킬 수 있습니다. -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 페이지 로드 시 자동 로그인 시도 및 환영 메시지 표시
+            function displayWelcomeMessage() {
+                const storedUsername = localStorage.getItem('username');
+                const welcomeMessage = document.getElementById('welcomeMessage');
+
+                if (storedUsername) {
+                    welcomeMessage.innerText = `안녕하세요, ${storedUsername}님!`;
+                } else {
+                    welcomeMessage.innerText = '로그인 후 이용해주세요.';
+                }
+            }
+
+            // 페이지 로드 시 자동 로그인 시도 및 환영 메시지 표시
+            displayWelcomeMessage();
+        </script>
+    </body>
+</html>
