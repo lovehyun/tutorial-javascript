@@ -48,6 +48,12 @@ app.get('/', (req, res) => {
     // res.send(`세션ID: ${req.sessionID}, 세션데이터:${JSON.stringify(req.session)}`);
 });
 
+// app.get('/user', (req, res) => {
+//     const { username, cart } = req.session;
+
+//     res.send(`너는 ${username} 이고, 장바구니에는 ${cart} 가 있어.`)
+// });
+
 app.listen(port, () => {
     console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
 });
