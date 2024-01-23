@@ -53,6 +53,9 @@ app.get('/profile', (req, res) => {
     } else {
         res.status(401).json({ message: '인증되지 않은 사용자' });
     }
+
+    // 전체 세션 정보 출력
+    // console.log('Session Info: ', req.sessionStore.sessions);
 });
 
 // 로그아웃 라우트

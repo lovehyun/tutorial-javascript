@@ -4,6 +4,10 @@
 // # 이전에 받은 쿠키를 사용하여 서버에 요청하기
 // curl -b cookie.txt http://localhost:3000
 
+// connect.sid
+// s%3AotyQHFqoDNCN-Lmsop4IGuMG50b7Dv-B.z82XYsNQ7xlBhnagGYLm5J8ORxEaGokBM1BquBYLsr0]
+// s:{세션 데이터}.{서명}
+
 const express = require('express');
 const session = require('express-session');
 
@@ -36,7 +40,12 @@ app.use((req, res, next) => {
 
 // 라우트: 세션을 사용하여 방문 횟수 표시
 app.get('/', (req, res) => {
+    // req.session.username = 'user1';
+    // req.session.cart = ['사과우유', '딸기우유', '바나나우유'];
+
     res.send(`방문 횟수: ${req.session.visitCount}`);
+
+    // res.send(`세션ID: ${req.sessionID}, 세션데이터:${JSON.stringify(req.session)}`);
 });
 
 app.listen(port, () => {

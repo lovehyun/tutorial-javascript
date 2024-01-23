@@ -2,11 +2,12 @@
 // curl 127.0.0.1:3000/api/data -c cookie.txt --cookie cookie.txt
 
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 const morgan = require('morgan');
 
 const app = express();
+const port = 3000;
 
 const secretKey = 'yourSecretKey'; // JWT 서명을 위한 시크릿 키
 
@@ -63,7 +64,6 @@ app.get('/', (req, res) => {
     res.send('Hello, this is the root path!');
 });
 
-const port = 3000;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
