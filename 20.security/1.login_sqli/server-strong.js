@@ -9,19 +9,21 @@ const PORT = 3000;
 const db = new sqlite3.Database('users.db');
 
 // 테이블 생성
-db.run('CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT)', (err) => {
+db.run('CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY, username TEXT, password TEXT)', (err) => {
     if (err) {
         console.error('Error creating table:', err);
     } else {
         // 기본 계정 추가
         const initialAccounts = [
-            { username: 'user1', password: 'pass1' },
-            { username: 'user2', password: 'pass2' },
+            { id: 1, username: 'admin', password: 'admin' },
+            { id: 2, username: 'user1', password: 'pass1' },
+            { id: 3, username: 'user2', password: 'pass2' },
+            { id: 4, username: 'user3', password: 'pass3' },
         ];
 
         // 기본 계정이 데이터베이스에 없으면 추가
-        initialAccounts.forEach(({ username, password }) => {
-            db.run('INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)', [username, password], (err) => {
+        initialAccounts.forEach(({ id, username, password }) => {
+            db.run('INSERT OR IGNORE INTO users (id, username, password) VALUES (?, ?, ?)', [id, username, password], (err) => {
                 if (err) {
                     console.error(`Error inserting user ${username}:`, err);
                 }
