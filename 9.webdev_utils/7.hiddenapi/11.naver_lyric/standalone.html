@@ -83,11 +83,13 @@
                 const lyrics = item.querySelector('.lyrics_text');
 
                 if (title && artist && lyrics) {
+                    // 결과를 기록할 셀 위치 가져오기
                     const row = tableBody.insertRow();
                     const titleCell = row.insertCell(0);
                     const artistCell = row.insertCell(1);
                     const lyricsCell = row.insertCell(2);
 
+                    // 해당 셀에 결과 입력
                     titleCell.innerHTML = title.outerHTML;
                     artistCell.textContent = artist.textContent;
 
@@ -95,7 +97,7 @@
                     const originalTitleLink = titleCell.querySelector('a');
                     originalTitleLink.setAttribute('target', '_blank');
 
-                    // 퀴즈2 - 가사 하이라이트
+                    // 퀴즈2 - 검색 키워드 가사 하이라이트
                     const highlightedLyrics = highlightMatchingLyrics(lyrics.innerHTML, query);
                     
                     // 퀴즈3 - 가사 접고 펴기 div 추가
@@ -115,7 +117,7 @@
             const result1 = results.current.html; // 검색 결과
             parseSongContents(result1, query, tableBody);
 
-            // 퀴즈1 -->
+            // 퀴즈1. 검색 결과 테이블에 출력 -->
             const result2 = results.next.html;
             parseSongContents(result2, query, tableBody);
             // <-- 퀴즈1
