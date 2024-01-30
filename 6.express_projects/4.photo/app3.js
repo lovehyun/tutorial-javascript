@@ -1,7 +1,15 @@
-// npm install express body-parser nunjucks multer sharp debug
+// npm install express body-parser nunjucks multer sharp
+
+// npm install debug
 // bash: DEBUG=myapp node app2
 // cmd: set DEBUG=myapp && node app2
-// cmd: set DEBUG=myapp1,myapp2,myapp3 && node app2
+// cmd: set DEBUG=myapp:mod1,myapp:mod2,myapp:mod3 등 여러개 등록도 가능함. (prefix match 는 myapp:* 으로 가능 함.)
+
+// new를 사용하여 내부에서 모듈을 세분화 하여 정의 할수도 있음
+const debug = require("debug");
+const debugS = new debug('myapp:server');
+const debugU = new debug('myapp:upload');
+const debugR = new debug('myapp:request');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -10,7 +18,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
-const debug = require('debug')('myapp');
+// const debug = require('debug')('myapp');
 
 const app = express();
 const port = 3000;
@@ -19,8 +27,8 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
-    // 디버그 로그 출력;
-    debug(req.method, req.originalUrl);
+    // 디버그 로그 출력
+    debugR(req.method, req.originalUrl);
     next();
 });
 
@@ -75,7 +83,7 @@ app.post('/write', upload.single('photo'), (req, res) => {
     const thumbnailPath = filePath ? `thumbnails/thumb_${req.file.filename}` : null;
 
     posts.push({ title, content, date, filePath, filename, thumbnailPath });
-    debug(posts);
+    debugU(posts);
 
     // 썸네일 생성
     if (filePath) {
@@ -122,4 +130,5 @@ app.post('/delete/:index', (req, res) => {
 // 서버 시작
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
+    debugS('Server is ready...');
 });
