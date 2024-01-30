@@ -1,4 +1,7 @@
-// npm install express body-parser nunjucks multer sharp
+// npm install express body-parser nunjucks multer sharp debug
+// bash: DEBUG=myapp node app2
+// cmd: set DEBUG=myapp && node app2
+// cmd: set DEBUG=myapp1,myapp2,myapp3 && node app2
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -7,6 +10,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const debug = require('debug')('myapp');
 
 const app = express();
 const port = 3000;
@@ -15,6 +19,8 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
+    // 디버그 로그 출력;
+    debug(req.method, req.originalUrl);
     next();
 });
 
@@ -26,6 +32,9 @@ nunjucks.configure('views', {
     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
     return new Date(date).toLocaleDateString('ko-KR', options); // 또는 en-US
 });
+
+// 디버그 로그 출력 설정
+// debug.enabled = true;
 
 let posts = [];
 
@@ -44,7 +53,7 @@ const upload = multer({
 
 // 루트 경로
 app.get('/', (req, res) => {
-    res.render('index2', { posts });
+    res.render('index3', { posts });
 });
 
 // 글 작성 폼
@@ -60,10 +69,25 @@ app.post('/write', upload.single('photo'), (req, res) => {
 
     // 업로드한 파일의 경로
     const filePath = req.file ? req.file.path : null;
+    
+    // 원본 이미지 및 썸네일 경로
     const filename = filePath ? `${req.file.filename}` : null;
+    const thumbnailPath = filePath ? `thumbnails/thumb_${req.file.filename}` : null;
 
-    posts.push({ title, content, date, filePath, filename });
+    posts.push({ title, content, date, filePath, filename, thumbnailPath });
+    debug(posts);
 
+    // 썸네일 생성
+    if (filePath) {
+        sharp(filePath)
+            .resize(100) // 썸네일 크기 조절
+            .toFile(`public/${thumbnailPath}`, (err, info) => {
+                if (err) {
+                    console.error(err);
+                }
+            });
+    }
+    
     res.redirect('/');
 });
 
@@ -81,10 +105,14 @@ app.post('/delete/:index', (req, res) => {
     const index = req.params.index;
     const post = posts[index - 1];
 
-    // 업로드한 파일 삭제
+    // 업로드한 파일 및 썸네일 삭제
     if (post.filePath) {
         filePath = path.join(__dirname, post.filePath);
         fs.unlinkSync(filePath);
+    }
+    if (post.thumbnailPath) {
+        thumbnailPath = path.join(__dirname, 'public', post.thumbnailPath);
+        fs.unlinkSync(thumbnailPath);
     }
     
     posts.splice(index - 1, 1);

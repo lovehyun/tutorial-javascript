@@ -52,7 +52,7 @@
                     <th>번호</th>
                     <th>제목</th>
                     <th>내용</th>
-                    <th>이미지</th>
+                    <th>썸네일</th>
                     <th>작성일</th>
                     <th>삭제</th>
                 </tr>
@@ -64,9 +64,9 @@
                     <td>{{ post.title }}</td>
                     <td>{{ post.content }}</td>
                     <td>
-                        {% if post.filename %}
+                        {% if post.thumbnailPath %}
                             <a href="/images/{{ post.filename }}" target="_blank">
-                                <img src="/images/{{ post.filename }}" alt="이미지" style="max-width: 100px; max-height: 100px;">
+                                <img src="{{ post.thumbnailPath }}" alt="썸네일" style="max-width: 100px; max-height: 100px;">
                             </a>
                         {% else %}
                             (없음)
