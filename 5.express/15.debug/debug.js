@@ -1,8 +1,8 @@
 const debug = require('debug');
 
-const debugS = debug('myapp:server');
-const debugU = debug('myapp:upload');
-const debugR = debug('myapp:request');
+const debugS = new debug('myapp:server');
+const debugU = new debug('myapp:upload');
+const debugR = new debug('myapp:request');
 
 module.exports = {
     debugS,

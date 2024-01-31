@@ -1,15 +1,15 @@
 const debug = require('debug');
 
-const debugS = debug('myapp:server');
-const debugU = debug('myapp:upload');
-const debugR = debug('myapp:request');
+const debugS = new debug('myapp:server');
+const debugU = new debug('myapp:upload');
+const debugR = new debug('myapp:request');
 
 function enableDebug(debugInstance, condition) {
     if (condition !== undefined) {
         if (condition === '1') {
-            debugInstance.enable();
+            debugInstance.enabled = true;
         } else if (condition === '0') {
-            debugInstance.disable();
+            debugInstance.enabled = false;
         }
     }
 }
