@@ -7,6 +7,7 @@ const flash = require('connect-flash');
 const path = require('path');
 const nunjucks = require('nunjucks');
 const users = require('./users'); // users 모듈 불러오기
+require('dotenv').config();
 
 const app = express();
 
