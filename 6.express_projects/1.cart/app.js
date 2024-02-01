@@ -22,7 +22,7 @@ app.use(
     })
 );
 
-app.use (morgan('dev')); // dev, combined
+app.use(morgan('dev')); // dev, combined
 
 // 정적 파일 제공
 app.use(express.static('public'));
