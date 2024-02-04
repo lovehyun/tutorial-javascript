@@ -56,12 +56,22 @@ app.post('/api/chat', async (req, res) => {
 
     // 대화 히스토리 길이 관리
     while (conversationHistory.length > MAX_HISTORY_LENGTH) {
-        conversationHistory.shift(); // 가장 오래된 대화 삭제
+        conversationHistory.shift(); // 가장 오래된 대화들 삭제
     }
     
     const end = new Date();
     console.log('요청 및 응답 시간:', end - start, 'ms');
     res.json({ chatGPTResponse });
+});
+
+// 수동으로 과거 대화내용 확인하는 API
+app.get('/api/history', (req, res) => {
+    // res.json({ conversationHistory });
+    const numberedHistory = conversationHistory.map((item, index) => {
+        return { ...item, number: conversationSeq - (conversationHistory.length - index) + 1 };
+    });
+
+    res.json({ conversationHistory: numberedHistory });
 });
 
 // ChatGPT에 전송할 대화 내용 구성
@@ -86,15 +96,6 @@ async function getChatGPTResponse(conversationHistory) {
         return '챗봇 응답을 가져오는 도중에 오류가 발생했습니다.';
     }
 }
-
-app.get('/api/history', (req, res) => {
-    // res.json({ conversationHistory });
-    const numberedHistory = conversationHistory.map((item, index) => {
-        return { ...item, number: conversationSeq - (conversationHistory.length - index) + 1 };
-    });
-
-    res.json({ conversationHistory: numberedHistory });
-});
 
 app.listen(port, () => {
     console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);

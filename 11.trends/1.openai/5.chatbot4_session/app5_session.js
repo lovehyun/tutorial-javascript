@@ -194,19 +194,6 @@ function dbGetAsync(sql, params) {
     });
 }
 
-// 세션별 대화 내용 가져오기
-async function getConversationBySession(sessionId) {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM conversation WHERE session_id = ? ORDER BY id DESC", [sessionId], (err, rows) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows.reverse());
-            }
-        });
-    });
-}
-
 // 모든 세션 가져오기
 app.get('/api/all-sessions', async (req, res) => {
     try {
@@ -244,19 +231,6 @@ app.get('/api/session/:sessionId', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-// 세션별 대화 내용 가져오기
-async function getConversationBySession(sessionId) {
-    return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM conversation WHERE session_id = ? ORDER BY id DESC", [sessionId], (err, rows) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(rows.reverse());
-            }
-        });
-    });
-}
 
 app.listen(port, () => {
     console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);
