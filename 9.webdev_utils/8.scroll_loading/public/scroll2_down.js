@@ -1,5 +1,6 @@
-let start = 0;
 const itemsPerLoad = 20;
+
+let start = 0;
 let end = start + itemsPerLoad;
 let loading = false; // 데이터를 불러오는 중인지 여부
 
@@ -17,20 +18,20 @@ function fetchData() {
     loading = true; // 데이터를 불러오는 중임을 표시
 
     fetch(`/get-items?start=${start}&end=${end}`)
-    .then((response) => response.json())
-    .then((items) => {
-        items.forEach((item) => {
-            const itemElement = document.createElement('div');
-            itemElement.classList.add('item');
-            itemElement.textContent = item;
-            container.appendChild(itemElement);
-        });
+        .then((response) => response.json())
+        .then((items) => {
+            items.forEach((item) => {
+                const itemElement = document.createElement('div');
+                itemElement.classList.add('item');
+                itemElement.textContent = item;
+                container.appendChild(itemElement);
+            });
 
-        // 다음 데이터를 가져오기 위해 start 값 업데이트
-        start += items.length; // 가져온 데이터의 개수만큼 start를 증가
-        end = start + itemsPerLoad;
-        loading = false; // 데이터 로딩이 완료되었음을 표시
-    });
+            // 다음 데이터를 가져오기 위해 start 값 업데이트
+            start += items.length; // 가져온 데이터의 개수만큼 start를 증가
+            end = start + itemsPerLoad;
+            loading = false; // 데이터 로딩이 완료되었음을 표시
+        });
 }
 
 // 무한스크롤 이벤트 감지

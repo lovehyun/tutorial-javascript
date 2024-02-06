@@ -1,5 +1,6 @@
-let start = 0;
 const itemsPerLoad = 20;
+
+let start = 0;
 let end = start + itemsPerLoad;
 
 const container = document.getElementById('scroll-container');
