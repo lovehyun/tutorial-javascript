@@ -47,8 +47,20 @@ nunjucks.configure('views', {
 let posts = [];
 
 // 파일 업로드를 위한 설정
+const storage = multer.diskStorage({
+    destination: 'public/uploads/',
+    filename: (req, file, cb) => {
+        // 확장자 추출
+        const ext = path.extname(file.originalname);
+        // 파일명 생성 (현재 시간을 기반으로 고유한 파일명 생성)
+        const uniqueSuffix = Date.now();
+        // 파일명 결합
+        cb(null, file.fieldname + '_' + uniqueSuffix + ext);
+    }
+});
+
 const upload = multer({ 
-    dest: 'public/uploads/',
+    storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 제한 예시
     fileFilter: (req, file, cb) => {
         // 파일 형식 체크(이미지만 허용)
