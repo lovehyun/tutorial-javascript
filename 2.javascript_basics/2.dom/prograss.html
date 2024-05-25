@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Bar Timer</title>
+    <style>
+        #progressBar {
+            width: 100%;
+            background-color: #f3f3f3;
+        }
+        #progress {
+            width: 0%;
+            height: 30px;
+            background-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Progress Bar Timer</h1>
+    <input type="number" id="timeInput" placeholder="Enter seconds" min="1">
+    <button id="startButton">Start</button>
+    <button id="resetButton">Reset</button>
+    <div id="progressBar">
+        <div id="progress"></div>
+    </div>
+
+    <script src="progress.js"></script>
+</body>
+</html>
