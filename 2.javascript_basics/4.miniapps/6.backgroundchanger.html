@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Color Changer</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #colorCode {
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <button id="changeColorBtn">Change Background Color</button>
+    <div id="colorCode"></div>
+
+    <script>
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        document.getElementById('changeColorBtn').addEventListener('click', () => {
+            const randomColor = getRandomColor();
+            document.body.style.backgroundColor = randomColor;
+            document.getElementById('colorCode').textContent = randomColor;
+        });
+    </script>
+</body>
+</html>

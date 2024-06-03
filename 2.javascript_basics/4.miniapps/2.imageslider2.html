@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slider</title>
+    <style>
+        .slider {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .slider img {
+            max-width: 100%;
+            max-height: 400px; /* 이미지의 최대 높이 설정 */
+            display: none;
+        }
+        .slider img.active {
+            display: block;
+        }
+        .slider button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 10px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            cursor: pointer;
+        }
+        #prevBtn {
+            left: 10px;
+        }
+        #nextBtn {
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <button id="prevBtn">Previous</button>
+        <img src="images/cat1.jpg" class="active" alt="Image 1">
+        <img src="images/cat2.jpg" alt="Image 2">
+        <img src="images/cat3.jpg" alt="Image 3">
+        <button id="nextBtn">Next</button>
+    </div>
+
+    <script>
+        const images = document.querySelectorAll('.slider img');
+        let currentIndex = 0;
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+            images[currentIndex].classList.add('active');
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+            images[currentIndex].classList.add('active');
+        });
+    </script>
+</body>
+</html>

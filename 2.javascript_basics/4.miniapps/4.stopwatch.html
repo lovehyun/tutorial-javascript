@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch App</title>
+    <style>
+        body {
+            display: flex; /* Flexbox 사용 */
+            flex-direction: column; /* 수직 정렬 */
+            align-items: center; /* 가로 중앙 정렬 */
+            justify-content: center; /* 세로 중앙 정렬 */
+            height: 100vh; /* 전체 화면 높이 */
+            margin: 0;
+            background-color: #f0f0f0; /* 배경색 설정 */
+        }
+        #display {
+            font-size: 48px; /* 글자 크기 */
+            margin-bottom: 20px; /* 아래 여백 */
+        }
+        .button-container {
+            display: flex; /* Flexbox 사용 */
+            gap: 10px; /* 버튼 사이의 간격 */
+        }
+        button {
+            padding: 10px 20px; /* 패딩 설정 */
+            font-size: 18px; /* 글자 크기 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 스톱워치 표시 영역 -->
+    <div id="display">00:00.00</div>
+    <!-- 버튼 컨테이너 -->
+    <div class="button-container">
+        <button id="startButton">Start</button>
+        <button id="stopButton">Stop</button>
+        <button id="resetButton">Reset</button>
+    </div>
+
+    <script>
+        let startTime; // 스톱워치 시작 시간
+        let updatedTime; // 업데이트된 시간
+        let difference; // 경과 시간
+        let timerInterval; // 타이머 인터벌
+        let running = false; // 스톱워치 실행 여부
+
+        const display = document.getElementById('display'); // 스톱워치 표시 요소
+        const startButton = document.getElementById('startButton'); // 시작 버튼
+        const stopButton = document.getElementById('stopButton'); // 정지 버튼
+        const resetButton = document.getElementById('resetButton'); // 리셋 버튼
+
+        function startTimer() {
+            if (!running) { // 스톱워치가 실행 중이 아닐 때
+                startTime = new Date().getTime() - (difference || 0); // 시작 시간 설정
+                timerInterval = setInterval(updateTimer, 10); // 10밀리초마다 updateTimer 호출
+                running = true; // 스톱워치 실행 상태로 변경
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval); // 타이머 인터벌 중지
+            running = false; // 스톱워치 실행 상태 해제
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval); // 타이머 인터벌 중지
+            running = false; // 스톱워치 실행 상태 해제
+            difference = 0; // 경과 시간 초기화
+            display.textContent = '00:00.00'; // 표시 초기화
+        }
+
+        function updateTimer() {
+            updatedTime = new Date().getTime(); // 현재 시간
+            difference = updatedTime - startTime; // 경과 시간 계산
+
+            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // 분 계산
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000); // 초 계산
+            let milliseconds = Math.floor((difference % 1000) / 10); // 밀리초 계산
+
+            // 계산된 시간을 00:00.00 형식으로 표시
+            display.textContent = 
+                (minutes < 10 ? '0' + minutes : minutes) + ':' +
+                (seconds < 10 ? '0' + seconds : seconds) + '.' +
+                (milliseconds < 10 ? '0' + milliseconds : milliseconds);
+        }
+
+        startButton.addEventListener('click', startTimer); // 시작 버튼 클릭 시 startTimer 호출
+        stopButton.addEventListener('click', stopTimer); // 정지 버튼 클릭 시 stopTimer 호출
+        resetButton.addEventListener('click', resetTimer); // 리셋 버튼 클릭 시 resetTimer 호출
+    </script>
+</body>
+</html>

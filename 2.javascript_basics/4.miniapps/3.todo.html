@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        /* To-Do 리스트 항목 스타일 */
+        #todo-list li {
+            margin-bottom: 5px; /* 아래쪽 마진 */
+        }
+        /* 완료된 항목에 적용될 스타일 */
+        #todo-list li.completed {
+            text-decoration: line-through; /* 취소선 */
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <!-- To-Do 리스트를 표시하는 비순서형 목록 -->
+    <ul id="todo-list"></ul>
+
+    <script>
+        // 'Add' 버튼에 클릭 이벤트 리스너 추가
+        document.getElementById('add-todo').addEventListener('click', function() {
+            // 입력 필드의 값을 가져옴
+            const newTodo = document.getElementById('new-todo').value;
+            
+            // 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
+            if (newTodo.trim() === '') return;
+
+            // 새로운 리스트 항목(li) 요소 생성
+            const li = document.createElement('li');
+            li.textContent = newTodo; // 리스트 항목에 입력된 텍스트 설정
+
+            // 리스트 항목에 클릭 이벤트 리스너 추가
+            li.addEventListener('click', function() {
+                // 항목을 클릭하면 'completed' 클래스를 토글 (추가/제거)
+                li.classList.toggle('completed');
+            });
+
+            // 새로운 항목을 To-Do 리스트에 추가
+            document.getElementById('todo-list').appendChild(li);
+            // 입력 필드를 비워서 초기화
+            document.getElementById('new-todo').value = '';
+        });
+    </script>
+</body>
+</html>

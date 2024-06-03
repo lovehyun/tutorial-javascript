@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slider</title>
+    <style>
+        .slider {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .slider img {
+            max-width: 100%;
+            height: 300px;
+            display: none; /* 이미지 기본적으로 숨김 */
+        }
+        .slider img.active {
+            display: block; /* 활성화 이미지만 표시 */
+        }
+        .buttons {
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <img src="images/cat1.jpg" class="active" alt="Image 1">
+        <img src="images/cat2.jpg" alt="Image 2">
+        <img src="images/cat3.jpg" alt="Image 3">
+        <div class="buttons">
+            <button id="prevBtn">Previous</button>
+            <button id="nextBtn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const images = document.querySelectorAll('.slider img');
+        let currentIndex = 0;
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+            images[currentIndex].classList.add('active');
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+            images[currentIndex].classList.add('active');
+        });
+    </script>
+</body>
+</html>
