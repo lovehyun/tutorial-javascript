@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Paste Event Example</title>
+</head>
+<body>
+    <textarea id="myTextArea">Paste some text here</textarea>
+    <script>
+        document.getElementById('myTextArea').addEventListener('paste', function(event) {
+            alert('Text pasted!');
+        });
+    </script>
+</body>
+</html>

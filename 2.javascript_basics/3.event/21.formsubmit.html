@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Submit Event Example</title>
+</head>
+<body>
+    <form id="myForm">
+        <input type="text" name="name" placeholder="Enter your name">
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼 태그의 기본 제출 중단
+            console.log('Form submitted!');
+        });
+    </script>
+</body>
+</html>

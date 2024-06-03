@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Keyboard Event Example</title>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="Press any key">
+    <script>
+        document.addEventListener('keydown', function(event) {
+            console.log(`Key pressed: ${event.key}`);
+        });
+    </script>
+</body>
+</html>

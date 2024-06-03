@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus Out Event Example</title>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="Focus out from me">
+    <script>
+        document.getElementById('myInput').addEventListener('focusout', function() {
+            console.log('Input lost focus (with bubbling)!');
+        });
+    </script>
+</body>
+</html>

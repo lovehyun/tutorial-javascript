@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Before Unload Event Example</title>
+</head>
+<body>
+    <script>
+        window.addEventListener('beforeunload', function(event) {
+            event.preventDefault();
+            event.returnValue = ''; // 사용자에게 경고 메시지를 표시함
+        });
+    </script>
+</body>
+</html>

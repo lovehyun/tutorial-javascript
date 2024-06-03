@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Focus In Event Example</title>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="Focus on me">
+    <script>
+        document.getElementById('myInput').addEventListener('focusin', function() {
+            console.log('Input focused (with bubbling)!');
+        });
+    </script>
+</body>
+</html>

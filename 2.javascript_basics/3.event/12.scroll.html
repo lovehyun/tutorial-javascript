@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scroll Event Example</title>
+    <style>
+        #content {
+            height: 2000px;
+            background: linear-gradient(to bottom, #ffcc00 0%, #ff6600 100%);
+        }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+    <script>
+        window.addEventListener('scroll', function() {
+            console.log('Page scrolled!');
+        });
+    </script>
+</body>
+</html>

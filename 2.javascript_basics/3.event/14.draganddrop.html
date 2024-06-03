@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag and Drop Event Example</title>
+    <style>
+        #dragItem {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #dropZone {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="dragItem" draggable="true">Drag me</div>
+    <div id="dropZone">Drop here</div>
+
+    <script>
+        const dragItem = document.getElementById('dragItem');
+        const dropZone = document.getElementById('dropZone');
+
+        // 드래그 시작 이벤트
+        dragItem.addEventListener('dragstart', function(event) {
+            event.dataTransfer.setData('text', event.target.id);
+            console.log('Drag started');
+        });
+
+        // 드래그 오버 이벤트
+        dropZone.addEventListener('dragover', function(event) {
+            event.preventDefault(); // 기본 드래그 오버 동작 중단
+            console.log('Drag over drop zone');
+        });
+
+        // 드롭 이벤트
+        dropZone.addEventListener('drop', function(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData('text');
+            const draggedElement = document.getElementById(data);
+            dropZone.appendChild(draggedElement);
+            console.log(`Dropped data: ${data}`);
+        });
+    </script>
+</body>
+</html>

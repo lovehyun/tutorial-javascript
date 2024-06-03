@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Reset Event Example</title>
+</head>
+<body>
+    <form id="myForm">
+        <input type="text" name="name" placeholder="Enter your name">
+        <button type="reset">Reset</button>
+    </form>
+    <script>
+        document.getElementById('myForm').addEventListener('reset', function() {
+            console.log('Form reset!');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Copy Event Example</title>
+</head>
+<body>
+    <textarea id="myTextArea">Try copying this text</textarea>
+    <script>
+        document.getElementById('myTextArea').addEventListener('copy', function() {
+            alert('Text copied!');
+        });
+    </script>
+</body>
+</html>

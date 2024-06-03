@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Input Event Example</title>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="Type something">
+    <script>
+        document.getElementById('myInput').addEventListener('input', function(event) {
+            console.log(`Input changed to: ${event.target.value}`);
+        });
+    </script>
+</body>
+</html>

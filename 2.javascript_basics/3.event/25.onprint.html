@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print Event Example</title>
+</head>
+<body>
+    <button onclick="window.print()">Print this page</button>
+    <script>
+        window.onbeforeprint = function() {
+            console.log('Before print event triggered');
+        };
+        window.onafterprint = function() {
+            console.log('After print event triggered');
+        };
+    </script>
+</body>
+</html>
