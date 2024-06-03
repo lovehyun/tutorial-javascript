@@ -33,6 +33,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             cursor: pointer;
+            transition: transform 0.1s ease; /* 애니메이션 추가 */
+        }
+
+        .cell.empty {
+            background-color: #ddd; /* 빈 칸의 배경색 */
+            border: none;
+            cursor: default; /* 빈 칸은 클릭 불가 */
         }
     </style>
     <title>Number Puzzle Game</title>
@@ -44,11 +51,12 @@
         const puzzleContainer = document.getElementById('puzzle');
         const puzzleSize = 3;
         const emptyCell = puzzleSize * puzzleSize;
+        let isAnimating = false;
 
         let puzzleState = [];
 
-        // Shuffle the puzzle by making 100 random moves
-        function shufflePuzzle() {
+        // Shuffle the puzzle by making 100 random moves with animation
+        async function shufflePuzzle() {
             for (let i = 0; i < 100; i++) {
                 const emptyIndex = puzzleState.indexOf(null);
                 const neighbors = getValidNeighbors(emptyIndex);
@@ -56,6 +64,8 @@
 
                 if (randomNeighbor !== undefined) {
                     [puzzleState[emptyIndex], puzzleState[randomNeighbor]] = [puzzleState[randomNeighbor], puzzleState[emptyIndex]];
+                    renderPuzzle();
+                    await new Promise(resolve => setTimeout(resolve, 50)); // 애니메이션 효과를 위해 약간의 지연 추가
                 }
             }
         }
@@ -93,20 +103,24 @@
             puzzleState.forEach((number, index) => {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
-                cell.textContent = number !== null ? number : '';
-                cell.addEventListener('click', () => moveCell(index));
+                if (number === null) {
+                    cell.classList.add('empty'); // 빈 칸 스타일 추가
+                } else {
+                    cell.textContent = number !== null ? number : '';
+                    cell.addEventListener('click', () => moveCell(index));
+                }
                 puzzleContainer.appendChild(cell);
             });
         }
 
         // Initialize the puzzle
-        function initializePuzzle() {
+        async function initializePuzzle() {
             puzzleState = [];
             for (let i = 1; i < emptyCell; i++) {
                 puzzleState.push(i);
             }
             puzzleState.push(null); // The last cell is initially empty
-            shufflePuzzle();
+            await shufflePuzzle();
             renderPuzzle();
         }
 
@@ -125,17 +139,34 @@
 
         // Move a cell if possible
         function moveCell(index) {
+            if (isAnimating) return;
             const emptyIndex = puzzleState.indexOf(null);
             if (isMoveValid(index, emptyIndex)) {
-                [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
-                renderPuzzle();
+                const cells = document.querySelectorAll('.cell');
+                const clickedCell = cells[index];
+                const emptyCell = cells[emptyIndex];
+                const [clickedRow, clickedCol] = [Math.floor(index / puzzleSize), index % puzzleSize];
+                const [emptyRow, emptyCol] = [Math.floor(emptyIndex / puzzleSize), emptyIndex % puzzleSize];
 
-                if (isPuzzleSolved()) {
-                    setTimeout(() => {
-                        alert('Congratulations! You solved the puzzle!');
-                        initializePuzzle();
-                    }, 0);
-                }
+                // 애니메이션 설정
+                const deltaX = (emptyCol - clickedCol) * 85; // 80px + 5px (grid-gap)
+                const deltaY = (emptyRow - clickedRow) * 85; // 80px + 5px (grid-gap)
+                clickedCell.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+                // 애니메이션이 끝난 후 실제로 퍼즐 상태 업데이트
+                isAnimating = true;
+                setTimeout(() => {
+                    [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
+                    renderPuzzle();
+                    isAnimating = false;
+
+                    if (isPuzzleSolved()) {
+                        setTimeout(() => {
+                            alert('Congratulations! You solved the puzzle!');
+                            initializePuzzle();
+                        }, 0);
+                    }
+                }, 300); // 애니메이션 시간 (0.3s) 과 일치해야 함
             }
         }
 

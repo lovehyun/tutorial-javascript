@@ -1,15 +1,3 @@
-<!-- 
-1. 해결 가능한 상태
-1 2 3
-4 5 6
-7 0 8
-
-2. 해결 불가능한 상태
-1 2 3
-4 5 6
-8 7 0 
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,6 +33,13 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             cursor: pointer;
+            transition: transform 0.3s ease; /* 애니메이션 추가 */
+        }
+
+        .cell.empty {
+            background-color: #ddd; /* 빈 칸의 배경색 */
+            border: none;
+            cursor: default; /* 빈 칸은 클릭 불가 */
         }
     </style>
     <title>Number Puzzle Game</title>
@@ -59,55 +54,14 @@
 
         let puzzleState = [];
 
-        // Check if the puzzle is solvable
-        function isPuzzleSolvable() {
-            // Implement logic to check if the initial state is solvable
-            // ...
-            // return true; // Return true if solvable, false otherwise
-
-            // 퍼즐이 해결 가능한지를 확인하는 함수인 isPuzzleSolvable를 구현하려면 퍼즐 이론에 기반한 알고리즘이 필요합니다. 
-            // 퍼즐 이론에서는 퍼즐이 해결 가능하려면 "역전 순서의 개수"가 짝수여야 한다는 원리를 이용합니다. 
-            // 역전 순서란 각 숫자가 정렬된 순서에서 자기 자신보다 큰 수가 앞에 위치한 경우를 말합니다.
-            // 여기서 역전 순서의 개수를 세는 방법은 간단합니다. 
-            // 각 숫자에 대해 그보다 뒤에 위치한 모든 숫자 중에서 자기보다 작은 숫자의 개수를 세면 됩니다.
-
-            let inversionCount = 0;
-
-            for (let i = 0; i < puzzleState.length - 1; i++) {
-                for (let j = i + 1; j < puzzleState.length; j++) {
-                    if (puzzleState[i] && puzzleState[j] && puzzleState[i] > puzzleState[j]) {
-                        inversionCount++;
-                    }
-                }
-            }
-
-            // If the grid size is even, add the row number of the empty cell
-            if (puzzleSize % 2 === 0) {
-                const emptyCellRow = Math.floor(puzzleState.indexOf(null) / puzzleSize);
-                inversionCount += emptyCellRow;
-            }
-
-            return inversionCount % 2 === 0;
-        }
-
         // Initialize the puzzle
         function initializePuzzle() {
-            let iterationCount = 0;
-            
-            do {
-                puzzleState = [];
-                for (let i = 1; i < emptyCell; i++) {
-                    puzzleState.push(i);
-                }
-                puzzleState.push(null); // The last cell is initially empty
-                shufflePuzzle();
-
-                iterationCount++;
-                console.log(`Iteration ${iterationCount}:`);
-                console.log('Current Puzzle State:', puzzleState);
-                console.log('Is Solvable:', isPuzzleSolvable());
-            } while (!isPuzzleSolvable()); // Repeat until the puzzle is solvable
-
+            puzzleState = [];
+            for (let i = 1; i < emptyCell; i++) {
+                puzzleState.push(i);
+            }
+            puzzleState.push(null); // The last cell is initially empty
+            shufflePuzzle();
             renderPuzzle();
         }
 
@@ -125,8 +79,12 @@
             puzzleState.forEach((number, index) => {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
-                cell.textContent = number !== null ? number : '';
-                cell.addEventListener('click', () => moveCell(index));
+                if (number === null) {
+                    cell.classList.add('empty'); // 빈 칸 스타일 추가
+                } else {
+                    cell.textContent = number !== null ? number : '';
+                    cell.addEventListener('click', () => moveCell(index));
+                }
                 puzzleContainer.appendChild(cell);
             });
         }
@@ -145,15 +103,29 @@
         function moveCell(index) {
             const emptyIndex = puzzleState.indexOf(null);
             if (isMoveValid(index, emptyIndex)) {
-                [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
-                renderPuzzle();
+                const cells = document.querySelectorAll('.cell');
+                const clickedCell = cells[index];
+                const emptyCell = cells[emptyIndex];
+                const [clickedRow, clickedCol] = [Math.floor(index / puzzleSize), index % puzzleSize];
+                const [emptyRow, emptyCol] = [Math.floor(emptyIndex / puzzleSize), emptyIndex % puzzleSize];
 
-                if (isPuzzleSolved()) {
-                    setTimeout(() => {
-                        alert('Congratulations! You solved the puzzle!');
-                        initializePuzzle();
-                    }, 0);
-                }
+                // 애니메이션 설정
+                const deltaX = (emptyCol - clickedCol) * 85; // 80px + 5px (grid-gap)
+                const deltaY = (emptyRow - clickedRow) * 85; // 80px + 5px (grid-gap)
+                clickedCell.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+                // 애니메이션이 끝난 후 실제로 퍼즐 상태 업데이트
+                setTimeout(() => {
+                    [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
+                    renderPuzzle();
+
+                    if (isPuzzleSolved()) {
+                        setTimeout(() => {
+                            alert('Congratulations! You solved the puzzle!');
+                            initializePuzzle();
+                        }, 0);
+                    }
+                }, 300); // 애니메이션 시간 (0.3s) 과 일치해야 함
             }
         }
 
