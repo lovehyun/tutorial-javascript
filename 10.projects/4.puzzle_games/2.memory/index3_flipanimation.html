@@ -6,6 +6,7 @@
     <style>
         body {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
@@ -13,24 +14,64 @@
             background-color: #f0f0f0;
         }
 
+        #scoreboard {
+            margin: 20px 0;
+            font-size: 24px;
+        }
+
+        #boardContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+        }
+
         #board {
             display: grid;
             grid-template-columns: repeat(4, 80px);
             grid-gap: 5px;
+            perspective: 1000px;
+        }
+        
+        /* 카드 뒤집기 효과 --> */
+        .card {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 1s;
         }
 
-        .card {
+        .card .front,
+        .card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 80px;
-            height: 80px;
             font-size: 24px;
-            background-color: #ffc5c5;
-            border: 1px solid #909090;
-            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
+        .card .front {
+            background-color: #ffcfcf;
+        }
+
+        .card .back {
+            background-color: #4CAF50;
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card.flipped {
+           transform: rotateY(180deg);
+        }
+        /* <-- 카드 뒤집기 효과 */
+        
         .card.hidden {
             visibility: hidden;
         }
@@ -50,7 +91,10 @@
     <title>Memory Puzzle Game</title>
 </head>
 <body>
-    <div id="board"></div>
+    <div id="scoreboard">Total Moves: 0</div>
+    <div id="boardContainer">
+        <div id="board"></div>
+    </div>
 
     <div id="congratulationPopup">
         <p>Congratulations! You cleared the game!</p>
@@ -61,6 +105,7 @@
     <script>
         const board = document.getElementById('board');
         const congratulationPopup = document.getElementById('congratulationPopup');
+        const scoreboard = document.getElementById('scoreboard');
         const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8];
         let selectedCards = [];
         let totalMoves = 0;
@@ -87,7 +132,18 @@
                 card.classList.add('card');
                 card.dataset.index = i;
                 card.dataset.value = cardValues[i];
-                card.textContent = ' ';
+
+                const front = document.createElement('div');
+                front.classList.add('front');
+                front.textContent = ' ';
+
+                const back = document.createElement('div');
+                back.classList.add('back');
+                back.textContent = cardValues[i];
+
+                card.appendChild(front);
+                card.appendChild(back);
+
                 card.addEventListener('click', () => flipCard(card));
                 board.appendChild(card);
             }
@@ -95,12 +151,13 @@
 
         // Flip a card
         function flipCard(card) {
-            if (selectedCards.length < 2 && card.textContent === ' ') {
-                card.textContent = card.dataset.value;
+            if (selectedCards.length < 2 && !card.classList.contains('flipped')) {
+                card.classList.add('flipped');
                 selectedCards.push(card);
                 if (selectedCards.length === 2) {
                     totalMoves++;
                     setTimeout(checkMatch, 1000);
+                    updateScoreboard();
                 }
             }
         }
@@ -113,15 +170,18 @@
                 // Matched, hide cards
                 card1.classList.add('hidden');
                 card2.classList.add('hidden');
+                checkAllCardsHidden();
             } else {
                 // Not matched, flip back
-                card1.textContent = ' ';
-                card2.textContent = ' ';
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
             }
 
             selectedCards = [];
+        }
 
-            // Check if all cards are hidden
+        // Check if all cards are hidden
+        function checkAllCardsHidden() {
             if (document.querySelectorAll('.card:not(.hidden)').length === 0) {
                 showCongratulationPopup();
             }
@@ -134,9 +194,15 @@
             congratulationPopup.style.display = 'block';
         }
 
+        // Update the scoreboard
+        function updateScoreboard() {
+            scoreboard.textContent = `Total Moves: ${totalMoves}`;
+        }
+
         // Reset the game
         function resetGame() {
             totalMoves = 0;
+            updateScoreboard();
             selectedCards = [];
             congratulationPopup.style.display = 'none';
             initializeBoard();
