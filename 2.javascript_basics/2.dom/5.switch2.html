@@ -3,8 +3,6 @@
     <head>
         <title>Hello World</title>
         <script>
-            var fruit = "apple";
-
             function fruitDisplay() {
                 fruit = document.getElementById("fruitSelector").value;
                 console.log(fruit);
@@ -13,15 +11,19 @@
                 switch (fruit) {
                     case "apple":
                         // document.write("이것은 사과입니다<BR>");
-                        result.innerHTML = "이것은 사과입니다";
+                        // 새로운 노드를 생성합니다.
+                        var newParagraph = document.createElement('p');
+                        newParagraph.textContent = "이것은 사과입니다";
+                        document.body.appendChild(newParagraph);
+                        // result.innerHTML = "이것은 <B>사과</B>입니다";
                         break;
                     case "banana":
                         // document.write("이것은 바나나입니다<BR>");
-                        result.innerHTML = "이것은 바나나입니다";
+                        result.innerText = "이것은 바나나입니다"; // 순수 TEXT
                         break;
                     case "orange":
                         // document.write("이것은 오렌지입니다<BR>");
-                        result.innerHTML = "이것은 오렌지입니다";
+                        result.textContent  = "이것은 오렌지입니다"; // 순수 TEXT
                         break;
                 }
             }

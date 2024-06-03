@@ -18,8 +18,19 @@
         function changeCellColor() {
             // 테이블 셀의 배경색을 변경하는 함수입니다.
             var cells = document.getElementsByTagName("td");
+            // for (const cell of cells) {
             for (var i = 0; i < cells.length; i++) {
                 cells[i].style.backgroundColor = "lightblue"; // 변경할 색상을 여기에 입력하세요.
+            }
+        }
+        
+        function changeOddCellColor() {
+            // 테이블 셀의 배경색을 변경하는 함수입니다.
+            var cells = document.getElementsByTagName("td");
+            for (var i = 0; i < cells.length; i++) {
+                if (i % 2 !== 1) { // 홀수 셀인 경우
+                    cells[i].style.backgroundColor = "lightgreen"; // 변경할 색상을 여기에 입력하세요.
+                }
             }
         }
     </script>
@@ -45,6 +56,7 @@
     </table>
 
     <button onclick="changeCellColor()">셀 색상 변경</button>
+    <button onclick="changeOddCellColor()">홀수셀 색상 변경</button>
 </body>
 
 </html>

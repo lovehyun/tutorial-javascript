@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Show/Hide Example</title>
+    <style>
+        /* CSS 스타일 시트에서 숨겨진 div의 스타일을 설정합니다. */
+        #myDiv {
+            display: none;
+            width: 200px;
+            height: 200px;
+            background-color: lightblue;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        function toggleDiv() {
+            var divElement = document.getElementById('myDiv');
+            // var displayStyle = window.getComputedStyle(divElement).display;
+
+            if (divElement.style.display === 'none') {
+                divElement.style.display = 'block'; // div를 보이게 설정합니다.
+            } else {
+                divElement.style.display = 'none'; // div를 숨깁니다.
+            }
+        }
+    </script>
+</head>
+<body>
+    <button onclick="toggleDiv()">Toggle Div</button>
+
+    <div id="myDiv">이것은 숨겨진 Div입니다.</div>
+</body>
+</html>
