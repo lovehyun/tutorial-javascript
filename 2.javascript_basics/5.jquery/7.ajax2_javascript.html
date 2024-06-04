@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS AJAX Example</title>
+</head>
+<body>
+    <h2>Load Content with AJAX</h2>
+
+    <div id="contentContainer">
+        <!-- AJAX로 가져온 내용이 여기에 표시될 것입니다. -->
+    </div>
+
+    <button id="loadContentBtn">Load Content</button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 버튼 클릭 시 AJAX 요청 수행
+            document.getElementById('loadContentBtn').addEventListener('click', function () {
+                // AJAX 요청
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', 'https://jsonplaceholder.typicode.com/posts/1', true);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        // 0 (UNSENT): XMLHttpRequest 객체가 생성되었지만, 아직 open 메서드가 호출되지 않은 상태.
+                        // 1 (OPENED): open 메서드가 호출된 상태. 요청이 아직 보내지지 않은 상태.
+                        // 2 (HEADERS_RECEIVED): send 메서드가 호출되고, 헤더가 수신된 상태.
+                        // 3 (LOADING): 요청한 데이터의 일부를 수신한 상태.
+                        // 4 (DONE): 요청이 완료되어 모든 데이터가 수신된 상태.
+
+                        if (xhr.status === 200) {
+                            const data = JSON.parse(xhr.responseText);
+                            // 성공적으로 데이터를 받아왔을 때 수행할 동작
+                            document.getElementById('contentContainer').innerHTML =
+                                '<p>Title: ' + data.title + '</p><p>Body: ' + data.body + '</p>';
+                        } else {
+                            // AJAX 요청이 실패했을 때 수행할 동작
+                            alert('Failed to load content.');
+                        }
+                    }
+                };
+                xhr.send();
+            });
+        });
+    </script>
+</body>
+</html>
