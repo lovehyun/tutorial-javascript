@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Propagation</title>
+    <style>
+        .container {
+            padding: 20px;
+            background-color: lightgray;
+        }
+
+        .inner {
+            padding: 10px;
+            background-color: white;
+        }
+    </style>
+    <script>
+        // 1. DOMContentLoaded 구문 없이 실행해보고 오류가 나는 원인 분석해보기
+        document.addEventListener('DOMContentLoaded', function () {
+            var container = document.querySelector('.container');
+            var inner = document.querySelector('.inner');
+
+            container.addEventListener('click', function (event) {
+                console.log('Container clicked!');
+            });
+
+            inner.addEventListener('click', function (event) {
+                // 2. inner 클릭하고 두개 이벤트 동시 발생하는것 확인하기
+                // event.stopPropagation();
+                console.log('Inner clicked!');
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="inner">Click Me</div>
+    </div>
+</body>
+</html>
