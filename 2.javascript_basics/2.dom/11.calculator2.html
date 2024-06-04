@@ -47,6 +47,8 @@
         function appendSymbol(symbol) {
             const resultInput = document.getElementById("result");
             const lastInput = resultInput.value.slice(-1);
+            // const lastInput = resultInput.value.charAt(resultInput.value.length - 1);
+            // const lastInput = resultInput.value.substring(resultInput.value.length - 1);
 
             // 이미 입력된 연산자인지 확인하고 새로운 연산자 추가
             if (lastInput !== symbol) {
