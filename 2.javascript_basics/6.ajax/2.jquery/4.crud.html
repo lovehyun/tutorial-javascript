@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSONPlaceholder Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>JSONPlaceholder API Example</h2>
+
+    <div>
+        <h3>Create a Post</h3>
+        <button id="createPostBtn">Create Post</button>
+    </div>
+    <div>
+        <h3>Update a Post</h3>
+        <button id="updatePostBtn">Update Post</button>
+    </div>
+    <div>
+        <h3>Retrieve a Post</h3>
+        <button id="retrievePostBtn">Retrieve Post</button>
+    </div>
+    <div>
+        <h3>Delete a Post</h3>
+        <button id="deletePostBtn">Delete Post</button>
+    </div>
+    <div>
+        <h3>Result:</h3>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#createPostBtn').click(function() {
+                const postData = {
+                    title: 'foo',
+                    body: 'bar',
+                    userId: 1
+                };
+
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts',
+                    method: 'POST',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: JSON.stringify(postData),
+                    success: function(response) {
+                        $('#result').text(JSON.stringify(response, null, 2));
+                    }
+                });
+            });
+
+            $('#updatePostBtn').click(function() {
+                const updateData = {
+                    id: 1,
+                    title: 'foo',
+                    body: 'bar',
+                    userId: 1
+                };
+
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/1',
+                    method: 'PUT',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: JSON.stringify(updateData),
+                    success: function(response) {
+                        $('#result').text(JSON.stringify(response, null, 2));
+                    }
+                });
+            });
+
+            $('#retrievePostBtn').click(function() {
+                $.get('https://jsonplaceholder.typicode.com/posts/1', function(response) {
+                    $('#result').text(JSON.stringify(response, null, 2));
+                });
+            });
+
+            $('#deletePostBtn').click(function() {
+                $.ajax({
+                    url: 'https://jsonplaceholder.typicode.com/posts/1',
+                    method: 'DELETE',
+                    success: function(response) {
+                        $('#result').text(JSON.stringify(response, null, 2));
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
