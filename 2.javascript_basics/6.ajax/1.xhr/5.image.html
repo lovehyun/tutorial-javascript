@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Dog Image</title>
+</head>
+<body>
+    <h1>Random Dog Image</h1>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        document.getElementById('fetch-button').addEventListener('click', function() {
+            // Create a new XMLHttpRequest object
+            var xhr = new XMLHttpRequest();
+
+            // Configure it: GET-request for the URL /post/user
+            xhr.open('GET', 'https://dog.ceo/api/breeds/image/random', true);
+
+            // Send the request over the network
+            xhr.send();
+
+            // This will be called after the response is received
+            xhr.onload = function() {
+                if (xhr.status != 200) { // analyze HTTP response status
+                    alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+                } else { // show the result
+                    // parse JSON response
+                    var responseObj = JSON.parse(xhr.responseText);
+                    var imageUrl = responseObj.message;
+
+                    // Create an image element
+                    var img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = 'Random Dog Image';
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+
+                    // Clear previous image and add new one to the container
+                    var imageContainer = document.getElementById('image-container');
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                }
+            };
+
+            xhr.onerror = function() {
+                alert("Request failed");
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Dog Image</title>
+</head>
+<body>
+    <h1>Random Dog Image</h1>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        document.getElementById('fetch-button').addEventListener('click', function() {
+            fetch('https://dog.ceo/api/breeds/image/random')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var imageUrl = data.message;
+
+                    // Create an image element
+                    var img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = 'Random Dog Image';
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+
+                    // Clear previous image and add new one to the container
+                    var imageContainer = document.getElementById('image-container');
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+        });
+    </script>
+</body>
+</html>

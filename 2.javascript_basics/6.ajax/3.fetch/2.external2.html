@@ -1,0 +1,20 @@
+<!-- JS의 AJAX요청이 다른 소스이기 때문에, CORS 이슈로 인해 서버에서 돌려야 함.
+     npm install -g http-server -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS AJAX Example</title>
+    <script type="module" src="ajax_fetch.js"></script>
+</head>
+<body>
+    <h2>Load Content with AJAX</h2>
+
+    <div id="contentContainer">
+        <!-- AJAX로 가져온 내용이 여기에 표시될 것입니다. -->
+    </div>
+
+    <button id="loadContentBtn">Load Content</button>    
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS AJAX Example</title>
+</head>
+<body>
+    <h2>Load Content with AJAX</h2>
+
+    <div id="contentContainer">
+        <!-- AJAX로 가져온 내용이 여기에 표시될 것입니다. -->
+    </div>
+
+    <button id="loadContentBtn">Load Content</button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 버튼 클릭 시 AJAX 요청 수행
+            document.getElementById('loadContentBtn').addEventListener('click', function () {
+                // fetch를 사용한 AJAX 요청
+                fetch('https://jsonplaceholder.typicode.com/posts/1')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // 성공적으로 데이터를 받아왔을 때 수행할 동작
+                        document.getElementById('contentContainer').innerHTML =
+                            '<p>Title: ' + data.title + '</p><p>Body: ' + data.body + '</p>';
+                    })
+                    .catch(error => {
+                        // AJAX 요청이 실패했을 때 수행할 동작
+                        alert('Failed to load content.');
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

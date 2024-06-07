@@ -12,24 +12,21 @@
 
     <script>
         document.getElementById('loadDataBtn').addEventListener('click', function() {
-            // XMLHttpRequest 객체 생성
-            var xhr = new XMLHttpRequest();
-
-            // 요청을 설정
-            xhr.open('GET', 'http://localhost:3000/data', true);
-
-            // 요청에 대한 응답 처리
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
+            fetch('http://localhost:3000/data')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
                     document.getElementById('result').innerHTML = 
                         '<h2>' + data.title + '</h2>' +
                         '<p>' + data.body + '</p>';
-                }
-            };
-
-            // 요청 전송
-            xhr.send();
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
         });
     </script>
 </body>

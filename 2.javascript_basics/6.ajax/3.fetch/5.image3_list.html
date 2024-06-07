@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Dog Breed Image</title>
+</head>
+<body>
+    <h1>Random Dog Breed Image</h1>
+    <label for="dog-selector">Choose a breed:</label>
+    <select id="dog-selector" class="dog-selector"></select>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        // Function to fetch breed list and populate the select element
+        function fetchBreedList() {
+            fetch('https://dog.ceo/api/breeds/list/all')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var breeds = data.message;
+                    var dogSelector = document.getElementById('dog-selector');
+                    
+                    for (var breed in breeds) {
+                        if (breeds[breed].length > 0) {
+                            breeds[breed].forEach(subBreed => {
+                                var option = document.createElement('option');
+                                option.value = `${breed}/${subBreed}`;
+                                option.text = `${subBreed} ${breed}`;
+                                dogSelector.appendChild(option);
+                            });
+                        } else {
+                            var option = document.createElement('option');
+                            option.value = breed;
+                            option.text = breed;
+                            dogSelector.appendChild(option);
+                        }
+                    }
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+        }
+
+        // Function to fetch and display image of selected breed
+        function fetchBreedImage() {
+            var breed = document.getElementById('dog-selector').value;
+            fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var imageUrl = data.message;
+                    var img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = `Random ${breed} Image`;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    var imageContainer = document.getElementById('image-container');
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+        }
+
+        // Add event listener to the fetch button
+        document.getElementById('fetch-button').addEventListener('click', fetchBreedImage);
+
+        // Fetch breed list when the page loads
+        fetchBreedList();
+    </script>
+</body>
+</html>

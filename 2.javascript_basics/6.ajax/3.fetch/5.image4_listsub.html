@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Dog Breed Image</title>
+</head>
+<body>
+    <h1>Random Dog Breed Image</h1>
+    <label for="main-breed-selector">Choose a main breed:</label>
+    <select id="main-breed-selector" class="dog-selector"></select>
+    <label for="sub-breed-selector">Choose a sub-breed:</label>
+    <select id="sub-breed-selector" class="dog-selector"></select>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        var breedsList;
+
+        // Function to fetch breed list and populate the main breed select element
+        function fetchBreedList() {
+            fetch('https://dog.ceo/api/breeds/list/all')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    breedsList = data.message;
+                    var mainBreedSelector = document.getElementById('main-breed-selector');
+
+                    for (var breed in breedsList) {
+                        var option = document.createElement('option');
+                        option.value = breed;
+                        option.text = breed;
+                        mainBreedSelector.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+        }
+
+        // Function to populate sub-breed select element based on selected main breed
+        function populateSubBreedList() {
+            var mainBreed = document.getElementById('main-breed-selector').value;
+            var subBreedSelector = document.getElementById('sub-breed-selector');
+            subBreedSelector.innerHTML = '';
+
+            if (breedsList[mainBreed].length > 0) {
+                breedsList[mainBreed].forEach(function(subBreed) {
+                    var option = document.createElement('option');
+                    option.value = subBreed;
+                    option.text = subBreed;
+                    subBreedSelector.appendChild(option);
+                });
+            } else {
+                var option = document.createElement('option');
+                option.value = '';
+                option.text = 'None';
+                subBreedSelector.appendChild(option);
+            }
+        }
+
+        // Function to fetch and display image of selected breed
+        function fetchBreedImage() {
+            var mainBreed = document.getElementById('main-breed-selector').value;
+            var subBreed = document.getElementById('sub-breed-selector').value;
+            var breed = subBreed ? `${mainBreed}/${subBreed}` : mainBreed;
+            fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var imageUrl = data.message;
+                    var img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = `Random ${breed} Image`;
+                    img.style.maxWidth = '100%';
+                    img.style.height = 'auto';
+                    var imageContainer = document.getElementById('image-container');
+                    imageContainer.innerHTML = '';
+                    imageContainer.appendChild(img);
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+        }
+
+        // Add event listeners
+        document.getElementById('main-breed-selector').addEventListener('change', populateSubBreedList);
+        document.getElementById('fetch-button').addEventListener('click', fetchBreedImage);
+
+        // Fetch breed list when the page loads
+        fetchBreedList();
+    </script>
+</body>
+</html>
