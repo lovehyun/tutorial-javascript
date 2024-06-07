@@ -4,10 +4,13 @@
     <title>To-Do List</title>
     <style>
         /* To-Do 리스트 항목 스타일 */
+        #todo-list {
+            list-style-type: none; /* 목록 스타일 없음 (bullet 제거) */
+            padding-left: 0; /* 기본 패딩 제거 */
+        }
+        
         #todo-list li {
             margin-bottom: 10px; /* 아래쪽 마진 */
-            display: flex;
-            align-items: center;
             font-size: 20px; /* 글자 크기 */
         }
         /* 완료된 항목에 적용될 스타일 */
@@ -23,10 +26,21 @@
             color: red;
             margin-left: 10px; /* 텍스트와 아이콘 사이의 간격 */
         }
+
+        /* 입력박스 크기 조정 */
         input[type="text"] {
             font-size: 18px;
             padding: 5px;
         }
+
+        /* 체크박스 크기 조정 */
+        input[type="checkbox"] {
+            /* 아래 둘중 하나: width x height 또는 transform */
+            width: 15px; /* 너비 설정 */
+            height: 15px; /* 높이 설정 */
+            transform: scale(1.5); /* 크기 조정 */
+        }
+
         button {
             font-size: 18px;
             padding: 5px 10px;
@@ -47,12 +61,13 @@
         document.getElementById('add-todo').addEventListener('click', function() {
             // 입력 필드의 값을 가져옴
             const newTodo = document.getElementById('new-todo').value;
+
             // 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
             if (newTodo.trim() === '') return;
 
             // 새로운 리스트 항목(li) 요소 생성
             const li = document.createElement('li');
-            
+
             // 체크박스 생성 및 추가
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';

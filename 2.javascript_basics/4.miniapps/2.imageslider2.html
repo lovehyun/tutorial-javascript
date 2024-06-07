@@ -6,36 +6,50 @@
     <title>Image Slider</title>
     <style>
         .slider {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            max-width: 600px;
-            margin: 0 auto;
+            position: relative; /* 자식 요소들을 절대 위치로 배치하기 위한 기준 */
+            width: 100%; /* 슬라이더의 너비를 부모 요소의 100%로 설정 */
+            max-width: 400px; /* 슬라이더의 최대 너비를 600px로 설정 */
+            margin: 0 auto; /* 슬라이더를 수평 중앙에 배치 */
+            overflow: hidden; /* 슬라이더 영역을 넘는 이미지 부분을 숨김 */
+            height: 400px; /* 슬라이더의 고정 높이 설정 */
         }
         .slider img {
-            max-width: 100%;
-            max-height: 400px; /* 이미지의 최대 높이 설정 */
-            display: none;
+            width: 100%; /* 이미지의 너비를 슬라이더의 100%로 설정 */
+            height: 100%; /* 이미지의 높이를 슬라이더의 높이와 동일하게 설정 */
+            position: absolute; /* 이미지를 절대 위치로 배치 */
+            top: 0; /* 이미지의 상단을 슬라이더의 상단에 맞춤 */
+            left: 100%; /* 기본적으로 이미지를 슬라이더의 오른쪽 밖으로 배치 */
+            opacity: 0; /* 기본적으로 이미지를 보이지 않게 설정 */
+            transition: opacity 0.5s ease, left 0.5s ease; /* 이미지의 위치와 투명도 변경에 애니메이션 적용 */
+            z-index: 1; /* 이미지의 z-index를 낮게 설정하여 버튼이 이미지 위에 표시되도록 함 */
         }
         .slider img.active {
-            display: block;
+            left: 0; /* 활성화된 이미지를 슬라이더 안으로 배치 */
+            opacity: 1; /* 활성화된 이미지를 보이도록 설정 */
+            z-index: 1; /* z-index 유지 */
+        }
+        .slider img.next {
+            left: 100%; /* 다음 이미지가 오른쪽에 위치하도록 설정 */
+        }
+        .slider img.prev {
+            left: -100%; /* 이전 이미지가 왼쪽에 위치하도록 설정 */
         }
         .slider button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 10px;
-            font-size: 16px;
-            background-color: rgba(255, 255, 255, 0.7);
-            border: none;
-            cursor: pointer;
+            position: absolute; /* 버튼을 절대 위치로 배치 */
+            top: 50%; /* 버튼을 수직 중앙에 배치 */
+            transform: translateY(-50%); /* 수직 중앙 정렬을 위한 변환 */
+            padding: 10px; /* 버튼의 안쪽 여백 설정 */
+            font-size: 16px; /* 버튼의 글자 크기 설정 */
+            background-color: rgba(255, 255, 255, 0.7); /* 버튼의 배경색과 투명도 설정 */
+            border: none; /* 버튼의 테두리 제거 */
+            cursor: pointer; /* 버튼에 마우스 커서를 올리면 포인터로 변경 */
+            z-index: 2; /* 버튼이 이미지 위에 표시되도록 z-index를 높게 설정 */
         }
         #prevBtn {
-            left: 10px;
+            left: 10px; /* 왼쪽 버튼의 위치를 왼쪽으로 10px 설정 */
         }
         #nextBtn {
-            right: 10px;
+            right: 10px; /* 오른쪽 버튼의 위치를 오른쪽으로 10px 설정 */
         }
     </style>
 </head>
@@ -49,19 +63,30 @@
     </div>
 
     <script>
-        const images = document.querySelectorAll('.slider img');
-        let currentIndex = 0;
+        const images = document.querySelectorAll('.slider img'); // 모든 이미지 요소 선택
+        let currentIndex = 0; // 현재 활성화된 이미지의 인덱스
+
+        function updateSlider(newIndex, direction) {
+            images[currentIndex].classList.remove('active');
+            images[currentIndex].classList.add(direction === 'next' ? 'prev' : 'next');
+            
+            images[newIndex].classList.remove('next', 'prev');
+            images[newIndex].classList.add('active');
+            currentIndex = newIndex;
+        }
 
         document.getElementById('prevBtn').addEventListener('click', () => {
-            images[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
-            images[currentIndex].classList.add('active');
+            if (currentIndex > 0) {
+                const newIndex = currentIndex - 1;
+                updateSlider(newIndex, 'prev');
+            }
         });
 
         document.getElementById('nextBtn').addEventListener('click', () => {
-            images[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
-            images[currentIndex].classList.add('active');
+            if (currentIndex < images.length - 1) {
+                const newIndex = currentIndex + 1;
+                updateSlider(newIndex, 'next');
+            }
         });
     </script>
 </body>

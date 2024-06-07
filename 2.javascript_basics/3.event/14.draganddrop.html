@@ -36,6 +36,7 @@
 
         // 드래그 시작 이벤트
         dragItem.addEventListener('dragstart', function(event) {
+            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
             event.dataTransfer.setData('text', event.target.id);
             console.log('Drag started');
         });

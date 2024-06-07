@@ -10,7 +10,7 @@
             cursor: pointer;
         }
         #large-image {
-            display: block;
+            display: none; /* 최초에 숨기기 */
             margin: 20px auto;
             max-width: 100%;
         }
@@ -19,18 +19,59 @@
 <body>
     <h1>Image Gallery</h1>
     <div class="gallery">
-        <img src="images/cat1.jpg" alt="Image 1">
-        <img src="images/cat2.jpg" alt="Image 2">
-        <img src="images/cat3.jpg" alt="Image 3">
+        <img id="img1" src="images/cat1.jpg" alt="Image 1">
+        <img id="img2" src="images/cat2.jpg" alt="Image 2">
+        <img id="img3" src="images/cat3.jpg" alt="Image 3">
     </div>
     <img id="large-image" src="" alt="Large Image">
 
     <script>
-        document.querySelectorAll('.gallery img').forEach(function(image) {
-            image.addEventListener('click', function() {
-                document.getElementById('large-image').src = image.src;
-            });
+        // <-- 1단계 코드 -->
+        // 개별 이미지 요소 선택
+        const img1 = document.getElementById('img1');
+        const img2 = document.getElementById('img2');
+        const img3 = document.getElementById('img3');
+
+        // 클릭 이벤트 리스너 추가
+        img1.addEventListener('click', function() {
+            const largeImage = document.getElementById('large-image');
+            largeImage.src = img1.src;
+            largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
         });
+
+        img2.addEventListener('click', function() {
+            const largeImage = document.getElementById('large-image');
+            largeImage.src = img2.src;
+            largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
+        });
+
+        img3.addEventListener('click', function() {
+            const largeImage = document.getElementById('large-image');
+            largeImage.src = img3.src;
+            largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
+        });
+
+        // <-- 2단계 코드 -->
+        // 이미지 요소들을 배열에 저장
+        const images = [img1, img2, img3];
+
+        // 반복문을 통해 클릭 이벤트 리스너 추가
+        // for (let i = 0; i < images.length; i++) {
+        //     images[i].addEventListener('click', function() {
+        //         const largeImage = document.getElementById('large-image');
+        //         largeImage.src = images[i].src;
+        //         largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
+        //     })
+        // }
+
+        // <-- 3단계 코드 -->
+        // document.querySelectorAll('.gallery img').forEach(function(image) {
+        //     image.addEventListener('click', function() {
+        //         const largeImage = document.getElementById('large-image');
+        //         largeImage.src = image.src;
+        //         largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
+        //     });
+        // });
     </script>
 </body>
 </html>

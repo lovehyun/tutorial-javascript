@@ -15,6 +15,9 @@
     <script>
         window.addEventListener('scroll', function() {
             console.log('Page scrolled!');
+
+            const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+            console.log('Current scroll position: ' + scrollPosition);
         });
     </script>
 </body>
