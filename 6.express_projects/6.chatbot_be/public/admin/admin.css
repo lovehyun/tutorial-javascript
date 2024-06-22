@@ -6,12 +6,13 @@ body {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* 스크롤바를 숨김 */
 }
 
 /* 관리자 페이지 컨테이너 스타일 */
 .admin-container {
     display: flex;
-    height: calc(100vh - 50px); /* 헤더를 고려하여 높이 조정 */
+    height: calc(100vh - 100px); /* 헤더를 고려하여 높이 조정 */
 }
 
 /* 사용자 목록 스타일 */

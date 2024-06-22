@@ -65,10 +65,15 @@ body {
     padding: 5px;
 }
 
+.chatbot-input-container {
+    display: flex; /* 입력창과 버튼을 같은 줄에 배치 */
+    align-items: center; /* 입력창과 버튼을 수직 중앙 정렬 */
+}
+
 /* 공통 메시지 스타일 */
 .chat-message {
     margin-bottom: 10px;
-    max-width: 80%;
+    max-width: 90%;
     word-wrap: break-word;
     padding: 5px 10px;
     border-radius: 10px;
@@ -103,4 +108,5 @@ body {
 #sendMessage {
     width: 50px;
     padding: 5px;
+    margin-bottom: 10px;
 }

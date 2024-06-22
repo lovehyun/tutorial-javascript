@@ -54,6 +54,9 @@ function displayMessages(messages) {
         messageElement.textContent = `[${new Date(msg.timestamp).toLocaleTimeString()}] ${msg.text}`;
         chatMessages.appendChild(messageElement);
     });
+
+    // 스크롤을 최하단으로 설정
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 document.getElementById('sendResponse').addEventListener('click', function() {
