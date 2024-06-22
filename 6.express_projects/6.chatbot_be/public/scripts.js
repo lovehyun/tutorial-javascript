@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const chatbotInput = document.getElementById('chatbotInput');
     const userId = Date.now();  // Unique user ID based on timestamp
 
-    let lastMessageCount = 0;
+    let lastMessageId = 0; // 마지막 메시지 ID를 추적하기 위한 변수
 
     chatbotIcon.addEventListener('click', function() {
         chatbotIcon.style.display = 'none';
@@ -74,16 +74,15 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(`/api/admin/messages?userId=${userId}`)
             .then(response => response.json())
             .then(messages => {
-                if (messages.length > lastMessageCount) {
-                    chatbotMessages.innerHTML = ''; // Clear the existing messages
-                    messages.forEach(msg => {
+                messages.forEach(msg => {
+                    if (msg.id > lastMessageId) {
                         appendMessage(msg.text, msg.fromAdmin, false);
-                    });
+                        lastMessageId = msg.id; // 마지막 메시지 ID 업데이트
+                    }
+                });
 
-                    // Scroll to the bottom if new messages are added
-                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-                    lastMessageCount = messages.length; // Update the message count
-                }
+                // Scroll to the bottom if new messages are added
+                chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
             })
             .catch(error => {
                 console.error('Error fetching messages:', error);
