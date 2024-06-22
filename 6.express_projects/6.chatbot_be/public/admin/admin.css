@@ -1,3 +1,4 @@
+/* 기본 바디 스타일 설정 */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -7,79 +8,93 @@ body {
     flex-direction: column;
 }
 
+/* 관리자 페이지 컨테이너 스타일 */
 .admin-container {
     display: flex;
-    height: calc(100vh - 50px); /* Adjust height considering the header */
+    height: calc(100vh - 50px); /* 헤더를 고려하여 높이 조정 */
 }
 
+/* 사용자 목록 스타일 */
 .user-list {
     width: 200px;
     border-right: 1px solid #ddd;
-    overflow-y: auto;
+    overflow-y: auto; /* 사용자 목록에 스크롤 추가 */
 }
 
+/* 사용자 목록 항목 스타일 */
 .user-list-item {
     padding: 10px;
-    cursor: pointer;
+    cursor: pointer; /* 마우스를 올렸을 때 포인터로 변경 */
     border-bottom: 1px solid #ddd;
 }
 
+/* 사용자 목록 항목 호버 스타일 */
 .user-list-item:hover {
     background-color: #f0f0f0;
 }
 
+/* 채팅 표시 영역 스타일 */
 .chat-display {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: auto; /* 채팅 내용에 스크롤 추가 */
 }
 
+/* 공통 메시지 스타일 */
 .chat-message {
     margin-bottom: 10px;
 }
 
+/* 사용자 메시지 스타일 */
 .chat-message.user {
     color: blue;
 }
 
+/* 관리자 메시지 스타일 */
 .chat-message.admin {
     color: red;
 }
 
+/* 채팅 테이블 스타일 */
 .chat-table {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow-y: auto; /* 채팅 테이블에 스크롤 추가 */
 }
 
+/* 채팅 헤더 스타일 */
 .chat-header {
     border-bottom: 1px solid #ddd;
     padding: 10px;
     background-color: #f9f9f9;
 }
 
+/* 채팅 메시지 영역 스타일 */
 .chat-messages {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: auto; /* 메시지 영역에 스크롤 추가 */
     padding: 10px;
 }
 
+/* 채팅 입력 영역 스타일 */
 .chat-input {
     display: flex;
     border-top: 1px solid #ddd;
     padding: 10px;
     background-color: #fff;
-    position: sticky;
+    position: sticky; /* 입력 영역을 하단에 고정 */
     bottom: 0;
 }
 
+/* 관리자 입력 필드 스타일 */
 #adminInput {
     flex: 1;
     padding: 5px;
 }
 
+/* 전송 버튼 스타일 */
 #sendResponse {
     padding: 5px;
 }

@@ -20,7 +20,7 @@ app.post('/api/messages', (req, res) => {
     }
 });
 
-app.get('/admin/messages', (req, res) => {
+app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/admin', 'admin.html'));
 });
 

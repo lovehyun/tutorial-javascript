@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const chatbotInput = document.getElementById('chatbotInput');
     const userId = Date.now();  // Unique user ID based on timestamp
 
+    let lastMessageCount = 0;
+
     chatbotIcon.addEventListener('click', function() {
         chatbotIcon.style.display = 'none';
         chatbotWindow.style.display = 'flex';
@@ -17,14 +19,27 @@ document.addEventListener("DOMContentLoaded", function() {
         chatbotIcon.style.display = 'flex';
     });
 
+    function appendMessage(message, fromAdmin, shouldScroll = true) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message');
+        if (fromAdmin) {
+            messageElement.classList.add('admin');
+        } else {
+            messageElement.classList.add('user');
+        }
+        messageElement.textContent = message;
+        chatbotMessages.appendChild(messageElement);
+
+        if (shouldScroll) {
+            // Scroll to the bottom
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        }
+    }
+
     sendMessage.addEventListener('click', function() {
         const message = chatbotInput.value.trim();
         if (message) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message');
-            messageElement.classList.add('user');
-            messageElement.textContent = message;
-            chatbotMessages.appendChild(messageElement);
+            appendMessage(message, false);
             chatbotInput.value = '';
 
             // Send message to server
@@ -42,6 +57,9 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(error => {
                 console.error('Error sending message:', error);
             });
+
+            // Scroll to the bottom
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
         }
     });
 
@@ -56,18 +74,16 @@ document.addEventListener("DOMContentLoaded", function() {
         fetch(`/api/admin/messages?userId=${userId}`)
             .then(response => response.json())
             .then(messages => {
-                chatbotMessages.innerHTML = ''; // Clear the existing messages
-                messages.forEach(msg => {
-                    const messageElement = document.createElement('div');
-                    messageElement.classList.add('chat-message');
-                    if (msg.fromAdmin) {
-                        messageElement.classList.add('admin');
-                    } else {
-                        messageElement.classList.add('user');
-                    }
-                    messageElement.textContent = msg.text;
-                    chatbotMessages.appendChild(messageElement);
-                });
+                if (messages.length > lastMessageCount) {
+                    chatbotMessages.innerHTML = ''; // Clear the existing messages
+                    messages.forEach(msg => {
+                        appendMessage(msg.text, msg.fromAdmin, false);
+                    });
+
+                    // Scroll to the bottom if new messages are added
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                    lastMessageCount = messages.length; // Update the message count
+                }
             })
             .catch(error => {
                 console.error('Error fetching messages:', error);

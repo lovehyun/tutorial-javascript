@@ -1,7 +1,9 @@
+/* 기본 바디 스타일 설정 */
 body {
     font-family: Arial, sans-serif;
 }
 
+/* 챗봇 아이콘 스타일 */
 .chatbot-icon {
     position: fixed;
     bottom: 20px;
@@ -18,6 +20,7 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
+/* 챗봇 창 스타일 */
 .chatbot-window {
     position: fixed;
     bottom: 20px;
@@ -32,6 +35,7 @@ body {
     flex-direction: column;
 }
 
+/* 챗봇 헤더 스타일 */
 .chatbot-header {
     background-color: #007bff;
     color: white;
@@ -43,36 +47,59 @@ body {
     align-items: center;
 }
 
+/* 챗봇 본문 스타일 */
 .chatbot-body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Ensure the child elements can scroll */
+    overflow: hidden; /* 자식 요소가 스크롤할 수 있도록 설정 */
 }
 
+/* 챗봇 메시지 영역 스타일 */
 .chatbot-messages {
     flex: 1;
-    overflow-y: auto; /* Add scroll for messages */
+    overflow-y: auto; /* 메시지에 대한 스크롤 추가 */
     margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 5px;
 }
 
+/* 공통 메시지 스타일 */
+.chat-message {
+    margin-bottom: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+/* 사용자 메시지 스타일 */
 .chat-message.user {
     color: blue;
+    background-color: #e0f7ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+    text-align: right; /* 텍스트 오른쪽 정렬 */
 }
 
+/* 관리자 메시지 스타일 */
 .chat-message.admin {
     color: red;
+    background-color: #ffe0e0;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+    text-align: left; /* 텍스트 왼쪽 정렬 */
 }
 
+/* 챗봇 입력 스타일 */
 #chatbotInput {
     width: calc(100% - 60px);
     padding: 5px;
     margin-bottom: 10px;
 }
 
+/* 전송 버튼 스타일 */
 #sendMessage {
     width: 50px;
     padding: 5px;
