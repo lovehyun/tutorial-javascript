@@ -1,0 +1,14 @@
+{
+    "name": "catch-mind-game",
+    "version": "1.0.0",
+    "description": "A simple Catch Mind game using JavaScript and Canvas",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "moment": "^2.30.1",
+        "socket.io": "^4.0.1"
+    }
+}
