@@ -1,3 +1,7 @@
+# 기본이론
+## 참고자료
+  https://web.dev/articles/webrtc-basics?hl=ko
+
 # 1.simple_p2p
 - 서버 없이 클라이언트에서 p2p 연결
 - index.html 파일을 서빙해줄 서버만 있으면 됨
