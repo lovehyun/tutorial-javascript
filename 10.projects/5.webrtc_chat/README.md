@@ -1,6 +1,8 @@
 # 기본이론
 ## 참고자료
-  https://web.dev/articles/webrtc-basics?hl=ko
+- https://webrtc.org/?hl=ko
+- https://webrtc.github.io/samples/
+- https://web.dev/articles/webrtc-basics?hl=ko
 
 # 1.simple_p2p
 - 서버 없이 클라이언트에서 p2p 연결
