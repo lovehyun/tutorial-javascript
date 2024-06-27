@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Lip Sync</title>
+    <style>
+        #character {
+            font-size: 100px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #log {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textInput" placeholder="텍스트를 입력하세요" rows="4" cols="50"></textarea>
+    <button id="speakButton">말하기</button>
+    <div id="character">😀</div>
+    <div id="log"></div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const speakButton = document.getElementById('speakButton');
+        const character = document.getElementById('character');
+        const log = document.getElementById('log');
+
+        const lipsyncMap = {
+            'a': '😮', // 입 벌린 모양
+            'e': '😐', // 중립 모양
+            'i': '😊', // 웃는 모양
+            'o': '😯', // 놀란 모양
+            'u': '😲'  // 놀란 모양
+        };
+
+        let voices = [];
+
+        const loadVoices = () => {
+            voices = window.speechSynthesis.getVoices();
+        };
+        
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        speakButton.addEventListener('click', () => {
+            // 이전 로그 내용 클리어
+            log.innerHTML = '';
+
+            const text = textInput.value;
+            if (!text) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    const word = text.slice(event.charIndex, event.charIndex + event.charLength);
+                    const char = word.toLowerCase().match(/[aeiou]/);
+                    const vowel = char ? char[0] : null;
+                    const emoji = vowel ? lipsyncMap[vowel] : '😀';
+
+                    character.textContent = emoji;
+
+                    const logEntry = document.createElement('div');
+                    logEntry.textContent = `Word: ${word}, Vowel: ${vowel}, Emoji: ${emoji}`;
+                    log.appendChild(logEntry);
+                }
+            };
+
+            utterance.onend = () => {
+                character.textContent = '😀'; // 끝나면 기본 얼굴 모양으로 돌아가기
+            };
+
+            window.speechSynthesis.speak(utterance);
+        });
+    </script>
+</body>
+</html>

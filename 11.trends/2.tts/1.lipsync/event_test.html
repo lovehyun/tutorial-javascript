@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Test</title>
+</head>
+<body>
+    <textarea id="textInput" placeholder="텍스트를 입력하세요" rows="4" cols="50"></textarea>
+    <button id="speakButton">말하기</button>
+    <select id="voiceSelect"></select>
+    <div id="log"></div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const speakButton = document.getElementById('speakButton');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const log = document.getElementById('log');
+
+        let voices = [];
+
+        const loadVoices = () => {
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+        };
+
+        loadVoices();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        speakButton.addEventListener('click', () => {
+            const text = textInput.value;
+            if (!text) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            const selectedVoiceName = voiceSelect.value;
+            const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+
+            utterance.onboundary = (event) => {
+                if (event.name === 'word' || event.name === 'char') {
+                    const logEntry = document.createElement('div');
+                    logEntry.textContent = `Boundary event detected at index ${event.charIndex} for ${event.name}`;
+                    log.appendChild(logEntry);
+                }
+            };
+
+            utterance.onend = () => {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = 'Speech ended';
+                log.appendChild(logEntry);
+            };
+
+            window.speechSynthesis.speak(utterance);
+        });
+    </script>
+</body>
+</html>

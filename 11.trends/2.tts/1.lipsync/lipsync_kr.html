@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Lip Sync</title>
+    <style>
+        #character {
+            font-size: 100px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #log {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textInput" placeholder="텍스트를 입력하세요" rows="4" cols="50"></textarea>
+    <button id="speakButton">말하기</button>
+    <div id="character">😀</div>
+    <div id="log"></div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const speakButton = document.getElementById('speakButton');
+        const character = document.getElementById('character');
+        const log = document.getElementById('log');
+
+        const lipsyncMap = {
+            'ㅏ': '😮', // 입 벌린 모양
+            'ㅑ': '😮', // 입 벌린 모양
+            'ㅓ': '😐', // 중립 모양
+            'ㅕ': '😐', // 중립 모양
+            'ㅗ': '😯', // 놀란 모양
+            'ㅛ': '😯', // 놀란 모양
+            'ㅜ': '😲', // 놀란 모양
+            'ㅠ': '😲', // 놀란 모양
+            'ㅡ': '😐', // 중립 모양
+            'ㅣ': '😊', // 웃는 모양
+            'ㅔ': '😊', // 웃는 모양
+            'ㅐ': '😊'  // 웃는 모양
+        };
+
+        function getLipSyncChar(char) {
+            for (let key in lipsyncMap) {
+                if (char.includes(key)) {
+                    return lipsyncMap[key];
+                }
+            }
+            return '😀'; // 기본 얼굴 모양
+        }
+
+        speakButton.addEventListener('click', () => {
+            // 이전 로그 내용 클리어
+            log.innerHTML = '';
+
+            const text = textInput.value;
+            if (!text) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ko-KR';
+
+            utterance.onboundary = (event) => {
+                if (event.name === 'word') {
+                    const char = text[event.charIndex];
+                    const lipSyncChar = getLipSyncChar(char);
+                    character.textContent = lipSyncChar;
+
+                    const logEntry = document.createElement('div');
+                    logEntry.textContent = `현재 문자: ${char}, 입모양 이모티콘: ${lipSyncChar}`;
+                    log.appendChild(logEntry);
+                }
+            };
+
+            utterance.onend = () => {
+                character.textContent = '😀'; // 끝나면 기본 얼굴 모양으로 돌아가기
+            };
+
+            window.speechSynthesis.speak(utterance);
+        });
+    </script>
+</body>
+</html>
