@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feather Icons</title>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .icon-large { width: 3rem; height: 3rem; }
+        .icon-medium { width: 2rem; height: 2rem; }
+        .icon-small { width: 1rem; height: 1rem; }
+        .text-primary { color: #007bff; }
+        .text-success { color: #28a745; }
+        .text-danger { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Feather Icons</h2>
+        <i data-feather="home" class="icon-large text-primary"></i>
+        <i data-feather="user" class="icon-medium text-success"></i>
+        <i data-feather="settings" class="icon-small text-danger"></i>
+    </div>
+    <script>
+        feather.replace()
+    </script>
+</body>
+</html>

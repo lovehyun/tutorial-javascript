@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feather Icons with Bootstrap and Tailwind</title>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
+    <style>
+        .bootstrap-icon-large { font-size: 3rem; }
+        .bootstrap-icon-medium { font-size: 2rem; }
+        .bootstrap-icon-small { font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Feather Icons with Bootstrap</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <i data-feather="home" class="fa-3x text-primary"></i>
+                <i data-feather="user" class="fa-2x text-success"></i>
+                <i data-feather="settings" class="fa-1x text-danger"></i>
+                <i data-feather="heart" class="fa-3x text-primary"></i>
+                <i data-feather="star" class="fa-2x text-success"></i>
+                <i data-feather="car" class="fa-1x text-danger"></i>
+                <i data-feather="camera" class="fa-3x text-primary"></i>
+                <i data-feather="bell" class="fa-2x text-success"></i>
+                <i data-feather="music" class="fa-1x text-danger"></i>
+                <i data-feather="cloud" class="fa-3x text-primary"></i>
+            </div>
+        </div>
+
+        <h2 class="mb-4 mt-5">Feather Icons with Tailwind</h2>
+        <div class="flex space-x-4">
+            <i data-feather="home" class="w-12 h-12 text-blue-500"></i>
+            <i data-feather="user" class="w-8 h-8 text-green-500"></i>
+            <i data-feather="settings" class="w-4 h-4 text-red-500"></i>
+            <i data-feather="heart" class="w-12 h-12 text-blue-500"></i>
+            <i data-feather="star" class="w-8 h-8 text-green-500"></i>
+            <i data-feather="car" class="w-4 h-4 text-red-500"></i>
+            <i data-feather="camera" class="w-12 h-12 text-blue-500"></i>
+            <i data-feather="bell" class="w-8 h-8 text-green-500"></i>
+            <i data-feather="music" class="w-4 h-4 text-red-500"></i>
+            <i data-feather="cloud" class="w-12 h-12 text-blue-500"></i>
+        </div>
+    </div>
+    <script>
+        feather.replace()
+    </script>
+</body>
+</html>

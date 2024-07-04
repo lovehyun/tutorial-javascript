@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailwind Feature Showcase</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- 네비게이션 바 -->
+<nav class="bg-blue-600 p-4">
+    <div class="container mx-auto flex justify-between items-center">
+        <a class="text-white text-lg font-semibold" href="#">MyLogo</a>
+        <button class="text-white bg-blue-500 p-2 rounded-lg" onclick="toggleModal()">Launch Modal</button>
+    </div>
+</nav>
+
+<!-- 모달 -->
+<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="modal">
+    <div class="bg-white rounded-lg p-6">
+        <h2 class="text-lg font-semibold mb-4">Modal Title</h2>
+        <p class="mb-4">This is a Tailwind CSS modal. It's a great way to get user attention.</p>
+        <button class="bg-blue-500 text-white p-2 rounded-lg mr-2" onclick="toggleModal()">Close</button>
+        <button class="bg-green-500 text-white p-2 rounded-lg">Save changes</button>
+    </div>
+</div>
+
+<!-- 알림 -->
+<div class="container mx-auto mt-6">
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+        <p class="font-bold">Holy guacamole!</p>
+        <p>You should check in on some of those fields below.</p>
+    </div>
+</div>
+
+<!-- 카드 -->
+<div class="container mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <img src="https://placekitten.com/500/300" alt="Card image" class="w-full">
+        <div class="p-4">
+            <h3 class="font-bold text-lg">Card title</h3>
+            <p class="text-gray-600">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="mt-4 block text-blue-500 hover:underline">Go somewhere</a>
+        </div>
+    </div>
+    <div class="bg-gray-800 text-white shadow-lg rounded-lg overflow-hidden">
+        <img src="https://placekitten.com/500/300" alt="Card image" class="w-full">
+        <div class="p-4">
+            <h3 class="font-bold text-lg">Dark Card title</h3>
+            <p class="text-gray-300">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="mt-4 block text-blue-400 hover:underline">Go somewhere</a>
+        </div>
+    </div>
+</div>
+
+<!-- 폼 입력 -->
+<div class="container mx-auto mt-6">
+    <form class="bg-white shadow-lg rounded-lg p-6">
+        <div class="mb-4">
+            <label for="email" class="block text-gray-700 font-bold mb-2">Email address</label>
+            <input type="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Email">
+        </div>
+        <div class="mb-4">
+            <label for="password" class="block text-gray-700 font-bold mb-2">Password</label>
+            <input type="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Password">
+        </div>
+        <div class="mb-4">
+            <input type="checkbox" id="check" class="mr-2 leading-tight">
+            <label for="check" class="text-gray-700 font-bold">Check me out</label>
+        </div>
+        <button type="submit" class="bg-blue-500 text-white p-2 rounded-lg">Submit</button>
+    </form>
+</div>
+
+<!-- 배지 -->
+<div class="container mx-auto mt-6">
+    <h2 class="text-xl font-semibold">Example heading <span class="bg-gray-200 text-gray-800 rounded-full px-2 py-1 text-xs font-bold align-top">New</span></h2>
+    <button class="bg-blue-500 text-white p-2 rounded-lg mt-2 relative">
+        Notifications <span class="absolute top-0 right-0 bg-red-600 text-white rounded-full px-2 py-1 text-xs">4</span>
+    </button>
+</div>
+
+<!-- 툴팁 -->
+<div class="container mx-auto mt-6">
+    <button class="bg-gray-500 text-white p-2 rounded-lg" data-tooltip-target="tooltip-top" data-tooltip-placement="top">
+        Tooltip on top
+    </button>
+    <button class="bg-gray-500 text-white p-2 rounded-lg ml-2" data-tooltip-target="tooltip-right" data-tooltip-placement="right">
+        Tooltip on right
+    </button>
+    <button class="bg-gray-500 text-white p-2 rounded-lg ml-2" data-tooltip-target="tooltip-bottom" data-tooltip-placement="bottom">
+        Tooltip on bottom
+    </button>
+    <button class="bg-gray-500 text-white p-2 rounded-lg ml-2" data-tooltip-target="tooltip-left" data-tooltip-placement="left">
+        Tooltip on left
+    </button>
+</div>
+
+<!-- 툴팁 요소 -->
+<div id="tooltip-top" role="tooltip" class="absolute z-10 hidden p-2 text-sm font-medium text-white bg-black rounded-lg shadow-sm">
+    Tooltip on top
+    <div class="tooltip-arrow" data-popper-arrow></div>
+</div>
+<div id="tooltip-right" role="tooltip" class="absolute z-10 hidden p-2 text-sm font-medium text-white bg-black rounded-lg shadow-sm">
+    Tooltip on right
+    <div class="tooltip-arrow" data-popper-arrow></div>
+</div>
+<div id="tooltip-bottom" role="tooltip" class="absolute z-10 hidden p-2 text-sm font-medium text-white bg-black rounded-lg shadow-sm">
+    Tooltip on bottom
+    <div class="tooltip-arrow" data-popper-arrow></div>
+</div>
+<div id="tooltip-left" role="tooltip" class="absolute z-10 hidden p-2 text-sm font-medium text-white bg-black rounded-lg shadow-sm">
+    Tooltip on left
+    <div class="tooltip-arrow" data-popper-arrow></div>
+</div>
+
+<!-- 아코디언 -->
+<div class="container mx-auto mt-6">
+    <div class="space-y-4" id="accordion">
+        <div class="border border-gray-200 rounded-lg">
+            <h2 class="mb-0">
+                <button class="flex items-center justify-between w-full p-4 text-left text-gray-800 bg-gray-200 rounded-t-lg focus:outline-none" data-accordion-target="#accordion-item-1" aria-expanded="true" aria-controls="accordion-item-1">
+                    <span>Accordion Item #1</span>
+                    <svg data-accordion-icon class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </h2>
+            <div id="accordion-item-1" class="hidden p-4">
+                <p class="text-gray-600">This is the first item's accordion body. It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element.</p>
+            </div>
+        </div>
+        <div class="border border-gray-200 rounded-lg">
+            <h2 class="mb-0">
+                <button class="flex items-center justify-between w-full p-4 text-left text-gray-800 bg-gray-200 rounded-t-lg focus:outline-none" data-accordion-target="#accordion-item-2" aria-expanded="false" aria-controls="accordion-item-2">
+                    <span>Accordion Item #2</span>
+                    <svg data-accordion-icon class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </h2>
+            <div id="accordion-item-2" class="hidden p-4">
+                <p class="text-gray-600">This is the second item's accordion body. It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element.</p>
+            </div>
+        </div>
+        <div class="border border-gray-200 rounded-lg">
+            <h2 class="mb-0">
+                <button class="flex items-center justify-between w-full p-4 text-left text-gray-800 bg-gray-200 rounded-t-lg focus:outline-none" data-accordion-target="#accordion-item-3" aria-expanded="false" aria-controls="accordion-item-3">
+                    <span>Accordion Item #3</span>
+                    <svg data-accordion-icon class="w-6 h-6 rotate-180 shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 9.293a1 1 0 011.414 0L10 12.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                </button>
+            </h2>
+            <div id="accordion-item-3" class="hidden p-4">
+                <p class="text-gray-600">This is the third item's accordion body. It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tippy.js@6.3.1/dist/tippy-bundle.umd.min.js"></script>
+<script>
+    function toggleModal() {
+        document.getElementById('modal').classList.toggle('hidden');
+    }
+
+    tippy('[data-tooltip-target]', {
+        content(reference) {
+            const id = reference.getAttribute('data-tooltip-target');
+            return document.getElementById(id).innerHTML;
+        },
+        allowHTML: true,
+        interactive: true,
+        theme: 'light',
+    });
+
+    document.querySelectorAll('[data-accordion-target]').forEach(button => {
+        button.addEventListener('click', () => {
+            const target = document.querySelector(button.dataset.accordionTarget);
+            target.classList.toggle('hidden');
+            const icon = button.querySelector('[data-accordion-icon]');
+            icon.classList.toggle('rotate-180');
+        });
+    });
+</script>
+</body>
+</html>

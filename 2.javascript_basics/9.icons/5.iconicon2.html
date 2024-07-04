@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ionicons with Bootstrap and Tailwind</title>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"> -->
+    <style>
+        .bootstrap-icon-large { font-size: 3rem; }
+        .bootstrap-icon-medium { font-size: 2rem; }
+        .bootstrap-icon-small { font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4">Ionicons with Bootstrap</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <ion-icon name="home-outline" class="fa-3x text-primary"></ion-icon>
+                <ion-icon name="person-outline" class="fa-2x text-success"></ion-icon>
+                <ion-icon name="settings-outline" class="fa-1x text-danger"></ion-icon>
+                <ion-icon name="heart-outline" class="fa-3x text-primary"></ion-icon>
+                <ion-icon name="star-outline" class="fa-2x text-success"></ion-icon>
+                <ion-icon name="car-outline" class="fa-1x text-danger"></ion-icon>
+                <ion-icon name="camera-outline" class="fa-3x text-primary"></ion-icon>
+                <ion-icon name="notifications-outline" class="fa-2x text-success"></ion-icon>
+                <ion-icon name="musical-notes-outline" class="fa-1x text-danger"></ion-icon>
+                <ion-icon name="cloud-outline" class="fa-3x text-primary"></ion-icon>
+            </div>
+        </div>
+
+        <h2 class="mb-4 mt-5">Ionicons with Tailwind</h2>
+        <div class="flex space-x-4">
+            <ion-icon name="home-outline" class="text-6xl text-blue-500"></ion-icon>
+            <ion-icon name="person-outline" class="text-4xl text-green-500"></ion-icon>
+            <ion-icon name="settings-outline" class="text-xl text-red-500"></ion-icon>
+            <ion-icon name="heart-outline" class="text-6xl text-blue-500"></ion-icon>
+            <ion-icon name="star-outline" class="text-4xl text-green-500"></ion-icon>
+            <ion-icon name="car-outline" class="text-xl text-red-500"></ion-icon>
+            <ion-icon name="camera-outline" class="text-6xl text-blue-500"></ion-icon>
+            <ion-icon name="notifications-outline" class="text-4xl text-green-500"></ion-icon>
+            <ion-icon name="musical-notes-outline" class="text-xl text-red-500"></ion-icon>
+            <ion-icon name="cloud-outline" class="text-6xl text-blue-500"></ion-icon>
+        </div>
+    </div>
+</body>
+</html>
