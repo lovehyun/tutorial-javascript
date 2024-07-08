@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Example</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="myCanvas" width="400" height="200"></canvas>
+
+    <script>
+        // Canvas 요소 가져오기
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d'); // 2D 그래픽 컨텍스트 얻기
+
+        // Pac-Man 그리기
+        context.beginPath(); // 연결 초기화
+        context.moveTo(300, 100); // 시작점 설정 (원점)
+
+        const startAngle = 0.2 * Math.PI; // 시작 각도, 45도
+        const endAngle = 1.8 * Math.PI; // 끝 각도, 315도
+        context.arc(300, 100, 50, startAngle, endAngle); // (x, y, 반지름, 시작 각도, 끝 각도)
+        // context.lineTo(300, 100); // 원점으로 선을 그어 입을 만듦
+
+        context.fillStyle = 'yellow'; // 색상 설정
+        context.fill(); // 그리기
+        context.closePath();
+
+        // 얼굴 그리기
+        context.beginPath();
+        context.arc(75, 75, 50, 0, Math.PI * 2, true); // Outer circle
+        context.moveTo(110, 75);
+        context.arc(75, 75, 35, 0, Math.PI, false); // Mouth (clockwise)
+        context.moveTo(65, 65);
+        context.arc(60, 65, 5, 0, Math.PI * 2, true); // Left eye
+        context.moveTo(95, 65);
+        context.arc(90, 65, 5, 0, Math.PI * 2, true); // Right eye
+        context.stroke();
+        context.closePath();
+        
+    </script>
+</body>
+</html>

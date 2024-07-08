@@ -34,8 +34,21 @@
         // 원 그리기
         context.fillStyle = '#00FF00'; // 색상 설정 (녹색)
         context.beginPath();
-        context.arc(350, 100, 30, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
+        context.arc(350, 50, 30, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
         context.fill(); // 실제로 그리기
+        context.closePath(); // 경로 종료
+
+        context.fillStyle = '#00FF00'; // 색상 설정 (녹색)
+        context.beginPath();
+        context.arc(350, 150, 30, 0, Math.PI); // (x, y, radius, startAngle, endAngle)
+        context.fill(); // 실제로 그리기
+        context.closePath();
+
+        // 0 라디안은 원의 오른쪽에서 시작하며, 
+        // π 라디안(180도)은 왼쪽, 
+        // π/2 라디안(90도)은 위, 
+        // 3π/2 라디안(270도)은 아래를 나타냅니다.
+
     </script>
 </body>
 </html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black; /* 배경색을 검정색으로 설정 */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        let startAngle = 0.2 * Math.PI;
+        let endAngle = 1.8 * Math.PI;
+        let angleIncrement = 0.02 * Math.PI; // 각도 증가량을 줄여서 움직임을 느리게 설정
+        let direction = 1;
+
+        function drawPacman() {
+            context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+
+            context.beginPath();
+            context.moveTo(350, 200);
+            context.arc(350, 200, 30, startAngle, endAngle);
+            context.lineTo(350, 200);
+            context.fillStyle = 'yellow'; // Pac-Man의 색상을 노란색으로 설정
+            context.fill();
+            context.closePath();
+        }
+
+        function updateAngles() {
+            if (startAngle <= 0 || startAngle >= 0.25 * Math.PI) {
+                direction *= -1;
+            }
+            startAngle += direction * angleIncrement;
+            endAngle -= direction * angleIncrement;
+        }
+
+        function animate() {
+            drawPacman();
+            updateAngles();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
