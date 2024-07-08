@@ -6,7 +6,7 @@
     const image = new Image();
     image.src = 'ship.png'; // 이미지 파일 경로
     image.onload = function () {
-        context.drawImage(image, 0, 0);
-        // context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0); // (image, dx, dy)
+        // context.drawImage(image, 0, 0, canvas.width, canvas.height); // (image, dx, dy, dWidth, dHeight)
     };
 </script>

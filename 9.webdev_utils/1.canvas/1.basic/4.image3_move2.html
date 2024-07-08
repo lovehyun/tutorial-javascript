@@ -24,17 +24,17 @@
             speed: 10,
         };
 
-        const meteo = {
+        const meteor = {
             x: 200,
             y: 0,
             speed: 1,
         };
 
         const image = new Image();
-        const meteoImage = new Image();
+        const meteorImage = new Image();
 
         image.src = 'ship.png'; // 플레이어 이미지 파일 경로
-        meteoImage.src = 'meteo.png'; // meteo 이미지 파일 경로
+        meteorImage.src = 'meteor.png'; // meteor 이미지 파일 경로
 
         function draw() {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -43,15 +43,15 @@
             context.drawImage(image, player.x, player.y, image.width, image.height);
 
             // meteo 이미지 그리기
-            context.drawImage(meteoImage, meteo.x, meteo.y, meteoImage.width, meteoImage.height);
+            context.drawImage(meteorImage, meteor.x, meteor.y, meteorImage.width, meteorImage.height);
 
             // meteo 아래로 움직이기
-            meteo.y += meteo.speed;
+            meteor.y += meteor.speed;
 
             // meteo가 화면 아래로 벗어나면 다시 위로 이동
-            if (meteo.y > canvas.height) {
-                meteo.y = -meteoImage.height;
-                meteo.x = Math.random() * (canvas.width - meteoImage.width);
+            if (meteor.y > canvas.height) {
+                meteor.y = -meteorImage.height;
+                meteor.x = Math.random() * (canvas.width - meteorImage.width);
             }
 
             requestAnimationFrame(draw);
