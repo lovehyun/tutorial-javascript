@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OpenStreetMap 지리적 데이터 시각화</title>
+        <style>
+            #map {
+                height: 600px;
+                width: 100%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+
+        <script src="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet/dist/leaflet.css" />
+
+        <script>
+            var map = L.map('map').setView([37.5665, 126.9784], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+
+            // 서울 관광지 데이터
+            var touristSpots = [
+                {
+                    name: '경복궁',
+                    location: [37.578, 126.977],
+                },
+                {
+                    name: '명동',
+                    location: [37.5635, 126.981],
+                },
+                {
+                    name: '남산 타워',
+                    location: [37.5515, 126.988],
+                },
+                // 추가 관광지 정보...
+            ];
+
+            var touristSpots = [
+                {
+                    name: '경복궁',
+                    location: [37.578, 126.977],
+                    description: '경복궁은 조선 시대의 법궁이자 서울의 대표적인 궁궐입니다.',
+                    imageUrl: 'https://via.placeholder.com/150',
+                },
+                {
+                    name: '명동',
+                    location: [37.5635, 126.981],
+                    description: '명동은 서울의 대표적인 쇼핑 거리로, 다양한 상점과 식당이 위치해 있습니다.',
+                    imageUrl: 'https://via.placeholder.com/150',
+                },
+                {
+                    name: '남산 타워',
+                    location: [37.5515, 126.988],
+                    description: '남산 타워는 서울의 랜드마크 중 하나로, 멋진 서울 전경을 감상할 수 있는 곳입니다.',
+                    imageUrl: 'https://via.placeholder.com/150',
+                },
+                // 추가 관광지 정보...
+            ];
+
+            // 관광지 마커 표시
+            touristSpots.forEach(function (spot) {
+                var marker = L.marker(spot.location).addTo(map).bindPopup(spot.name);
+            
+                // 1. 클릭 시 flyTo 호출
+                // marker.on('click', function () {
+                //     map.flyTo(spot.location, 16); 
+                // });
+
+                // 2. 클릭 시 상세 정보 Popup
+                // marker.on('click', function () {
+                //     var popupContent = `
+                //         <div>
+                //             <h3>${spot.name}</h3>
+                //             <p>${spot.description}</p>
+                //             <img src="${spot.imageUrl}" alt="${spot.name}" style="width: 100%; height: auto;"/>
+                //         </div>
+                //     `;
+
+                //     var popup = L.popup()
+                //         .setLatLng(spot.location)
+                //         .setContent(popupContent)
+                //         .openOn(map);
+                // });
+
+                // 3. 클릭 시 상세 지도 - 이미지가 로드된 이후에 popup
+                // marker.on('click', function () {
+                //     var image = new Image();
+                //     image.src = spot.imageUrl;
+                //     image.style.width = '100%';
+                //     image.style.height = 'auto';
+                //     image.alt = spot.name;
+
+                //     image.onload = function() {
+                //         var popupContent = `
+                //             <div>
+                //                 <h3>${spot.name}</h3>
+                //                 <p>${spot.description}</p>
+                //                 <img src="${spot.imageUrl}" alt="${spot.name}" style="width: 100%; height: auto;"/>
+                //             </div>
+                //         `;
+
+                //         var popup = L.popup()
+                //             .setLatLng(spot.location)
+                //             .setContent(popupContent)
+                //             .openOn(map);
+                //     };
+
+                //     image.onerror = function() {
+                //         console.error('이미지를 로드하는 데 실패했습니다:', spot.imageUrl);
+                //         var popupContent = `
+                //             <div>
+                //                 <h3>${spot.name}</h3>
+                //                 <p>${spot.description}</p>
+                //                 <p>이미지를 로드하는 데 실패했습니다.</p>
+                //             </div>
+                //         `;
+
+                //         var popup = L.popup()
+                //             .setLatLng(spot.location)
+                //             .setContent(popupContent)
+                //             .openOn(map);
+                //     };
+                // });
+            });
+        </script>
+    </body>
+</html>
