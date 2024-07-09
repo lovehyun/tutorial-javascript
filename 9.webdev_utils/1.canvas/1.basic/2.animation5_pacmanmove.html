@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black; /* 배경색을 검정색으로 설정 */
+        }
+        canvas {
+            border: 1px solid white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        let pacman = {
+            x: 350,
+            y: 200,
+            radius: 30,
+            startAngle: 0.2 * Math.PI,
+            endAngle: 1.8 * Math.PI,
+            angleIncrement: 0.05 * Math.PI,
+            directionX: 1,
+            directionY: 0,
+            speed: 3,  // 이동 속도 설정
+            mouthOpen: true
+        };
+
+        function drawPacman() {
+            context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+
+            context.beginPath();
+            context.moveTo(pacman.x, pacman.y);
+            context.arc(pacman.x, pacman.y, pacman.radius, pacman.startAngle, pacman.endAngle);
+            context.lineTo(pacman.x, pacman.y);
+            context.fillStyle = 'yellow'; // Pac-Man의 색상을 노란색으로 설정
+            context.fill();
+            context.closePath();
+        }
+
+        function updatePacmanPosition() {
+            pacman.x += pacman.directionX * pacman.speed;
+            pacman.y += pacman.directionY * pacman.speed;
+
+            // 화면을 벗어나지 않도록 제한 (예시로 벽은 캔버스 크기 내부로 가정)
+            if (pacman.x < pacman.radius) {
+                pacman.x = pacman.radius;
+            }
+            if (pacman.x > canvas.width - pacman.radius) {
+                pacman.x = canvas.width - pacman.radius;
+            }
+            if (pacman.y < pacman.radius) {
+                pacman.y = pacman.radius;
+            }
+            if (pacman.y > canvas.height - pacman.radius) {
+                pacman.y = canvas.height - pacman.radius;
+            }
+
+            // Pac-Man 입 모양 애니메이션 조절
+            if (pacman.mouthOpen) {
+                pacman.startAngle += pacman.angleIncrement;
+                pacman.endAngle -= pacman.angleIncrement;
+                if (pacman.startAngle >= 0.25 * Math.PI) {
+                    pacman.mouthOpen = false;
+                }
+            } else {
+                pacman.startAngle -= pacman.angleIncrement;
+                pacman.endAngle += pacman.angleIncrement;
+                if (pacman.startAngle <= 0.0 * Math.PI) {
+                    pacman.mouthOpen = true;
+                }
+            }
+        }
+
+        function handleKeyDown(event) {
+            // 방향키에 따라 Pac-Man의 이동 방향 설정
+            switch (event.key) {
+                case 'ArrowUp':
+                    pacman.directionX = 0;
+                    pacman.directionY = -1;
+                    break;
+                case 'ArrowDown':
+                    pacman.directionX = 0;
+                    pacman.directionY = 1;
+                    break;
+                case 'ArrowLeft':
+                    pacman.directionX = -1;
+                    pacman.directionY = 0;
+                    break;
+                case 'ArrowRight':
+                    pacman.directionX = 1;
+                    pacman.directionY = 0;
+                    break;
+                default:
+                    return;
+            }
+
+            // Pac-Man 위치가 변경될 때마다 다시 그리기
+            drawPacman();
+        }
+
+        function animate() {
+            updatePacmanPosition();
+            drawPacman();
+            requestAnimationFrame(animate);
+        }
+
+        // 키보드 이벤트 리스너 등록
+        document.addEventListener('keydown', handleKeyDown);
+
+        // 초기 애니메이션 시작
+        animate();
+    </script>
+</body>
+</html>

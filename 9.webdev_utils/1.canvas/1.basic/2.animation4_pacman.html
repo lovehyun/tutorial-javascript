@@ -14,7 +14,7 @@
             background-color: black; /* 배경색을 검정색으로 설정 */
         }
         canvas {
-            border: 1px solid black;
+            border: 1px solid white;
         }
     </style>
 </head>
@@ -24,8 +24,14 @@
         const canvas = document.getElementById('myCanvas');
         const context = canvas.getContext('2d');
 
+        // 오른쪽 방향 이동시
         let startAngle = 0.2 * Math.PI;
         let endAngle = 1.8 * Math.PI;
+
+        // 왼쪽 방향 이동 시
+        // let startAngle = 1.2 * Math.PI;
+        // let endAngle = 0.8 * Math.PI;
+
         let angleIncrement = 0.02 * Math.PI; // 각도 증가량을 줄여서 움직임을 느리게 설정
         let direction = 1;
 
@@ -35,7 +41,7 @@
             context.beginPath();
             context.moveTo(350, 200);
             context.arc(350, 200, 30, startAngle, endAngle);
-            context.lineTo(350, 200);
+            // context.lineTo(350, 200);
             context.fillStyle = 'yellow'; // Pac-Man의 색상을 노란색으로 설정
             context.fill();
             context.closePath();
@@ -43,6 +49,7 @@
 
         function updateAngles() {
             if (startAngle <= 0 || startAngle >= 0.25 * Math.PI) {
+            // if (startAngle <= 1 * Math.PI || startAngle >= 1.25 * Math.PI) {
                 direction *= -1;
             }
             startAngle += direction * angleIncrement;

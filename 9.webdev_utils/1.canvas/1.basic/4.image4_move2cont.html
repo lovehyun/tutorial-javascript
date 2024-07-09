@@ -21,16 +21,17 @@
         const player = {
             x: 150,
             y: 100,
-            speed: 10,
+            speed: 2,
+            directionX: 0,
+            directionY: 0,
         };
 
-        // https://icons8.com/icons 에서 아이콘 찾기
         const image = new Image();
         image.src = 'ship.png'; // 이미지 파일 경로
         image.onload = function () {
             // 1. 이미지가 로드된 후에 플레이어 위치 설정
-            // player.x = (canvas.width - image.width) / 2;
-            // player.y = canvas.height - image.height;
+            player.x = (canvas.width - image.width) / 2;
+            player.y = canvas.height - image.height;
             draw();
         };
 
@@ -40,17 +41,48 @@
             // 플레이어 이미지 그리기
             context.drawImage(image, player.x, player.y, image.width, image.height);
 
+            updatePosition();
+
             requestAnimationFrame(draw);
+        }
+
+        function updatePosition() {
+            player.x += player.directionX * player.speed;
+            player.y += player.directionY * player.speed;
+
+            // 화면을 벗어나지 않도록 제한
+            if (player.x < 0) {
+                player.x = 0;
+            }
+            if (player.x > canvas.width - image.width) {
+                player.x = canvas.width - image.width;
+            }
+            if (player.y < 0) {
+                player.y = 0;
+            }
+            if (player.y > canvas.height - image.height) {
+                player.y = canvas.height - image.height;
+            }
         }
 
         // 키보드 이벤트 처리
         window.addEventListener('keydown', (e) => {
             switch (e.key) {
                 case 'ArrowLeft':
-                    player.x -= player.speed;
+                    player.directionX = -1;
+                    player.directionY = 0;
                     break;
                 case 'ArrowRight':
-                    player.x += player.speed;
+                    player.directionX = 1;
+                    player.directionY = 0;
+                    break;
+                case 'ArrowUp':
+                    player.directionX = 0;
+                    player.directionY = -1;
+                    break;
+                case 'ArrowDown':
+                    player.directionX = 0;
+                    player.directionY = 1;
                     break;
             }
         });

@@ -61,6 +61,34 @@
                     })
                     .catch((error) => console.error('Error:', error));
             }
+
+            // async function findRoute() {
+            //     try {
+            //         var start = document.getElementById('start').value;
+            //         var end = document.getElementById('end').value;
+
+            //         // 출발지 좌표 변환
+            //         let response = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + start);
+            //         let data = await response.json();
+            //         var startCoord = [data[0].lat, data[0].lon];
+
+            //         // 도착지 좌표 변환
+            //         response = await fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + end);
+            //         data = await response.json();
+            //         var endCoord = [data[0].lat, data[0].lon];
+
+            //         // 출발지와 도착지에 마커 추가
+            //         L.marker(startCoord).addTo(map).bindPopup('출발지: ' + start).openPopup();
+            //         L.marker(endCoord).addTo(map).bindPopup('도착지: ' + end).openPopup();
+
+            //         // 경로 표시
+            //         var route = L.polyline([startCoord, endCoord], { color: 'blue' }).addTo(map);
+            //         map.fitBounds(route.getBounds());
+            //     } catch (error) {
+            //         console.error('Error:', error);
+            //     }
+            // }
+
         </script>
     </body>
 </html>

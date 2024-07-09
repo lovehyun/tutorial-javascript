@@ -21,20 +21,18 @@
         const player = {
             x: 150,
             y: 100,
-            speed: 10,
-        };
-
-        const meteor = {
-            x: 200,
-            y: 0,
-            speed: 1,
+            speed: 2,
+            directionX: 0,
         };
 
         const image = new Image();
-        const meteorImage = new Image();
-
-        image.src = 'ship.png'; // 플레이어 이미지 파일 경로
-        meteorImage.src = 'meteor.png'; // meteor 이미지 파일 경로
+        image.src = 'ship.png'; // 이미지 파일 경로
+        image.onload = function () {
+            // 1. 이미지가 로드된 후에 플레이어 위치 설정
+            player.x = (canvas.width - image.width) / 2;
+            player.y = canvas.height - image.height;
+            draw();
+        };
 
         function draw() {
             context.clearRect(0, 0, canvas.width, canvas.height);
@@ -42,16 +40,15 @@
             // 플레이어 이미지 그리기
             context.drawImage(image, player.x, player.y, image.width, image.height);
 
-            // meteo 이미지 그리기
-            context.drawImage(meteorImage, meteor.x, meteor.y, meteorImage.width, meteorImage.height);
+            // 위치 업데이트
+            player.x += player.directionX * player.speed;
 
-            // meteo 아래로 움직이기
-            meteor.y += meteor.speed;
-
-            // meteo가 화면 아래로 벗어나면 다시 위로 이동
-            if (meteor.y > canvas.height) {
-                meteor.y = -meteorImage.height;
-                meteor.x = Math.random() * (canvas.width - meteorImage.width);
+            // 화면을 벗어나지 않도록 제한
+            if (player.x < 0) {
+                player.x = 0;
+            }
+            if (player.x > canvas.width - image.width) {
+                player.x = canvas.width - image.width;
             }
 
             requestAnimationFrame(draw);
@@ -61,13 +58,22 @@
         window.addEventListener('keydown', (e) => {
             switch (e.key) {
                 case 'ArrowLeft':
-                    player.x -= player.speed;
+                    player.directionX = -1;
                     break;
                 case 'ArrowRight':
-                    player.x += player.speed;
+                    player.directionX = 1;
                     break;
             }
         });
+
+        // window.addEventListener('keyup', (e) => {
+        //     switch (e.key) {
+        //         case 'ArrowLeft':
+        //         case 'ArrowRight':
+        //             player.directionX = 0;
+        //             break;
+        //     }
+        // });
 
         // Start animation
         draw();
