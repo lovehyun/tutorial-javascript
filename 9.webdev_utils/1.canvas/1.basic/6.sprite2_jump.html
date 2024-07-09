@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running and Jumping Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white; /* 배경색을 흰색으로 설정 */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        // 스프라이트 시트 이미지 로드
+        const spriteSheet = new Image();
+        spriteSheet.src = 'sprite-sheet.png'; // 스프라이트 시트 경로
+
+        const spriteWidth = 85; // 각 스프라이트의 너비
+        const spriteHeight = 100; // 각 스프라이트의 높이
+        const totalRunFrames = 6; // 달리기 스프라이트 시트의 프레임 수
+        const totalJumpFrames = 2; // 점프 스프라이트 시트의 프레임 수
+
+        const jumpYPosition = 160; // 점프 이미지가 위치한 Y 좌표
+
+        let currentFrame = 0; // 현재 프레임 인덱스
+        let spriteX = 50; // 스프라이트가 화면에서 이동할 x 좌표
+        let spriteY = 200; // 스프라이트가 화면에서 이동할 y 좌표
+        
+        const spriteDX = 15; // 스프라이트가 이동할 속도 (x 방향)
+        const groundY = 200; // 지면의 y 좌표
+
+        let isJumping = false; // 점프 상태
+        let jumpFrame = 0; // 점프 프레임 인덱스
+        let jumpHeight = 50; // 점프 높이
+        let jumpSpeed = 15; // 점프 속도
+        let jumpDirection = -1; // 점프 방향 (-1: 위로, 1: 아래로)
+
+        function drawFrame(frameX, frameY, canvasX, canvasY) {
+            context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+            context.drawImage(spriteSheet,
+                frameX * spriteWidth, frameY * spriteHeight, spriteWidth, spriteHeight,
+                canvasX, canvasY, spriteWidth, spriteHeight);
+        }
+
+        function updateAnimation() {
+            if (isJumping) {
+                // 점프 애니메이션 로직
+                let frameY = jumpYPosition / spriteHeight; // 점프 이미지의 Y 좌표 인덱스
+
+                if (jumpDirection === -1) {
+                    drawFrame(0, frameY, spriteX, spriteY + (jumpDirection * jumpSpeed)); // 점프 시 첫 번째 이미지
+                } else {
+                    drawFrame(1, frameY, spriteX, spriteY + (jumpDirection * jumpSpeed)); // 내려올 때 두 번째 이미지
+                }
+
+                spriteY += jumpDirection * jumpSpeed;
+                spriteX += spriteDX; // 점프할 때도 앞으로 이동
+
+                // 점프 높이에 도달하면 방향을 바꿔서 내려오기 시작
+                if (spriteY <= groundY - jumpHeight) {
+                    jumpDirection = 1;
+                }
+                // 원래 위치로 돌아오면 점프 종료
+                if (spriteY >= groundY) {
+                    isJumping = false;
+                    jumpDirection = -1;
+                    spriteY = groundY; // 원래 위치로 복구
+                }
+            } else {
+                // 달리기 애니메이션 로직
+                currentFrame = (currentFrame + 1) % totalRunFrames;
+                drawFrame(currentFrame, 0, spriteX, spriteY); // 첫 번째 줄 (index 0)의 프레임 사용
+                spriteX += spriteDX; // 스프라이트가 이동할 속도 (x 방향)
+                if (spriteX > canvas.width) {
+                    spriteX = -spriteWidth; // 화면을 벗어나면 다시 시작 위치로 이동
+                }
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.code === 'Space' && !isJumping) {
+                isJumping = true;
+                jumpFrame = 0; // 점프 프레임 초기화
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        spriteSheet.onload = function() {
+            setInterval(updateAnimation, 100); // 100ms마다 애니메이션 업데이트
+        };
+    </script>
+</body>
+</html>

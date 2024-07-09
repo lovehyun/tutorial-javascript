@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white; /* 배경색을 검정색으로 설정 */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        // 스프라이트 시트 이미지 로드
+        const spriteSheet = new Image();
+        spriteSheet.src = 'sprite-sheet.png'; // 스프라이트 시트 경로
+
+        const spriteWidth = 85; // 각 스프라이트의 너비
+        const spriteHeight = 100; // 각 스프라이트의 높이
+        const totalFrames = 6; // 스프라이트 시트의 프레임 수
+
+        let currentFrame = 0; // 현재 프레임 인덱스
+        let spriteX = 50; // 스프라이트가 화면에서 이동할 x 좌표
+        
+        const spriteDX = 10; // 스프라이트가 이동할 속도 (x 방향)
+        const spriteY = 200; // 스프라이트가 화면에서 이동할 y 좌표
+
+        function drawFrame(frameX, frameY, canvasX, canvasY) {
+            context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+            context.drawImage(spriteSheet,
+                frameX * spriteWidth, frameY * spriteHeight, spriteWidth, spriteHeight,
+                canvasX, canvasY, spriteWidth, spriteHeight);
+        }
+
+        function updateAnimation() {
+            currentFrame = (currentFrame + 1) % totalFrames; // 다음 프레임으로 이동
+            drawFrame(currentFrame, 0, spriteX, spriteY); // 프레임을 캔버스에 그리기
+            spriteX += spriteDX; // 스프라이트가 이동할 속도 (x 방향)
+            if (spriteX > canvas.width) {
+                spriteX = -spriteWidth; // 화면을 벗어나면 다시 시작 위치로 이동
+            }
+        }
+
+        spriteSheet.onload = function() {
+            setInterval(updateAnimation, 100); // 100ms마다 애니메이션 업데이트
+        };
+    </script>
+</body>
+</html>

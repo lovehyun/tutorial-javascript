@@ -25,10 +25,11 @@
         const context = canvas.getContext('2d');
 
         const angles = {
-            right: { baseStart: 0.2 * Math.PI, baseEnd: 1.8 * Math.PI, minStart: 0.0 * Math.PI, maxStart: 0.25 * Math.PI },
-            left: { baseStart: 1.2 * Math.PI, baseEnd: 0.8 * Math.PI, minStart: 1.0 * Math.PI, maxStart: 1.25 * Math.PI },
-            up: { baseStart: 1.7 * Math.PI, baseEnd: 1.3 * Math.PI, minStart: 1.5 * Math.PI, maxStart: 1.75 * Math.PI },
-            down: { baseStart: 0.7 * Math.PI, baseEnd: 0.3 * Math.PI, minStart: 0.5 * Math.PI, maxStart: 0.75 * Math.PI }
+            // baseStart: 기본 시작 각도, baseEnd: 기본 끝 각도, minStart: 입을 닫을때 최소 각도, maxStart: 입을 벌릴때 최대 각도
+            right: { baseStart: 0.2 * Math.PI, baseEnd: 1.8 * Math.PI, minStart: 0.05 * Math.PI, maxStart: 0.25 * Math.PI },
+            left: { baseStart: 1.2 * Math.PI, baseEnd: 0.8 * Math.PI, minStart: 1.05 * Math.PI, maxStart: 1.25 * Math.PI },
+            up: { baseStart: 1.7 * Math.PI, baseEnd: 1.3 * Math.PI, minStart: 1.55 * Math.PI, maxStart: 1.75 * Math.PI },
+            down: { baseStart: 0.7 * Math.PI, baseEnd: 0.3 * Math.PI, minStart: 0.55 * Math.PI, maxStart: 0.75 * Math.PI }
         };
 
         let pacman = {
