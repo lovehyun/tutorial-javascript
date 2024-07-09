@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directional Movement Animation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: white; /* 배경색을 흰색으로 설정 */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        // 스프라이트 시트 이미지 로드
+        const spriteSheet = new Image();
+        spriteSheet.src = 'sprite-sheet2.png'; // 스프라이트 시트 경로
+
+        const spriteWidth = 174; // 각 스프라이트의 너비
+        const spriteHeight = 248; // 각 스프라이트의 높이
+        const totalFrames = 4; // 각 방향의 스프라이트 시트의 프레임 수
+        const imageScale = 0.3;
+
+        let currentFrame = 0; // 현재 프레임 인덱스
+        let spriteX = 250; // 스프라이트가 화면에서 이동할 x 좌표
+        let spriteY = 150; // 스프라이트가 화면에서 이동할 y 좌표
+
+        const spriteDX = 5; // 스프라이트가 이동할 속도 (x 방향)
+        const spriteDY = 5; // 스프라이트가 이동할 속도 (y 방향)
+
+        let direction = null; // 이동 방향
+        const directions = {
+            ArrowDown: 0,
+            ArrowLeft: 1,
+            ArrowRight: 2,
+            ArrowUp: 3,
+        };
+
+        function drawFrame(frameX, frameY, canvasX, canvasY) {
+            context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
+            context.drawImage(spriteSheet,
+                frameX * spriteWidth, frameY * spriteHeight, spriteWidth, spriteHeight,
+                canvasX, canvasY, spriteWidth * imageScale, spriteHeight * imageScale);
+        }
+
+        function updateAnimation() {
+            if (direction !== null) {
+                currentFrame = (currentFrame + 1) % totalFrames;
+                drawFrame(currentFrame, directions[direction], spriteX, spriteY);
+
+                // 방향에 따라 캐릭터 이동
+                // switch (direction) {
+                //     case 'ArrowDown':
+                //         spriteY += spriteDY;
+                //         break;
+                //     case 'ArrowLeft':
+                //         spriteX -= spriteDX;
+                //         break;
+                //     case 'ArrowRight':
+                //         spriteX += spriteDX;
+                //         break;
+                //     case 'ArrowUp':
+                //         spriteY -= spriteDY;
+                //         break;
+                // }
+
+                // 방향에 따라 캐릭터 이동 - 캔바스 안에서만 이동 가능
+                switch (direction) {
+                    case 'ArrowDown':
+                        if (spriteY + spriteHeight * imageScale < canvas.height) {
+                            spriteY += spriteDY;
+                        }
+                        break;
+                    case 'ArrowLeft':
+                        if (spriteX > 0) {
+                            spriteX -= spriteDX;
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (spriteX + spriteWidth * imageScale < canvas.width) {
+                            spriteX += spriteDX;
+                        }
+                        break;
+                    case 'ArrowUp':
+                        if (spriteY > 0) {
+                            spriteY -= spriteDY;
+                        }
+                        break;
+                }
+            } else {
+                drawFrame(currentFrame, directions['ArrowDown'], spriteX, spriteY); // 멈췄을 때 기본 이미지 (예: 아래)
+            }
+
+            requestAnimationFrame(updateAnimation);
+        }
+
+        function handleKeyDown(event) {
+            if (event.code in directions) {
+                direction = event.code;
+            }
+        }
+
+        function handleKeyUp(event) {
+            if (event.code in directions) {
+                direction = null;
+                currentFrame = 0; // 멈출 때 프레임 초기화
+            }
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        spriteSheet.onload = function() {
+            updateAnimation(); // 애니메이션 시작
+        };
+    </script>
+</body>
+</html>
