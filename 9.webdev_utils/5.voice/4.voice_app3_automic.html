@@ -23,7 +23,7 @@
             margin-top: 20px;
         }
         #interimResults {
-            margin-top: 20px;
+            margin-top: 5px;
             font-size: 14px;
             color: gray;
         }
@@ -66,9 +66,9 @@
             const startButton = document.getElementById('startButton');
             const questionButton = document.getElementById('questionButton');
             const statusElement = document.getElementById('status');
-            const interimResultsElement = document.getElementById('interimResults');
             const ttsStatusElement = document.getElementById('ttsStatus');
             const sttStatusElement = document.getElementById('sttStatus');
+            const interimResultsElement = document.getElementById('interimResults');
 
             const questions = [
                 {
@@ -85,10 +85,8 @@
                 }
             ];
             let currentQuestionIndex = 0;
-            let interval;
             let finalTranscript = '';
-            let isRecognizing = false;
-            let timeout;
+            let interimTranscript = '';
 
             if (!('speechSynthesis' in window)) {
                 alert('죄송합니다. 이 브라우저는 Text-to-Speech를 지원하지 않습니다.');
@@ -103,8 +101,25 @@
             const synthesis = window.speechSynthesis;
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = 'ko-KR';
-            recognition.interimResults = true;
+            recognition.interimResults = true; // 중간 결과를 받도록 설정
             recognition.continuous = true;
+
+            // 음성 인식 처리 함수
+            recognition.onresult = (event) => {
+                interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                interimResultsElement.textContent = `중간 소리: ${interimTranscript}`;
+            };
+
+            recognition.onerror = () => {
+                sttStatusElement.textContent = 'STT 상태: 오류 발생';
+            };
 
             // 음성으로 말하기 함수
             const speakText = (text) => {
@@ -130,68 +145,63 @@
 
             // 음성 인식 시작
             const startRecognition = () => {
-                if (!isRecognizing) {
-                    recognition.start();
-                    isRecognizing = true;
-                    sttStatusElement.textContent = 'STT 상태: 활성화됨';
-                }
+                recognition.start();
+                sttStatusElement.textContent = 'STT 상태: 활성화됨';
             };
 
-            // 음성 인식 결과 처리
-            const handleInterimResult = (event) => {
-                let interimTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    interimTranscript += event.results[i][0].transcript;
-                }
-                interimResultsElement.textContent = `중간 소리: ${interimTranscript}`;
-                if (event.results[event.resultIndex].isFinal) {
-                    finalTranscript += event.results[event.resultIndex][0].transcript;
-                }
+            // 음성 인식 일시 정지
+            const pauseRecognition = () => {
+                recognition.stop();
+                sttStatusElement.textContent = 'STT 상태: 일시 중지됨';
             };
 
-            // 음성 인식 오류 처리
-            const handleError = () => {
-                clearInterval(interval);
-                clearTimeout(timeout);
-                recognition.onresult = null;
-                recognition.onerror = null;
-                statusElement.textContent = '음성 인식 오류 발생';
-            };
-
-            const nextQuestion = () => {
-                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
-                checkAnswer();
-            };
-
-            // 정답 확인 함수
-            const checkAnswer = () => {
-                const currentQuestion = questions[currentQuestionIndex];
-                if (finalTranscript.includes(currentQuestion.answer)) {
-                    statusElement.textContent = `사용자 답변: ${finalTranscript} - 정답!`;
-                } else {
-                    statusElement.textContent = `사용자 답변: ${finalTranscript} - 오답!`;
-                }
-                finalTranscript = ''; // 초기화
+            // 음성 인식 재개
+            const unpauseRecognition = () => {
+                finalTranscript = '';
+                interimTranscript = '';
+                interimResultsElement.textContent = '중간 소리: ';
+                sttStatusElement.textContent = 'STT 상태: 진행 중...';
+                recognition.start();
             };
 
             // 음성 인식 처리 함수
             const handleRecognition = () => {
                 return new Promise((resolve) => {
+                    let isAnswered = false;
                     let count = 5;
-                    interval = setInterval(() => {
+                    const interval = setInterval(() => {
                         statusElement.textContent = `답변을 기다리는 중: ${count}초`;
                         count--;
                         if (count < 0) {
                             clearInterval(interval);
-                            resolve();
-                            checkAnswer();
+                            if (!isAnswered) {
+                                recognition.stop();
+                                resolve(finalTranscript || '[무응답]');
+                            }
                         }
-                    }, 1000); // 5초동안 응답을 기다림 (정확히는 6초)
+                    }, 1000);
+
+                    recognition.onresult = (event) => {
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            if (event.results[i].isFinal) {
+                                finalTranscript += event.results[i][0].transcript;
+                                isAnswered = true;
+                                clearInterval(interval);
+                                resolve(finalTranscript);
+                            } else {
+                                interimTranscript += event.results[i][0].transcript;
+                                interimResultsElement.textContent = `중간 소리: ${interimTranscript}`;
+                            }
+                        }
+                    };
+
+                    recognition.onerror = () => {
+                        clearInterval(interval);
+                        recognition.stop();
+                        resolve('[오류]');
+                    };
                 });
             };
-
-            recognition.onresult = handleInterimResult;
-            recognition.onerror = handleError;
 
             // 마이크 권한 확인 및 활성화
             const checkMicrophonePermission = async () => {
@@ -203,8 +213,7 @@
                 }
             };
 
-            // 퀴즈 시작 버튼 클릭 이벤트
-            const startQuiz = async () => {
+            startButton.addEventListener('click', async () => {
                 const hasMicrophonePermission = await checkMicrophonePermission();
                 if (!hasMicrophonePermission) {
                     alert('마이크에 접근할 수 없습니다. 권한을 허용해 주세요.');
@@ -213,18 +222,24 @@
                 startRecognition();
                 questionButton.disabled = false;
                 startButton.disabled = true;
-            };
+            });
 
             // 퀴즈 질문 듣기 버튼 클릭 이벤트
-            const handleQuestionButtonClick = async () => {
+            questionButton.addEventListener('click', async () => {
                 const currentQuestion = questions[currentQuestionIndex];
+                pauseRecognition();
                 await speakText(currentQuestion.question);
-                await handleRecognition();
-                nextQuestion();
-            };
-
-            startButton.addEventListener('click', startQuiz);
-            questionButton.addEventListener('click', handleQuestionButtonClick);
+                unpauseRecognition();
+                const userAnswer = await handleRecognition();
+                statusElement.textContent = `사용자 답변: "${userAnswer}"`;
+                if (userAnswer.includes(currentQuestion.answer)) {
+                    statusElement.textContent += ' - 정답!';
+                } else {
+                    statusElement.textContent += ' - 오답!';
+                }
+                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                pauseRecognition();
+            });
         });
     </script>
 </body>
