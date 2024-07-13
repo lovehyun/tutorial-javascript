@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>텍스트 음성 변환 (TTS) 예제</title>
+        <style>
+            #textInput {
+                width: 50%; /* 원하는 너비로 조정 */
+                height: 50px; /* 원하는 높이로 조정 */
+                padding: 10px; /* 여백 추가 */
+                font-size: 16px; /* 글자 크기 조정 */
+                resize: none; /* 사용자가 크기를 조정하지 못하게 함 */
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+            }
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+                margin-top: 10px;
+                height: 50px;
+                box-sizing: border-box; /* 패딩 포함 높이 설정 */
+            }
+        </style>
+    </head>
+    <body>
+        <!-- <input type="text" id="textInput" placeholder="음성으로 변환할 텍스트를 입력하세요" value="여기에 텍스트를 입력하세요"/> -->
+        <textarea id="textInput" placeholder="음성으로 변환할 텍스트를 입력하세요">여기에 텍스트를 입력하세요</textarea>
+        <button id="speakButton">음성으로 변환</button>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const textInput = document.getElementById('textInput');
+                const speakButton = document.getElementById('speakButton');
+
+                // 음성으로 변환 함수
+                const speakText = () => {
+                    const utterance = new SpeechSynthesisUtterance(textInput.value);
+                    speechSynthesis.speak(utterance);
+                };
+
+                // 음성으로 변환 버튼 클릭 이벤트
+                speakButton.addEventListener('click', speakText);
+            });
+        </script>
+    </body>
+</html>

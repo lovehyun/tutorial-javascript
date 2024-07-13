@@ -28,12 +28,12 @@
                     // 인식 결과 이벤트
                     recognition.onresult = (event) => {
                         const transcript = event.results[0][0].transcript;
-                        resultElement.textContent = `음성 결과: ${transcript}`;
+                        resultElement.innerHTML = `음성 결과: ${transcript}<br>`;
                     };
 
                     // 인식 종료 이벤트
                     recognition.onend = () => {
-                        resultElement.textContent += '\n음성 입력이 종료되었습니다.';
+                        resultElement.innerHTML += '음성 입력이 종료되었습니다.<br>';
                     };
 
                     // 에러 처리 이벤트

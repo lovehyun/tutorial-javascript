@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>퀴즈 음성 출력 예제</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        #status {
+            margin-top: 20px;
+        }
+        #interimResults {
+            margin-top: 20px;
+            font-size: 14px;
+            color: gray;
+        }
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            width: 60%;
+        }
+        .status-column {
+            width: 45%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .status-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>퀴즈 음성 출력</h1>
+    <button id="startButton">퀴즈 시작</button>
+    <button id="questionButton" disabled>퀴즈 질문 듣기</button>
+    <p id="status">상태: 준비 중...</p>
+    <p id="interimResults">중간 소리: </p>
+    <div class="status-container">
+        <div class="status-column">
+            <div class="status-title">TTS 상태</div>
+            <p id="ttsStatus">TTS 상태: 준비 중...</p>
+        </div>
+        <div class="status-column">
+            <div class="status-title">STT 상태</div>
+            <p id="sttStatus">STT 상태: 준비 중...</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const startButton = document.getElementById('startButton');
+            const questionButton = document.getElementById('questionButton');
+            const statusElement = document.getElementById('status');
+            const interimResultsElement = document.getElementById('interimResults');
+            const ttsStatusElement = document.getElementById('ttsStatus');
+            const sttStatusElement = document.getElementById('sttStatus');
+
+            const questions = [
+                {
+                    question: '대한민국의 수도는 어디인가요?',
+                    answer: '서울'
+                },
+                {
+                    question: '태양계에서 가장 큰 행성은 무엇인가요?',
+                    answer: '목성'
+                },
+                {
+                    question: '세계에서 가장 높은 산은 무엇인가요?',
+                    answer: '에베레스트'
+                }
+            ];
+            let currentQuestionIndex = 0;
+            let interval;
+            let finalTranscript = '';
+            let isRecognizing = false;
+            let timeout;
+
+            if (!('speechSynthesis' in window)) {
+                alert('죄송합니다. 이 브라우저는 Text-to-Speech를 지원하지 않습니다.');
+                return;
+            }
+
+            if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+                alert('죄송합니다. 이 브라우저는 Speech Recognition을 지원하지 않습니다.');
+                return;
+            }
+
+            const synthesis = window.speechSynthesis;
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'ko-KR';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            // 음성으로 말하기 함수
+            const speakText = (text) => {
+                return new Promise((resolve) => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+
+                    utterance.rate = 1;
+                    utterance.pitch = 1;
+                    utterance.volume = 1;
+
+                    utterance.onstart = () => {
+                        ttsStatusElement.textContent = 'TTS 상태: 진행 중...';
+                    };
+
+                    utterance.onend = () => {
+                        ttsStatusElement.textContent = 'TTS 상태: 종료';
+                        resolve();
+                    };
+
+                    synthesis.speak(utterance);
+                });
+            };
+
+            // 음성 인식 시작
+            const startRecognition = () => {
+                if (!isRecognizing) {
+                    recognition.start();
+                    isRecognizing = true;
+                    sttStatusElement.textContent = 'STT 상태: 활성화됨';
+                }
+            };
+
+            // 음성 인식 결과 처리
+            const handleInterimResult = (event) => {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+                interimResultsElement.textContent = `중간 소리: ${interimTranscript}`;
+                if (event.results[event.resultIndex].isFinal) {
+                    finalTranscript += event.results[event.resultIndex][0].transcript;
+                }
+            };
+
+            // 음성 인식 오류 처리
+            const handleError = () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+                recognition.onresult = null;
+                recognition.onerror = null;
+                statusElement.textContent = '음성 인식 오류 발생';
+            };
+
+            const nextQuestion = () => {
+                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                checkAnswer();
+            };
+
+            // 정답 확인 함수
+            const checkAnswer = () => {
+                const currentQuestion = questions[currentQuestionIndex];
+                if (finalTranscript.includes(currentQuestion.answer)) {
+                    statusElement.textContent = `사용자 답변: ${finalTranscript} - 정답!`;
+                } else {
+                    statusElement.textContent = `사용자 답변: ${finalTranscript} - 오답!`;
+                }
+                finalTranscript = ''; // 초기화
+            };
+
+            // 음성 인식 처리 함수
+            const handleRecognition = () => {
+                return new Promise((resolve) => {
+                    let count = 5;
+                    interval = setInterval(() => {
+                        statusElement.textContent = `답변을 기다리는 중: ${count}초`;
+                        count--;
+                        if (count < 0) {
+                            clearInterval(interval);
+                            resolve();
+                            checkAnswer();
+                        }
+                    }, 1000); // 5초동안 응답을 기다림 (정확히는 6초)
+                });
+            };
+
+            recognition.onresult = handleInterimResult;
+            recognition.onerror = handleError;
+
+            // 마이크 권한 확인 및 활성화
+            const checkMicrophonePermission = async () => {
+                try {
+                    await navigator.mediaDevices.getUserMedia({ audio: true });
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            };
+
+            // 퀴즈 시작 버튼 클릭 이벤트
+            const startQuiz = async () => {
+                const hasMicrophonePermission = await checkMicrophonePermission();
+                if (!hasMicrophonePermission) {
+                    alert('마이크에 접근할 수 없습니다. 권한을 허용해 주세요.');
+                    return;
+                }
+                startRecognition();
+                questionButton.disabled = false;
+                startButton.disabled = true;
+            };
+
+            // 퀴즈 질문 듣기 버튼 클릭 이벤트
+            const handleQuestionButtonClick = async () => {
+                const currentQuestion = questions[currentQuestionIndex];
+                await speakText(currentQuestion.question);
+                await handleRecognition();
+                nextQuestion();
+            };
+
+            startButton.addEventListener('click', startQuiz);
+            questionButton.addEventListener('click', handleQuestionButtonClick);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>퀴즈 음성 출력 예제</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        #status {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>퀴즈 음성 출력</h1>
+    <button id="questionButton">퀴즈 질문 듣기</button>
+    <p id="status">상태: 준비 중...</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const questionButton = document.getElementById('questionButton');
+            const statusElement = document.getElementById('status');
+
+            const questions = [
+                '첫 번째 질문: 대한민국의 수도는 어디인가요?',
+                '두 번째 질문: 태양계에서 가장 큰 행성은 무엇인가요?',
+                '세 번째 질문: 세계에서 가장 높은 산은 무엇인가요?'
+            ];
+            let currentQuestionIndex = 0;
+
+            // Web Speech API 지원 여부 확인
+            if ('speechSynthesis' in window) {
+                const synthesis = window.speechSynthesis;
+
+                // 음성으로 말하기 함수
+                const speakText = (text) => {
+                    const utterance = new SpeechSynthesisUtterance(text);
+
+                    // 음성 속성 설정
+                    utterance.rate = 1; // 속도 (0.1 ~ 10)
+                    utterance.pitch = 1; // 피치 (0 ~ 2)
+                    utterance.volume = 1; // 볼륨 (0 ~ 1)
+
+                    // 이벤트 핸들러 추가
+                    utterance.onstart = () => {
+                        statusElement.textContent = '상태: 음성 출력 중...';
+                    };
+
+                    utterance.onend = () => {
+                        statusElement.textContent = '상태: 음성 출력 완료';
+                        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                    };
+
+                    utterance.onpause = () => {
+                        statusElement.textContent = '상태: 음성 출력 일시 중지';
+                    };
+
+                    utterance.onresume = () => {
+                        statusElement.textContent = '상태: 음성 출력 재개';
+                    };
+
+                    utterance.onerror = (event) => {
+                        statusElement.textContent = '상태: 오류 발생 - ' + event.error;
+                    };
+
+                    synthesis.speak(utterance);
+                };
+
+                // 퀴즈 질문 듣기 버튼 클릭 이벤트
+                questionButton.addEventListener('click', () => {
+                    const question = questions[currentQuestionIndex];
+                    speakText(question);
+                });
+            } else {
+                // Web Speech API를 지원하지 않는 경우 메시지 표시
+                alert('죄송합니다. 이 브라우저는 Text-to-Speech를 지원하지 않습니다.');
+            }
+        });
+    </script>
+</body>
+</html>

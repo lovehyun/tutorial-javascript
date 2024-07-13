@@ -7,10 +7,12 @@
     </head>
     <body>
         <button id="speakButton">음성으로 인사하기</button>
+        <p id="status">상태: 준비 중...</p>
 
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const speakButton = document.getElementById('speakButton');
+                const statusElement = document.getElementById('status');
 
                 // Web Speech API 지원 여부 확인
                 if ('speechSynthesis' in window) {
@@ -19,6 +21,33 @@
                     // 음성으로 말하기 함수
                     const speakText = (text) => {
                         const utterance = new SpeechSynthesisUtterance(text);
+
+                        // 음성 속성 설정
+                        utterance.rate = 1; // 속도 (0.1 ~ 10)
+                        utterance.pitch = 1; // 피치 (0 ~ 2)
+                        utterance.volume = 1; // 볼륨 (0 ~ 1)
+
+                        // 이벤트 핸들러 추가
+                        utterance.onstart = () => {
+                            statusElement.textContent = '상태: 음성 출력 중...';
+                        };
+
+                        utterance.onend = () => {
+                            statusElement.textContent = '상태: 음성 출력 완료';
+                        };
+
+                        utterance.onpause = () => {
+                            statusElement.textContent = '상태: 음성 출력 일시 중지';
+                        };
+
+                        utterance.onresume = () => {
+                            statusElement.textContent = '상태: 음성 출력 재개';
+                        };
+
+                        utterance.onerror = (event) => {
+                            statusElement.textContent = '상태: 오류 발생 - ' + event.error;
+                        };
+
                         synthesis.speak(utterance);
                     };
 

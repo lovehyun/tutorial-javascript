@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>텍스트 음성 변환 (TTS) 예제</title>
+    <style>
+        #textInput {
+            width: 50%; /* 원하는 너비로 조정 */
+            height: 100px; /* 원하는 높이로 조정 */
+            padding: 10px; /* 여백 추가 */
+            font-size: 16px; /* 글자 크기 조정 */
+            resize: none; /* 사용자가 크기를 조정하지 못하게 함 */
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button, select {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            height: 50px;
+            box-sizing: border-box; /* 패딩 포함 높이 설정 */
+        }
+        select {
+            margin-right: 10px; /* 오른쪽 여백 추가 */
+        }
+    </style>
+</head>
+<body>
+    <textarea id="textInput" placeholder="음성으로 변환할 텍스트를 입력하세요">여기에 텍스트를 입력하세요</textarea>
+    <div class="controls">
+        <select id="voiceSelect"></select>
+        <button id="speakButton">음성으로 변환</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            const voiceSelect = document.getElementById('voiceSelect');
+            const speakButton = document.getElementById('speakButton');
+
+            // Web Speech API를 지원하는지 확인
+            if ('speechSynthesis' in window) {
+                // 음성 목록을 업데이트하는 함수
+                const updateVoices = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    console.log('사용 가능한 목소리 목록:', voices);
+
+                    voiceSelect.innerHTML = ''; // 목록 초기화
+
+                    voices.forEach((voice, index) => {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.text = `${voice.name} (${voice.lang})`;
+                        voiceSelect.add(option);
+                    });
+                };
+
+                // 목소리 목록이 변경될 때마다 업데이트
+                window.speechSynthesis.addEventListener('voiceschanged', updateVoices);
+
+                // 초기 목소리 목록 업데이트
+                updateVoices();
+
+                // 음성으로 변환 함수
+                const speakText = () => {
+                    const selectedVoiceIndex = voiceSelect.value;
+                    const selectedVoice = window.speechSynthesis.getVoices()[selectedVoiceIndex];
+                    const textToSpeak = textInput.value;
+                    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                    utterance.voice = selectedVoice;
+                    speechSynthesis.speak(utterance);
+                };
+
+                // 음성으로 변환 버튼 클릭 이벤트
+                speakButton.addEventListener('click', speakText);
+            } else {
+                // Web Speech API를 지원하지 않는 경우 메시지 표시
+                alert('죄송합니다. 이 브라우저는 Text-to-Speech를 지원하지 않습니다.');
+            }
+        });
+    </script>
+</body>
+</html>

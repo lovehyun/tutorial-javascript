@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speech-to-Text Example</title>
+</head>
+<body>
+    <h1>Speech-to-Text Example</h1>
+    <button onclick="startRecognition()">Start Recognition</button>
+    <p id="result">Speech will appear here...</p>
+
+    <script>
+        function startRecognition() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('result').innerText = transcript;
+            };
+
+            recognition.onerror = function(event) {
+                console.error(event.error);
+            };
+
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
