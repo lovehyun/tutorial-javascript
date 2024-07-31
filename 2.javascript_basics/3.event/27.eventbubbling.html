@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Bubbling Example</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const child = document.getElementById('child');
+            const parent = document.getElementById('parent');
+            const grandparent = document.getElementById('grandparent');
+
+            child.addEventListener('click', () => {
+                alert('Child Clicked');
+            });
+
+            // child.addEventListener('click', (event) => {
+            //     alert('Child Clicked');
+            //     event.stopPropagation();
+            // });
+
+            parent.addEventListener('click', () => {
+                alert('Parent Clicked');
+            });
+
+            grandparent.addEventListener('click', () => {
+                alert('Grandparent Clicked');
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- 이벤트 버블링(Event Bubbling)은 웹 개발에서 중요한 개념 중 하나입니다. 
+    이벤트 버블링은 특정 요소에서 이벤트가 발생했을 때, 그 이벤트가 그 요소의 부모 요소로 전파되는 과정을 말합니다. 
+    이는 DOM 트리 상에서 최하위 요소에서 상위 요소로 이벤트가 전파되는 방향을 의미합니다. -->
+
+    <div id="grandparent" style="padding: 50px; background-color: lightgrey;">
+        Grandparent
+        <div id="parent" style="padding: 50px; background-color: lightblue;">
+            Parent
+            <div id="child" style="padding: 50px; background-color: lightgreen;">
+                Child
+            </div>
+        </div>
+    </div>
+</body>
+</html>
