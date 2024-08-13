@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Games</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #game-list {
+            margin-bottom: 20px;
+        }
+
+        #game-list button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #game-frame {
+            width: 100%;
+            max-width: 1000px;
+            height: 800px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Canvas Games</h1>
+
+    <div id="game-list">
+        <button onclick="loadGame('1.snake')">Snake</button>
+        <button onclick="loadGame('2.arkanoid')">Arkanoid</button>
+        <button onclick="loadGame('3.tetris')">Tetris</button>
+        <button onclick="loadGame('4.pang')">Pang</button>
+        <button onclick="loadGame('9.space')">Space Invaders</button>
+    </div>
+
+    <iframe id="game-frame" src="" frameborder="0"></iframe>
+
+    <script>
+        function loadGame(gameFolder) {
+            const iframe = document.getElementById('game-frame');
+            iframe.src = `${gameFolder}/index.html`;
+        }
+    </script>
+
+</body>
+</html>
