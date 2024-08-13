@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textarea with Line Numbers and Ctrl + Enter Submit</title>
+    <style>
+        .textarea-container {
+            position: relative;
+            width: fit-content;
+            margin: 0 auto;
+            display: flex;
+        }
+        .line-numbers {
+            padding: 8px 0; /* 줄번호의 패딩을 줄여서 줄 높이와 맞춤 */
+            color: #888;
+            text-align: right;
+            font-family: monospace;
+            line-height: 1.5em; /* 줄 높이를 텍스트와 동일하게 */
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+            margin-right: 10px;
+        }
+        textarea {
+            font-family: monospace;
+            padding: 8px 0 8px 20px; /* padding-top과 padding-bottom을 조정 */
+            line-height: 1.5em; /* 줄 높이 조정 */
+            white-space: pre;
+            border: 1px solid #ddd;
+            resize: none;
+            outline: none;
+            box-sizing: border-box;
+            overflow-y: scroll; /* 스크롤을 강제 표시 */
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <form id="myForm" action="/submit" method="post">
+        <div class="textarea-container">
+            <div class="line-numbers" id="lineNumbers"></div>
+            <textarea id="myTextarea" rows="10" cols="100"></textarea>
+        </div>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const textarea = document.getElementById('myTextarea');
+        const lineNumbers = document.getElementById('lineNumbers');
+        const form = document.getElementById('myForm');
+
+        function updateLineNumbers() {
+            const lines = textarea.value.split('\n').length;
+            lineNumbers.innerHTML = '';
+            for (let i = 1; i <= lines; i++) {
+                lineNumbers.innerHTML += i + '<br>';
+            }
+        }
+
+        textarea.addEventListener('input', updateLineNumbers);
+        textarea.addEventListener('scroll', function() {
+            lineNumbers.scrollTop = textarea.scrollTop;
+        });
+
+        // Ctrl + Enter로 폼 제출 기능
+        textarea.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                form.submit(); // 폼 제출
+            }
+        });
+
+        // 페이지 로드 시 줄번호 업데이트
+        // window.onload = function() {
+        //     updateLineNumbers();
+        // };
+
+        // 페이지 로드 또는 뒤로가기 시 줄번호 업데이트
+        window.addEventListener('pageshow', function() {
+            updateLineNumbers();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textarea Ctrl + Enter Submit</title>
+</head>
+<body>
+    <form id="myForm" action="/submit" method="post">
+        <textarea id="myTextarea" rows="10" cols="30"></textarea>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        document.getElementById('myTextarea').addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                document.getElementById('myForm').submit(); // 폼 제출
+            }
+        });
+    </script>
+</body>
+</html>
