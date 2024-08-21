@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>노래 검색 결과</title>
+    <style>
+        body {
+            font-family: 'Nanum Gothic', sans-serif;
+        }
+
+        h1, h2 {
+            margin-top: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        a {
+            text-decoration: underline;
+            color: blue;
+            cursor: pointer;
+        }
+
+        .lyrics-row {
+            overflow: hidden;
+            max-height: 3em; /* 초기 높이 */
+            cursor: pointer;
+        }
+
+        .lyrics-row.expanded {
+            max-height: 100em; /* none 으로 하면 max인데, transition 이 적용되지 않음 */
+            transition: max-height 2.0s ease;
+        }
+    </style>
+</head>
+<body>
+    <h1>가사로 노래찾기</h1>
+    <form onsubmit="event.preventDefault(); searchLyrics();">
+        <label for="queryInput">가사 입력:</label>
+        <input type="text" id="queryInput" required>
+        <button type="submit">검색</button>
+    </form>
+    <h2>가사 검색 결과</h2>
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>제목</th>
+                <th>아티스트</th>
+                <th>가사</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 결과가 출력될 곳 -->
+        </tbody>
+    </table>
+    <script>
+        function parseSongContents(data, query, tableBody) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, 'text/html');
+            const listItems = doc.querySelectorAll('li');
+
+            listItems.forEach((item) => {
+                const title = item.querySelector('.music_title a');
+                const artist = item.querySelector('.music_detail .additional_info a');
+                const lyrics = item.querySelector('.lyrics_text');
+
+                if (title && artist && lyrics) {
+                    // 결과를 기록할 셀 위치 가져오기
+                    const row = tableBody.insertRow();
+                    const titleCell = row.insertCell(0);
+                    const artistCell = row.insertCell(1);
+                    const lyricsCell = row.insertCell(2);
+
+                    // 해당 셀에 결과 입력
+                    titleCell.innerHTML = title.outerHTML;
+                    artistCell.textContent = artist.textContent;
+
+                    // 퀴즈4 - a링크 새창에서 열기로 변경
+                    const originalTitleLink = titleCell.querySelector('a');
+                    originalTitleLink.setAttribute('target', '_blank');
+
+                    // 퀴즈2 - 검색 키워드 가사 하이라이트
+                    const highlightedLyrics = highlightMatchingLyrics(lyrics.innerHTML, query);
+                    
+                    // 퀴즈3 - 가사 접고 펴기 div 추가
+                    // lyricsCell.innerHTML = `${highlightedLyrics}`;
+                    lyricsCell.innerHTML = `<div class="lyrics-row">${highlightedLyrics}</div>`;
+                }
+            });
+        }
+
+        // 검색 결과 업데이트 함수
+        function updateTable(results, query) {
+            // console.log("API Response:", results);
+
+            const tableBody = document.getElementById('resultsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+            
+            const result1 = results.current.html; // 검색 결과
+            parseSongContents(result1, query, tableBody);
+
+            // 퀴즈1. 검색 결과 테이블에 출력 -->
+            const result2 = results.next.html;
+            parseSongContents(result2, query, tableBody);
+            // <-- 퀴즈1
+
+            // 퀴즈3 -->
+            // 가사 부분의 각 row를 나타내는 HTML 요소들을 선택합니다.
+            const lyricsRows = document.querySelectorAll('.lyrics-row');
+
+            // 각 row에 클릭 이벤트 리스너를 추가합니다.
+            lyricsRows.forEach(row => {
+                row.addEventListener('click', function () {
+                    // 현재 클릭된 row의 상태를 확인합니다.
+                    const isExpanded = row.classList.contains('expanded');
+
+                    // 모든 row의 상태를 초기화합니다.
+                    lyricsRows.forEach(r => r.classList.remove('expanded'));
+
+                    // 현재 클릭된 row가 닫혀있는 경우, 펼쳐짐 상태로 변경합니다.
+                    if (!isExpanded) {
+                        row.classList.add('expanded');
+                    }
+                });
+            });
+            // <-- 퀴즈3
+        }
+
+
+        // --> 퀴즈2
+        // 가사 중 검색 결과 하이라이트
+        function highlightMatchingLyrics(lyrics, query) {
+            const regex = new RegExp(query, 'gi'); // global + case-insensitive
+            return lyrics.replace(regex, match => `<mark>${match}</mark>`);
+        }
+        // <-- 퀴즈2
+
+        // 검색 결과 수행
+        async function searchLyrics() {
+            const query = document.getElementById('queryInput').value;
+
+            try {
+                const response = await fetch(`https://m.search.naver.com/p/csearch/content/qapirender.nhn?where=m&key=LyricsSearchResult&pkid=519&u1=1&u2=3&u3=0&u4=1&q=가사검색 ${encodeURIComponent(query)}`);
+                const data = await response.json();
+                updateTable(data, query);
+            } catch (error) {
+                console.error('Error fetching search results:', error.message);
+            }
+        }
+
+    </script>
+</body>
+</html>
