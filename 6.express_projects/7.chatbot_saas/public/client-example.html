@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Example</title>
+</head>
+<body>
+    <h1>Welcome to My Webpage</h1>
+    <p>This is an example of a webpage that includes the chatbot snippet.</p>
+    
+    <!-- Insert the chatbot snippet here -->
+    <link rel="stylesheet" href="http://127.0.0.1:3000/client/chatbot.css">
+    <script>
+        (function() {
+            const bot = document.createElement('script');
+            bot.type = 'text/javascript';
+            bot.async = true;
+            bot.icon = 3;
+            // bot.src = 'http://127.0.0.1:3000/client/chatbot.js?apiKey=YOUR_API_KEY_HERE';
+            bot.src = 'http://127.0.0.1:3000/client/chatbot.js?apiKey=c8490d573fcb82ecb862e540645f2813';
+            document.head.appendChild(bot);
+        })();
+    </script>
+</body>
+</html>
