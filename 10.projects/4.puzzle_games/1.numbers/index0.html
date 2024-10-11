@@ -61,8 +61,7 @@
         // Shuffle the puzzle
         function shufflePuzzle() {
             for (let i = puzzleState.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [puzzleState[i], puzzleState[j]] = [puzzleState[j], puzzleState[i]];
+                // 랜덤으로 퍼즐을 섞는 코드를 작성하시오
             }
         }
 
@@ -73,7 +72,9 @@
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.textContent = number !== null ? number : '';
-                cell.addEventListener('click', () => moveCell(index));
+
+                // 클릭 이벤트에 대해 moveCell 함수를 호출하는 이벤트 핸들러 코드를 작성하시오
+
                 puzzleContainer.appendChild(cell);
             });
         }
@@ -81,9 +82,7 @@
         // Check if the puzzle is solved
         function isPuzzleSolved() {
             for (let i = 0; i < puzzleState.length - 1; i++) {
-                if (puzzleState[i] !== i + 1) {
-                    return false;
-                }
+                // 퍼즐이 완료 되었는지 확인하는 코드를 작성하시오
             }
             return true;
         }
@@ -92,8 +91,7 @@
         function moveCell(index) {
             const emptyIndex = puzzleState.indexOf(null);
             if (isMoveValid(index, emptyIndex)) {
-                [puzzleState[index], puzzleState[emptyIndex]] = [puzzleState[emptyIndex], puzzleState[index]];
-                renderPuzzle();
+                // 움직임이 유효한지 확인후, 유효하면 두 자리를 바꾸는 코드를 작성하시오
 
                 if (isPuzzleSolved()) {
                     setTimeout(() => {
@@ -112,7 +110,9 @@
             const colEmpty = emptyIndex % puzzleSize;
 
             return (
+                // 클릭한 퍼즐 조각이 빈 칸과 같은 행에 있고, 두 칸의 열 차이가 1인 경우(즉, 좌우로 인접한 경우).
                 (rowClicked === rowEmpty && Math.abs(colClicked - colEmpty) === 1) ||
+                // 클릭한 퍼즐 조각이 빈 칸과 같은 열에 있고, 두 칸의 행 차이가 1인 경우(즉, 상하로 인접한 경우).
                 (colClicked === colEmpty && Math.abs(rowClicked - rowEmpty) === 1)
             );
         }
