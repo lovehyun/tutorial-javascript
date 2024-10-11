@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            grid-gap: 5px;
+        }
+
+        .card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            font-size: 24px;
+            background-color: #ffc5c5;
+            border: 1px solid #909090;
+            cursor: pointer;
+        }
+
+        .card.hidden {
+            visibility: hidden;
+        }
+    </style>
+    <title>Memory Puzzle Game</title>
+</head>
+<body>
+    <div id="board"></div>
+
+    <script>
+        const board = document.getElementById('board');
+        const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8];
+        let selectedCards = [];
+
+        // Shuffle the card values
+        function shuffleCards() {
+            for (let i = cardValues.length - 1; i > 0; i--) {
+                // 카드를 섞는 코드를 작성하시오
+            }
+        }
+
+        // Initialize the game board
+        function initializeBoard() {
+            shuffleCards();
+            renderBoard();
+        }
+
+        // Render the game board
+        function renderBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < cardValues.length; i++) {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.dataset.index = i; // 커스텀 데이터 속성 (data-index)
+                card.dataset.value = cardValues[i]; // card value 추가 (data-value)
+                card.textContent = ' ';  // 빈 값 출력 (기본값)
+                card.textContent = cardValues[i]; // 과제를 위해 일단 보여준 후 출발 (**풀이시 삭제**)
+
+                // 클릭 이벤트에 대해 카드를 뒤집는 이벤트 핸들러를 작성하시오
+
+                board.appendChild(card);
+            }
+        }
+
+        // Flip a card
+        function flipCard(card) {
+            if (selectedCards.length < 2 && card.textContent === ' ') {
+                card.textContent = card.dataset.value; // 숨겨진 값 표시
+                selectedCards.push(card); // 카드를 선택된 배열에 추가
+                
+                // 카드 두장을 골랐으면, 1초후에 checkMatch() 함수를 호출하는 코드를 작성하시오
+            }
+        }
+
+        // Check if the selected cards match
+        function checkMatch() {
+            const [card1, card2] = selectedCards;
+
+            if (card1.dataset.value === card2.dataset.value) {
+                // Matched, hide cards
+                // 두 카드가 값이 같으면 숨김 처리
+            } else {
+                // Not matched, flip back
+                // 두 카드가 값이 다르면 다시 뒤짚기
+            }
+
+            selectedCards = [];
+        }
+
+        // Initialize the game on page load
+        window.onload = initializeBoard; // HTML, CSS, JS, 이미지 등 완전히 로드된 이후 시작
+    </script>
+</body>
+</html>
