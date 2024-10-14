@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Test</title>
+    <style>
+        /* 기본 로컬 폰트 - 1차/2차 fallback 폰트 */
+        .p1 {
+            font-family: "Times New Roman", Times, serif;
+            /* text-shadow: 2px 2px; */
+            /* text-shadow: 2px 2px red; */
+            /* text-shadow: 2px 2px 5px red; */
+        }
+
+        .p2 {
+            font-family: Arial, Helvetica, sans-serif;
+            /* text-decoration: line-through; */
+            /* letter-spacing: -1px; */
+        }
+
+        .p3 {
+            font-family: "Lucida Console", "Courier New", monospace;
+        }
+
+        /* 한글 폰트 예시 */
+        .p4 {
+            font-family: "Nanum Gothic", "Malgun Gothic", sans-serif;
+        }
+
+        .p5 {
+            font-family: "Batang", "Gulim", serif;
+        }
+
+        /* 웹폰트 예시 (Google Fonts) */
+        .p6 {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .p7 {
+            font-family: 'Lobster', cursive;
+        }
+
+        .p8 {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+    <!-- Google Fonts 로드 -->
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Noto+Sans+KR&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>Font Test</h1>
+    
+    <p class="p1">This is a paragraph with "Times New Roman", Times, and serif fallback fonts.</p>
+    <p class="p2">This is a paragraph with Arial, Helvetica, and sans-serif fallback fonts.</p>
+    <p class="p3">This is a paragraph with "Lucida Console", "Courier New", and monospace fallback fonts.</p>
+    
+    <p class="p4">이 문장은 나눔고딕(Nanum Gothic) 또는 맑은 고딕(Malgun Gothic) 폰트로 표시됩니다.</p>
+    <p class="p5">이 문장은 바탕(Batang) 또는 굴림(Gulim) 폰트로 표시됩니다.</p>
+    
+    <p class="p6">This is a paragraph with Roboto web font.</p>
+    <p class="p7">This is a paragraph with Lobster web font.</p>
+    <p class="p8">이 문장은 Noto Sans KR 웹폰트로 표시됩니다.</p>
+</body>
+</html>
