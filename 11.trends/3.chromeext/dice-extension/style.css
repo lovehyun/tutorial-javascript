@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+    min-width: 300px; /* 팝업의 최소 너비 설정 */
+    min-height: 300px; /* 팝업의 최소 높이 설정 */
+    /* width: 350px;  팝업의 고정된 너비 */
+    /* height: 400px; 팝업의 고정된 높이 */
+}
+
+#diceArea {
+    margin: 20px auto;
+    width: 100px;
+    height: 100px;
+}
+
+#dice {
+    width: 100px;
+    height: 100px;
+    transition: transform 1s ease;
+}
+
+#dice.roll {
+    transform: rotate(360deg); /* 회전 애니메이션 */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+#resultText {
+    margin-top: 20px;
+    font-size: 18px;
+}

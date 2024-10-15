@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "Dice Roller",
+    "version": "1.0",
+    "description": "Roll a dice and see the result with animation.",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "dice.png",
+            "48": "dice.png",
+            "128": "dice.png"
+        }
+    },
+    "permissions": []
+}
