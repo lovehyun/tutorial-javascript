@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Mini Game Extension",
-    "version": "1.0",
+    "version": "1.1",
     "description": "A simple click game in a Chrome extension.",
     "action": {
         "default_popup": "popup.html",
