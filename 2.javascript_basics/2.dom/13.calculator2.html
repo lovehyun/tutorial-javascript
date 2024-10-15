@@ -42,23 +42,19 @@
         <button onclick="appendNumber(this.innerText)">3</button>
         <button onclick="appendNumber(this.innerText)">0</button>
     </div>
+    
     <script>
         // 연산자 추가 함수
         function appendSymbol(symbol) {
             const resultInput = document.getElementById("result");
             const lastInput = resultInput.value.slice(-1);
+            // const lastInput = resultInput.value.charAt(resultInput.value.length - 1);
+            // const lastInput = resultInput.value.substring(resultInput.value.length - 1);
 
-            // 마지막으로 입력된 값이 연산자이고 새로운 연산자가 입력되면 이전 연산자를 대체
-            if (isSymbol(lastInput) && isSymbol(symbol)) {
-                resultInput.value = resultInput.value.slice(0, -1) + symbol;
-            } else if (!isSymbol(lastInput) || !isSymbol(symbol)) {
+            // 이미 입력된 연산자인지 확인하고 새로운 연산자 추가
+            if (lastInput !== symbol) {
                 resultInput.value += symbol;
             }
-        }
-
-        // 입력된 값이 연산자인지 확인하는 함수
-        function isSymbol(value) {
-            return ['+', '-', '*', '/'].includes(value);
         }
 
         // 숫자 추가 함수
@@ -66,41 +62,15 @@
             document.getElementById("result").value += number;
         }
 
-        // 계산 함수
+        // 계산 실행 함수
         function calculate() {
             const resultInput = document.getElementById("result");
-
-            // 0으로 나누는지 확인 - 정규표현식 (/0 이면서 뒤에 숫자가 아닌경우 (?!\d))
-            // if (/\/0(?!\d)/.test(resultInput.value)) {
-            //     resultInput.value = "ERROR: Division by 0";
-            //     return;
-            // }
-
-            // 0으로 나누는지 확인
-            if (isDivisionByZero(resultInput.value)) {
-                resultInput.value = "ERROR: Division by 0";
-                return;
-            }
-
             try {
                 const result = eval(resultInput.value);
                 resultInput.value = result;
             } catch (error) {
                 resultInput.value = "ERROR";
             }
-        }
-
-        // 0으로 나누는지 확인하는 함수
-        function isDivisionByZero(expression) {
-            for (let i = 0; i < expression.length; i++) {
-                if (expression[i] === '/') {
-                    let j = i + 1;
-                    if (expression[j] === '0') {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
 
         // 결과 초기화 함수

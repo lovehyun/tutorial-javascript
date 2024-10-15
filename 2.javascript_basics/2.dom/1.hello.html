@@ -2,14 +2,17 @@
 <html>
     <head>
         <title>Hello World</title>
-        <script>
-            function sayHello() {
-                console.log('hello');
-            }
-        </script>
     </head>
     <body>
         <H1>헬로우 월드</H1>
         <button onclick="sayHello()">Hello</button>
     </body>
+
+    <script>
+        // Body 의 끝부분에 추가
+        // 페이지의 DOM이 모두 로드된 후에 스크립트가 로드되고 실행.
+        function sayHello() {
+            console.log('hello');
+        }
+    </script>
 </html>

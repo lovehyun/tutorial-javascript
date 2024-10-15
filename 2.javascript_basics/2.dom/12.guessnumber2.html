@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Number Guessing Game</title>
+</head>
+<body>
+    <h1>Guess the Number (1~100)</h1>
+    <input type="number" id="guessInput" placeholder="Enter your guess">
+    <button onclick="checkGuess()">Guess</button>
+    <p id="result"></p>
+
+    <h2>Guess History</h2>
+    <!-- <ul id="historyList"></ul> 히스토리를 표시할 영역 -->
+    <ol id="historyList"></ol> <!-- 히스토리를 표시할 영역 -->
+
+    <script>
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        // let guessCount = 0; // 추측 순번을 저장할 변수
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById("guessInput").value);
+            const result = document.getElementById("result");
+            const historyList = document.getElementById("historyList");
+
+            let feedback = "";
+
+            if (guess < randomNumber) {
+                feedback = "Too low!";
+            } else if (guess > randomNumber) {
+                feedback = "Too high!";
+            } else {
+                feedback = "Correct! You guessed the number!";
+            }
+
+            result.textContent = feedback;
+
+            // 추측을 히스토리에 누적
+            // guessCount++; // 순번 증가
+            const listItem = document.createElement("li"); // 새로운 li 항목 생성
+            // listItem.textContent = `${guessCount}. You guessed ${guess}: ${feedback}`;
+            listItem.textContent = `You guessed ${guess}: ${feedback}`;
+            historyList.appendChild(listItem); // 히스토리 리스트에 추가
+        }
+    </script>
+</body>
+</html>
