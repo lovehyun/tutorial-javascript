@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigator Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Browser Information</h1>
+    <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+    <p><strong>Language:</strong> <span id="language"></span></p>
+    <p><strong>Online Status:</strong> <span id="onlineStatus"></span></p>
+
+    <script>
+        // User Agent 정보 가져오기
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+
+        // Language 정보 가져오기
+        document.getElementById('language').textContent = navigator.language;
+
+        // 온라인 상태 가져오기
+        // true는 온라인(Internet 연결됨) 상태를, false는 오프라인(Internet 연결 안 됨) 상태를 의미
+        document.getElementById('onlineStatus').textContent = navigator.onLine ? "Online" : "Offline";
+
+        // 온라인 상태가 변경될 때마다 업데이트
+        window.addEventListener('online', () => {
+            document.getElementById('onlineStatus').textContent = "Online";
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('onlineStatus').textContent = "Offline";
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation API Example</title>
+</head>
+<body>
+    <h1>Get Your Current Location</h1>
+    <button id="getLocation">Get Location</button>
+    <p id="location"></p>
+
+    <script>
+        document.getElementById('getLocation').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const { latitude, longitude } = position.coords;
+                    document.getElementById('location').textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                }, (error) => {
+                    document.getElementById('location').textContent = `Error: ${error.message}`;
+                });
+            } else {
+                document.getElementById('location').textContent = "Geolocation is not supported by this browser.";
+            }
+        });
+    </script>
+</body>
+</html>

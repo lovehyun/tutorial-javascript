@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Access</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        video {
+            width: 500px;
+            height: 375px;
+            border: 1px solid black;
+            background-color: black;
+        }
+
+        p {
+            font-size: 18px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Access Your Webcam</h1>
+    <video id="webcam" autoplay playsinline></video>
+    <p id="error"></p>
+
+    <script>
+        // 웹캠 스트림을 가져와서 비디오 요소에 연결하는 함수
+        const videoElement = document.getElementById('webcam');
+        const errorElement = document.getElementById('error');
+
+        // getUserMedia를 통해 웹캠에 접근
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                // 웹캠 스트림을 video 요소에 연결
+                videoElement.srcObject = stream;
+            })
+            .catch(error => {
+                // 에러 발생 시 메시지 출력
+                errorElement.textContent = `Error accessing webcam: ${error.message}`;
+            });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery API Example</title>
+</head>
+<body>
+    <h1>Battery Status</h1>
+    <p id="batteryStatus">Checking battery status...</p>
+
+    <script>
+        navigator.getBattery().then(function(battery) {
+            function updateBatteryStatus() {
+                document.getElementById('batteryStatus').textContent = 
+                    `Battery Level: ${(battery.level * 100).toFixed(0)}%, Charging: ${battery.charging}`;
+            }
+
+            updateBatteryStatus();
+
+            battery.addEventListener('levelchange', updateBatteryStatus);
+            battery.addEventListener('chargingchange', updateBatteryStatus);
+        });
+    </script>
+</body>
+</html>

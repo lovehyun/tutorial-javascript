@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification API Example</title>
+</head>
+<body>
+    <h1>Send Notification</h1>
+    <button id="notifyBtn">Send Notification</button>
+
+    <script>
+        document.getElementById('notifyBtn').addEventListener('click', () => {
+            if (Notification.permission === 'granted') {
+                new Notification('Hello! This is your notification.');
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Hello! This is your notification.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
