@@ -19,12 +19,16 @@
             }
 
             var result = document.getElementById("fruitResult");
+            /* 새로운 노드 생성 */
             var textNode = document.createTextNode(fruitString + " ");
-            var lineBreak = document.createElement("br");
             result.appendChild(textNode);
+
+            var lineBreak = document.createElement("br");
             result.appendChild(lineBreak);
         }
 
+        /* onchange 대신 이벤트 핸들러 사용 */
+        // 이미지, 스타일시트, 외부 스크립트 등은 아직 로드되지 않았어도, DOM 트리가 완성되면 즉시 실행.
         document.addEventListener("DOMContentLoaded", function() {
             var selectElement = document.getElementById("fruitSelector");
             selectElement.addEventListener("change", function() {

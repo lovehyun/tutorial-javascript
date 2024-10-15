@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Toggle Text Color Example</title>
+    <style>
+        /* quiz 1. 처음에는 검정색 기본값으로 시작 */
+        /* quiz 2. 초기값을 빨간색으로 CSS 적용 후 아래 코드 실행 및 초기 빨간색 적용 안되는 버그 확인 */
+        p {
+            color: red;
+        }
+    </style>
+    <script>
+        function toggleTextColor() {
+            var textElement = document.getElementById("myText");
+            // var currentColor = textElement.style.color; /* 최초 DOM 요소의 HTML 에는 해당 속성이 적용되어 있지 않음 (inline 속성만 가져옴) */
+            // console.log(currentColor);
+
+            // if (currentColor === "red") {
+            //     textElement.style.color = "blue";
+            // } else {
+            //     textElement.style.color = "red";
+            // }
+
+            /* 2 */
+            var currentColor = window.getComputedStyle(textElement).color;
+            console.log(currentColor);
+            if (currentColor === "rgb(255, 0, 0)") {
+                textElement.style.color = "rgb(0, 0, 255)";
+            } else {
+                textElement.style.color = "rgb(255, 0, 0)";
+            }
+        }
+    </script>
+</head>
+<body>
+    <p id="myText">이 텍스트의 색상을 토글해보세요!</p>
+
+    <button onclick="toggleTextColor()">텍스트 색상 토글</button>
+</body>
+</html>

@@ -11,19 +11,20 @@
                 switch (fruit) {
                     case "apple":
                         // document.write("이것은 사과입니다<BR>");
+                        result.innerHTML = "이것은 <B>사과</B>입니다"; // TEXT (HTML/CSS 등 적용)
+                        
                         // 새로운 노드를 생성합니다.
-                        var newParagraph = document.createElement('p');
-                        newParagraph.textContent = "이것은 사과입니다";
-                        document.body.appendChild(newParagraph);
-                        // result.innerHTML = "이것은 <B>사과</B>입니다";
+                        // var newParagraph = document.createElement('p');
+                        // newParagraph.textContent = "이것은 사과입니다";
+                        // document.body.appendChild(newParagraph);
                         break;
                     case "banana":
                         // document.write("이것은 바나나입니다<BR>");
-                        result.innerText = "이것은 바나나입니다"; // 순수 TEXT
+                        result.innerText = "이것은 <B>바나나</B>입니다"; // 순수 TEXT (TAG 무시)
                         break;
                     case "orange":
                         // document.write("이것은 오렌지입니다<BR>");
-                        result.textContent  = "이것은 오렌지입니다"; // 순수 TEXT
+                        result.textContent  = "이것은 <B>오렌지</B>입니다"; // 순수 TEXT, CSS무시
                         break;
                 }
             }

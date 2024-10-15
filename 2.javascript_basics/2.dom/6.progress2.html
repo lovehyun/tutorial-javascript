@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Bar Timer</title>
+    <style>
+        #progressBar {
+            width: 100%;
+            background-color: #f3f3f3;
+            position: relative; /* 자식 요소를 중앙에 배치하기 위해 position 설정 */
+        }
+        #progress {
+            width: 0%;
+            height: 30px;
+            background-color: #4caf50;
+            position: relative;
+        }
+        #progressText {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 0;
+            left: 0;
+            height: 30px;
+            line-height: 30px; /* 텍스트를 중앙에 정렬 */
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Progress Bar Timer</h1>
+    <input type="number" id="timeInput" placeholder="Enter seconds" min="1">
+    <button id="startButton">Start</button>
+    <button id="resetButton">Reset</button>
+    <div id="progressBar">
+        <div id="progress">
+            <span id="progressText">0%</span> <!-- 퍼센트 표시 -->
+        </div>
+    </div>
+
+    <script src="progress2a.js"></script>
+</body>
+</html>
