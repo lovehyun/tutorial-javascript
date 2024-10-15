@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Grid Layout Demo</title>
+    <style>
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3개의 열을 동일한 너비로 설정 */
+            grid-template-rows: auto; /* 자동으로 행 높이 설정 */
+            gap: 10px; /* 그리드 아이템 간의 간격 */
+            background-color: #f1f1f1;
+            padding: 10px;
+        }
+
+        .grid-item {
+            background-color: #4caf50;
+            color: white;
+            border: 1px solid #ccc;
+            text-align: center;
+            padding: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS Grid Layout Example</h1>
+
+    <div class="grid-container">
+        <div class="grid-item">1</div>
+        <div class="grid-item">2</div>
+        <div class="grid-item">3</div>
+        <div class="grid-item">4</div>
+        <div class="grid-item">5</div>
+        <div class="grid-item">6</div>
+    </div>
+</body>
+</html>

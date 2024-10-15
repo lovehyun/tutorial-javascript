@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Flexbox Layout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .flex-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header, footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        main {
+            flex-grow: 1;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        nav, article {
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+
+        nav {
+            flex: 1;
+        }
+
+        article {
+            flex: 3;
+        }
+
+        /* 화면이 768px 이상일 때 수평 배치 */
+        @media (min-width: 768px) {
+            .content {
+                flex-direction: row;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="flex-container">
+        <header>
+            <h1>Responsive Flexbox Layout</h1>
+        </header>
+
+        <main>
+            <div class="content">
+                <nav>
+                    <h2>Navigation</h2>
+                    <ul>
+                        <li>Home</li>
+                        <li>About</li>
+                        <li>Contact</li>
+                    </ul>
+                </nav>
+
+                <article>
+                    <h2>Main Content</h2>
+                    <p>This is the main content section of the page using Flexbox layout.</p>
+                    <ul>
+                        <li>display: flex;와 flex-direction: column;을 사용하여 페이지의 레이아웃을 수직으로 쌓습니다.</li>
+                        <li>main 안의 content는 display: flex;를 사용하여 좌측에 내비게이션, 우측에 메인 컨텐츠가 배치됩니다.</li>
+                        <li>flex: 1;과 flex: 3;을 사용하여 내비게이션은 1/4, 메인 컨텐츠는 3/4 비율로 화면에 배치됩니다.</li>
+                        <li>flex-grow: 1;은 main 영역이 중간 영역을 유연하게 차지하도록 만듭니다.</li>
+                        <li>작은 화면: Flexbox의 flex-direction: column;을 사용해 내비게이션과 메인 컨텐츠가 세로로 배치됩니다.</li>
+                        <li>큰 화면(768px 이상): 미디어 쿼리를 사용하여 flex-direction: row;로 변경해 내비게이션과 메인 컨텐츠가 수평으로 나란히 배치됩니다.</li>
+                    </ul>
+                </article>
+            </div>
+        </main>
+
+        <footer>
+            <p>Footer Section</p>
+        </footer>
+    </div>
+
+</body>
+</html>
