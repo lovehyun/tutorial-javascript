@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Keyboard Event Example</title>
+    <style>
+        #displayKey {
+            font-size: 100px;
+            text-align: center;
+            margin-top: 50px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="myInput" placeholder="Press any key">
+    <div id="displayKey"></div> <!-- 눌린 키를 표시할 요소 -->
+    
+    <script>
+        document.addEventListener('keydown', function(event) {
+            const displayKeyElement = document.getElementById('displayKey');
+            displayKeyElement.textContent = event.key; // 눌린 키를 화면에 표시
+        });
+    </script>
+</body>
+</html>
