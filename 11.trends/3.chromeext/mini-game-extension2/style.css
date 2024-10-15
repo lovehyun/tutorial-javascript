@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+}
+
+#gameArea {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border: 1px solid #000;
+    margin: 20px auto;
+    background-color: #f1f1f1;
+}
+
+#dot {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: red;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#score, #level {
+    font-size: 24px;
+    margin-top: 10px;
+}
