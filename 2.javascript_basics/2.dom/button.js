@@ -3,6 +3,7 @@ function number_inc() {
 
     result = document.getElementById("result");
 
+    // let current = Number(result.textContent);
     let current = parseInt(result.innerText, 10);
 
     console.log("현재값: " + current);

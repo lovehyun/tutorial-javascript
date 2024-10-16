@@ -24,15 +24,19 @@
 
             let feedback = "";
 
-            if (guess < randomNumber) {
-                feedback = "Too low!";
-            } else if (guess > randomNumber) {
-                feedback = "Too high!";
-            } else {
-                feedback = "Correct! You guessed the number!";
-            }
+            // if (guess < randomNumber) {
+            //     feedback = "Too low!";
+            // } else if (guess > randomNumber) {
+            //     feedback = "Too high!";
+            // } else {
+            //     feedback = "Correct! You guessed the number!";
+            // }
+            // result.textContent = feedback;
 
-            result.textContent = feedback;
+            // 3항 연산자
+            result.textContent = guess < randomNumber ? "Too low!" 
+                    : guess > randomNumber ? "Too high!" 
+                    : "Correct! You guessed the number!";
 
             // 추측을 히스토리에 누적
             // guessCount++; // 순번 증가

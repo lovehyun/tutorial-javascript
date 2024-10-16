@@ -62,3 +62,17 @@ function scopeExample() {
 
 scopeExample();
 // console.log(localVar); // 지역 변수는 함수 외부에서 접근 불가 (에러 발생)
+
+
+// 7. 템플릿 리터럴 (Template Literals)
+let name2 = "John";
+let age2 = 30;
+
+// 기존 방법
+let message1 = "Hello, my name is " + name2 + " and I am " + age2 + " years old.";
+
+// 템플릿 리터럴을 사용한 방법
+let message2 = `Hello, my name is ${name2} and I am ${age2} years old.`;
+
+console.log(message1);
+console.log(message2);

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <h1>도큐먼트에 자바스트립트로 내용 출력하기</h1>
+        <p class="text" id="mytext">여기에 본문 내용 작성하기</p>
+        <!-- script 구문의 순서 변경해보기 (head/body) -->
+        <script>
+            document.write("Hello World");
+            console.log("Hello???");
+
+            // const paras = document.getElementsByTagName("p");
+            // paras[0].innerText = "헬로우 JS";
+
+            // const paras = document.getElementsByClassName("text");
+            // paras[0].innerText = "헬로우 JS";
+
+            const para = document.getElementById("mytext");
+            para.innerText = "헬로우 JS";
+
+        </script>
+    </body>
+</html>
