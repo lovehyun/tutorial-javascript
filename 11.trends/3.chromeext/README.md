@@ -10,6 +10,16 @@ Chrome 확장 프로그램을 로드하는 방법은 다음과 같습니다.
 
 이제 Chrome에 확장 프로그램이 추가됩니다. 도구 모음에 확장 프로그램의 아이콘이 표시되고, 아이콘을 클릭하면 팝업 창이 나타나며 "Hello World!" 메시지가 표시됩니다.
 
+## 개발시 유의사항
+- HTML 파일에서 JS 분리해야 함.
+- Inline JS 코드도 동작하지 않음. (onclick 등을 addEventListener 로 등록해 주어야 함.)
+- JS 파일은 아래 보안 정책 코드 (CSP, Content Security Policy) 를 manifast 에 추가해야 함 (단, manifest V3 에서는 기본값이라 추가 안해도 무방함.)
+  ```json
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+  ```
+
 ## 요약:
 - manifest.json: 확장의 설정 파일.
 - popup.html: 팝업 창에 표시할 HTML.
