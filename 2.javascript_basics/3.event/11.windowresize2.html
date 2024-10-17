@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup Resize Example</title>
+</head>
+<body>
+    <button id="openPopup">Open and Resize Popup</button>
+
+    <script>
+        document.getElementById('openPopup').addEventListener('click', function() {
+            const popup = window.open('', 'popupWindow', 'width=300,height=300'); // 초기 값
+            popup.resizeTo(800, 600);  // 팝업 창 크기를 800x600으로 변경
+        });
+    </script>
+</body>
+</html>

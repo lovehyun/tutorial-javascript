@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag and Drop Event Example</title>
+    <style>
+        #dragItems {
+            /* display: block; */
+            display: flex;
+        }
+        .dragItem {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0; /* 자식 요소가 줄어들지 않도록 설정 */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #dragItem1 {
+            background-color: #ffcc00;
+        }
+
+        #dragItem2 {
+            background-color: #00ffdd;
+        }
+
+        #dragItem3 {
+            background-color: #dd88ff;
+        }
+
+        #dropZone {
+            width: 200px;
+            height: 200px;
+            /* min-height: 200px; */
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            background-color: #f0f0f0;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="dragItems">
+        <div id="dragItem1" class="dragItem" draggable="true">Drag me</div>
+        <div id="dragItem2" class="dragItem" draggable="true">Drag me</div>
+        <div id="dragItem3" class="dragItem" draggable="true">Drag me</div>
+    </div>
+    <div id="dropZone">Drop here</div>
+
+    <script>
+        const dragItems = document.querySelectorAll('.dragItem');
+        const dropZone = document.getElementById('dropZone');
+
+        let currentWidth = 200; // dropZone의 초기 너비
+
+        // 드래그 가능한 모든 아이템에 이벤트 리스너 추가
+        // dragItems.forEach(dragItem => {
+        //     dragItem.addEventListener('dragstart', handleDragStart);
+        // });
+
+        // function handleDragStart(event) {
+        //     // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
+        //     event.dataTransfer.setData('text', event.target.id);
+        //     console.log('Drag started:', event.target.id);
+        // }
+
+        // 드래그 가능한 모든 아이템에 이벤트 리스너 추가 (익명 함수 사용)
+        dragItems.forEach(dragItem => {
+            dragItem.addEventListener('dragstart', function(event) {
+                event.dataTransfer.setData('text', event.target.id);
+                console.log('Drag started:', event.target.id);
+            });
+        });
+
+        // 드래그 오버 이벤트
+        dropZone.addEventListener('dragover', function(event) {
+            event.preventDefault(); // 기본 드래그 오버 동작 중단
+            console.log('Drag over drop zone');
+        });
+
+        // 드롭 이벤트
+        dropZone.addEventListener('drop', function(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData('text');
+            const draggedElement = document.getElementById(data);
+            dropZone.appendChild(draggedElement);
+            console.log(`Dropped data: ${data}`);
+
+            currentWidth += 100;
+            dropZone.style.width = currentWidth + 'px'; // dropZone의 너비를 동적으로 조정
+        });
+    </script>
+</body>
+</html>

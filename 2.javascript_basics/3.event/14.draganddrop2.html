@@ -4,35 +4,10 @@
     <meta charset="UTF-8">
     <title>Drag and Drop Event Example</title>
     <style>
-        #dragItems {
-            display: block;
-        }
-        #dragItem1 {
+        #dragItem {
             width: 100px;
             height: 100px;
             background-color: #ffcc00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        #dragItem2 {
-            width: 100px;
-            height: 100px;
-            background-color: #00ffdd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        #dragItem3 {
-            width: 100px;
-            height: 100px;
-            background-color: #dd88ff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,35 +27,17 @@
     </style>
 </head>
 <body>
-    <div id="dragItems">
-        <div id="dragItem1" draggable="true">Drag me</div>
-        <div id="dragItem2" draggable="true">Drag me</div>
-        <div id="dragItem3" draggable="true">Drag me</div>
-        <div id="dropZone">Drop here</div>
-    </div>
+    <div id="dragItem" draggable="true">Drag me</div>
+    <div id="dropZone">Drop here</div>
 
     <script>
-        const dragItem1 = document.getElementById('dragItem1');
-        const dragItem2 = document.getElementById('dragItem2');
-        const dragItem3 = document.getElementById('dragItem3');
+        const dragItem = document.getElementById('dragItem');
         const dropZone = document.getElementById('dropZone');
 
         // 드래그 시작 이벤트
-        dragItem1.addEventListener('dragstart', function(event) {
+        dragItem.addEventListener('dragstart', function(event) {
             // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
-            event.dataTransfer.setData('text', event.target.id);
-            console.log('Drag started');
-        });
-
-        dragItem2.addEventListener('dragstart', function(event) {
-            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
-            event.dataTransfer.setData('text', event.target.id);
-            console.log('Drag started');
-        });
-
-        dragItem3.addEventListener('dragstart', function(event) {
-            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
-            event.dataTransfer.setData('text', event.target.id);
+            event.dataTransfer.setData('target', event.target.id);
             console.log('Drag started');
         });
 
@@ -93,11 +50,18 @@
         // 드롭 이벤트
         dropZone.addEventListener('drop', function(event) {
             event.preventDefault();
-            const data = event.dataTransfer.getData('text');
+            const data = event.dataTransfer.getData('target');
             const draggedElement = document.getElementById(data);
+
+            // DOM(Document Object Model) 구조에서 하나의 요소는 동시에 한 위치에만 존재할 수 있음 (append 하면 move가 됨).
             dropZone.appendChild(draggedElement);
             console.log(`Dropped data: ${data}`);
         });
     </script>
 </body>
 </html>
+
+<!--
+event 는 전역변수라서 함수 인자로 안받아도 동작은 하지만 **비권장**됨.
+event 객체를 인자로 받지 않아도 동작하는 이유는, 이벤트 객체가 자동으로 전역 객체(window.event)를 통해 참조될 수 있음.
+-->

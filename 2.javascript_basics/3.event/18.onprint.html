@@ -5,11 +5,20 @@
     <title>Print Event Example</title>
 </head>
 <body>
-    <button onclick="window.print()">Print this page</button>
+    <button id="printButton">Print this page</button>
+
     <script>
+        // 버튼 클릭 시 페이지를 프린트하는 이벤트 리스너 추가
+        document.getElementById('printButton').addEventListener('click', function() {
+            window.print();
+        });
+
+        // beforeprint 이벤트 처리
         window.onbeforeprint = function() {
             console.log('Before print event triggered');
         };
+
+        // afterprint 이벤트 처리
         window.onafterprint = function() {
             console.log('After print event triggered');
         };

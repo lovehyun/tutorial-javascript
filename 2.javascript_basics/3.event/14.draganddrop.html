@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Drag and Drop Event Example</title>
+    <title>Drag and Drop without dataTransfer</title>
     <style>
         #dragItem {
             width: 100px;
@@ -35,9 +35,7 @@
         const dropZone = document.getElementById('dropZone');
 
         // 드래그 시작 이벤트
-        dragItem.addEventListener('dragstart', function(event) {
-            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
-            event.dataTransfer.setData('text', event.target.id);
+        dragItem.addEventListener('dragstart', function() {
             console.log('Drag started');
         });
 
@@ -50,11 +48,13 @@
         // 드롭 이벤트
         dropZone.addEventListener('drop', function(event) {
             event.preventDefault();
-            const data = event.dataTransfer.getData('text');
-            const draggedElement = document.getElementById(data);
-            dropZone.appendChild(draggedElement);
-            console.log(`Dropped data: ${data}`);
+            dropZone.appendChild(dragItem);
+            console.log('Dropped using getElementById');
         });
     </script>
 </body>
 </html>
+
+<!-- 
+기본 동작: 드래그 앤 드롭 시 브라우저가 파일 복사, 링크 이동 등의 기본적으로 정의된 동작을 실행하는 것. 
+-->

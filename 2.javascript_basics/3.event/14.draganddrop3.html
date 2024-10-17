@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag and Drop Event Example</title>
+    <style>
+        #dragItems {
+            display: block;
+        }
+        #dragItem1 {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #dragItem2 {
+            width: 100px;
+            height: 100px;
+            background-color: #00ffdd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #dragItem3 {
+            width: 100px;
+            height: 100px;
+            background-color: #dd88ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #dropZone {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="dragItems">
+        <div id="dragItem1" draggable="true">Drag me</div>
+        <div id="dragItem2" draggable="true">Drag me</div>
+        <div id="dragItem3" draggable="true">Drag me</div>
+        <div id="dropZone">Drop here</div>
+    </div>
+
+    <script>
+        const dragItem1 = document.getElementById('dragItem1');
+        const dragItem2 = document.getElementById('dragItem2');
+        const dragItem3 = document.getElementById('dragItem3');
+        const dropZone = document.getElementById('dropZone');
+
+        // 드래그 시작 이벤트
+        dragItem1.addEventListener('dragstart', function(event) {
+            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
+            event.dataTransfer.setData('text', event.target.id);
+            console.log('Drag started');
+        });
+
+        dragItem2.addEventListener('dragstart', function(event) {
+            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
+            event.dataTransfer.setData('text', event.target.id);
+            console.log('Drag started');
+        });
+
+        dragItem3.addEventListener('dragstart', function(event) {
+            // 드래그 중에 전송될 데이터를 설정합니다. 드래그 시작 요소의 ID를 전송합니다.
+            event.dataTransfer.setData('text', event.target.id);
+            console.log('Drag started');
+        });
+
+        // 드래그 오버 이벤트
+        dropZone.addEventListener('dragover', function(event) {
+            event.preventDefault(); // 기본 드래그 오버 동작 중단
+            console.log('Drag over drop zone');
+        });
+
+        // 드롭 이벤트
+        dropZone.addEventListener('drop', function(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData('text');
+            const draggedElement = document.getElementById(data);
+            dropZone.appendChild(draggedElement);
+            console.log(`Dropped data: ${data}`);
+        });
+    </script>
+</body>
+</html>

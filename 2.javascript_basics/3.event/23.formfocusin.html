@@ -5,11 +5,34 @@
     <title>Focus In Event Example</title>
 </head>
 <body>
-    <input type="text" id="myInput" placeholder="Focus on me">
+    <div id="parent">
+        <input type="text" id="child" />
+    </div>
+    
     <script>
-        document.getElementById('myInput').addEventListener('focusin', function() {
-            console.log('Input focused (with bubbling)!');
+        // 자식 요소에 포커스인 이벤트 등록
+        document.getElementById('child').addEventListener('focusin', function() {
+            console.log('Child input focused');
+        });
+    
+        // 부모 요소에 포커스인 이벤트 등록
+        document.getElementById('parent').addEventListener('focusin', function() {
+            console.log('Parent received focusin event (bubbling)');
         });
     </script>
+    
 </body>
 </html>
+
+<!-- 
+1. focus/blur 이벤트
+설명: 요소가 포커스를 받을 때 발생하는 이벤트입니다.
+일반적인 사용 예: 사용자가 입력 필드에 포커스를 맞출 때 처리할 작업을 정의할 때 사용됩니다.
+버블링 지원: 버블링을 지원하지 않음. 즉, 이벤트가 발생한 요소에서만 이벤트가 처리되고, 부모 요소로 전파되지 않습니다.
+
+2. focusin/focusout 이벤트
+설명: 요소가 포커스를 받을 때 발생하는 이벤트입니다.
+버블링 지원: 버블링을 지원함. 즉, 이벤트가 발생한 요소뿐만 아니라 상위 요소로도 이벤트가 전파됩니다.
+일반적인 사용 예: 여러 요소가 포함된 부모 요소에서 자식 요소들의 포커스 상태를 감지하고자 할 때 사용됩니다.
+이벤트 전파: 상위 요소로 버블링되어 전파됩니다.
+-->

@@ -6,12 +6,16 @@
 </head>
 <body>
     <form id="myForm">
-        <input type="text" name="name" placeholder="Enter your name">
+        <input id=text type="text" name="name" placeholder="Enter your name">
         <button type="reset">Reset</button>
     </form>
     <script>
-        document.getElementById('myForm').addEventListener('reset', function() {
+        document.getElementById('myForm').addEventListener('reset', function(event) {
             console.log('Form reset!');
+
+            event.preventDefault(); /* 2 */
+            const text = document.getElementById('text');
+            text.value = "";
         });
     </script>
 </body>
