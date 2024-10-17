@@ -1,6 +1,9 @@
 # 기본 노드 파일
 node_modules/
 
+# 기본 파이썬 파일
+__pycache__/
+
 # 로그파일
 logs/
 *.log
