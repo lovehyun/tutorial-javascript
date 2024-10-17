@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Word Highlighter</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                padding: 10px;
+                width: 250px;
+            }
+            .input-container {
+                display: flex;
+                margin-bottom: 10px;
+            }
+            input {
+                flex: 1;
+                padding: 5px;
+                margin-right: 5px;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+            }
+            li {
+                padding: 5px;
+                background-color: #f1f1f1;
+                margin-bottom: 5px;
+                display: flex;
+                justify-content: space-between;
+            }
+            button {
+                background-color: red;
+                color: white;
+                border: none;
+                cursor: pointer;
+                padding: 5px 10px;
+            }
+            .toggle {
+                position: relative;
+                display: inline-block;
+                width: 40px;
+                height: 20px;
+            }
+            .toggle input {
+                display: none;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.4s;
+                border-radius: 34px;
+            }
+            .slider:before {
+                position: absolute;
+                content: '';
+                height: 16px;
+                width: 16px;
+                left: 4px;
+                bottom: 2px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #2196f3;
+            }
+            input:checked + .slider:before {
+                transform: translateX(20px);
+            }
+            .switch {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <h3>Highlight Words</h3>
+        <div class="input-container">
+            <input id="wordInput" type="text" placeholder="Enter a word" />
+            <button id="addWord">Add Word</button>
+        </div>
+        <ul id="wordList"></ul>
+
+        <div class="switch">
+            <label>Highlight On/Off</label>
+            <label class="toggle">
+                <input type="checkbox" id="toggleHighlight" />
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <script src="popup.js"></script>
+    </body>
+</html>
