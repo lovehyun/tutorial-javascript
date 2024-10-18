@@ -24,6 +24,15 @@ console.log(x); // 24 출력
 
 
 // 비교 연산자(Comparison Operators)
+// 동등 비교 연산자(==)
+console.log(5 == '5'); // true (자료형을 변환하여 비교)
+console.log(0 == false); // true
+
+// 엄격 동등 비교 연산자(===)
+console.log(5 === '5'); // false (자료형이 다르므로)
+console.log(0 === false); // false (자료형이 다르므로)
+
+// 부등 비교 연산자
 let p = 10;
 let q = 5;
 
@@ -33,6 +42,8 @@ console.log(p >= q); // 크거나 같다: true
 console.log(p <= q); // 작거나 같다: false
 console.log(p === q); // 같다: false
 console.log(p !== q); // 같지 않다: true
+// >==와 <==는 JavaScript에서 유효한 연산자가 아닙니다. 문법 오류가 발생합니다. 
+// JavaScript에서는 항상 >=(크거나 같다) 또는 <=(작거나 같다)를 사용해야 합니다.
 
 
 // 논리 연산자(Logical Operators)
@@ -57,3 +68,10 @@ console.log(num); // 5 출력
 // Quiz
 // 아래 표현의 결과는? (true)
 console.log(5 + 2 === 7 && 4 > 5 || 'Hi' === 'Hi');
+
+// 주의사항
+console.log(null == undefined); // true (자료형을 변환하여 동등)
+console.log(null === undefined); // false (자료형이 다름)
+
+// 비교 연산에서 NaN은 어떤 값과도 같지 않습니다.
+console.log(NaN === NaN); // false
