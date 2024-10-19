@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Video Streaming</title>
+
+        <!-- Bootstrap CSS 추가 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            crossorigin="anonymous"
+        />
+
+        <style>
+            #videoPlayer {
+                width: 100%;
+                max-width: 600px;
+                height: 340px;
+                transition: width 0.3s ease, height 0.3s ease;
+            }
+        </style>
+    </head>
+    <body class="bg-light">
+        <div class="container py-5">
+            <h1 class="text-center mb-5">Video Streaming</h1>
+
+            <!-- 비디오 선택 (카드 스타일) -->
+            <div id="video-list" class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Video 1</h5>
+                            <button class="btn btn-primary" onclick="loadVideo('video1.mp4')">Play Video 1</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Video 2</h5>
+                            <button class="btn btn-primary" onclick="loadVideo('video2.mp4')">Play Video 2</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Video 3</h5>
+                            <button class="btn btn-primary" onclick="loadVideo('video3.mp4')">Play Video 3</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 동영상 플레이어 -->
+            <div class="my-5 text-center">
+                <video id="videoPlayer" controls class="shadow-lg rounded">
+                    <source id="videoSource" src="" type="video/mp4" />
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
+
+            <!-- 크기 조정 버튼 -->
+            <div id="controls" class="text-center">
+                <button class="btn btn-outline-secondary" onclick="makeSmall()">Small</button>
+                <button class="btn btn-outline-secondary" onclick="makeLarge()">Large</button>
+                <button class="btn btn-outline-secondary" onclick="resetSize()">Reset</button>
+                <br><br>
+                <button class="btn btn-outline-primary" onclick="skipTime(-10)">-10초</button>
+                <button class="btn btn-outline-primary" onclick="skipTime(10)">+10초</button>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS 및 의존성 추가 -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"
+        ></script>
+
+        <script>
+            // 비디오 불러오기
+            function loadVideo(filename) {
+                const videoSource = document.getElementById('videoSource');
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoSource.src = `/video/${filename}`;
+                videoPlayer.load();
+                videoPlayer.play();
+            }
+
+            // 크기 조정
+            function makeSmall() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '300px';
+                videoPlayer.style.height = '170px';
+            }
+
+            function makeLarge() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '900px';
+                videoPlayer.style.height = '510px';
+            }
+
+            function resetSize() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '100%';
+                videoPlayer.style.height = '340px';
+            }
+
+            // 시간 조정 (30초 뒤로, 30초 앞으로)
+            function skipTime(seconds) {
+                const videoPlayer = document.getElementById('videoPlayer');
+                const newTime = videoPlayer.currentTime + seconds;
+
+                // 새 시간이 음수면 0으로 설정
+                if (newTime < 0) {
+                    videoPlayer.currentTime = 0;
+                } else if (newTime > videoPlayer.duration) {
+                    // 새 시간이 동영상 길이를 초과하면 동영상 끝으로 설정
+                    videoPlayer.currentTime = videoPlayer.duration;
+                } else {
+                    videoPlayer.currentTime = newTime;
+                }
+            }
+        </script>
+    </body>
+</html>

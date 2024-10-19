@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Video Streaming</title>
+        <style>
+            #videoPlayer {
+                width: 600px;
+                height: 340px;
+                transition: width 0.3s ease, height 0.3s ease;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Video Streaming</h1>
+
+        <!-- 비디오 선택 -->
+        <div id="video-list">
+            <button onclick="loadVideo('video1.mp4')">Play Video 1</button>
+            <button onclick="loadVideo('video2.mp4')">Play Video 2</button>
+            <button onclick="loadVideo('video3.mp4')">Play Video 3</button>
+        </div>
+
+        <!-- 동영상 플레이어 -->
+        <video id="videoPlayer" controls>
+            <source id="videoSource" src="" type="video/mp4" />
+            Your browser does not support HTML5 video.
+        </video>
+
+        <!-- 크기 조정 버튼 -->
+        <div id="controls">
+            <button onclick="makeSmall()">Small</button>
+            <button onclick="makeLarge()">Large</button>
+            <button onclick="resetSize()">Reset</button>
+            <!-- 크기 초기화 버튼 추가 -->
+        </div>
+
+        <script>
+            // 비디오 불러오기
+            function loadVideo(filename) {
+                const videoSource = document.getElementById('videoSource');
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoSource.src = `/video/${filename}`;
+                videoPlayer.load();
+                videoPlayer.play();
+            }
+
+            // 크기 조정
+            function makeSmall() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '300px';
+                videoPlayer.style.height = '170px';
+            }
+
+            function makeLarge() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '900px';
+                videoPlayer.style.height = '510px';
+            }
+
+            function resetSize() {
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.width = '600px';
+                videoPlayer.style.height = '340px';
+            }
+        </script>
+    </body>
+</html>
