@@ -71,7 +71,7 @@ class Snake {
         this.direction = direction;
         this.speed = speed;
         this.movedelay = 0;
-        this.growsegments = 0;
+        this.growsegments = numsegments;
         this.segments = Array.from({ length: numsegments }, (_, i) => ({
             x: x - i * direction[0], // 방향에 맞춰 x값 변경
             y: y - i * direction[1], // 방향에 맞춰 y값 변경
@@ -420,7 +420,7 @@ class Game {
     }
 
     startNewGame() {
-        this.snake.init(10, 10, Snake.DIRECTIONS.RIGHT, 10, 4);
+        this.snake.init(10, 10, Snake.DIRECTIONS.RIGHT, 10, 2);
         this.board.generate();
         this.board.addApple(this.snake);
         this.score = 0;
