@@ -19,6 +19,7 @@ TEMP/
 *.sqlite
 *.csv
 *.db
+*.pkl
 
 # 패키지 파일 (임시 제외)
 package-lock.json

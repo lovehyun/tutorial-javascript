@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import spam_classifier # 미리 학습된 스팸 필터링 모델 로드
+import spam_classifier2 as spam_classifier  # 미리 학습된 스팸 필터링 모델 로드
 
 app = Flask(__name__)
 
@@ -21,19 +21,22 @@ def check_spam():
 
     # 스팸 여부 확인 (간단한 예시)
     # is_spam = "spam" in email_content.lower()
-    is_spam = "광고" in email_content
-    spam_prob = 1.00
+    # is_spam = "광고" in email_content
 
     # 스팸 여부 확인
-    # is_spam = spam_classifier.predict(email_content, model, vectorizer)
+    is_spam = spam_classifier.predict(email_content, model, vectorizer)
     # 스팸 확률 확인
-    # spam_prob = spam_classifier.predict_proba(email_content, model, vectorizer)
+    spam_prob = spam_classifier.predict_proba(email_content, model, vectorizer)
     
-    print(f"Spam detection result: is_spam = {is_spam}, spam_probability = {spam_prob}")
+    # 분류에 기여한 주요 단어 확인
+    important_words = spam_classifier.explain_prediction(email_content, model, vectorizer)
+
+    print(f"Spam detection result: is_spam = {is_spam}, spam_probability = {spam_prob}, important_words = {important_words}")
     
     return jsonify({
         "is_spam": int(is_spam), 
         "spam_probability": spam_prob, 
+        "important_words": important_words
     })
 
 if __name__ == '__main__':
