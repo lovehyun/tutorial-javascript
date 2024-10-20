@@ -1,8 +1,8 @@
 // ------------------------------------------------------------------
 // Creating a Snake Game Tutorial with HTML5
-// License: GNU v3
+// License: GPLv3
 // Original Author: http://rembound.com/articles/creating-a-snake-game-tutorial-with-html5
-// Changed by shpark: http://github.com/lovehyun/tutorial-javascript
+// Changed by shpark: https://github.com/lovehyun/tutorial-javascript/tree/main/10.projects/2.canvas_games/1.snake2_img
 // ------------------------------------------------------------------
 
 // 스크립트 시작
@@ -71,7 +71,7 @@ class Snake {
         this.direction = direction;
         this.speed = speed;
         this.movedelay = 0;
-        this.growsegments = numsegments;
+        this.growsegments = 0;
         this.segments = Array.from({ length: numsegments }, (_, i) => ({
             x: x - i * direction[0], // 방향에 맞춰 x값 변경
             y: y - i * direction[1], // 방향에 맞춰 y값 변경
@@ -118,6 +118,7 @@ class Snake {
         this.movedelay = 0;
     }
 
+    // 뱀이 자신의 몸에 부딛친경우
     hasCollision(nx, ny) {
         return this.segments.some(segment => segment.x === nx && segment.y === ny);
     }
@@ -130,40 +131,63 @@ class Snake {
             let tx, ty;
 
             if (i === 0) {
-                // 머리 부분 스프라이트
-                const nseg = this.segments[i + 1];
-                if (segment.y < nseg.y) { ({ tx, ty } = Renderer.SNAKE_TILES.head.up); } 
-                else if (segment.x > nseg.x) { ({ tx, ty } = Renderer.SNAKE_TILES.head.right); } 
-                else if (segment.y > nseg.y) { ({ tx, ty } = Renderer.SNAKE_TILES.head.down); } 
-                else if (segment.x < nseg.x) { ({ tx, ty } = Renderer.SNAKE_TILES.head.left); }
+                // 머리 부분
+                const nseg = this.segments[i + 1]; // 다음 세그먼트를 기반으로 머리 방향 결정
+                ({ tx, ty } = this.getHeadTile(segment, nseg));
             } else if (i === this.segments.length - 1) {
-                // 꼬리 부분 스프라이트
-                const pseg = this.segments[i - 1];
-                if (pseg.y < segment.y) { ({ tx, ty } = Renderer.SNAKE_TILES.tail.up); } 
-                else if (pseg.x > segment.x) { ({ tx, ty } = Renderer.SNAKE_TILES.tail.right); }
-                else if (pseg.y > segment.y) { ({ tx, ty } = Renderer.SNAKE_TILES.tail.down); }
-                else if (pseg.x < segment.x) { ({ tx, ty } = Renderer.SNAKE_TILES.tail.left); }
+                // 꼬리 부분
+                const pseg = this.segments[i - 1]; // 이전 세그먼트를 기반으로 꼬리 방향 결정
+                ({ tx, ty } = this.getTailTile(segment, pseg));
             } else {
-                // 몸통 부분 스프라이트
-                const pseg = this.segments[i - 1];
+                // 몸통 부분
+                const pseg = this.segments[i - 1]; // 이전과 이후 세그먼트를 기반으로 몸의 방향 결정
                 const nseg = this.segments[i + 1];
-                if (pseg.x < segment.x && nseg.x > segment.x || nseg.x < segment.x && pseg.x > segment.x) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.horizontal); // 수평
-                } else if (pseg.y < segment.y && nseg.y > segment.y || nseg.y < segment.y && pseg.y > segment.y) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.vertical); // 수직
-                } else if (pseg.x < segment.x && nseg.y > segment.y || nseg.x < segment.x && pseg.y > segment.y) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.curveLeftDown); // 왼쪽-아래
-                } else if (pseg.y < segment.y && nseg.x < segment.x || nseg.y < segment.y && pseg.x < segment.x) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.curveLeftUp); // 왼쪽-위
-                } else if (pseg.x > segment.x && nseg.y < segment.y || nseg.x > segment.x && pseg.y < segment.y) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.curveRightUp); // 오른쪽-위
-                } else if (pseg.y > segment.y && nseg.x > segment.x || nseg.y > segment.y && pseg.x > segment.x) {
-                    ({tx, ty} = Renderer.SNAKE_TILES.body.curveRightDown); // 오른쪽-아래
-                }
+                ({ tx, ty } = this.getBodyTile(segment, pseg, nseg));
             }
-
+    
             renderer.drawTile(tx, ty, tilex, tiley, tilewidth, tileheight);
         });
+    }
+
+    // 머리 부분 타일 결정 함수
+    getHeadTile(segment, nseg) {
+        if (segment.y < nseg.y) return Renderer.SNAKE_TILES.head.up;
+        if (segment.x > nseg.x) return Renderer.SNAKE_TILES.head.right;
+        if (segment.y > nseg.y) return Renderer.SNAKE_TILES.head.down;
+        return Renderer.SNAKE_TILES.head.left;
+    }
+
+    // 꼬리 부분 타일 결정 함수
+    getTailTile(segment, pseg) {
+        if (pseg.y < segment.y) return Renderer.SNAKE_TILES.tail.up;
+        if (pseg.x > segment.x) return Renderer.SNAKE_TILES.tail.right;
+        if (pseg.y > segment.y) return Renderer.SNAKE_TILES.tail.down;
+        return Renderer.SNAKE_TILES.tail.left;
+    }
+
+    // 몸통 부분 타일 결정 함수
+    getBodyTile(segment, pseg, nseg) { // 정방향 역방향 모두 고려
+        if ((pseg.x < segment.x && nseg.x > segment.x) || 
+            (nseg.x < segment.x && pseg.x > segment.x)) { 
+            return Renderer.SNAKE_TILES.body.horizontal;
+        }
+        if ((pseg.y < segment.y && nseg.y > segment.y) || 
+            (nseg.y < segment.y && pseg.y > segment.y)) {
+            return Renderer.SNAKE_TILES.body.vertical;
+        }
+        if ((pseg.x < segment.x && nseg.y > segment.y) || 
+            (nseg.x < segment.x && pseg.y > segment.y)) {
+            return Renderer.SNAKE_TILES.body.curveLeftDown;
+        }
+        if ((pseg.y < segment.y && nseg.x < segment.x) || 
+            (nseg.y < segment.y && pseg.x < segment.x)) {
+            return Renderer.SNAKE_TILES.body.curveLeftUp;
+        }
+        if ((pseg.x > segment.x && nseg.y < segment.y) || 
+            (nseg.x > segment.x && pseg.y < segment.y)) {
+            return Renderer.SNAKE_TILES.body.curveRightUp;
+        }
+        return Renderer.SNAKE_TILES.body.curveRightDown;
     }
 
     // 방향 변경 함수
@@ -245,7 +269,9 @@ class Board {
                 } else if (tile === Board.BOARD_APPLE) { // 사과
                     renderer.context.fillStyle = "#f7e697";
                     renderer.context.fillRect(tilex, tiley, this.tilewidth, this.tileheight);
-                    renderer.drawTile(0, 3, tilex, tiley, this.tilewidth, this.tileheight); // Use drawTile from Renderer
+                    
+                    let {tx, ty} = Renderer.SNAKE_TILES.food.apple;
+                    renderer.drawTile(tx, ty, tilex, tiley, this.tilewidth, this.tileheight); // Use drawTile from Renderer
                 }
             }
         }
@@ -291,24 +317,27 @@ class Renderer {
     static SNAKE_TILE_SIZE = 64;
     static SNAKE_TILES = {
         head: {
-            up: { tx: 3, ty: 0 },
+            up:    { tx: 3, ty: 0 },
             right: { tx: 4, ty: 0 },
-            down: { tx: 4, ty: 1 },
-            left: { tx: 3, ty: 1 }
+            down:  { tx: 4, ty: 1 },
+            left:  { tx: 3, ty: 1 }
         },
         tail: {
-            up: { tx: 3, ty: 2 },
+            up:    { tx: 3, ty: 2 },
             right: { tx: 4, ty: 2 },
-            down: { tx: 4, ty: 3 },
-            left: { tx: 3, ty: 3 }
+            down:  { tx: 4, ty: 3 },
+            left:  { tx: 3, ty: 3 }
         },
         body: {
-            horizontal: { tx: 1, ty: 0 },
-            vertical: { tx: 2, ty: 1 },
-            curveLeftDown: { tx: 2, ty: 0 },
-            curveLeftUp: { tx: 2, ty: 2 },
-            curveRightUp: { tx: 0, ty: 1 },
+            horizontal:     { tx: 1, ty: 0 },
+            vertical:       { tx: 2, ty: 1 },
+            curveLeftDown:  { tx: 2, ty: 0 },
+            curveLeftUp:    { tx: 2, ty: 2 },
+            curveRightUp:   { tx: 0, ty: 1 },
             curveRightDown: { tx: 0, ty: 0 }
+        },
+        food: {
+            apple: { tx: 0, ty: 3 }
         }
     };
 
@@ -420,7 +449,7 @@ class Game {
     }
 
     startNewGame() {
-        this.snake.init(10, 10, Snake.DIRECTIONS.RIGHT, 10, 2);
+        this.snake.init(10, 10, Snake.DIRECTIONS.RIGHT, 10, 3);
         this.board.generate();
         this.board.addApple(this.snake);
         this.score = 0;
