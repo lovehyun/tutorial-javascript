@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'checkSpam' && message.className) {
+    if (message.action === 'checkSpam') {
         // 수동 체크: content.js로 className 전달
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, { action: 'extractEmailContent', className: message.className }, (response) => {

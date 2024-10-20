@@ -4,8 +4,10 @@ const autoClassName = 'mail_view_header'; // 자동으로 체크할 클래스명
 
 // 수동 체크 로직 - 전달받은 className 으로 검색
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'extractEmailContent' && message.className) {
-        const emailElement = document.querySelector(`.${message.className}`);
+    if (message.action === 'extractEmailContent') {
+        const className = message.className || autoClassName; // 받은 className이 없으면 autoClassName 사용
+
+        const emailElement = document.querySelector(`.${className}`);
         if (emailElement) {
             const emailContent = emailElement.innerText;
             sendResponse({ emailContent: emailContent });
