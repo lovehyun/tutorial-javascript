@@ -2,6 +2,11 @@
 
     ```bash
     npx create-next-app@latest my-next-app
+    
+    or
+
+    npx create-next-app@14 my-next-app
+
     cd my-next-app
     npm run dev
     ```

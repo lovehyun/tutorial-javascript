@@ -1,6 +1,7 @@
 // 1. setTimeout
 console.log('시작');
 
+// setTimeout(function, delay);
 setTimeout(() => {
     console.log('1초 후에 실행');
 }, 1000);

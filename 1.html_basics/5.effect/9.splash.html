@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splash Screen Example</title>
+    <style>
+        /* 스플래시 화면의 초기 상태 */
+        .splash {
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+            
+            background-color: #000;
+            color: #fff;
+            font-size: 2em;
+            opacity: 1;
+            
+            display: flex;
+            text-align: center;
+            line-height: 100vh;
+
+            transition: opacity 1s ease-in-out;  /* 1초 동안 서서히 사라짐 */
+            z-index: 1000;  /* 스플래시 화면을 최상단에 유지 */
+        }
+
+        /* 스플래시 화면이 사라지는 상태 */
+        .splash.hidden {
+            opacity: 0;  /* 서서히 사라지기 위한 속성 */
+            pointer-events: none;  /* 사라질 때 클릭 불가 */
+        }
+
+        /* 콘텐츠의 기본 상태 */
+        .content {
+            display: none;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 스플래시 화면 -->
+    <div id="splash" class="splash">Loading...</div>
+
+    <!-- 메인 콘텐츠 -->
+    <div id="content" class="content">
+        <h1>Welcome to the Main Content!</h1>
+        <p>This is the main content of the page that is shown after the splash screen.</p>
+    </div>
+
+    <script>
+        // 스플래시 화면을 처음에 보여줌
+        document.getElementById("splash").style.display = "block";
+
+        // 3초 후에 스플래시 화면이 서서히 사라지고 콘텐츠를 표시
+        setTimeout(() => {
+            // 스플래시 화면에 'hidden' 클래스를 추가해서 트랜지션 효과로 서서히 사라지게 함
+            document.getElementById("splash").classList.add("hidden");
+
+            // 트랜지션이 끝나고 나서 스플래시 화면을 완전히 숨김
+            setTimeout(() => {
+                document.getElementById("splash").style.display = "none";
+                document.getElementById("content").style.display = "block";  // 콘텐츠 표시
+            }, 1000);  // 트랜지션 시간이 1초이므로 그에 맞춰 1초 후에 스플래시를 숨김
+        }, 3000);  // 3초 후에 스플래시를 서서히 숨기기 시작
+    </script>
+
+</body>
+</html>

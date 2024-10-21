@@ -29,7 +29,7 @@ console.log(person);
 
 // 4. 객체 메소드(Method) 추가
 let car = {
-    brand: "Toyota",
+    brand: "Hyundai",
     year: 2020,
     start: function () {
         return "Engine started";
@@ -41,6 +41,8 @@ let car = {
 
 console.log(car.start()); // "Engine started" 출력
 console.log(car.stop()); // "Engine stopped" 출력
+
+car.name = "K5";
 
 
 // 5. 객체 내부 루프 (for...in) 활용
