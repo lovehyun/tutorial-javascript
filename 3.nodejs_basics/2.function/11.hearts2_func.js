@@ -1,21 +1,19 @@
 // 공백 추가 함수
 function addSpaces(count) {
+    // return " ".repeat(count);
     let spaces = "";
-    let i = 1;
-    while (i <= count) {
+    for (let i = 1; i <= count; i++) {
         spaces += " ";
-        i++;
     }
     return spaces;
 }
 
 // 별 추가 함수
 function addStars(count) {
+    // return "*".repeat(count);
     let stars = "";
-    let i = 1;
-    while (i <= count) {
+    for (let i = 1; i <= count; i++) {
         stars += "*";
-        i++;
     }
     return stars;
 }

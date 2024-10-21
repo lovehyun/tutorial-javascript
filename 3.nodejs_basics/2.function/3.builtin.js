@@ -1,12 +1,19 @@
 // 1. setTimeout
 console.log('시작');
 
-// setTimeout(function, delay);
+// 원형: setTimeout(function, delay);
 setTimeout(() => {
     console.log('1초 후에 실행');
 }, 1000);
 
 console.log('끝');
+
+// 타임아웃 취소
+const timeoutId = setTimeout(() => {
+    console.log('실행되지 않음');
+}, 3000);
+
+clearTimeout(timeoutId); // 바로 타이머를 취소
 
 
 // 2. parseInt

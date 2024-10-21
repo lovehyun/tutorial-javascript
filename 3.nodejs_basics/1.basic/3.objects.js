@@ -1,12 +1,33 @@
 // 1. 개체(Object) 생성
 // 개체 생성
+const obj = { a: 1, b: 2, c: 3};
+
+console.log(typeof obj); // object
+console.log(Object.keys(obj)); // ['a', 'b', 'c'] 출력
+console.log(Object.values(obj)); // [1, 2, 3] 출력
+
+// typeof 연산자가 반환하는 값은
+// "number", "string", "boolean", "undefined", "object", "function", "symbol", "bigint"
+
+const obj1 = new Object(); // Object 생성자를 사용
+const obj2 = {}; // 객체 리터럴을 사용
+const obj3 = obj1;
+
+console.log(obj1); // {}
+console.log(obj2); // {}
+
+console.log(obj1 == obj2); // false
+console.log(typeof obj1 === typeof obj2); // true
+console.log(obj1 === obj3); // true
+
+
+// 2. 객체 속성에 접근
 let person = {
     name: "Alice",
     age: 30,
     profession: "Engineer"
 };
 
-// 2. 객체 속성에 접근
 console.log(person.name); // "Alice" 출력
 console.log(person.age); // 30 출력
 console.log(person.profession); // "Engineer" 출력

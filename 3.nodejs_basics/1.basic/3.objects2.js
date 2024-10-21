@@ -34,3 +34,8 @@ console.log(text.length); // 13
 // 문자열 메서드 (예: 대문자 변환) - toUpperCase() = 메소드(method)
 console.log(text.toUpperCase()); // HELLO, WORLD!
 console.log(text.toLowerCase()); // 'hello, world!'
+
+console.log(text.charAt(1)); // e
+console.log(text.includes("World")); // true
+console.log(text.indexOf("World")); // 7
+console.log(text.substring(1, 4)); // 'ell'

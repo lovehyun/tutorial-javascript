@@ -13,63 +13,72 @@ try {
 }
 
 
-// 2. 오류 잡기 (간단한 문자열 생성)
-function divide2(a, b) {
-    try {
-        if (b === 0) {
-            throw '0으로 나눌 수 없습니다.';
-        }
-        return a / b;
-    } catch (error) {
-        return '오류 발생: ' + error;
+// 2. 참조 오류 (ReferenceError) 처리
+try {
+    console.log(undefinedVariable); // 존재하지 않는 변수를 참조하므로 ReferenceError 발생
+} catch (error) {
+    if (error instanceof ReferenceError) {
+        console.log("참조 오류가 발생했습니다:", error.message);
+    } else {
+        console.log("다른 오류:", error.message);
     }
 }
 
-// 함수 호출
-console.log(divide2(10, 2)); // 정상적인 경우: 10 나누기 2는 5를 반환합니다.
-console.log(divide2(8, 0)); // 0으로 나누는 경우: 오류가 발생하고, 오류 메시지가 반환됩니다.
-console.log('---');
-
-
-// 3. 오류 생성 (Error 객체를 통해 오류 반환)
-function divide3(a, b) {
-    try {
-        if (b === 0) {
-            throw new Error('0으로 나눌 수 없습니다.');
-        }
-        return a / b;
-    } catch (error) {
-        console.error('오류 발생:', error.message);
-        // console.error("스택 트레이스:", error.stack);
+// 3. 문법적 오류 (SyntaxError) 처리
+try {
+    eval("alert('Hello)"); // 따옴표가 닫히지 않아서 SyntaxError 발생
+} catch (error) {
+    if (error instanceof SyntaxError) {
+        console.log("문법 오류가 발생했습니다:", error.message);
+    } else {
+        console.log("다른 오류:", error.message);
     }
 }
 
-// 함수 호출
-console.log(divide3(10, 2)); // 정상적인 경우: 10 나누기 2는 5를 반환합니다.
-console.log(divide3(8, 0)); // 0으로 나누는 경우: 오류가 발생하고, 오류 메시지가 출력됩니다.
-console.log('---');
 
-
-// 4. Finally 블럭
-function divide4(a, b) {
-    try {
-        if (b === 0) {
-            throw new Error('0으로 나눌 수 없습니다.');
-        }
-        return a / b;
-    } catch (error) {
-        console.error('오류 발생:', error.message);
-    } finally {
-        console.log('오류 발생 여부와 상관없이 finally 블록은 실행됩니다.');
+// 4. 타입 오류 (TypeError) 처리
+try {
+    let obj = null;
+    obj.method(); // TypeError: null에서 메서드를 호출할 수 없음
+} catch (error) {
+    if (error instanceof TypeError) {
+        console.log("타입 오류가 발생했습니다:", error.message);
+    } else {
+        console.log("다른 오류:", error.message);
     }
 }
 
-console.log(divide4(10, 2)); // 정상적인 경우: 10 나누기 2는 5를 반환합니다.
-console.log(divide4(8, 0)); // 0으로 나누는 경우: 오류가 발생하고, 오류 메시지와 스택 트레이스가 출력됩니다.
-console.log('---');
+
+// 5. 범위 오류 (RangeError) 처리
+try {
+    let arr = new Array(-1); // Array의 길이는 양수여야 하므로 RangeError 발생
+} catch (error) {
+    if (error instanceof RangeError) {
+        console.log("범위 오류가 발생했습니다:", error.message);
+    } else {
+        console.log("다른 오류:", error.message);
+    }
+}
 
 
-// 5. 다양한 오류 케이스 대응
+// 6. 다양한 오류 케이스 대응
+try {
+    // 존재하지 않는 함수 호출 (ReferenceError 발생)
+    nonExistentFunction();
+} catch (error) {
+    if (error instanceof TypeError) {
+        console.log("타입 오류:", error.message);
+    } else if (error instanceof ReferenceError) {
+        console.log("참조 오류:", error.message);
+    } else if (error instanceof RangeError) {
+        console.log("범위 오류:", error.message);
+    } else {
+        console.log("기타 오류:", error.message);
+    }
+}
+
+
+// 7. 함수 구현 예제 (다양한 오류 처리 포함)
 function divide5(a, b) {
     try {
         if (typeof b !== 'number') {

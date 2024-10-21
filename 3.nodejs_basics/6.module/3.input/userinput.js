@@ -1,9 +1,10 @@
 // https://www.npmjs.com/package/readline
 const readline = require('readline');
 
+// 기본적으로 createInterface는 input과 output을 지정해야 함
 const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+    input: process.stdin,   // 표준 입력 (키보드 입력)
+    output: process.stdout, // 표준 출력 (콘솔 출력)
 });
 
 rl.question('구구단의 단을 입력하세요: ', (input) => {
