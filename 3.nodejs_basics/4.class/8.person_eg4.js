@@ -116,12 +116,16 @@ function introduce(people) {
         person.greet();
     }
     for (let i = 0; i < people.length; i++) {
-        console.log(i)
+        people[i].walk();
+        
+        if (people[i] instanceof Employee) {
+            people[i].work();
+        }
     }
 }
 
-const employee2 = new Employee("영희", "매니저");
-const student2 = new Student("철수", "컴퓨터 공학");
+const employee2 = new Employee("영희", jobTitle="매니저"); // 이렇게 일부만 할당 불가
+const student2 = new Student("철수", major="컴퓨터 공학"); // 이렇게 일부만 할당 불가. 그냥 두번째 인자로 입력되고, 나머지는 모두 undefined.
 const people = [manager1, student1, customer1, employee2, student2];
 
 introduce(people);

@@ -57,7 +57,7 @@ class Manager extends Employee {
     }
 
     assignTasks() {
-        console.log(`${this.name} 매니저가 팀에 업무를 배분하고 있습니다.`);
+        console.log(`${this.name} 매니저가 ${this.team}팀에 업무를 배분하고 있습니다.`);
     }
     // 다른 매니저 관련 기능 추가 가능
 }

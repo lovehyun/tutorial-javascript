@@ -44,4 +44,4 @@ function drawHeart(rows) {
 }
 
 // 하트 출력
-drawHeart(3);
+drawHeart(5);

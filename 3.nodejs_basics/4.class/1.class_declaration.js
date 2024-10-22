@@ -10,5 +10,6 @@ class Car {
 }
 
 // 클래스를 사용하여 객체 생성
-const myCar = new Car('Toyota', 'Corolla');
-console.log(myCar.drive()); // 출력: "Toyota Corolla is driving."
+const myCar = new Car('Hyundai', 'K5');
+console.log(myCar.drive()); // 출력: "Hyundai K5 is driving."
+

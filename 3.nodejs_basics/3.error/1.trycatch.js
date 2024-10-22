@@ -79,7 +79,35 @@ try {
 
 
 // 7. 함수 구현 예제 (다양한 오류 처리 포함)
-function divide5(a, b) {
+function divide(a, b) {
+    return a / b;
+}
+
+function divide2(a, b) {
+    // a와 b가 숫자인지 확인
+    if (typeof a !== 'number' || typeof b !== 'number') {
+        throw new Error("인자는 숫자여야 합니다.");
+    }
+
+    return a / b;
+}
+
+function divide3(a, b) {
+    // a와 b가 숫자인지 확인
+    if (typeof a !== 'number' || typeof b !== 'number') {
+        throw new Error("인자는 숫자여야 합니다.");
+    }
+
+    // 0으로 나누는 것을 방지
+    if (b === 0) {
+        throw new Error("0으로 나눌 수 없습니다.");
+    }
+
+    return a / b;
+}
+
+
+function divide4(a, b) {
     try {
         if (typeof b !== 'number') {
             throw new TypeError('숫자를 입력하세요.');
@@ -105,8 +133,8 @@ function divide5(a, b) {
     }
 }
 
-console.log(divide5(10, 2)); // 정상적인 경우: 10 나누기 2는 5를 반환합니다.
-console.log(divide5(10, '문자열')); // 문자열 입력값 체크.
-console.log(divide5(1234567890, 5)); // 숫자 길이 입력값 체크.
-console.log(divide5(8, 0)); // 0으로 나누는 경우: 오류가 발생하고, 오류 메시지와 스택 트레이스가 출력됩니다.
+console.log(divide4(10, 2)); // 정상적인 경우: 10 나누기 2는 5를 반환합니다.
+console.log(divide4(10, '문자열')); // 문자열 입력값 체크.
+console.log(divide4(1234567890, 5)); // 숫자 길이 입력값 체크.
+console.log(divide4(8, 0)); // 0으로 나누는 경우: 오류가 발생하고, 오류 메시지와 스택 트레이스가 출력됩니다.
 console.log('---');
