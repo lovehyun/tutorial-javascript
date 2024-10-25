@@ -13,5 +13,5 @@ const dirName = path.dirname(filePath);
 console.log('파일이 속한 디렉토리:', dirName);
 
 // 파일명만 반환 (Return the file name)
-const baseName = path.basename(filePath);
-console.log('파일명:', baseName);
+const fileName = path.basename(filePath);
+console.log('파일명:', fileName);

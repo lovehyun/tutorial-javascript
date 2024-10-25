@@ -117,11 +117,14 @@ function introduce(people) {
     }
     for (let i = 0; i < people.length; i++) {
         people[i].walk();
-        
-        if (people[i] instanceof Employee) {
-            people[i].work();
-        }
     }
+    people.forEach((person) => {   
+        if (person instanceof Employee) {
+            person.work();
+        } else if (person instanceof Student) {
+            person.study();
+        }
+    });
 }
 
 const employee2 = new Employee("영희", jobTitle="매니저"); // 이렇게 일부만 할당 불가

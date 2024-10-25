@@ -1,5 +1,4 @@
 // index.js
-// const { addNumbers, subtractNumbers } = require('./operations');
 const { addNumbers, subtractNumbers } = require('./add2');
 
 const sum = addNumbers(5, 3);

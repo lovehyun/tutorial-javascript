@@ -31,7 +31,7 @@ function writeCSV(filePath, dataToWrite, callback) {
 
 // 예제 데이터
 const sampleData = [
-    ['이름', '생년월일', '성별'],
+    ['이름', '생년월일', '성별'], // Header
     ['김수현', '19900101', '남'],
     ['송혜교', '19951231', '여'],
     ['이병헌', '19870415', '남'],
@@ -51,8 +51,11 @@ const filePath = 'user.csv';
 // const repeatedData = Array.from({ length: 100 }, () => sampleData).flat();
 
 // 샘플 데이터를 100번 반복해서 추가 (타이틀을 제외한 10개의 데이터만 반복)
-const repeatedData = Array.from({ length: 100 }, (_, index) => (index === 0 ? sampleData[0] : sampleData[index % 10]));
-console.log(repeatedData);
+const repeatedData = Array.from({ length: 100 }, (_, index) => (
+    index === 0 ? sampleData[0] : sampleData[(index - 1) % (sampleData.length - 1) + 1]
+));
+// console.log(repeatedData);
+
 
 console.log("쓰기 시작");
 // CSV 파일 쓰기
@@ -65,6 +68,7 @@ writeCSV(filePath, repeatedData, (err) => {
     console.log('데이터가 성공적으로 CSV 파일에 쓰여졌습니다.');
 });
 console.log("쓰기 완료");
+
 
 console.log("읽기 시작");
 // CSV 파일 읽기

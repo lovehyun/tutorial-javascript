@@ -1,6 +1,7 @@
 class Shape {
     getArea() {
-        return 0;
+        // return 0;
+        throw new Error('getArea() must be implemented by a subclass');
     }
 
     getInfo() {

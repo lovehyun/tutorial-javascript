@@ -1,12 +1,13 @@
 class Shape {
     getArea() {
-        return 0;
+        // return 0;
+        throw new Error('getArea() must be implemented by a subclass');
     }
 }
 
 class Square extends Shape {
     constructor(sideLength) {
-        super();
+        super(); // 빈 내용이지만 상속받은 클래스 함수를 호출하기 위해서는 필수
         this.sideLength = sideLength;
     }
 

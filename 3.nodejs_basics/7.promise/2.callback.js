@@ -7,10 +7,11 @@ function greet(name, callback) {
 function displayGreeting(greeting) {
     console.log(greeting);
     // console.log(`<H1>${greeting}</H1>`);
+    // console.log(`<LI>${greeting}</LI>`);
 }
 
 // greet 함수 호출 후 displayGreeting 함수를 콜백으로 전달
-greet('예제', displayGreeting);
+greet('홍길동', displayGreeting);
 
 
 

@@ -82,8 +82,25 @@ class Customer extends Person {
         this.orderHistory = orderHistory;
     }
 
-    placeOrder() {
+    placeOrder(product) {
         console.log(`${this.name} 고객이 주문을 완료했습니다.`);
+        this.orderHistory.push(product);
+        console.log(this.orderHistory);
+    }
+
+    printOrderHistory() {
+        console.log("주문 목록: ");
+        for (let i = 0; i < this.orderHistory.length; i++) {
+            console.log(" - " + this.orderHistory[i])
+        }
+
+        this.orderHistory.forEach((orderItem) => {
+            console.log(`<li>${orderItem}</li>`)
+        });
+
+        console.log(`주문 내역: ${this.orderHistory.join('<BR>')}`);
+
+        console.log(`주문 내역: ${this.orderHistory.join(', ')}`);
     }
     // 고객 관련 추가 기능 포함 가능
 }
@@ -98,4 +115,5 @@ student1.study(); // "지연 학생이 컴퓨터 공학을 공부하고 있습�
 
 // Customer 객체 생성 및 활용
 const customer1 = new Customer("태식", 30, "남성", "C1001", ["주문1", "주문2"]);
-customer1.placeOrder(); // "태식 고객이 주문을 완료했습니다." 출력
+customer1.placeOrder("주문3"); // "태식 고객이 주문을 완료했습니다." 출력
+customer1.printOrderHistory();

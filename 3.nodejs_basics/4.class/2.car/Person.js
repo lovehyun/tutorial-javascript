@@ -11,6 +11,7 @@ class Person {
     }
 
     getInCar(car) {
+        console.log(car);
         console.log(`${this.name}이(가) ${car.brand} ${car.model}에 탑승했습니다.`);
     }
 }

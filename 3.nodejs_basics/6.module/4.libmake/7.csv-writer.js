@@ -1,4 +1,6 @@
 // npm install csv-writer
+
+// 모듈 전체 중 특정 함수만 가져옴
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const csvWriter = createCsvWriter({

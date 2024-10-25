@@ -2,9 +2,11 @@ const fs = require('fs');
 
 const filePath = 'sample.csv';
 
-const dataToWrite = [
+const dataToWrite = [ // 예, 온도, 습도
     ['Column 1', 'Column 2'],
     ['값1', '값2'],
+    ['값3', '값4'],
+    ['값5', '값6'],
     // 추가 데이터 정의
 ];
 

@@ -1,7 +1,7 @@
-const http = require('https');
+const http = require('http'); // http 모듈을 가져옴
 const fs = require('fs');
 
-const url = 'https://www.example.com'; // 크롤링할 웹페이지의 URL
+const url = 'http://www.example.com'; // 크롤링할 HTTP 웹페이지의 URL
 
 // HTTP GET 요청을 보내고 응답을 받아 데이터를 처리합니다.
 http.get(url, (response) => {
@@ -14,14 +14,7 @@ http.get(url, (response) => {
 
     // 데이터를 모두 받은 후 발생하는 이벤트
     response.on('end', () => {
-        // 받은 데이터를 파일에 씁니다.
-        fs.writeFile('output.html', data, 'utf8', (err) => {
-            if (err) {
-                console.error('파일에 쓰는 중 오류 발생:', err);
-                return;
-            }
-            console.log('파일에 데이터를 성공적으로 썼습니다.');
-        });
+        console.log('데이터: ', data);
     });
 }).on('error', (error) => {
     console.error('요청 중 오류 발생:', error);
