@@ -1,3 +1,4 @@
+// calculators/GenericCalculator.js
 class GenericCalculator {
     add(num1, num2) {
         return num1 + num2;
@@ -18,7 +19,15 @@ class GenericCalculator {
         return num1 / num2;
     }
 
-    operate(operator, num1, num2) {
+    getSupportedOperators() {
+        return ['+', '-', '*', '/'];
+    }
+
+    calculate(operator, num1, num2 = null) {
+        if (!this.getSupportedOperators().includes(operator)) {
+            return "Invalid operator";
+        }
+
         switch (operator) {
             case '+':
                 return this.add(num1, num2);
@@ -28,13 +37,7 @@ class GenericCalculator {
                 return this.multiply(num1, num2);
             case '/':
                 return this.divide(num1, num2);
-            default:
-                return "Invalid operator";
         }
-    }
-
-    getOperators() {
-        return ['+', '-', '*', '/'];
     }
 }
 

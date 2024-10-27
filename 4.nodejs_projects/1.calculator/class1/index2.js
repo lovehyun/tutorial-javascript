@@ -3,9 +3,9 @@ const readline = require('readline').createInterface({
     output: process.stdout
 });
 
-const EngineeringCalculator = require('./EngineeringCalculator');
-const StandardCalculator = require('./StandardCalculator');
-const ProgrammerCalculator = require('./ProgrammerCalculator');
+const EngineeringCalculator = require('./calculators/EngineeringCalculator');
+const StandardCalculator = require('./calculators/StandardCalculator');
+const ProgrammerCalculator = require('./calculators/ProgrammerCalculator');
 
 console.log("Select Calculator Mode:");
 console.log("1. Engineering Calculator");

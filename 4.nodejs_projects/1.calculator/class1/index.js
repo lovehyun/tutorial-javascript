@@ -12,11 +12,11 @@ readline.question("Enter the mode (1/2/3): ", (mode) => {
     let calculator;
 
     if (mode === '1') {
-        calculator = new (require('./EngineeringCalculator'))();
+        calculator = new (require('./calculators/EngineeringCalculator'))();
     } else if (mode === '2') {
-        calculator = new (require('./StandardCalculator'))();
+        calculator = new (require('./calculators/StandardCalculator'))();
     } else if (mode === '3') {
-        calculator = new (require('./ProgrammerCalculator'))();
+        calculator = new (require('./calculators/ProgrammerCalculator'))();
     } else {
         console.log("Invalid mode selection.");
         readline.close();
