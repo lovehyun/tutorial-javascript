@@ -1,42 +1,5 @@
 // -------------------------
-// 예제1. 이전의 Promise 코드를 async/await를 통해서 해결
-// -------------------------
-function asyncOperation1() {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log('Operation 1 completed');
-            resolve('Response 1');
-        }, 1000);
-    });
-}
-
-function asyncOperation2(response) {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            console.log('Operation 2 completed with', response);
-            resolve('Response 2');
-        }, 1000);
-    });
-}
-
-async function executeOperations() {
-    try {
-        const response1 = await asyncOperation1(null);
-        const response2 = await asyncOperation2(response1);
-        const response3 = await asyncOperation1(response2);
-        const response4 = await asyncOperation2(response3);
-
-        console.log('Final response:', response4);
-    } catch (error) {
-        console.error('에러 발생:', error);
-    }
-}
-
-// executeOperations();
-
-
-// -------------------------
-// 예제2. 대기 및 재시도 코드
+// 예제1. 대기 및 재시도 코드
 // -------------------------
 async function waitForResult(retryCount = 0) {
     try {

@@ -21,6 +21,9 @@ TEMP/
 *.db
 *.pkl
 
+# 작업 데이터 파일
+file.txt
+
 # 패키지 파일 (임시 제외)
 package-lock.json
 

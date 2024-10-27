@@ -47,19 +47,10 @@ const sampleData = [
 // CSV 파일 경로
 const filePath = 'user.csv';
 
-// 샘플 데이터를 100번 반복해서 추가
-// const repeatedData = Array.from({ length: 100 }, () => sampleData).flat();
-
-// 샘플 데이터를 100번 반복해서 추가 (타이틀을 제외한 10개의 데이터만 반복)
-const repeatedData = Array.from({ length: 100 }, (_, index) => (
-    index === 0 ? sampleData[0] : sampleData[(index - 1) % (sampleData.length - 1) + 1]
-));
-// console.log(repeatedData);
-
 
 console.log("쓰기 시작");
 // CSV 파일 쓰기
-writeCSV(filePath, repeatedData, (err) => {
+writeCSV(filePath, sampleData, (err) => {
     if (err) {
         console.error('CSV 파일 쓰기 실패:', err);
         return;

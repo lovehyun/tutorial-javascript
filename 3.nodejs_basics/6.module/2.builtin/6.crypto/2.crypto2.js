@@ -5,6 +5,7 @@ const dataToHash = 'Hello, World!';
 const hash = crypto.createHash('sha256').update(dataToHash).digest('hex');
 console.log('해시 결과:', hash);
 
+
 // 암호화 (Encryption)
 const algorithm = 'aes-192-cbc';
 const password = 'MySuperSecretPassword';
@@ -15,6 +16,7 @@ const cipher = crypto.createCipheriv(algorithm, key, iv);
 let encrypted = cipher.update(dataToHash, 'utf8', 'hex');
 encrypted += cipher.final('hex');
 console.log('암호화된 결과:', encrypted);
+
 
 // 복호화 (Decryption)
 const decipher = crypto.createDecipheriv(algorithm, key, iv);

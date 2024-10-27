@@ -4,7 +4,7 @@ const csv = require('csv-parser');
 
 const results = [];
 
-fs.createReadStream('example.csv')
+fs.createReadStream('sample.csv')
     .pipe(csv())
     .on('data', (data) => results.push(data))
     .on('end', () => {

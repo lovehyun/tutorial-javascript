@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const directoryPath = "../";
+const directoryPath = "./";
+// const directoryPath = "../";
 
 fs.readdir(directoryPath, (err, files) => {
     if (err) {

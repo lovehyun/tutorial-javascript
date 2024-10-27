@@ -10,8 +10,6 @@ const dataToWrite = [ // 예, 온도, 습도
     // 추가 데이터 정의
 ];
 
-const csvContent = dataToWrite.map((row) => row.join(',')).join('\n');
-
 // for 루프 방식
 // let csvContent = '';
 // for (let i = 0; i < dataToWrite.length; i++) {
@@ -22,6 +20,8 @@ const csvContent = dataToWrite.map((row) => row.join(',')).join('\n');
 //     }
 //     console.log(csvContent);
 // }
+
+const csvContent = dataToWrite.map((row) => row.join(',')).join('\n');
 
 fs.writeFile(filePath, csvContent, 'utf8', (err) => {
     if (err) {

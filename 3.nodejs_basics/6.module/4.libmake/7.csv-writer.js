@@ -4,7 +4,7 @@
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const csvWriter = createCsvWriter({
-    path: 'example.csv',
+    path: 'sample.csv',
     header: [
         // 헤더 정의
         { id: 'column1', title: 'Column 1' },
@@ -15,6 +15,8 @@ const csvWriter = createCsvWriter({
 
 const data = [
     { column1: '값1', column2: '값2' },
+    { column1: '값3', column2: '값4' },
+    { column1: '값5', column2: '값6' },
     // 추가 데이터 정의
 ];
 
