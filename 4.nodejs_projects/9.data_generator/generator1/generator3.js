@@ -1,6 +1,4 @@
-// https://www.npmjs.com/package/csv-writer
 const fs = require('fs');
-const csvWriter = require('csv-writer').createObjectCsvWriter;
 
 class NameGenerator {
     constructor(file_path) {
@@ -49,7 +47,7 @@ class AddressGenerator {
     }
 }
 
-class DataGenerator {
+class UserGenerator {
     constructor(name_file, city_file) {
         this.nameGen = new NameGenerator(name_file);
         this.birthdateGen = new BirthdateGenerator();
@@ -70,9 +68,21 @@ class DataGenerator {
     }
 }
 
-class DataExporter extends DataGenerator {
-    exportToCsv(count, filename) {
-        const data = this.generateData(count);
+class DataPrinter {
+    constructor(data) {
+        this.data = data;
+    }
+
+    printData() {
+        for (const [name, birthdate, gender, address] of this.data) {
+            console.log(`Name: ${name}\nBirthdate: ${birthdate}\nGender: ${gender}\nAddress: ${address}\n`);
+        }
+    }
+
+    saveToFile(filename) {
+        // https://www.npmjs.com/package/csv-writer
+        const csvWriter = require('csv-writer').createObjectCsvWriter;
+
         const csv = csvWriter({
             path: filename,
             header: [
@@ -83,7 +93,7 @@ class DataExporter extends DataGenerator {
             ]
         });
 
-        const records = data.map(([name, birthdate, gender, address]) => ({
+        const records = this.data.map(([name, birthdate, gender, address]) => ({
             Name: name,
             Birthdate: birthdate,
             Gender: gender,
@@ -100,7 +110,10 @@ class DataExporter extends DataGenerator {
 const nameFile = 'names.txt';  // 이름 데이터 파일 경로
 const cityFile = 'cities.txt';  // 도시 데이터 파일 경로
 
-const exporter = new DataExporter(nameFile, cityFile);
+const userGenerator = new UserGenerator(nameFile, cityFile);
+const users = userGenerator.generateData(10);
+const printer = new DataPrinter(users);
 
-// CSV 파일로 저장
-exporter.exportToCsv(100, 'data.csv');  // 100개의 데이터를 'data.csv' 파일로 저장
+// 출력 (화면 or CSV 파일로 저장)
+printer.printData();
+printer.saveToFile('data.csv');  // 100개의 데이터를 'data.csv' 파일로 저장
