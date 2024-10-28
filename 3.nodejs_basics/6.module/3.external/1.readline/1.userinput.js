@@ -1,4 +1,6 @@
+// npm install readline
 // https://www.npmjs.com/package/readline
+
 const readline = require('readline');
 
 // 기본적으로 createInterface는 input과 output을 지정해야 함
