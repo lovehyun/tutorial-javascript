@@ -4,22 +4,22 @@ const readline = require('readline').createInterface({
 });
 
 // 덧셈 함수
-const add = (num1, num2) => {
+function add(num1, num2) {
     return num1 + num2;
 };
 
 // 뺄셈 함수
-const subtract = (num1, num2) => {
+function subtract(num1, num2) {
     return num1 - num2;
 };
 
 // 곱셈 함수
-const multiply = (num1, num2) => {
+function multiply(num1, num2) {
     return num1 * num2;
 };
 
 // 나눗셈 함수
-const divide = (num1, num2) => {
+function divide(num1, num2) {
     if (num2 === 0) {
         return "Error: Division by zero is not allowed";
     }
@@ -27,7 +27,7 @@ const divide = (num1, num2) => {
 };
 
 // 연산자를 분석하고 해당 연산을 수행하는 함수
-const operate = (operator, num1, num2) => {
+function calculator(num1, operator, num2) {
     switch (operator) {
         case '+':
             return add(num1, num2);
@@ -49,7 +49,7 @@ const getUserInput = () => {
             readline.question('Enter second number: ', (num2) => {
                 num1 = parseFloat(num1);
                 num2 = parseFloat(num2);
-                const result = operate(operator, num1, num2);
+                const result = calculator(num1, operator, num2);
                 console.log(`Result: ${result}`);
                 readline.close();
             });

@@ -18,7 +18,7 @@ class GenericCalculator {
         return num1 / num2;
     }
 
-    operate(operator, num1, num2) {
+    calculate(num1, operator, num2) {
         switch (operator) {
             case '+':
                 return this.add(num1, num2);
@@ -60,40 +60,61 @@ class ProgrammerCalculator extends GenericCalculator {
 }
 
 // 사용자 모드 입력을 받는 부분
-const readline = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
-console.log("Select Calculator Mode:");
-console.log("1. Engineering Calculator");
-console.log("2. Standard Calculator");
-console.log("3. Programmer Calculator");
 
-readline.question("Enter the mode (1/2/3): ", (mode) => {
-    let calculator;
-
-    if (mode === '1') {
-        calculator = new EngineeringCalculator();
-    } else if (mode === '2') {
-        calculator = new StandardCalculator();
-    } else if (mode === '3') {
-        calculator = new ProgrammerCalculator();
-    } else {
-        console.log("Invalid mode selection.");
-        readline.close();
-        return;
+class UserInput {
+    constructor(calculator) {
+        this.calculator = calculator;
+        this.readline = require('readline').createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
     }
 
-    readline.question('Enter first number: ', (num1) => {
-        readline.question('Enter operator (+, -, *, /): ', (operator) => {
-            readline.question('Enter second number: ', (num2) => {
-                num1 = parseFloat(num1);
-                num2 = parseFloat(num2);
-                const result = calculator.operate(operator, num1, num2);
-                console.log(`Result: ${result}`);
-                readline.close();
+    start() {
+        this.selectCalculatorMode();
+    }
+
+    getUserInput() {
+        this.readline.question('Enter first number: ', (num1) => {
+            this.readline.question('Enter operator (+, -, *, /): ', (operator) => {
+                this.readline.question('Enter second number: ', (num2) => {
+                    num1 = parseFloat(num1);
+                    num2 = parseFloat(num2);
+                    const result = this.calculator.calculate(num1, operator, num2);
+                    console.log(`Result: ${result}`);
+                    this.readline.close();
+                });
             });
         });
-    });
-});
+    }
+
+    selectCalculatorMode() {
+        console.log("Select Calculator Mode:");
+        console.log("1. Engineering Calculator");
+        console.log("2. Standard Calculator");
+        console.log("3. Programmer Calculator");
+
+        this.readline.question("Enter the mode (1/2/3): ", (mode) => {
+            switch (mode) {
+                case '1':
+                    this.calculator = new EngineeringCalculator();
+                    break;
+                case '2':
+                    this.calculator = new StandardCalculator();
+                    break;
+                case '3':
+                    this.calculator = new ProgrammerCalculator();
+                    break;
+                default:
+                    console.log("Invalid mode selection.");
+                    this.readline.close();
+                    return;
+            }
+            this.getUserInput();
+        });
+    }
+}
+
+const userInput = new UserInput();
+userInput.start();

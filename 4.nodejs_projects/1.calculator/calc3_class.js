@@ -18,7 +18,7 @@ class Calculator {
         return num1 / num2;
     }
 
-    operate(operator, num1, num2) {
+    calculate(num1, operator, num2) {
         switch (operator) {
             case '+':
                 return this.add(num1, num2);
@@ -53,7 +53,7 @@ class UserInput {
                 this.readline.question('Enter second number: ', (num2) => {
                     num1 = parseFloat(num1);
                     num2 = parseFloat(num2);
-                    const result = this.calculator.operate(operator, num1, num2);
+                    const result = this.calculator.calculate(num1, operator, num2);
                     console.log(`Result: ${result}`);
                     this.readline.close();
                 });

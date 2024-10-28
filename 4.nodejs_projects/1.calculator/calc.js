@@ -5,7 +5,7 @@ const readline = require('readline').createInterface({
 });
 
 // 계산기 함수
-const calculator = (num1, operator, num2) => {
+function calculator(num1, operator, num2) {
     switch (operator) {
         case '+':
             return num1 + num2;
