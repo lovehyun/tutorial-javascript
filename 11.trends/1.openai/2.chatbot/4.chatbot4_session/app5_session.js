@@ -1,7 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const sqlite3 = require('sqlite3').verbose(); // sqlite3 모듈 추가
-const { OpenAI } = require('openai');
+const { OpenAI } = require('openai/index.mjs');
 
 require('dotenv').config();
 
