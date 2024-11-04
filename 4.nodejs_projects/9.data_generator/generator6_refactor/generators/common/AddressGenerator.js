@@ -1,6 +1,6 @@
 // generators/common/AddressGenerator.js
 
-const Generator = require('../common/Generator');
+const Generator = require('./Generator');
 
 class AddressGenerator extends Generator {
     constructor() {
