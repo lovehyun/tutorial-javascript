@@ -20,31 +20,37 @@ const server = http.createServer(async (req, res) => {
                 const data = await fs.readFile('./about.html');
                 res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
                 return res.end(data);
-            } else if (req.url === '/user') { // Step6. user 요청 처리 로직 완성
-                res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-                return res.end(JSON.stringify(users));
             } else if (req.url.startsWith('/image/')) {
                 // Step2. 이미지 처리
+
+                // const imageName = req.url.split('/image/');
+                // ["", "sample.jpg"]
+                // [0]은 "" (빈 문자열): '/image/' 앞에 아무것도 없기 때문에 빈 문자열
+                // [1]은 "sample.jpg": '/image/' 이후의 문자열, 즉 이미지 파일 이름
+
                 const imageName = req.url.split('/image/')[1];
                 const imagePath = path.join(__dirname, 'static', imageName);
                 const imageData = await fs.readFile(imagePath);
                 res.writeHead(200, { 'Content-Type': 'image/jpg' });
-
-                // const contentType = getContentType(imagePath);
-                // res.writeHead(200, { 'Content-Type': contentType });
-
                 return res.end(imageData);                
             } else {
                 // Step3. 또는, 동적 이미지 요청 핸들링
                 const imageMatch = req.url.match(/^\/image\/(.+)$/);
+                
+                // ["/image/sample.jpg", "sample.jpg"]
+                // [0]: 전체 매칭된 문자열 (req.url과 일치하는 부분 전체).
+                // [1]: 첫 번째 캡처 그룹 (.+)에 매칭된 부분, 즉 '/image/' 이후의 문자열입니다.
+                
                 if (imageMatch) {
                     const imageName = imageMatch[1];
                     const imagePath = path.join(__dirname, './static/', imageName);
                     try {
                         const imageData = await fs.readFile(imagePath);
                         console.log(imageData);
+
                         const contentType = getContentType(imagePath);
                         console.log(contentType);
+                        
                         res.writeHead(200, { 'Content-Type': contentType });
                         return res.end(imageData);
                     } catch (error) {

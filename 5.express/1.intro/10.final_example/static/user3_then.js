@@ -1,19 +1,18 @@
-import { getUsers, addUser, updateUser, deleteUserById } from './user3_fetch.js';
+import { getUsers, addUser, updateUser, deleteUserById } from './user3_module_fetchawait.js';
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form');
     const username = document.getElementById('username');
     const userTable = document.getElementById('userTable');
 
     // 페이지 로딩 시 백엔드의 /users API 호출하여 테이블 생성
-    await updateTable();
+    updateTable();
 
     form.addEventListener('submit', handleSubmitForm);
 });
 
-
 // 폼 제출 이벤트 핸들러 함수
-async function handleSubmitForm(ev) {
+function handleSubmitForm(ev) {
     ev.preventDefault();
 
     const name = username.value;
@@ -23,17 +22,18 @@ async function handleSubmitForm(ev) {
         return;
     }
 
-    try {
-        await addUser(name);
-        alert('등록 성공');
-        username.value = ''; // 입력 필드 초기화
+    addUser(name)
+        .then(() => {
+            alert('등록 성공');
+            username.value = ''; // 입력 필드 초기화
 
-        // 등록 성공 시 테이블 갱신
-        await updateTable();
-    } catch (error) {
-        console.error('등록 중 오류 발생:', error);
-        alert('등록 중 오류가 발생했습니다.');
-    }
+            // 등록 성공 시 테이블 갱신
+            return updateTable();
+        })
+        .catch(error => {
+            console.error('등록 중 오류 발생:', error);
+            alert('등록 중 오류가 발생했습니다.');
+        });
 }
 
 // --------------------------------------------------------
@@ -41,13 +41,14 @@ async function handleSubmitForm(ev) {
 // --------------------------------------------------------
 
 // 테이블 갱신을 위한 함수
-async function updateTable() {
-    try {
-        const users = await getUsers();
-        displayUsers(users);
-    } catch (error) {
-        console.error('사용자 정보 불러오기 실패:', error);
-    }
+function updateTable() {
+    return getUsers()
+        .then(users => {
+            displayUsers(users);
+        })
+        .catch(error => {
+            console.error('사용자 정보 불러오기 실패:', error);
+        });
 }
 
 // 사용자 정보를 받아와 테이블에 표시하는 함수
@@ -89,33 +90,35 @@ function createButton(text, clickHandler) {
 // --------------------------------------------------------
 
 // 사용자 정보 수정 함수
-async function editUser(userId) {
+function editUser(userId) {
     const newName = prompt('수정할 이름을 입력하세요.');
     if (newName !== null) {
-        try {
-            await updateUser(userId, { name: newName });
-            alert('수정 성공');
-            // 수정 성공 시 테이블 갱신
-            await updateTable();
-        } catch (error) {
-            console.error('수정 중 오류 발생:', error);
-            alert('수정 중 오류가 발생했습니다.');
-        }
+        updateUser(userId, { name: newName })
+            .then(() => {
+                alert('수정 성공');
+                // 수정 성공 시 테이블 갱신
+                return updateTable();
+            })
+            .catch(error => {
+                console.error('수정 중 오류 발생:', error);
+                alert('수정 중 오류가 발생했습니다.');
+            });
     }
 }
 
 // 사용자 정보 삭제 함수
-async function deleteUser(userId) {
+function deleteUser(userId) {
     const confirmDelete = confirm('정말로 삭제하시겠습니까?');
     if (confirmDelete) {
-        try {
-            await deleteUserById(userId);
-            alert('삭제 성공');
-            // 삭제 성공 시 테이블 갱신
-            await updateTable();
-        } catch (error) {
-            console.error('삭제 중 오류 발생:', error);
-            alert('삭제 중 오류가 발생했습니다.');
-        }
+        deleteUserById(userId)
+            .then(() => {
+                alert('삭제 성공');
+                // 삭제 성공 시 테이블 갱신
+                return updateTable();
+            })
+            .catch(error => {
+                console.error('삭제 중 오류 발생:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            });
     }
 }

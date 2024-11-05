@@ -92,9 +92,11 @@ const server = http.createServer(async (req, res) => {
                     // form이 application/x-www-form-urlencoded로 전송될 때 파싱
                     if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
                         const parsedData = parse(body);
+
                         // 위에처럼 하면 [Object: null prototype] { name: 'bbb' }
                         // 그게 싫으면, 스프레드 연산자로 일반 객체로 담기
                         // const parsedData = { ...parse(body) };
+
                         console.log('Received form data:', parsedData);
 
                         const username = parsedData.name;
@@ -102,6 +104,11 @@ const server = http.createServer(async (req, res) => {
                             users[username] = username;
                             res.writeHead(201, { 'Content-Type': 'text/plain; charset=utf-8' });
                             return res.end('등록 성공');
+
+                            // 또는 원래 페이지로 돌리려면??
+                            // 리디렉션 설정
+                            // res.writeHead(303, { 'Location': '/' });
+                            // return res.end();
                         } else {
                             res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
                             return res.end('name 필드가 필요합니다.');

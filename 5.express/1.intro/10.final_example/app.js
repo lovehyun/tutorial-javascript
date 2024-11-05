@@ -1,9 +1,15 @@
+// curl -X POST -H "Content-Type: application/json" -d "{\"id\": \"1\", \"name\": \"John Doe\", \"age\": 25}" http://127.0.0.1:3000/users
+// curl -X GET http://127.0.0.1:3000/users
+// curl -X GET http://127.0.0.1:3000/users/1
+// curl -X PUT -H "Content-Type: application/json" -d "{\"name\": \"John Smith\", \"age\": 30}" http://127.0.0.1:3000/users/1
+// curl -X DELETE http://127.0.0.1:3000/users/1
+
 const express = require('express');
 const path = require('path');
 // const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 8080;
+const PORT = 3000;
 
 
 // 미들웨어를 사용하여 req의 body를 파싱하여 req.body를 생성 (POST/PUT에 유용함)
@@ -17,10 +23,6 @@ const users = {};
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/image', express.static(path.join(__dirname, 'image')));
 
-// res.send 시의 기본값은 'text/html; charset=utf-8'
-// res.json 시의 기본값은 'application/json'
-// 변경 시 res.type('text/plain');
-
 // 기본 경로
 app.get('/', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'index.html'));
@@ -33,6 +35,10 @@ app.get('/about', (req, res) => {
 // 사용자 정보 요청 처리
 app.get('/user', (req, res) => {
     res.json(users);
+
+    // res.send 시의 기본값은 'text/html; charset=utf-8'
+    // res.json 시의 기본값은 'application/json'
+    // 변경 시 res.type('text/plain');
 });
 
 // 사용자 등록
@@ -74,8 +80,19 @@ app.delete('/user/:id', (req, res) => {
 });
 
 // 404 처리
-app.use((req, res) => {
-    res.status(404).send('Not Found');
+// app.use((req, res) => {
+//     res.status(404).send('Not Found');
+// });
+
+// 모든 정의된 라우트 외의 요청에 대해 404 페이지 제공
+app.use(async (req, res, next) => {
+    try {
+        const data = await fs.readFile(path.join(__dirname, '404.html'));
+        res.status(404).type('html').send(data);
+    } catch (error) {
+        console.error('404 페이지 읽기 실패:', error);
+        res.status(500).send('서버 내부 오류');
+    }
 });
 
 // 서버 시작
