@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Streaming Site</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 헤더 섹션 -->
+    <header class="header">
+        <div class="logo">MyMovie</div>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Series</a>
+            <a href="#">Movies</a>
+            <a href="#">New & Popular</a>
+            <a href="#">My List</a>
+        </nav>
+        <div class="user-profile">
+            <img src="https://via.placeholder.com/40" alt="User Profile">
+        </div>
+    </header>
+
+    <!-- 배너 섹션 -->
+    <section class="banner">
+        <img src="https://via.placeholder.com/1200x500" alt="Featured Movie">
+        <div class="banner-content">
+            <h1>Featured Movie Title</h1>
+            <p>Exciting description of the featured movie goes here.</p>
+            <button class="play-btn">▶ Play</button>
+            <button class="info-btn">ℹ️ More Info</button>
+        </div>
+    </section>
+
+    <!-- 영화 리스트 섹션 -->
+    <section class="movie-slider">
+        <h2>Popular Movies</h2>
+        <button class="slider-btn left-btn" onclick="scrollLeftMovie()">⬅️</button>
+        <div class="movie-list-container">
+            <div class="movie-list">
+                <!-- 영화 카드 반복 -->
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 1"><p>Movie 1</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 2"><p>Movie 2</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 3"><p>Movie 3</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 4"><p>Movie 4</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 5"><p>Movie 5</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 6"><p>Movie 6</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 7"><p>Movie 7</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 8"><p>Movie 8</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 9"><p>Movie 9</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 10"><p>Movie 10</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 11"><p>Movie 11</p></div>
+                <div class="movie-card"><img src="https://via.placeholder.com/150x220" alt="Movie 12"><p>Movie 12</p></div>
+            </div>
+        </div>
+        <button class="slider-btn right-btn" onclick="scrollRightMovie()">➡️</button>
+    </section>
+
+    <!-- JavaScript 파일을 HTML 끝에 추가 -->
+    <script src="script.js"></script>
+</body>
+</html>
