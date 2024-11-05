@@ -1,13 +1,12 @@
-// npm install express body-parser nunjucks
+// npm install express nunjucks
 
 const express = require('express');
-const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
 
 const app = express();
 const port = 3000;
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'html');
 
 nunjucks.configure('views', {

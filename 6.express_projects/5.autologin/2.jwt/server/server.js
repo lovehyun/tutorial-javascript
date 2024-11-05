@@ -4,7 +4,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const path = require('path');
-const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const morgan = require('morgan');
 const fs = require('fs');
@@ -21,7 +20,7 @@ fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
 const accessLogStream = fs.createWriteStream(path.join(logDirectory, 'access.log'), { flags: 'a' });
 
 // 미들웨어 설정
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(cookieParser()); 
 app.use('/static', express.static(path.join(__dirname, 'public', 'static')));
 // app.use(morgan('combined', { stream: accessLogStream }));

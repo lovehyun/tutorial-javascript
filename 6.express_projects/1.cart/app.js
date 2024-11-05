@@ -1,6 +1,6 @@
 const express = require('express');
 const session = require('express-session');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
 const mainRoutes = require('./src/routes/mainRoutes');
@@ -12,8 +12,11 @@ const paymentRoutes = require('./src/routes/paymentRoutes');
 const app = express();
 const port = 3000;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.use(
     session({
         secret: 'your-secret-key',

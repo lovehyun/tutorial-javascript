@@ -1,7 +1,6 @@
-// npm install express body-parser nunjucks multer sharp
+// npm install express nunjucks multer sharp
 
 const express = require('express');
-const bodyParser = require('body-parser');
 const nunjucks = require('nunjucks');
 const multer = require('multer');
 const sharp = require('sharp');
@@ -12,7 +11,7 @@ const app = express();
 const port = 3000;
 
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
     next();

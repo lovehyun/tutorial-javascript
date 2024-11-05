@@ -1,7 +1,7 @@
 // npm install express nunjucks body-parser
 const express = require('express');
 const nunjucks = require('nunjucks');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const Database = require('./database_sqlite3');
 
 const app = express();
@@ -15,8 +15,10 @@ nunjucks.configure('views', {
 app.set('view engine', 'html');
 
 // 미들웨어 설정
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // 데이터베이스 모듈로부터 DB연결 객체를 생성
 const db = new Database();
