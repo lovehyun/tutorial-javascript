@@ -1,6 +1,20 @@
 const http = require('http');
 
 // HTTP 서버 생성
+
+
+// const server = http.createServer(callback); 추가하면
+// server.on('request', callback) 과 동일한 효과를 줌
+
+// request 이벤트 리스너 추가
+// server.on('request', (req, res) => {
+//     // 헤더(Header)
+//     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+//     // 본문(Body)
+//     res.write('<H1>Hello Node!</H1>');
+//     res.end('<P>안녕, 이것은 HTTP 서버입니다!</P>');
+// });
+
 const server = http.createServer((req, res) => {
     // 헤더(Header)
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });

@@ -1,0 +1,38 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('form');
+    const username = document.getElementById('username');
+
+    form.addEventListener('submit', (ev) => {
+        // 폼의 기본 기능 비활성화 - 페이지 재로딩 등
+        ev.preventDefault();
+
+        const name = username.value;
+
+        if (!name) {
+            alert('이름을 입력하세요.');
+            return;
+        }
+
+        fetch('/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name }),
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('등록 성공');
+                username.value = ''; // 입력 필드 초기화
+            } else {
+                return response.text().then(errorMessage => {
+                    alert(`등록 실패: ${errorMessage}`);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('등록 중 오류 발생:', error);
+            alert('등록 중 오류가 발생했습니다.');
+        });
+    });
+});

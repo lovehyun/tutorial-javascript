@@ -1,4 +1,4 @@
-import { getUsers, addUser, updateUser, deleteUserById } from './user3_utils.js';
+import { getUsers, addUser, updateUser, deleteUserById } from './user3_module_utils.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('form');
