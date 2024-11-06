@@ -3,11 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = document.getElementById('username');
 
     form.addEventListener('submit', async (ev) => {
-        // 폼의 기본 기능 비활성화 - 페이지 재로딩 등
-        ev.preventDefault();
+        ev.preventDefault(); // 폼의 기본 기능 비활성화 - 페이지 재로딩 등
 
         const name = username.value;
-
         if (!name) {
             alert('이름을 입력하세요.');
             return;

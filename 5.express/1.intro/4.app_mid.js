@@ -12,10 +12,12 @@ const port = 3000;
 
 // myLogger 미들웨어 함수
 function myLogger(req, res, next) {
-    console.log('LOGGED');
+    // console.log('LOGGED');
+    console.log(`LOG: ${req.method} ${req.url}`)
     next();
 };
 
+// 미들웨어 등록
 app.use(myLogger);
 
 // 루트 경로에 대한 요청 처리

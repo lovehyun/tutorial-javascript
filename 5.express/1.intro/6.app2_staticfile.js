@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
 const app = express();
 const port = 3000;
@@ -21,8 +22,21 @@ app.get('/', (req, res) => {
         }
 
         // 읽은 파일 내용을 클라이언트에게 전송합니다.
+        res.setHeader('Content-Type', 'text/html'); // MIME 타입 설정 (필수는 아님)
         res.send(data);
     });
+});
+
+// fsp 를 통한 await 처리 예제
+app.get('/path', async (req, res) => {
+    const htmlFilePath = path.join(__dirname, 'public', 'index.html');
+
+    try {
+        const data = await fsp.readFile(htmlFilePath);
+        res.send(data);
+    } catch (err) {
+        res.status(500).send('서버오류');
+    }
 });
 
 // 서버를 시작합니다.

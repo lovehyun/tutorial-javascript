@@ -21,31 +21,33 @@ const users = {};
 
 // 정적 파일 및 동적 이미지 요청 처리
 app.use('/static', express.static(path.join(__dirname, 'static')));
-app.use('/image', express.static(path.join(__dirname, 'image')));
+app.use('/image', express.static(path.join(__dirname, 'static/image')));
 
 // 기본 경로
 app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
 
 app.get('/about', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'about.html'));
+    res.sendFile(path.join(__dirname, 'static', 'about.html'));
 });
 
 // 사용자 정보 요청 처리
 app.get('/user', (req, res) => {
-    res.json(users);
-
     // res.send 시의 기본값은 'text/html; charset=utf-8'
     // res.json 시의 기본값은 'application/json'
     // 변경 시 res.type('text/plain');
+    
+    res.json(users);
+    // res.send(JSON.stringify(users));
 });
 
 // 사용자 등록
 app.post('/user', (req, res) => {
     try {
         const { name } = req.body;
-        const id = Date.now();
+        const id = Date.now(); // id를 시간으로 할수도 아니면 name 으로 할수도..
+        // const id = name;
         users[id] = name;
         res.status(201).send('등록 성공');
     } catch (error) {

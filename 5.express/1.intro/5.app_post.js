@@ -2,10 +2,12 @@
 // cmd: curl -X POST -H "Content-Type: application/json" -d "{\"name\": \"John\", \"age\": 30}" http://127.0.0.1:3000/submit
 
 const express = require('express');
+// const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
 
 // JSON 데이터 파싱 미들웨어 추가
+// app.use(bodyParser.json());
 app.use(express.json());
 
 // POST 라우트

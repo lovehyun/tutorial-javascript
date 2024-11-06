@@ -7,7 +7,7 @@ const port = 3000;
 app.use(express.static('public'));
 
 // 루트 경로에 대한 예제 라우트
-app.get('/', (req, res) => {
+app.get('/', (req, res, next) => {
     // hello.html 파일의 경로를 만듭니다.
     const htmlFilePath = path.join(__dirname, 'public', 'index.html');
 
@@ -18,9 +18,16 @@ app.get('/', (req, res) => {
     res.sendFile(htmlFilePath, (err) => {
         if (err) {
             console.error('파일 전송 오류:', err);
-            res.status(500).send('서버 오류');
+            // 에러를 생성하고, 다음 미들웨어로 전달
+            next(new Error('파일을 찾을 수 없습니다.'));
         }
     });
+});
+
+// 에러 처리 미들웨어
+app.use((err, req, res, next) => {
+    console.error('에러 발생:', err.message); // 콘솔에 에러 로그
+    res.status(500).json({ message: '서버 내부 오류가 발생했습니다.' }); // 클라이언트에 응답
 });
 
 // 서버를 시작합니다.

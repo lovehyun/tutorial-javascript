@@ -5,6 +5,7 @@ const port = 3000;
 // myLogger 미들웨어 함수
 var requestTime = function (req, res, next) {
     req.requestTime = Date.now();
+    // req.requestTime = new Date().toLocaleString();
     next();
 };
 
@@ -14,6 +15,8 @@ app.use(requestTime);
 app.get('/', (req, res) => {
     var responseText = 'Hello World!';
     responseText += 'Requested at: ' + req.requestTime + '';
+    // responseText += 'Requested at: ' + new Date(req.requestTime).toLocaleString();
+
     res.send(responseText);
 });
 

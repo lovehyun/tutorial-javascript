@@ -79,6 +79,8 @@ function handlePostRequest(req, res) {
                 sendResponse(res, 400, '유효하지 않거나 이미 존재하는 사용자입니다.');
             }
         });
+    } else {
+        sendResponse(res, 404, 'Not Found');
     }
 }
 
@@ -94,6 +96,8 @@ function handlePutRequest(req, res) {
         } else {
             sendResponse(res, 404, '사용자를 찾을 수 없습니다.');
         }
+    } else {
+        sendResponse(res, 404, 'Not Found');
     }
 }
 
@@ -107,6 +111,8 @@ function handleDeleteRequest(req, res) {
         } else {
             sendResponse(res, 404, '사용자를 찾을 수 없습니다.');
         }
+    } else {
+        sendResponse(res, 404, 'Not Found');
     }
 }
 

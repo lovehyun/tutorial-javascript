@@ -118,6 +118,9 @@ function handlePostRequest(req, res) {
                 res.end('지원되지 않는 Content-Type입니다.');
             }
         });
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
     }
 }
 
@@ -144,6 +147,9 @@ function handlePutRequest(req, res) {
                 res.end('사용자를 찾을 수 없습니다.');
             }
         });
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
     }
 }
 
@@ -159,6 +165,9 @@ function handleDeleteRequest(req, res) {
             res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
             res.end('사용자를 찾을 수 없습니다.');
         }
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
     }
 }
 

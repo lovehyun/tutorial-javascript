@@ -62,9 +62,11 @@ let person = {
         console.log('Hello, ' + this.name + '!');
     }
 };
-  
+
 console.log(person.name);
+console.log(person["name"]);
 console.log(person.age);
+console.log(person["age"]);
 person.greet();
 
 
