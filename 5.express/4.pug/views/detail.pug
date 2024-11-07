@@ -1,0 +1,54 @@
+//- 기본적인 HTML 문서 구조
+doctype html
+html
+  head
+    title Pug 템플릿 예제
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/styles.css")
+
+  body
+    header
+      h1 제목: Pug 템플릿 예제
+      p 설명: 이 페이지는 Pug 템플릿 문법을 사용하여 작성되었습니다.
+
+    //- 네비게이션 바
+    nav
+      ul
+        li: a(href="/") Home
+        li: a(href="/about") About
+        li: a(href="/contact") Contact
+
+    //- 조건문 사용 예제
+    if user
+      p 환영합니다, #{user.name}님!
+    else
+      p 로그인하지 않은 상태입니다.
+
+    //- 반복문 사용 예제
+    section
+      h2 오늘의 뉴스
+      ul
+        each article in articles
+          li
+            h3= article.title
+            p= article.content
+
+    //- 폼 요소 작성 예제
+    section
+      h2 연락하기
+      form(action="/submit" method="POST")
+        label(for="name") 이름
+        input(type="text" id="name" name="name" required)
+        
+        label(for="email") 이메일
+        input(type="email" id="email" name="email" required)
+        
+        label(for="message") 메시지
+        textarea(id="message" name="message" rows="4" required)
+
+        button(type="submit") 전송
+
+    //- footer
+    footer
+      p &copy; 2024 My Website

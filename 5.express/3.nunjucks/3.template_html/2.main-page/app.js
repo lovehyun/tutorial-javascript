@@ -17,7 +17,7 @@ app.get('/page', (req, res) => {
         title: 'My Page',
         content: 'This is the content of my page.',
     };
-    res.render('page.html', data);
+    res.render('page', data);
 });
 
 // 서버 시작

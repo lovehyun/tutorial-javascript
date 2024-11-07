@@ -16,7 +16,23 @@ app.get('/page', (req, res) => {
         title: 'My Page',
         content: 'This is the content of my page.',
     };
-    res.render('main.html', data);
+    res.render('main', data);
+});
+
+app.get('/user', (req, res) => {
+    const data = {
+        title: 'User Page',
+        content: 'Welcome to the user page.',
+    };
+    res.render('user', data);
+});
+
+app.get('/product', (req, res) => {
+    const data = {
+        title: 'Product Page',
+        content: 'Here are our products.',
+    };
+    res.render('product', data);
 });
 
 app.listen(port, () => {

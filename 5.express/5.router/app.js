@@ -6,6 +6,10 @@ const userRouter = require('./userRouter');
 const productRouter = require('./productRouter');
 const cartRouter = require('./cartRouter');
 
+// JSON 데이터와 URL-encoded 데이터를 파싱하는 미들웨어 추가
+app.use(express.json()); // JSON 형식의 요청 본문을 파싱
+app.use(express.urlencoded({ extended: true })); // URL-encoded 형식의 요청 본문을 파싱
+
 // 각 라우터를 애플리케이션에 연결
 app.use('/user', userRouter);
 app.use('/product', productRouter);
