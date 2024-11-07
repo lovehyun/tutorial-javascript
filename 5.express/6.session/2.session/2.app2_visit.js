@@ -23,8 +23,7 @@ app.use(
     })
 );
 
-// 미들웨어: 세션을 이용하여 사용자 방문 횟수 추적
-app.use((req, res, next) => {
+function visitCounter(req, res, next) {
     // 세션에 visitCount가 없으면 0으로 초기화
     req.session.visitCount = req.session.visitCount || 0;
 
@@ -36,7 +35,10 @@ app.use((req, res, next) => {
     console.log('Session Info: ', req.session);
 
     next();
-});
+}
+
+// 미들웨어: 세션을 이용하여 사용자 방문 횟수 추적
+app.use(visitCounter);
 
 // 라우트: 세션을 사용하여 방문 횟수 표시
 app.get('/', (req, res) => {
@@ -48,11 +50,17 @@ app.get('/', (req, res) => {
     // res.send(`세션ID: ${req.sessionID}, 세션데이터:${JSON.stringify(req.session)}`);
 });
 
-// app.get('/user', (req, res) => {
-//     const { username, cart } = req.session;
+// 세션에서 사용자 정보를 읽어오는 라우트
+app.get('/user', (req, res) => {
+    const username = req.session.username;
+    const cart = req.session.cart;
 
-//     res.send(`너는 ${username} 이고, 장바구니에는 ${cart} 가 있어.`)
-// });
+    if (username && cart) {
+        res.send(`사용자 이름: ${username}, 장바구니: ${cart.join(', ')}`);
+    } else {
+        res.send('저장된 사용자 정보가 없습니다.');
+    }
+});
 
 app.listen(port, () => {
     console.log(`서버가 http://localhost:${port} 에서 실행 중입니다.`);

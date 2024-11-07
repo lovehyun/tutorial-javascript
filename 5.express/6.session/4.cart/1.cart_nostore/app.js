@@ -8,13 +8,11 @@ const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(
-    session({
-        secret: 'your-secret-key',
-        resave: false,
-        saveUninitialized: true,
-    })
-);
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+}));
 
 // 세션 정보 출력 미들웨어
 app.use((req, res, next) => {

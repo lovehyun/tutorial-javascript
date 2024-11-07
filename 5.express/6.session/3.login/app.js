@@ -1,14 +1,16 @@
 // cmd: curl "localhost:3000/login" -X POST -H "Content-Type: application/json" -d "{\"username\":\"user1\", \"password\":\"password1\"}"
 
 const express = require('express');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
 const port = 3000;
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // 정적 파일 제공
 // app.use(express.static(path.join(__dirname, 'public')));

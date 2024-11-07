@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     checkLoginStatus();
 
+    // 로그인 및 로그아웃 버튼에 이벤트 리스너 추가
+    document.getElementById('loginButton').addEventListener('click', login);
+    document.getElementById('logoutButton').addEventListener('click', logout);
+    
     // 사용자의 활동을 감지하여 performUserActivity 호출
     document.addEventListener('click', performUserActivity);
     // 또는 다른 이벤트에 따라 호출할 수 있음
