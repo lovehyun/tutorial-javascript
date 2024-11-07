@@ -1,14 +1,11 @@
 // cmd: curl "localhost:3000/login" -X POST -H "Content-Type: application/json" -d "{\"username\":\"user1\", \"password\":\"password1\"}"
 
 const express = require('express');
-// const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
 const port = 3000;
 
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -24,6 +21,15 @@ const users = [
 // 로그인 라우트
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
+
+    // for 루프를 이용한 로그인 체크
+    // const user = null;
+    // for (let i = 0; i < users.length; i++) {
+    //     if (users[i].username === username && users[i].password === password) {
+    //         user = users[i];
+    //         break;
+    //     }
+    // }
 
     // 간단한 메모리 기반 로그인 체크
     // https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/find

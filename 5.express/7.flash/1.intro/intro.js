@@ -9,13 +9,11 @@ const app = express();
 const port = 3000;
 
 // 세션 설정
-app.use(
-    session({
-        secret: 'your-secret-key',
-        resave: false,
-        saveUninitialized: true,
-    })
-);
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+}));
 
 // Flash 미들웨어 사용
 app.use(flash());

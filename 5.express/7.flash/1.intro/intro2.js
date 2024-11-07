@@ -4,13 +4,12 @@
 const express = require('express');
 const session = require('express-session');
 const flash = require('connect-flash'); // 별도 설치는 불필요 (express-session 과 함께 동작)
-const bodyParser = require('body-parser');
 
 const app = express();
 const port = 3000;
 
 app.use(session({ secret: 'your-secret-key', resave: false, saveUninitialized: true }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(flash());
 
 app.post('/login', (req, res) => {
