@@ -5,9 +5,9 @@ const app = express();
 // EJS를 뷰 엔진으로 설정
 app.set('view engine', 'ejs');
 
-// <% 로직 %>
 // <%= 변수명 %>
 // <%# 주석 %>
+// <% 로직 %>
 
 app.get('/', (req, res) => {
     res.render('index', { title: 'Express 앱', message: 'EJS를 사용 중입니다.' });
@@ -20,7 +20,7 @@ app.get('/fruits', (req, res) => {
 
 app.get('/greeting', (req, res) => {
     const username = 'John Doe'; // 실제로는 데이터베이스에서 사용자 이름을 가져오거나 다른 방식으로 동적으로 생성할 수 있습니다.
-    res.render('greeting', { username: username });
+    res.render('greeting', { username }); // 축약 문법
 });
 
 app.get('/welcome', (req, res) => {

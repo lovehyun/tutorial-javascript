@@ -10,6 +10,15 @@ const port = 3000;
 // app.use(bodyParser.json());
 app.use(express.json());
 
+// URL 인코딩 파싱 (express.urlencoded() / bodyParser.urlencoded()):
+// 1. express.json(): JSON 형식의 요청 본문을 파싱하고, req.body에 객체 형태로 담아줍니다.
+// 2. express.urlencoded(): URL-encoded 형식의 요청 본문을 파싱하고, req.body에 객체 형태로 담아줍니다.
+//    application/x-www-form-urlencoded 형식의 데이터를 파싱합니다. HTML 폼에서 데이터를 전송할 때 이 형식을 사용합니다.
+//    옵션 extended는 true 또는 false로 설정할 수 있습니다:
+//    true: qs 라이브러리를 사용해 중첩된 객체를 지원합니다.
+//    false: querystring 모듈을 사용해 단순한 키-값 쌍으로 파싱합니다.
+
+
 // POST 라우트
 app.post('/submit', (req, res) => {
     let data = '';

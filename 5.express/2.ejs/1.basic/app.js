@@ -6,6 +6,7 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
+    // 뷰엔진 등록 후 render 함수 사용 가능
     res.render('index', { title: 'Express 앱', message: 'EJS를 사용 중입니다.' });
 });
 

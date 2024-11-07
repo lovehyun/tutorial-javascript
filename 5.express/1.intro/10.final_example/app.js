@@ -23,6 +23,12 @@ const users = {};
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/image', express.static(path.join(__dirname, 'static/image')));
 
+// 기본 로거
+app.use((req, _, next) => {
+    console.log(`LOG: ${req.method} ${req.url} `);
+    next();
+});
+
 // 기본 경로
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'static', 'index.html'));
@@ -74,7 +80,7 @@ app.delete('/user/:id', (req, res) => {
     try {
         const id = req.params.id;
         delete users[id];
-        res.status(204).send();
+        res.status(204).send(); // 204 No Content
     } catch (error) {
         console.error('DELETE 요청 처리 중 오류 발생: ', error);
         res.status(500).send('서버 내부 오류');
@@ -88,13 +94,13 @@ app.delete('/user/:id', (req, res) => {
 
 // 모든 정의된 라우트 외의 요청에 대해 404 페이지 제공
 app.use(async (req, res, next) => {
-    try {
-        const data = await fs.readFile(path.join(__dirname, '404.html'));
-        res.status(404).type('html').send(data);
-    } catch (error) {
-        console.error('404 페이지 읽기 실패:', error);
-        res.status(500).send('서버 내부 오류');
-    }
+    const errorpage = path.join(__dirname, '404.html');
+    res.status(404).sendFile(errorpage, (error) => {
+        if (error) {
+            console.error('404 페이지 전송 실패:', error);
+            res.status(500).send('서버 내부 오류');
+        }
+    });
 });
 
 // 서버 시작
