@@ -22,14 +22,19 @@
 const { connectToDatabase, queryName, queryAll } = require('./queryTime');
 
 const db = connectToDatabase();
-const searchName = '정다사'; // 찾고자 하는 이름을 입력하세요
 
-// 검색 조건 설정
-const searchOptions = {
+const searchName = '정다사'; // 찾고자 하는 이름을 입력하세요
+const searchOptions = { // 검색 조건 설정
     name: '정다사',
     department: 'HR',
     salary: 60000
 };
 
-// queryName(db, searchName);
+// 특정 사용자 쿼리 실행
+queryName(db, searchName);
+
+// 모든 사용자 쿼리 실행
 queryAll(db, searchOptions);
+
+// 모든 작업 후 데이터베이스 닫기
+db.close();

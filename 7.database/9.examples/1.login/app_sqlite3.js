@@ -1,5 +1,6 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -18,7 +19,7 @@ app.use(express.static('public'));
 
 // 라우트 - 홈 페이지
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 // 라우트 - 로그인 처리

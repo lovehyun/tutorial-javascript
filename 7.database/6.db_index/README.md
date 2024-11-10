@@ -53,6 +53,7 @@ CREATE TABLE employees (
 
 sqlite> select count(*) from employees;
 100000
+
 sqlite> .timer on
 ```
 
@@ -63,9 +64,11 @@ sqlite> .timer on
 sqlite> select count(*) from employees where salary > 50000; 
 54728
 Run Time: real 0.009 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where salary > 50000;
 54728
 Run Time: real 0.010 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where salary > 50000 and salary < 70000;
 21210
 Run Time: real 0.012 user 0.000000 sys 0.000000
@@ -75,6 +78,7 @@ Run Time: real 0.012 user 0.000000 sys 0.000000
 ```
 sqlite> create index idx_salary on employees(salary);
 Run Time: real 0.045 user 0.000000 sys 0.015625
+
 sqlite> .schema
 CREATE TABLE employees (
             id INTEGER PRIMARY KEY,
@@ -87,9 +91,10 @@ CREATE INDEX idx_salary on employees(salary);
 
 ### 조회 다시 수행
 ```
-select count(*) from employees where salary > 50000;
+sqlite> select count(*) from employees where salary > 50000;
 54728
 Run Time: real 0.002 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where salary > 50000 and salary < 70000;
 21210
 Run Time: real 0.001 user 0.000000 sys 0.000000
@@ -100,9 +105,11 @@ Run Time: real 0.001 user 0.000000 sys 0.000000
 sqlite> select count(*) from employees where name like '박%'; 
 19969
 Run Time: real 0.011 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.013 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.012 user 0.000000 sys 0.000000
@@ -112,7 +119,7 @@ Run Time: real 0.012 user 0.000000 sys 0.000000
 ```
 sqlite> create index idx_name on employees(name);
 Run Time: real 0.059 user 0.015625 sys 0.000000
-sqlite>
+
 sqlite> .schema                                  
 CREATE TABLE employees (
             id INTEGER PRIMARY KEY,
@@ -129,9 +136,11 @@ CREATE INDEX idx_name on employees(name);
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.005 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.007 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.007 user 0.000000 sys 0.000000
@@ -145,9 +154,11 @@ Run Time: real 0.006 user 0.000000 sys 0.000000
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.014 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.017 user 0.000000 sys 0.000000
+
 sqlite> select count(*) from employees where name like '박%';
 19969
 Run Time: real 0.012 user 0.000000 sys 0.000000

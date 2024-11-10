@@ -1,7 +1,9 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('mydatabase.db');
 
-const numData = 100_000;
+const numData = 1_000_000;
+// 1%에 해당하는 데이터 개수
+const progressStep = Math.floor(numData / 100);
 
 // 테이블 생성
 db.serialize(() => {
@@ -50,7 +52,7 @@ db.serialize(() => {
         const { name } = getRandomName();
         const department = getRandomDepartment();
         const salary = getRandomSalary();
-        console.log(name, department, salary);
+        // console.log(name, department, salary);
 
         // insertStmt.run(name, department, salary);
         insertStmt.run(name, department, salary, function(err) {
@@ -58,6 +60,12 @@ db.serialize(() => {
                 console.error(err.message);
             }
         });
+
+        // 1%마다 진행 상황을 콘솔에 표시
+        if ((i + 1) % progressStep === 0) {
+            const progress = ((i + 1) / numData) * 100;
+            console.log(`진행률: ${progress.toFixed(2)}% (${i + 1}/${numData})`);
+        }
     }
 
     insertStmt.finalize();

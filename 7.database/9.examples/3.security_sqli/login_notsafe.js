@@ -1,13 +1,12 @@
 const express = require('express');
 const sqlite3 = require('sqlite3');
-const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
 const db = new sqlite3.Database(':memory:'); // 메모리에 데이터베이스 생성
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 db.serialize(() => {
     db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)');

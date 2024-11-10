@@ -1,4 +1,4 @@
-const database = require('./6.include_db');
+const database = require('./8.include_db');
 
 async function main() {
     try {

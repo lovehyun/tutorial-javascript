@@ -16,7 +16,7 @@ db.serialize(() => {
 
     // SELECT 쿼리 실행
     db.each('SELECT id, name FROM users', (err, row) => {
-        console.log(row.id, row.name);
+        console.log('조회:', row.id, row.name);
     });
 
     // SELECT 쿼리 실행

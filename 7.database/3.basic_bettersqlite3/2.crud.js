@@ -3,26 +3,26 @@ const sqlite = require('better-sqlite3');
 // SQLite 데이터베이스 연결 (파일이 없으면 새로 생성됨)
 const db = sqlite('mydatabase.db');
 
-// 테이블 생성 (사용자 정보를 저장하는 예시 테이블)
+// 1. 테이블 생성 (사용자 정보를 저장하는 예시 테이블)
 db.exec(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT,
     email TEXT
 )`);
 
-// 모든 사용자 조회
+// 2. 모든 사용자 조회
 // const allUsers = db.prepare('SELECT * FROM users').all();
 // console.log('All Users:', allUsers);
 const allUsers = db.prepare('SELECT * FROM users');
 const allUsersResult = allUsers.all();
 console.log('All Users:', allUsersResult);
 
-// 특정 사용자 조회
+// 3. 특정 사용자 조회
 const userId = 1;
-const user = db.prepare('SELECT * FROM users WHERE id = ?').get();
+const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 console.log('User with ID', userId, ':', user);
 
-// 새로운 사용자 생성
+// 4. 새로운 사용자 생성
 const newUser = {
     username: 'user1',
     email: 'user1@example.com',
@@ -32,7 +32,7 @@ const insert = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
 const insertResult = insert.run(newUser.username, newUser.email);
 console.log('User added with ID:', insertResult.lastInsertRowid);
 
-// 사용자 정보 업데이트
+// 5. 사용자 정보 업데이트
 const updateUser = {
     id: 1,
     username: 'user001',
@@ -43,7 +43,7 @@ const update = db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?
 update.run(updateUser.username, updateUser.email, updateUser.id);
 console.log('User updated successfully');
 
-// 사용자 삭제
+// 6. 사용자 삭제
 const deleteUser = {
     id: 2,
 };
