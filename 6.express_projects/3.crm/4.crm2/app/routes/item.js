@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { Item } = require('../database/model');
+const { Item } = require('../database');
+const { OrderItem } = require('../database');
 
 router.get('/', async (req, res) => {
     try {
@@ -27,6 +28,32 @@ router.get('/', async (req, res) => {
 
         res.render('items', { pagination });
         
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// 특정 상품의 상세 페이지
+router.get('/:item_id', async (req, res) => {
+    try {
+        const itemId = req.params.item_id;
+        const item = await new Item().executeQuery(`SELECT * FROM items WHERE id = ?`, [itemId]);
+
+        // 1월부터 12월까지의 월별 매출 데이터 가져오기
+        const revenues = await new OrderItem().executeQuery(`
+            SELECT strftime('%Y-%m', orders.orderat) as month,
+                   SUM(items.unitprice) as total_revenue,
+                   COUNT(order_items.itemid) as item_count
+            FROM order_items
+            JOIN items ON order_items.itemid = items.id
+            JOIN orders ON order_items.orderid = orders.id
+            WHERE items.id = ?
+            GROUP BY month
+            ORDER BY month
+        `, [itemId]);
+
+        res.render('item_detail', { item: item[0], revenues });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

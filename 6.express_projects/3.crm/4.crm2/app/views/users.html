@@ -33,9 +33,7 @@
                 <tbody>
                 {% for user in pagination.items %}
                     <tr id="{{ user.Id }}" class="table-light">
-                        <td scope="row"> 
-                            <a href="/users/{{ user.Id }}"> {{ user.Id }} </a>
-                        </td>
+                        <td><a href="/users/{{ user.Id }}"> {{ user.Id }} </a></td>
                         <td> {{ user.Name }} </td>
                         <td> {{ user.Gender }} </td>
                         <td> {{ user.Age }} </td>
@@ -48,7 +46,7 @@
     </div>
 
     
-    <div>
+    <div class="d-flex justify-content-center">
         {% if pagination %}
             {% set total_pages = pagination.totalPages %}
             {% set current_page = pagination.currentPage %}

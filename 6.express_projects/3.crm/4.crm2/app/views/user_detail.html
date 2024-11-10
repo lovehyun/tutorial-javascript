@@ -3,6 +3,9 @@
     <div class="cell-container" style="overflow: auto; max-height: 80vh">
         <div class="table-responsive">
             <!-- 사용자 정보 -->
+            <div class="section-header">
+                고객 정보
+            </div>
             <table class="table" id="user">
                 <thead>
                     <tr>
@@ -36,9 +39,9 @@
                 <tbody>
                     {% for order in orders %}
                     <tr id={{ order.Id }}>
-                        <td> {{ order.Id }} </td>
+                        <td><a href="/orders/{{ order.Id }}">{{ order.Id }}</a></td>
                         <td> {{ order.OrderAt }} </td>
-                        <td> {{ order.StoreId }} </td>
+                        <td><a href="/stores/{{ order.StoreId }}">{{ order.StoreId }}</a></td>
                     </tr>
                     {% endfor %}
                 </tbody>

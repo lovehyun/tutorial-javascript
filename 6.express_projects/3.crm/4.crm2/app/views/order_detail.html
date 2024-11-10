@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="order">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Ordered At</th>
+                        <th scope="col">Store ID</th>
+                        <th scope="col">User ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr id="{{ order.Id }}">
+                        <td>{{ order.Id }}</td>
+                        <td>{{ order.OrderAt }}</td>
+                        <td><a href="/stores/{{ order.StoreId }}">{{ order.StoreId }}</a></td>
+                        <td><a href="/users/{{ order.UserId }}">{{ order.UserId }}</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -14,8 +14,8 @@
                     {% for order_item in pagination.items %}
                         <tr id={{ order_item.Id }}>
                             <td> {{ order_item.Id }} </td>
-                            <td> {{ order_item.OrderId }} </td>
-                            <td> {{ order_item.ItemId }} </td>
+                            <td><a href="/order_detail/{{ order_item.OrderId }}"> {{ order_item.OrderId }} </a></td>
+                            <td><a href="/items/{{ order_item.ItemId }}"> {{ order_item.ItemId }} </a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

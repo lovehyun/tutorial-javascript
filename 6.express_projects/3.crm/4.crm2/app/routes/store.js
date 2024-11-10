@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Store } = require('../database/model');
+const { Store } = require('../database');
 
 router.get('/', async (req, res) => {
     try {
@@ -62,7 +62,6 @@ router.get('/:store_id', async (req, res) => {
         query += 'GROUP BY substr(orders.orderat, 1, 7) ORDER BY substr(orders.orderat, 1, 7)';
 
         const revenues = await store.executeQuery(query, [ storeId ]);
-        console.log(store_data, revenues);
 
         res.render('store_detail', {
             store: store_data[0],

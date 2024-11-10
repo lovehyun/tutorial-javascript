@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Order } = require('../database/model');
+const { Order } = require('../database');
 
 router.get('/', async (req, res) => {
     try {
@@ -27,6 +27,28 @@ router.get('/', async (req, res) => {
 
         res.render('orders', { pagination });
         
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// 특정 주문 상세 정보 페이지
+router.get('/:order_id', async (req, res) => {
+    try {
+        const orderId = req.params.order_id;
+
+        const orderModel = new Order();
+
+        // 특정 order_id에 해당하는 주문 정보 조회
+        const orders = await orderModel.executeQuery(`
+            SELECT * FROM orders WHERE id = ?
+        `, [orderId]);
+
+        orderModel.close(); // 쿼리 실행 후 데이터베이스 연결 닫기
+
+        // 조회한 주문 정보를 템플릿으로 렌더링
+        res.render('order_detail', { orders });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

@@ -14,10 +14,10 @@
                 <tbody>
                     {% for order in pagination.items %}
                         <tr id={{ order.Id }}>
-                            <td> {{ order.Id }} </td>
+                            <td><a href="/orderitems/{{ order.Id }}">{{ order.Id }}</a></td>
                             <td> {{ order.OrderAt }} </td>
-                            <td> {{ order.StoreId }} </td>
-                            <td> {{ order.UserId }} </td>
+                            <td><a href="/stores/{{ order.StoreId }}">{{ order.StoreId }}</a></td>
+                            <td><a href="/users/{{ order.UserId }}">{{ order.UserId }}</a></td>
                         </tr>
                     {% endfor %}
                 </tbody>

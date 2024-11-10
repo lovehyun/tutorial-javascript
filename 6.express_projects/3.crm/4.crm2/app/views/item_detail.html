@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="cell-container" style="max-height: 80vh">
+        <!-- 상품 기본 정보 -->
+        <div class="section-header">
+            상품 정보
+        </div>
+        <div class="table-responsive">
+            <table class="table" id="item">
+                <thead>
+                    <tr>
+                        <th scope="col">name</th>
+                        <th scope="col">unit_price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="{{ item.id }}">
+                        <td> {{ item.Name }} </td>
+                        <td> {{ item.UnitPrice }} </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <style>
+            .scrollable-table {
+                max-height: 350px;
+                overflow: auto;
+            }
+        </style>
+        <!-- 월간 매출액 -->
+        <div class="section-header">
+            월간 매출액
+        </div>
+        <div class="table-responsive scrollable-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Month</th>
+                        <th scope="col">Total Revenue</th>
+                        <th scope="col">Item Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for revenue in revenues %}
+                        <tr>
+                            <td>{{ revenue.month }}</td>
+                            <td>{{ revenue.total_revenue }}</td>
+                            <td>{{ revenue.item_count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-header">
+            월별 매출액 그래프
+        </div>
+        <div class="chart-container" style="height: 300px"></div>
+    </div>
+{% endblock %}
