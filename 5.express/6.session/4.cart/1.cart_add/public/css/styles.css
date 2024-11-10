@@ -1,0 +1,19 @@
+table {
+    width: 100%; /* 테이블의 너비를 전체 부모 요소의 100%로 설정 */
+    border-collapse: collapse; /* 테이블의 셀 간의 경계를 겹치게 하여 깔끔한 외곽선으로 표시 */
+    margin-bottom: 20px; /* 테이블 아래쪽에 20px의 여백 추가 */
+}
+
+th, td {
+    border: 1px solid #ddd; /* 셀의 외곽선 색상을 연한 회색으로 설정 */
+    padding: 8px; /* 셀 내부 여백을 8px로 설정하여 내용이 너무 붙지 않게 함 */
+    text-align: left; /* 셀 내부의 텍스트를 왼쪽 정렬 */
+}
+
+th {
+    background-color: #f2f2f2; /* 헤더 셀 배경색을 연한 회색으로 설정하여 강조 */
+}
+
+button {
+    cursor: pointer; /* 버튼 위에 커서를 올리면 포인터(손가락) 커서로 변경 */
+}

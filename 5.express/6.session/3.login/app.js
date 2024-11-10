@@ -23,7 +23,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
     // for 루프를 이용한 로그인 체크
-    // const user = null;
+    // let user = null;
     // for (let i = 0; i < users.length; i++) {
     //     if (users[i].username === username && users[i].password === password) {
     //         user = users[i];
