@@ -1,12 +1,13 @@
 // src/routes/mainRoutes.js
 
-const express = require('express');
+import express from 'express';
+import { home, products, cart } from '../controllers/mainController.js';
+
 const router = express.Router();
-const mainController = require('../controllers/mainController');
 
-router.get('/', mainController.home);
-router.get('/home', mainController.home);
-router.get('/products', mainController.products);
-router.get('/cart', mainController.cart);
+router.get('/', home);
+router.get('/home', home);
+router.get('/products', products);
+router.get('/cart', cart);
 
-module.exports = router;
+export default router;

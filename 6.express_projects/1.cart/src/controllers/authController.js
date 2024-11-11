@@ -1,6 +1,6 @@
 // src/controllers/authController.js
 
-const users = require('../data/user');
+import users from '../data/users.js';
 
 function login(req, res) {
     const { username, password } = req.body;
@@ -35,4 +35,4 @@ function checkLogin(req, res) {
     }
 }
 
-module.exports = { login, logout, checkLogin };
+export { login, logout, checkLogin };

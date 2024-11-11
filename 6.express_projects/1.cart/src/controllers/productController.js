@@ -1,9 +1,9 @@
 // src/controllers/productController.js
 
-const products = require('../data/products');
+import products from '../data/products.js';
 
 function getProducts(req, res) {
     res.json(products);
 }
 
-module.exports = { getProducts };
+export { getProducts };

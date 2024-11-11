@@ -1,21 +1,26 @@
 // src/controllers/paymentController.js
 
-function processPayment(req, res) {
-    /// 클라이언트에서 전달한 결제 정보
-    const paymentInfo = req.body;
-    const totalAmount = paymentInfo.totalAmount;
+import fetch from 'node-fetch';
 
-    // 토스 결제 API를 호출하는 로직을 추가해야 합니다.
-    // 실제로는 토스에서 제공하는 API를 사용하셔야 합니다.
+// 결제 승인 요청 처리
+async function confirmPayment(req, res) {
+    const { paymentKey, orderId, amount, isSuccess } = req.body;
 
-    // 예시: 토스 결제 API 호출 및 응답 처리
-    // const tossApiResponse = callTossPaymentAPI(paymentInfo);
+    // 결제 성공 여부에 따라 응답을 처리
+    if (!paymentKey || !orderId || !amount) {
+        return res.status(400).json({ success: false, message: '필수 파라미터가 누락되었습니다.' });
+    }
 
-    // 토스 결제 API 호출 결과를 클라이언트에 전달
-    // res.json(tossApiResponse);
-    res.json({ message: `${totalAmount} 의 결제가 완료되었습니다.` });
+    // 결제 성공 여부를 임의로 처리
+    if (isSuccess) {
+        // 결제 성공 처리
+        console.log(`결제 승인 성공: ${orderId}, 금액: ${amount}`);
+        return res.json({ success: true, message: '결제 승인 성공' });
+    } else {
+        // 결제 실패 처리
+        console.log(`결제 승인 실패: ${orderId}`);
+        return res.status(400).json({ success: false, message: '결제 승인 실패' });
+    }
 }
 
-module.exports = {
-    processPayment,
-};
+export { confirmPayment };

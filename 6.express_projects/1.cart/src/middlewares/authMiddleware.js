@@ -12,4 +12,4 @@ function checkLogin(req, res, next) {
     }
 }
 
-module.exports = { checkLogin };
+export { checkLogin };

@@ -1,6 +1,6 @@
 // src/controllers/cartController.js
 
-const products = require('../data/products');
+import products from '../data/products.js';
 
 function getCart(req, res) {
     const cart = req.session.cart || [];
@@ -81,4 +81,4 @@ function calculateTotalAmount(cart) {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 
-module.exports = { getCart, addToCart, updateCartItem, removeFromCart };
+export { getCart, addToCart, updateCartItem, removeFromCart };

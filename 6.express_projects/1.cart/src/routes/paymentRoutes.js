@@ -1,9 +1,11 @@
 // src/routes/paymentRoutes.js
-const express = require('express');
-const paymentController = require('../controllers/paymentController');
+
+import express from 'express';
+import { confirmPayment } from '../controllers/paymentController.js';
 
 const router = express.Router();
 
-router.post('/toss-payment', paymentController.processPayment);
+// 결제 승인 엔드포인트
+router.post('/confirm', confirmPayment);
 
-module.exports = router;
+export default router;

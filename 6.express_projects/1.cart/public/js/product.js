@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${product.id}</td>
-                <td><img src="/static/images/${product.image}" class="product-image"></td>
+                <td><img src="${product.image}" class="product-image"></td>
                 <td>${product.name}</td>
                 <td>${product.price}</td>
                 <td><button onclick="addToCart(${product.id})">담기</button></td>

@@ -1,29 +1,27 @@
-const express = require('express');
-const session = require('express-session');
-// const bodyParser = require('body-parser');
-const morgan = require('morgan');
 
-const mainRoutes = require('./src/routes/mainRoutes');
-const authRoutes = require('./src/routes/authRoutes');
-const productRoutes = require('./src/routes/productRoutes');
-const cartRoutes = require('./src/routes/cartRoutes');
-const paymentRoutes = require('./src/routes/paymentRoutes');
+import express from 'express';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+
+// 환경 변수 설정
+dotenv.config();
+
+// 경로에 따른 라우트 모듈
+import mainRoutes from './src/routes/mainRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
+import productRoutes from './src/routes/productRoutes.js';
+import cartRoutes from './src/routes/cartRoutes.js';
+import paymentRoutes from './src/routes/paymentRoutes.js';
+
+import { sessionConfig } from './config/sessionConfig.js';
 
 const app = express();
 const port = 3000;
 
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use(
-    session({
-        secret: 'your-secret-key',
-        resave: false,
-        saveUninitialized: true,
-    })
-);
+app.use(sessionConfig); // 분리된 세션 설정 적용
 
 app.use(morgan('dev')); // dev, combined
 

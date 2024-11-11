@@ -1,18 +1,18 @@
 // src/controllers/mainController.js
 
-const path = require('path');
+import path from 'path';
 
 function home(req, res) {
     const user = req.session.user;
-    res.sendFile(path.join(__dirname, '../../public', 'home.html'));
+    res.sendFile(path.resolve('public/home.html'));
 }
 
 function products(req, res) {
-    res.sendFile(path.join(__dirname, '../../public', 'products.html'));
+    res.sendFile(path.resolve('public/products.html'));
 }
 
 function cart(req, res) {
-    res.sendFile(path.join(__dirname, '../../public', 'cart.html'));
+    res.sendFile(path.resolve('public/cart.html'));
 }
 
-module.exports = { home, products, cart };
+export { home, products, cart };

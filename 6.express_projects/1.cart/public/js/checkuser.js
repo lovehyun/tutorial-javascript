@@ -51,20 +51,3 @@ function logout() {
             alert('로그아웃 실패');
         });
 }
-
-// 특정 요소가 나타날 때까지 대기하는 함수
-// waitForElement('#logout').then((logoutButton) => {
-    // logoutButton.addEventListener('click', logout);
-// });
-//
-// function waitForElement(selector) {
-//     return new Promise((resolve) => {
-//         const intervalId = setInterval(() => {
-//             const element = document.querySelector(selector);
-//             if (element) {
-//                 clearInterval(intervalId);
-//                 resolve(element);
-//             }
-//         }, 100); // 100ms 간격으로 확인
-//     });
-// }
