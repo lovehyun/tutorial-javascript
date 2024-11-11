@@ -59,7 +59,7 @@ app.post('/api/login', (req, res) => {
 
     if (user) {
         req.session.user = user;
-        res.json({ message: '로그인 성공' });
+        res.json({ message: '로그인 성공', username: user.username });
     } else {
         res.status(401).json({ message: '로그인 실패' });
     }
@@ -78,7 +78,7 @@ app.get('/api/logout', (req, res) => {
     });
 });
 
-app.use('/api/check-login', (req, res) => {
+app.get('/api/check-login', (req, res) => {
     const user = req.session.user;
 
     if (user) {
@@ -113,9 +113,8 @@ app.get('/api/cart', checkLogin, (req, res) => {
 });
 
 app.post('/api/cart/:productId', checkLogin, (req, res) => {
-    const productId = parseInt(req.params.productId);
+    const productId = Number(req.params.productId);
     const product = products.find((p) => p.id === productId);
-
     if (!product) {
         return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
     }
@@ -139,8 +138,8 @@ app.post('/api/cart/:productId', checkLogin, (req, res) => {
 });
 
 app.put('/api/cart/:productId', checkLogin, (req, res) => {
-    const productId = parseInt(req.params.productId);
-    const change = parseInt(req.query.change);
+    const productId = Number(req.params.productId);
+    const change = Number(req.query.change);
 
     if (isNaN(productId) || isNaN(change)) {
         return res.status(400).json({ message: '잘못된 요청입니다.' });
@@ -160,7 +159,7 @@ app.put('/api/cart/:productId', checkLogin, (req, res) => {
 });
 
 app.delete('/api/cart/:productId', checkLogin, (req, res) => {
-    const productId = parseInt(req.params.productId);
+    const productId = Number(req.params.productId);
 
     if (isNaN(productId)) {
         return res.status(400).json({ message: '잘못된 요청입니다.' });

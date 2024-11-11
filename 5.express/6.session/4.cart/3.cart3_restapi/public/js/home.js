@@ -1,22 +1,25 @@
-import { fetchUserInfo } from './checkuser.js';
+import { fetchUserInfo_asyncawait } from './checkuser.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     checkLoginStatus();
-    document.getElementById('login').addEventListener('click', login);
+    document.getElementById('login').addEventListener('click', (event) => {
+        event.preventDefault(); // 기본 동작 비활성화
+        login();
+    });
 });
 
 function checkLoginStatus() {
-    fetchUserInfo()
-    .then((username) => {
-        if (username) {
-            showProfile(username);
-        } else {
-            showLoginForm();
-        }
-    })
-    .catch((error) => {
-        console.error('사용자 정보를 가져오는 중 에러 발생:', error);
-    });
+    fetchUserInfo_asyncawait()
+        .then((username) => {
+            if (username) {
+                showProfile(username);
+            } else {
+                showLoginForm();
+            }
+        })
+        .catch((error) => {
+            console.error('사용자 정보를 가져오는 중 에러 발생:', error);
+        });
 }
 
 function login() {
@@ -40,7 +43,6 @@ function login() {
             }
         })
         .then(data => { // 파싱 한 데이터를 다시 프로세싱
-            // console.log(data.message);
             alert(data.message);
             checkLoginStatus();
         })

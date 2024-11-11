@@ -1,64 +1,70 @@
-import { fetchUserInfo } from './checkuser.js';
+import { fetchUserInfo_asyncawait } from './checkuser.js';
 
 document.addEventListener('DOMContentLoaded', function () {
-    fetchUserInfo();
+    fetchUserInfo_asyncawait();
 
     fetch('/api/products')
         .then((response) => response.json())
         .then((products) => displayProducts(products));
-
-    function displayProducts(products) {
-        const productTableBody = document.querySelector('#productTable tbody');
-
-        products.forEach((product) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>${product.price}</td>
-                <td><button onclick="addToCart(${product.id})">담기</button></td>
-            `;
-            productTableBody.appendChild(row);
-        });
-    }
 });
 
-window.addToCart = function (productId) {
-    fetch(`/api/cart/${productId}`, { method: 'POST' })
-        .then(async (response) => {
+function displayProducts(products) {
+    const productTableBody = document.querySelector('#productTable tbody');
+
+    products.forEach((product) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${product.id}</td>
+            <td>${product.name}</td>
+            <td>${product.price}</td>
+            <td><button class="add-to-cart-btn" data-product-id="${product.id}">담기</button></td>
+        `;
+
+        productTableBody.appendChild(row);
+
+        // 버튼이 생성될 때마다 바로 이벤트 리스너를 추가, once 옵션 사용
+        row.querySelector('.add-to-cart-btn').addEventListener('click', function () {
+                // const productId = this.dataset.productId; // dataset을 통해 data-product-id 값을 가져옴
+                const productId = this.getAttribute('data-product-id');
+                addToCart(productId);
+            }, { once: true }
+        );
+    });
+}
+
+function addToCart(productId) {
+    fetch(`/api/cart/${productId}`, { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then((response) => {
             if (response.status === 200) {
                 return response.json();
             } else if (response.status === 401) {
-                // 401 상태 코드일 경우 로그인이 필요하다는 메시지를 화면에 표시
-                const data = await response.json();
-                alert(data.message);
-
-                // 만약 리다이렉트 URL이 제공되면 해당 URL로 이동
-                if (data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                }
-                
-                throw new Error('Unauthorized');
+                return response.json().then((data) => {
+                    alert(data.message);
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    }
+                    throw new Error('Unauthorized');
+                });
             } else {
                 throw new Error('Failed to fetch cart data');
             }
         })
         .then((data) => {
             alert(data.message);
-            fetch('/api/cart')
-                .then((response) => response.json())
-                .then((data) => {
-                    // 세션 스토리지에 저장
-                    sessionStorage.setItem('cart', JSON.stringify(data));
-                    // 로컬 스토리지에 저장
-                    // localStorage.setItem('cart', JSON.stringify(data));
-
-                    // 페이지 이동
-                    window.location.href = '/cart';
-                });
+            return fetch('/api/cart')
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            // 브라우저 세션 저장소에 장바구니 저장
+            // sessionStorage.setItem('cart', JSON.stringify(data));
+            window.location.href = '/cart';
         })
         .catch(error => {
-            // 여기에서 로그인 실패 또는 다른 오류 처리
             console.error('주문 오류:', error);
             alert('상품 담기 실패');
         });

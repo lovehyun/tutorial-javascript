@@ -71,34 +71,27 @@ function displayCart(cartData) {
             <td>${item.price}</td>
             <td>
                 <span class="quantity" id="quantity-${item.id}">${item.quantity}</span>
-                <button class="increase-btn" data-product-id="${item.id}">+</button>
-                <button class="decrease-btn" data-product-id="${item.id}">-</button>
+                <button onclick="increaseQuantity(${item.id})">+</button>
+                <button onclick="decreaseQuantity(${item.id})">-</button>
             </td>
-            <td><button class="remove-btn" data-product-id="${item.id}">Remove</button></td>
+            <td><button onclick="removeFromCart(${item.id})">Remove</button></td>
         `;
+
         cartTableBody.appendChild(row);
         totalAmount += item.price * item.quantity;
-
-        // 각 버튼에 이벤트 리스너를 once 옵션을 사용하여 한 번만 추가
-        row.querySelector('.increase-btn').addEventListener('click', (event) => {
-            const productId = event.target.getAttribute('data-product-id');
-            updateQuantity(productId, 1);
-        }, { once: true });
-
-        row.querySelector('.decrease-btn').addEventListener('click', (event) => {
-            const productId = event.target.getAttribute('data-product-id');
-            updateQuantity(productId, -1);
-        }, { once: true });
-
-        row.querySelector('.remove-btn').addEventListener('click', (event) => {
-            const productId = event.target.getAttribute('data-product-id');
-            removeFromCart(productId);
-        }, { once: true });
     });
 
     // totalAmountSpan.textContent = totalAmount.toFixed(2);
     totalAmountSpan.textContent = totalAmount;
 }
+
+window.increaseQuantity = function (productId) {
+    updateQuantity(productId, 1);
+};
+
+window.decreaseQuantity = function (productId) {
+    updateQuantity(productId, -1);
+};
 
 function updateQuantity(productId, change) {
     fetch(`/api/cart/${productId}?change=${change}`, { method: 'PUT' })
@@ -113,7 +106,7 @@ function updateQuantity(productId, change) {
         });
 }
 
-function removeFromCart(productId) {
+window.removeFromCart = function (productId) {
     fetch(`/api/cart/${productId}`, { method: 'DELETE' })
         .then(async (response) => {
             if (response.status === 200) {
