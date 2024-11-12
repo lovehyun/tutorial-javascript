@@ -83,17 +83,17 @@ function displayCart(cartData) {
         row.querySelector('.increase-btn').addEventListener('click', (event) => {
             const productId = event.target.getAttribute('data-product-id');
             updateQuantity(productId, 1);
-        }, { once: true });
+        });
 
         row.querySelector('.decrease-btn').addEventListener('click', (event) => {
             const productId = event.target.getAttribute('data-product-id');
             updateQuantity(productId, -1);
-        }, { once: true });
+        });
 
         row.querySelector('.remove-btn').addEventListener('click', (event) => {
             const productId = event.target.getAttribute('data-product-id');
             removeFromCart(productId);
-        }, { once: true });
+        });
     });
 
     // totalAmountSpan.textContent = totalAmount.toFixed(2);

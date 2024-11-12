@@ -31,7 +31,7 @@ app.use(express.static('public'));
 
 // 라우트 - 홈 페이지
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'));
+    res.sendFile(path.resolve('public/index.html'));
 });
 
 // 라우트 - 로그인 처리
@@ -57,10 +57,28 @@ app.get('/profile', (req, res) => {
 
     // 세션에 사용자 정보가 없으면 로그인 페이지로 리다이렉트
     if (!user) {
-        res.redirect('/');
-    } else {
-        res.send(`프로필 페이지 - 사용자 이름: ${user.username}`);
+        return res.redirect('/');
     }
+
+    // 데이터베이스에서 추가 정보 가져오기
+    db.get('SELECT email, created_at FROM users WHERE id = ?', [user.id], (err, row) => {
+        if (err) {
+            console.error('DB 조회 오류:', err);
+            return res.status(500).send('서버 오류');
+        }
+
+        // row가 존재하는지 확인 후 정보 전달
+        if (row) {
+            res.send(`
+                <h1>프로필 페이지</h1>
+                <p>사용자 이름: ${user.username}</p>
+                <p>이메일: ${row.email}</p>
+                <p>가입 날짜: ${row.created_at}</p>
+            `);
+        } else {
+            res.send('프로필 정보를 찾을 수 없습니다.');
+        }
+    });
 });
 
 // 라우트 - 로그아웃 처리

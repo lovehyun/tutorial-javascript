@@ -24,11 +24,10 @@ function displayProducts(products) {
 
         // 버튼이 생성될 때마다 바로 이벤트 리스너를 추가, once 옵션 사용
         row.querySelector('.add-to-cart-btn').addEventListener('click', function () {
-                // const productId = this.dataset.productId; // dataset을 통해 data-product-id 값을 가져옴
-                const productId = this.getAttribute('data-product-id');
-                addToCart(productId);
-            }, { once: true }
-        );
+            // const productId = this.dataset.productId; // dataset을 통해 data-product-id 값을 가져옴
+            const productId = this.getAttribute('data-product-id');
+            addToCart(productId);
+        });
     });
 }
 

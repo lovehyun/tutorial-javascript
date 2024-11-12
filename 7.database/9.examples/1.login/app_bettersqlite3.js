@@ -17,7 +17,7 @@ app.use(express.static('public'));
 
 // 라우트 - 홈 페이지
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'));
+    res.sendFile(path.resolve('public/index.html'));
 });
 
 // 라우트 - 로그인 처리

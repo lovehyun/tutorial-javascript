@@ -11,16 +11,17 @@ const db = new sqlite3.Database('mydatabase.db');
 // 테이블 생성
 db.run(`CREATE TABLE IF NOT EXISTS greetings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    message TEXT
+    message TEXT,
+    author TEXT
 )`);
 
 // 데이터 삽입
-db.run('INSERT INTO greetings (message) VALUES (?)', ['Hello, World!'], function (err) {
+db.run('INSERT INTO greetings (message, author) VALUES (?, ?)', ['Hello, World!', 'Alice'], function (err) {
     if (err) {
         console.error('Error inserting into database:', err);
         return;
     }
-    console.log('Hello, World! added with ID:', this.lastID);
+    console.log('Added with ID:', this.lastID);
 });
 
 // 데이터 조회

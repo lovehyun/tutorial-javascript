@@ -10,6 +10,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS users (
     email TEXT
 )`);
 
+
 // 2. 모든 사용자 조회
 // const allUsers = db.prepare('SELECT * FROM users').all();
 // console.log('All Users:', allUsers);
@@ -17,10 +18,12 @@ const allUsers = db.prepare('SELECT * FROM users');
 const allUsersResult = allUsers.all();
 console.log('All Users:', allUsersResult);
 
+
 // 3. 특정 사용자 조회
 const userId = 1;
 const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
 console.log('User with ID', userId, ':', user);
+
 
 // 4. 새로운 사용자 생성
 const newUser = {
@@ -31,6 +34,7 @@ const newUser = {
 const insert = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
 const insertResult = insert.run(newUser.username, newUser.email);
 console.log('User added with ID:', insertResult.lastInsertRowid);
+
 
 // 5. 사용자 정보 업데이트
 const updateUser = {
@@ -43,6 +47,7 @@ const update = db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?
 update.run(updateUser.username, updateUser.email, updateUser.id);
 console.log('User updated successfully');
 
+
 // 6. 사용자 삭제
 const deleteUser = {
     id: 2,
@@ -51,6 +56,7 @@ const deleteUser = {
 const deleteQuery = db.prepare('DELETE FROM users WHERE id = ?');
 deleteQuery.run(deleteUser.id);
 console.log('User deleted successfully');
+
 
 // 데이터베이스 연결 종료
 db.close();

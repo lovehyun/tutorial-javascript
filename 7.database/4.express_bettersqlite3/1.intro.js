@@ -13,7 +13,6 @@ const db = new Database(dbFile);
 function initializeDatabase() {
     // init_data.sql 파일 읽기
     const sql = fs.readFileSync('init_database.sql', 'utf8');
-    console.log('haha');
 
     // 파일 내의 SQL 쿼리 실행
     const statements = sql.split(';').filter(Boolean);
