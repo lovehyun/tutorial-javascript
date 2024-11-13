@@ -1,7 +1,10 @@
 const sqlite3 = require('sqlite3').verbose();
 
+// SQLite 데이터베이스 연결 (파일이 없으면 새로 생성됨)
+const db = new sqlite3.Database('simple.db');
+
 // 프라미스로 변환하는 유틸리티 함수
-function runQuery(db, query, params = []) {
+function runQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.run(query, params, function (err) {
             if (err) {
@@ -12,7 +15,7 @@ function runQuery(db, query, params = []) {
     });
 }
 
-function getQuery(db, query, params = []) {
+function getQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.get(query, params, (err, row) => {
             if (err) {
@@ -23,7 +26,7 @@ function getQuery(db, query, params = []) {
     });
 }
 
-function allQuery(db, query, params = []) {
+function allQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         db.all(query, params, (err, rows) => {
             if (err) {
@@ -36,20 +39,17 @@ function allQuery(db, query, params = []) {
 
 // async/await로 데이터베이스 작업 수행
 (async () => {
-    // SQLite 데이터베이스 연결 (파일이 없으면 새로 생성됨)
-    const db = new sqlite3.Database('simple.db');
-
     try {
         // 테이블 생성
-        await runQuery(db, 'CREATE TABLE IF NOT EXISTS messages (text TEXT)');
+        await runQuery('CREATE TABLE IF NOT EXISTS messages (text TEXT)');
         console.log('테이블이 성공적으로 생성되었습니다.');
 
         // 데이터 삽입
-        const insertResult = await runQuery(db, 'INSERT INTO messages (text) VALUES (?)', ['Hello, SQLite!']);
+        const insertResult = await runQuery('INSERT INTO messages (text) VALUES (?)', ['Hello, SQLite!']);
         console.log('데이터가 성공적으로 삽입되었습니다. ID:', insertResult.lastID);
 
         // 데이터 조회
-        const rows = await allQuery(db, 'SELECT * FROM messages');
+        const rows = await allQuery('SELECT * FROM messages');
         rows.forEach(row => console.log('조회된 메시지:', row.text));
 
     } catch (err) {

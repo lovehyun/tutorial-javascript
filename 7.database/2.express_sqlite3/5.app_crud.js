@@ -1,6 +1,7 @@
 // curl -X POST 127.0.0.1:3000/users -d username=user3 -d password=password3
 // curl -X PUT 127.0.0.1:3000/users/2 -d username=user002 -d password=password002
 // curl -X DELETE 127.0.0.1:3000/users/1
+// curl -X PUT http://localhost:3000/users/1 -H "Content-Type: application/json" -d '{"username": "new_username", "password": "new_password"}'
 
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
@@ -26,8 +27,7 @@ app.get('/users', (req, res) => {
     db.all('SELECT * FROM users', (err, rows) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.json(rows);
     });
@@ -39,8 +39,7 @@ app.get('/users/:id', (req, res) => {
     db.get('SELECT * FROM users WHERE id = ?', [userId], (err, row) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.json(row);
     });
@@ -53,8 +52,7 @@ app.post('/users', (req, res) => {
     db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, passwsord], function (err) {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.send(`User added with ID: ${this.lastID}`);
     });
@@ -69,8 +67,7 @@ app.put('/users/:id', (req, res) => {
     db.run('UPDATE users SET username = ?, password = ? WHERE id = ?', [username, password, userId], (err) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.send('User updated successfully');
     });
@@ -82,35 +79,37 @@ app.put('/users/:id', (req, res) => {
     const userId = req.params.id;
     const { username, password } = req.body;
 
-    if (!username && !password) {
-        res.status(400).send('Either username or password is required');
-        return;
+    // 업데이트할 필드와 값
+    let fields = [];
+    let values = [];
+
+    if (username !== undefined) {
+        fields.push("username = ?");
+        values.push(username);
+    }
+    if (password !== undefined) {
+        fields.push("password = ?");
+        values.push(password);
     }
 
-    const updateFields = {};
-    const updateValues = [];
-
-    if (username) {
-        updateFields.username = username;
-        updateValues.push(username);
+    // 업데이트할 필드가 없을 경우
+    if (fields.length === 0) {
+        return res.status(400).send("No fields provided for update.");
     }
 
-    if (password) {
-        updateFields.password = password;
-        updateValues.push(password);
+    // 필드 개수와 values 배열 개수 일치 확인
+    if (fields.length !== values.length) {
+        return res.status(500).send("Field and value count mismatch. Please check input.");
     }
+    
+    // SQL 쿼리 작성
+    const query = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
+    values.push(userId);  // 마지막에 id 값을 추가하여 ?와 매칭
 
-    updateValues.push(userId);
-
-    const placeholders = Object.keys(updateFields).map(field => `${field} = ?`).join(', ');
-
-    const query = `UPDATE users SET ${placeholders} WHERE id = ?`;
-
-    db.run(query, updateValues, (err) => {
+    db.run(query, values, (err) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.send('User updated successfully');
     });    
@@ -122,8 +121,7 @@ app.delete('/users/:id', (req, res) => {
     db.run('DELETE FROM users WHERE id = ?', [userId], (err) => {
         if (err) {
             console.error(err.message);
-            res.status(500).send('Internal Server Error');
-            return;
+            return res.status(500).send('Internal Server Error');
         }
         res.send('User deleted successfully');
     });

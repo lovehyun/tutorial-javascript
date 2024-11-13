@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinook Database Search</title>
+</head>
+<body>
+    <h1>Chinook 데이터베이스 검색</h1>
+    <form action="/search" method="POST">
+        <input type="text" name="searchQuery" placeholder="검색어 입력" required>
+        <select name="searchScope" required>
+            <option value="artist">아티스트 이름</option>
+            <option value="album">앨범 제목</option>
+            <option value="track">트랙 제목</option>
+            <option value="composer">작곡가</option>
+            <option value="genre">장르</option>
+            <option value="customer">고객 이름</option>
+        </select>
+        <button type="submit">검색</button>
+    </form>
+
+    <h2>검색 결과:</h2>
+    <ul>
+        {% for result in results %}
+            <li>{{ result.Name or result.Title or result.First_Name or result.Last_Name or result.Composer }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

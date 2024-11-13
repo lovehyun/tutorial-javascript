@@ -19,13 +19,7 @@ const allUsersResult = allUsers.all();
 console.log('All Users:', allUsersResult);
 
 
-// 3. 특정 사용자 조회
-const userId = 1;
-const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
-console.log('User with ID', userId, ':', user);
-
-
-// 4. 새로운 사용자 생성
+// 3. 새로운 사용자 생성
 const newUser = {
     username: 'user1',
     email: 'user1@example.com',
@@ -34,6 +28,12 @@ const newUser = {
 const insert = db.prepare('INSERT INTO users (username, email) VALUES (?, ?)');
 const insertResult = insert.run(newUser.username, newUser.email);
 console.log('User added with ID:', insertResult.lastInsertRowid);
+
+
+// 4. 특정 사용자 조회
+const userId = 1;
+const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+console.log('User with ID', userId, ':', user);
 
 
 // 5. 사용자 정보 업데이트

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinook Database Search</title>
+</head>
+<body>
+    <h1>Search Artists in Chinook Database</h1>
+    <form action="/search" method="POST">
+        <input type="text" name="searchQuery" placeholder="Enter artist name" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Search Results:</h2>
+    <ul>
+        {% for artist in results %}
+            <li>{{ artist.Name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

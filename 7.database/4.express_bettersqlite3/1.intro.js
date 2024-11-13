@@ -15,12 +15,28 @@ function initializeDatabase() {
     const sql = fs.readFileSync('init_database.sql', 'utf8');
 
     // 파일 내의 SQL 쿼리 실행
-    const statements = sql.split(';').filter(Boolean);
+    const statements = sql.split(';').filter(Boolean); // 각 행의 ; 로 잘라서 undefined, null 등의 행은 제외
     db.transaction(() => {
         for (const statement of statements) {
             db.exec(statement);
         }
-    })();
+    })(); // db.transaction 은 함수를 반환함. 그리고 성공하면 자동 커밋, 실패하면 자동 롤백
+
+    // 에러체크를 하려면?
+    /*
+    const transaction = db.transaction(() => {
+        for (const statement of statements) {
+            db.exec(statement);
+        }
+    });
+
+    try {
+        transaction(); // 트랜잭션 실행
+        console.log("Database initialized successfully");
+    } catch (err) {
+        console.error("Error initializing database:", err);
+    }
+    */
 }
 
 // 데이터베이스 초기화

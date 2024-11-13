@@ -106,19 +106,16 @@ app.get('/users/:userId', (req, res) => {
     res.json(row);
 });
 
+// curl "http://localhost:3000/products?name=apple"
+// curl "http://localhost:3000/products?name=book%201"
 // 상품 조회 엔드포인트
 app.get('/products', (req, res) => {
     const { name } = req.query;
     
-    // 따옴표 삭제 함수
-    function removeQuotes(value) {
-        return value.replace(/["']/g, "");
-    }
-
     if (name) {
         // 상품명으로 검색
         const query = db.prepare('SELECT * FROM products WHERE name LIKE ?');
-        const rows = query.all(`%${removeQuotes(name)}%`);
+        const rows = query.all(`%${name}%`);
 
         res.json(rows);
     } else {
@@ -128,6 +125,21 @@ app.get('/products', (req, res) => {
 
         res.json(rows);
     }
+});
+
+// https://www.urlencoder.org/
+// curl "http://127.0.0.1:3000/products_weak?name=' OR '1'='1"
+// curl "http://127.0.0.1:3000/products_weak?name=%27%20OR%20%271%27%3D%271"
+// curl "http://127.0.0.1:3000/products_weak?name=' UNION SELECT * FROM users --"
+// curl "http://127.0.0.1:3000/products_weak?name=%27%20UNION%20SELECT%20*%20FROM%20users%20--"
+app.get('/products_weak', (req, res) => {
+    const { name } = req.query;
+
+    // 취약한 방식으로 상품명 검색
+    const queryStr = `SELECT * FROM products WHERE name LIKE '%${name}%'`;
+    const rows = db.prepare(queryStr).all();
+
+    res.json(rows);
 });
 
 // 상품 상세 정보 조회 엔드포인트
