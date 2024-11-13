@@ -16,7 +16,7 @@ nunjucks.configure('views', {
 
 app.set('view engine', 'html');
 
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 // 메인 페이지: 검색 옵션과 폼
 app.get('/', (req, res) => {
@@ -24,8 +24,8 @@ app.get('/', (req, res) => {
 });
 
 // 검색 실행
-app.post('/search', (req, res) => {
-    const { searchQuery, searchScope } = req.body;
+app.get('/search', (req, res) => {
+    const { searchQuery, searchScope } = req.query;
     
     // 테이블 및 필드 매핑
     const searchOptions = {

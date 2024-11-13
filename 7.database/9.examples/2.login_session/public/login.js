@@ -7,12 +7,19 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     try {
         const response = await fetch('/login', {
             method: 'POST',
+            // headers: {
+            //     'Content-Type': 'application/x-www-form-urlencoded'
+            // },
+            // body: new URLSearchParams({
+            //     username,
+            //     password
+            // })
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Content-Type': 'application/json'
             },
-            body: new URLSearchParams({
-                username,
-                password
+            body: JSON.stringify({
+                username: username,
+                password: password
             })
         });
 

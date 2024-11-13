@@ -4,18 +4,19 @@ const path = require('path');
 
 const app = express();
 const db = new sqlite3.Database(':memory:'); // 메모리에 데이터베이스 생성
+const PORT = process.env.PORT || 3000;
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 db.serialize(() => {
-    db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)');
+    db.run('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT, nickname TEXT)');
 
     // 기본 사용자 추가
-    const insert = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-    insert.run('user1', 'password1');
-    insert.run('user2', 'password2');
-    insert.run('user3', 'password3');
+    const insert = db.prepare('INSERT INTO users (username, password, nickname) VALUES (?, ?, ?)');
+    insert.run('user1', 'password1', 'bill');
+    insert.run('user2', 'password2', 'steve');
+    insert.run('user3', 'password3', 'tom');
     insert.finalize();
 });
 
@@ -49,7 +50,25 @@ app.post('/login', (req, res) => {
     });
 });
 
-const PORT = process.env.PORT || 3000;
+app.get('/users/:id', (req, res) => {
+    const userId = req.params.id;
+
+    // Prepared Statement를 사용하여 SQL 인젝션 방어
+    const sql = "SELECT username, nickname FROM users WHERE id = ?";
+    console.log(`Executing query: ${sql} with id = ${userId}`);
+
+    db.get(sql, [userId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: '사용자 조회 실패' });
+        }
+        if (row) {
+            res.status(200).json({ username: row.username, nickname: row.nickname });
+        } else {
+            res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+        }
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
 });

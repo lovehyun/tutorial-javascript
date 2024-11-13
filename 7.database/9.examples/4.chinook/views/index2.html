@@ -7,8 +7,8 @@
 </head>
 <body>
     <h1>Chinook 데이터베이스 검색</h1>
-    <form action="/search" method="POST">
-        <input type="text" name="searchQuery" placeholder="검색어 입력" required>
+    <form action="/search" method="GET">
+        <input type="text" name="searchQuery" placeholder="검색어 입력">
         <select name="searchScope" required>
             <option value="artist">아티스트 이름</option>
             <option value="album">앨범 제목</option>

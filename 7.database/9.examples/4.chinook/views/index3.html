@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinook Database Search</title>
+</head>
+<body>
+    <h1>Chinook 데이터베이스 검색</h1>
+    <form action="/search" method="GET">
+        <input type="text" name="searchQuery" placeholder="검색어 입력">
+        <select name="searchScope" required>
+            <option value="artist">아티스트 이름</option>
+            <option value="album">앨범 제목</option>
+            <option value="track">트랙 제목</option>
+            <option value="composer">작곡가</option>
+            <option value="genre">장르</option>
+            <option value="customer">고객 이름</option>
+        </select>
+        <button type="submit">검색</button>
+    </form>
+
+    <h2>검색 결과:</h2>
+    <ul>
+        {% for result in results %}
+            <li>{{ result.Name or result.Title or result.First_Name or result.Last_Name or result.Composer }}</li>
+        {% endfor %}
+    </ul>
+
+    <div>
+        <form action="/search" method="GET" style="display:inline;">
+            <input type="hidden" name="searchQuery" value="{{ searchQuery }}">
+            <input type="hidden" name="searchScope" value="{{ searchScope }}">
+            
+            {% if currentPage > 1 %}
+                <input type="hidden" name="page" value="{{ currentPage - 1 }}">
+                <button type="submit">이전</button>
+            {% else %}
+                <button type="submit" disabled>이전</button>
+            {% endif %}
+        </form>
+        
+        <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
+        
+        <form action="/search" method="GET" style="display:inline;">
+            <input type="hidden" name="searchQuery" value="{{ searchQuery }}">
+            <input type="hidden" name="searchScope" value="{{ searchScope }}">
+            
+            {% if currentPage < totalPages %}
+                <input type="hidden" name="page" value="{{ currentPage + 1 }}">
+                <button type="submit">다음</button>
+            {% else %}
+                <button type="submit" disabled>다음</button>
+            {% endif %}
+        </form>
+    </div>
+</body>
+</html>
