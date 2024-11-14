@@ -39,7 +39,7 @@ app.get('/search', (req, res) => {
         'track': { table: 'tracks', field: 'name' },
         'composer': { table: 'tracks', field: 'composer' },
         'genre': { table: 'genres', field: 'name' },
-        'customer': { table: 'customers', field: 'first_name' }  // 또는 last_name
+        'customer': { table: 'customers', field: 'firstname' }  // 또는 lastname
     };
     
     const option = searchOptions[searchScope];

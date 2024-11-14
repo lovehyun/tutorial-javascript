@@ -77,6 +77,7 @@ app.get('/profile-data', (req, res) => {
                 username: user.username,
                 email: row.email,
                 created_at: row.created_at,
+                role: row.role,
             });
         } else {
             res.status(404).json({ error: '프로필 정보를 찾을 수 없습니다.' });

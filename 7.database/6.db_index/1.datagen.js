@@ -40,11 +40,13 @@ function getRandomDepartment() {
 
 // 랜덤 급여를 생성하는 함수
 function getRandomSalary() {
-    return Math.floor(Math.random() * 90) * 1000 + 10000; // 10,000에서 100,000 사이의 랜덤 급여
+    return Math.floor(Math.random() * 100) * 1000 + 10000; // 10,000에서 100,000 사이의 랜덤 급여
 }
 
 // numData명의 레코드를 추가
 db.serialize(() => {
+    console.time("Execution Time"); // 시작 시간 기록
+
     db.run('BEGIN TRANSACTION');
 
     const insertStmt = db.prepare('INSERT INTO employees (name, department, salary) VALUES (?, ?, ?)');
@@ -69,7 +71,11 @@ db.serialize(() => {
     }
 
     insertStmt.finalize();
-    db.run('COMMIT');
+    
+    // db.run('COMMIT');
+    db.run('COMMIT', () => {
+        console.timeEnd("Execution Time"); // 종료 시간 및 소요 시간 출력
+    });
 });
 
 // 데이터베이스 연결 종료

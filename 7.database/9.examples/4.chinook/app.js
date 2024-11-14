@@ -24,8 +24,10 @@ app.get('/', (req, res) => {
 });
 
 // Handle search form submissions
-app.post('/search', (req, res) => {
-    const { searchQuery } = req.body;
+// app.post('/search', (req, res) => {
+    // const { searchQuery } = req.body;
+app.get('/search', (req, res) => {
+    const { searchQuery } = req.query;
     
     const sql = `SELECT * FROM artists WHERE name LIKE ?`;
     db.all(sql, [`%${searchQuery}%`], (err, rows) => {
@@ -34,7 +36,7 @@ app.post('/search', (req, res) => {
             res.status(500).send("Database error.");
             return;
         }
-        res.render('index.njk', { results: rows });
+        res.render('index', { results: rows });
     });
 });
 

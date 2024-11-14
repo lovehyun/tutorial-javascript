@@ -5,22 +5,31 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
     const password = document.getElementById('password').value;
 
     try {
+        // 방법1. FormData
+        // const formData = new FormData();
+        // formData.append('username', username);
+        // formData.append('password', password);
+        // 이후 fetch 에서 "body: formData" 를 통해 전달
+
         const response = await fetch('/login', {
             method: 'POST',
-            // headers: {
-            //     'Content-Type': 'application/x-www-form-urlencoded'
-            // },
-            // body: new URLSearchParams({
-            //     username,
-            //     password
-            // })
+            // 방법2. URLSearchParams
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify({
+            body: new URLSearchParams({
                 username: username,
                 password: password
             })
+
+            // 방법3. JSON
+            // headers: {
+            //     'Content-Type': 'application/json'
+            // },
+            // body: JSON.stringify({
+            //     username: username,
+            //     password: password
+            // })
         });
 
         if (response.redirected) {

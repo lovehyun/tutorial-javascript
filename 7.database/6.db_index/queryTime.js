@@ -10,18 +10,30 @@ function queryName(db, searchName) {
     const selectQuery = 'SELECT * FROM employees WHERE name = ?';
 
     // 쿼리 실행 시간 측정
-    const startTime = process.hrtime();
+    // const startTime = process.hrtime();
+    console.time('Query execution time');
 
-    db.get(selectQuery, [searchName], (err, row) => {
+    // db.get(selectQuery, [searchName], (err, row) => {
+    //     if (err) {
+    //         console.error(err.message);
+    //     } else {
+    //         console.log('Result:', row);
+    //     }
+
+    //     console.timeEnd('Query execution time');
+    // });
+
+    db.all(selectQuery, [searchName], (err, rows) => {
         if (err) {
             console.error(err.message);
         } else {
-            console.log('Result:', row);
+            console.log('Result:', rows);
         }
 
         // 쿼리 실행 시간 측정 종료
-        const endTime = process.hrtime(startTime);
-        console.log(`Query execution time: ${endTime[0]}s ${endTime[1] / 1e6}ms`);
+        // const endTime = process.hrtime(startTime);
+        // console.log(`Query execution time: ${endTime[0]}s ${endTime[1] / 1e6}ms`);
+        console.timeEnd('Query execution time');
     });
 }
 
@@ -43,7 +55,8 @@ function queryAll(db, searchOptions) {
     }
 
     // 쿼리 실행 시간 측정 시작
-    const startTime = process.hrtime();
+    // const startTime = process.hrtime();
+    console.time('Query execution time');
 
     db.all(selectQuery, queryParams, (err, rows) => {
         if (err) {
@@ -53,8 +66,9 @@ function queryAll(db, searchOptions) {
         }
 
         // 쿼리 실행 시간 측정 종료
-        const endTime = process.hrtime(startTime);
-        console.log(`Query execution time: ${endTime[0]}s ${endTime[1] / 1e6}ms`);
+        // const endTime = process.hrtime(startTime);
+        // console.log(`Query execution time: ${endTime[0]}s ${endTime[1] / 1e6}ms`);
+        console.timeEnd('Query execution time');
     });
 }
 

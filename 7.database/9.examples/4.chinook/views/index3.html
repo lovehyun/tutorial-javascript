@@ -23,7 +23,7 @@
     <h2>검색 결과:</h2>
     <ul>
         {% for result in results %}
-            <li>{{ result.Name or result.Title or result.First_Name or result.Last_Name or result.Composer }}</li>
+            <li>{{ result.Name or result.Title or result.FirstName or result.LastName or result.Composer }}</li>
         {% endfor %}
     </ul>
 

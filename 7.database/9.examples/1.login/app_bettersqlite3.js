@@ -10,10 +10,19 @@ const db = new Database('users.db');
 
 // 테이블 생성
 db.exec('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)');
+// const insert = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
+// const users = [
+//     { username: 'user1', password: 'password1' },
+//     { username: 'user2', password: 'password2' },
+//     { username: 'user3', password: 'password3' },
+// ];
+
+// for (const user of users) {
+//     insert.run(user.username, user.password);
+// }
 
 // 미들웨어 설정
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
 
 // 라우트 - 홈 페이지
 app.get('/', (req, res) => {
