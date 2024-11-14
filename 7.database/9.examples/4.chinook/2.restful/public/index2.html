@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinook Database Search</title>
+    <script defer src="search2.js"></script> <!-- JavaScript 파일 연결 -->
+</head>
+<body>
+    <h1>Chinook 데이터베이스 검색</h1>
+    <!-- 검색 폼 -->
+    <form id="searchForm">
+        <input type="text" id="searchQuery" placeholder="검색어 입력" required>
+        <select id="searchScope" required>
+            <option value="artist">아티스트 이름</option>
+            <option value="album">앨범 제목</option>
+            <option value="track">트랙 제목</option>
+            <option value="composer">작곡가</option>
+            <option value="genre">장르</option>
+            <option value="customer">고객 이름</option>
+        </select>
+        <button type="submit">검색</button>
+    </form>
+
+    <!-- 검색 결과를 표시할 영역 -->
+    <h2>검색 결과:</h2>
+    <ul id="resultsList"></ul> <!-- 검색 결과 리스트 -->
+</body>
+</html>

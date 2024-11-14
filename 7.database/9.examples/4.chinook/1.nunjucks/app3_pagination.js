@@ -20,7 +20,7 @@ app.set('view engine', 'html');
 
 // 메인 페이지: 검색 옵션과 폼
 app.get('/', (req, res) => {
-    res.render('index2', { results: [], searchScope: '' });
+    res.render('index3', { results: [], searchScope: '' });
 });
 
 // 검색 실행
