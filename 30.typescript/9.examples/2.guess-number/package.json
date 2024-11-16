@@ -1,0 +1,15 @@
+{
+    "name": "guess-number",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "start": "npx ts-node src/index2.ts"
+    },
+    "devDependencies": {
+        "@types/node": "^18.0.0",
+        "typescript": "^4.0.0"
+    },
+    "dependencies": {
+        "readline-sync": "^1.4.10"
+    }
+}

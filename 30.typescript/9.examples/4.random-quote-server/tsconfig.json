@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS", // CommonJS 사용
+        "target": "ES6", // ES6 이상의 JavaScript로 컴파일
+        "strict": true, // 엄격한 타입 검사
+        "esModuleInterop": true, // CommonJS 모듈과의 호환성
+        "outDir": "./dist", // 출력 폴더 (esbuild에서는 사용되지 않음)
+        "rootDir": "./src" // 소스 파일의 루트 디렉토리
+    },
+    "include": ["src/**/*"], // 컴파일할 파일
+    "exclude": ["node_modules"] // 제외할 파일
+}

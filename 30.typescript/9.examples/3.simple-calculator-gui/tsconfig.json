@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "ES6", // 컴파일된 JavaScript의 버전
+        "module": "ESNext", // 모듈 시스템
+        "strict": true, // 엄격한 타입 체크
+        "esModuleInterop": true // ES 모듈 호환성
+    },
+    "include": ["src/**/*"], // 컴파일할 파일
+    "exclude": ["node_modules"] // 제외할 파일
+}

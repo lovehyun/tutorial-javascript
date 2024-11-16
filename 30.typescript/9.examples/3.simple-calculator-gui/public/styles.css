@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.calculator {
+    width: 300px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#display {
+    width: 100%;
+    height: 60px;
+    font-size: 2em;
+    text-align: right;
+    padding: 0 10px; /* 좌우에 패딩을 추가 */
+    border: none;
+    outline: none;
+    background-color: #f9f9f9;
+    box-sizing: border-box; /* 패딩을 포함한 전체 크기 계산 */
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: #ddd;
+}
+
+button {
+    background: white;
+    border: none;
+    font-size: 1.5em;
+    padding: 20px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #f0f0f0;
+}

@@ -1,0 +1,22 @@
+{
+    "name": "simple-calculator-app",
+    "version": "1.0.0",
+    "description": "A simple GUI calculator built with TypeScript",
+    "main": "dist/index.js",
+    "scripts": {
+        "dev": "esbuild src/index.ts --bundle --outfile=public/app.js --watch",
+        "start-dev": "npx live-server public",
+        "dev-vite": "vite",
+        "build-vite": "vite build",
+        "build": "esbuild src/index.ts --bundle --outfile=public/app.js",
+        "start": "npx http-server public"
+    },
+    "devDependencies": {
+        "@types/node": "^18.0.0",
+        "esbuild": "^0.24.0",
+        "http-server": "^14.1.1",
+        "live-server": "^1.2.2",
+        "typescript": "^4.0.0",
+        "vite": "^5.4.11"
+    }
+}

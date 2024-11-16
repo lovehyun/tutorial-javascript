@@ -1,0 +1,12 @@
+{
+    "name": "counter-app",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "start": "npx ts-node src/index.ts"
+    },
+    "devDependencies": {
+        "typescript": "^4.0.0",
+        "@types/node": "^18.0.0"
+    }
+}

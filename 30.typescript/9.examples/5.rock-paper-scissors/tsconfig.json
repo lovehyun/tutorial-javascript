@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "CommonJS",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "typeRoots": ["./node_modules/@types"], // 타입 정의 경로
+        "types": ["node"] // Node.js 타입 사용
+    }
+}
