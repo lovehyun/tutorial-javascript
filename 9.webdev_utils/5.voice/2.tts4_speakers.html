@@ -220,6 +220,10 @@
                     return;
                 }
 
+                // 디버그 창 초기화
+                debugElement.innerHTML = '';
+                updateDebug('새로운 대화 시작');
+                
                 // 각 화자의 대사를 배열로 변환
                 const aLines = speakerAInput.value.split('\n').filter(line => line.trim() !== '');
                 const bLines = speakerBInput.value.split('\n').filter(line => line.trim() !== '');
