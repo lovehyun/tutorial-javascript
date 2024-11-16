@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대화 음성 출력</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .box {
+            width: 45%;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:active {
+            transform: scale(0.95);
+            background-color: #0056b3;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #debug {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>대화 음성 출력</h1>
+    <div class="container">
+        <div class="box">
+            <h2>Speaker A</h2>
+            <textarea id="speakerA" placeholder="Speaker A의 말할 내용을 입력하세요">Speaker A의 말할 내용을 입력하세요</textarea>
+            <select id="voiceA"></select>
+        </div>
+        <div class="box">
+            <h2>Speaker B</h2>
+            <textarea id="speakerB" placeholder="Speaker B의 말할 내용을 입력하세요">Speaker B의 말할 내용을 입력하세요</textarea>
+            <select id="voiceB"></select>
+        </div>
+    </div>
+    <button id="startButton">대화 시작</button>
+    <button id="stopButton" style="background-color: #dc3545; margin-top: 10px;">대화 중지</button>
+    <p id="status">상태: 준비 중...</p>
+    <div id="debug"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const speakerAInput = document.getElementById('speakerA');
+            const speakerBInput = document.getElementById('speakerB');
+            const voiceASelect = document.getElementById('voiceA');
+            const voiceBSelect = document.getElementById('voiceB');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+            const statusElement = document.getElementById('status');
+            const debugElement = document.getElementById('debug');
+
+            let voices = [];
+            let isSpeaking = false;
+
+            function updateDebug(message) {
+                debugElement.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+                debugElement.scrollTop = debugElement.scrollHeight;
+            }
+
+            // 음성 목록을 로드하는 함수
+            function loadVoices() {
+                return new Promise((resolve) => {
+                    function setVoices() {
+                        voices = window.speechSynthesis.getVoices();
+                        
+                        if (voices.length > 0) {
+                            voiceASelect.innerHTML = '';
+                            voiceBSelect.innerHTML = '';
+
+                            voices.forEach((voice) => {
+                                const optionA = document.createElement('option');
+                                const optionB = document.createElement('option');
+                                optionA.value = voice.name;
+                                optionB.value = voice.name;
+                                optionA.textContent = `${voice.name} (${voice.lang})`;
+                                optionB.textContent = `${voice.name} (${voice.lang})`;
+                                voiceASelect.appendChild(optionA);
+                                voiceBSelect.appendChild(optionB);
+                            });
+
+                            // 기본값 설정
+                            const koreanVoice = voices.findIndex(voice => voice.lang.includes('ko-'));
+                            if (koreanVoice !== -1) {
+                                voiceASelect.selectedIndex = koreanVoice;
+                                voiceBSelect.selectedIndex = koreanVoice;
+                            } else {
+                                voiceASelect.selectedIndex = 0;
+                                voiceBSelect.selectedIndex = Math.min(1, voices.length - 1); // B는 두 번째 음성 선택
+                            }
+
+                            updateDebug(`음성 ${voices.length}개 로드됨`);
+                            statusElement.textContent = '상태: 음성 준비 완료';
+                            resolve();
+                        }
+                    }
+
+                    setVoices();
+                    
+                    if (speechSynthesis.onvoiceschanged !== undefined) {
+                        speechSynthesis.onvoiceschanged = setVoices;
+                    }
+                });
+            }
+
+            function resetSpeechSynthesis() {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                updateDebug('음성 합성 리셋됨');
+            }
+
+            function getSelectedVoice(speaker) {
+                const select = speaker === 'A' ? voiceASelect : voiceBSelect;
+                const selectedVoice = voices.find(voice => voice.name === select.value);
+                updateDebug(`Speaker ${speaker}의 음성: ${selectedVoice?.name || '없음'}`);
+                return selectedVoice;
+            }
+
+            async function speakDialogue(dialogues) {
+                isSpeaking = true;
+                updateDebug(`대화 시작: ${dialogues.length}개 문장`);
+                
+                for (let i = 0; i < dialogues.length; i++) {
+                    if (!isSpeaking) {
+                        updateDebug('대화 중단됨');
+                        break;
+                    }
+
+                    const dialogue = dialogues[i];
+                    
+                    // Chrome 버그 해결을 위한 주기적인 리셋
+                    if (i > 0 && i % 3 === 0) {
+                        resetSpeechSynthesis();
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+
+                    await new Promise((resolve) => {
+                        const utterance = new SpeechSynthesisUtterance(dialogue.text);
+                        const selectedVoice = getSelectedVoice(dialogue.speaker);
+                        
+                        if (!selectedVoice) {
+                            updateDebug(`오류: Speaker ${dialogue.speaker}의 음성이 선택되지 않음`);
+                            statusElement.textContent = '상태: 음성 설정 오류';
+                            resolve();
+                            return;
+                        }
+
+                        utterance.voice = selectedVoice;
+                        utterance.lang = selectedVoice.lang;
+                        utterance.rate = 1;
+                        utterance.pitch = 1;
+                        utterance.volume = 1;
+
+                        utterance.onstart = () => {
+                            updateDebug(`Speaker ${dialogue.speaker} 발화 시작: "${dialogue.text}"`);
+                            statusElement.textContent = `상태: Speaker ${dialogue.speaker}가 말하는 중...`;
+                        };
+
+                        utterance.onend = () => {
+                            updateDebug(`Speaker ${dialogue.speaker} 발화 완료`);
+                            statusElement.textContent = `상태: Speaker ${dialogue.speaker} 완료`;
+                            resolve();
+                        };
+
+                        utterance.onerror = (e) => {
+                            updateDebug(`오류 발생: ${e.error}`);
+                            statusElement.textContent = `상태: 오류 발생 - ${e.error}`;
+                            resolve();
+                        };
+
+                        window.speechSynthesis.speak(utterance);
+                    });
+
+                    // 문장 사이에 짧은 간격 추가
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+
+                isSpeaking = false;
+                statusElement.textContent = '상태: 대화 완료';
+                updateDebug('대화 완료');
+            }
+
+            // 대화 시작 버튼
+            startButton.addEventListener('click', async () => {
+                if (isSpeaking) {
+                    updateDebug('이미 대화가 진행 중입니다.');
+                    return;
+                }
+
+                // 각 화자의 대사를 배열로 변환
+                const aLines = speakerAInput.value.split('\n').filter(line => line.trim() !== '');
+                const bLines = speakerBInput.value.split('\n').filter(line => line.trim() !== '');
+
+                if (aLines.length === 0 && bLines.length === 0) {
+                    alert('대화 내용을 입력하세요.');
+                    return;
+                }
+
+                // 두 화자의 대사를 번갈아가며 배열로 구성
+                const maxLines = Math.max(aLines.length, bLines.length);
+                const dialogues = [];
+                
+                for (let i = 0; i < maxLines; i++) {
+                    // A의 대사가 있으면 추가
+                    if (i < aLines.length) {
+                        dialogues.push({ speaker: 'A', text: aLines[i] });
+                    }
+                    // B의 대사가 있으면 추가
+                    if (i < bLines.length) {
+                        dialogues.push({ speaker: 'B', text: bLines[i] });
+                    }
+                }
+
+                updateDebug(`대화 구성됨: A ${aLines.length}줄, B ${bLines.length}줄`);
+                await speakDialogue(dialogues);
+            });
+
+            // 중지 버튼
+            stopButton.addEventListener('click', () => {
+                resetSpeechSynthesis();
+                statusElement.textContent = '상태: 대화 중지됨';
+            });
+
+            // 초기화
+            loadVoices().then(() => {
+                statusElement.textContent = '상태: 준비 완료';
+                updateDebug('초기화 완료');
+            });
+
+            // 페이지 종료 시 음성 정리
+            window.addEventListener('beforeunload', resetSpeechSynthesis);
+        });
+    </script>
+</body>
+</html>
