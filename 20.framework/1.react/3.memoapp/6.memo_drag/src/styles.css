@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.search-bar {
+    display: block;
+    margin: 0 auto 20px;
+    width: 300px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.memo-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.memo-form input[type='text'] {
+    height: 36px;
+    width: 300px;
+    margin-right: 8px;
+    box-sizing: border-box;
+}
+
+.memo-form button {
+    height: 36px;
+}
+
+.memo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.memo-item { /* 변경 */
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 8px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.memo-item:hover { /* 추가 */
+    background-color: #f9f9f9;
+}
+
+.memo-item input[type='text'] {
+    flex: 1;
+    height: 36px;
+    margin-right: 8px;
+}
+
+.memo-item button {
+    height: 36px;
+}
+
+.memo-item.completed input[type='text'] {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.sort-dropdown {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    width: 200px;
+}
+
+.drag-handle {
+    cursor: grab; /* 드래그 가능하다는 것을 표시 */
+    font-size: 20px; /* 아이콘 크기 */
+    margin-left: 10px; /* 적절한 간격 */
+    color: #888; /* 아이콘 색상 */
+}
+
+.drag-handle:hover {
+    color: #333; /* 호버 시 색상 강조 */
+}
