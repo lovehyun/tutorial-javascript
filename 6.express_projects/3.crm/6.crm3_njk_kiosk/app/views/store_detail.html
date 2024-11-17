@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <a href="/stores/">
+            back
+        </a>
+        <!-- 상점 기본 정보 -->
+        <div class="table-responsive">
+            <table class="table" id="store">
+                <thead>
+                    <tr>
+                        <th scope="col">name</th>
+                        <th scope="col">type</th>
+                        <th scope="col">address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id={{ store.Id }}>
+                        <td> {{ store.Name }} </td>
+                        <td> {{ store.Type }} </td>
+                        <td> {{ store.Address }} </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 월간 매출액 -->
+        <div class="table-responsive">
+            <table class="table" id="store">
+                <thead>
+                    <tr>
+                        <th scope="col">month</th>
+                        <th scope="col">revenue</th>
+                        <th scope="col">count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in revenues %}
+                        <tr>
+                            <td>{{ entry.month }}</td>
+                            <td>{{ entry.revenue }}</td>
+                            <td>{{ entry.count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

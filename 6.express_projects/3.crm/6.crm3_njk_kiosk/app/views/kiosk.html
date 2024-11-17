@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Order Your Items</h2>
+<form action="/kiosk/order" method="post">
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Price</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>{{ item.Name }}</td>
+                        <td>{{ item.UnitPrice }}</td>
+                        <td>
+                            <input type="checkbox" name="items[]" value="{{ item.Id }}">
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button type="submit" class="btn btn-primary">Place Order</button>
+</form>
+{% endblock %}

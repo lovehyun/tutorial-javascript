@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <div class="table-responsive">
+            <table class="table" id="orders">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">ordered_at</th>
+                        <th scope="col">store_id</th>
+                        <th scope="col">user_id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in pagination.items %}
+                        <tr id={{ order.Id }}>
+                            <td> {{ order.Id }} </td>
+                            <td> {{ order.OrderAt }} </td>
+                            <td><a href="/stores/{{ order.StoreId }}">{{ order.StoreId }}</a></td>
+                            <td><a href="/users/{{ order.UserId }}">{{ order.UserId }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <ul class="pagination">
+            {% if pagination.currentPage > 1 %}
+                <li class="page-item"><a class="page-link" href="?page=1">&lt;&lt;</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage - 1 }}">&lt;</a></li>
+            {% endif %}
+
+            {% for page in range(pagination.currentPage - 5, pagination.currentPage + 6) %}
+                {% if page > 0 and page <= pagination.totalPages %}
+                    <li class="page-item {% if page == pagination.currentPage %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if pagination.currentPage < pagination.totalPages %}
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.currentPage + 1 }}">&gt;</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ pagination.totalPages }}">&gt;&gt;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+
+{% endblock %}

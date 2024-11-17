@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="cell-container" style="overflow: auto; max-height: 80vh">
+        <form action="/users" method="get">
+            {{ form.csrf }}
+            <div class="input text">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" value="{{ form.name }}">
+
+                <label for="gender">Gender</label>
+                <!-- <input type="text" id="gender" name="gender" value="{{ form.gender }}"> -->
+                <select id="gender" name="gender">
+                    <option value="" {% if form.gender == "" %}selected{% endif %}>All</option>
+                    <option value="Male" {% if form.gender == "Male" %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if form.gender == "Female" %}selected{% endif %}>Female</option>
+                </select>
+
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table" id="users">
+                <thead>
+                    <tr>
+                        <th scope="col">id</th>
+                        <th scope="col">name</th>
+                        <th scope="col">gender</th>
+                        <th scope="col">age</th>
+                        <th scope="col">birthday</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in pagination.items %}
+                    <tr id="{{ user.Id }}" class="table-light">
+                        <td scope="row"> 
+                            <a href="/users/{{ user.Id }}"> {{ user.Id }} </a>
+                        </td>
+                        <td> {{ user.Name }} </td>
+                        <td> {{ user.Gender }} </td>
+                        <td> {{ user.Age }} </td>
+                        <td> {{ user.Birthdate }} </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+    <div class="d-flex justify-content-center">
+        {% if pagination %}
+            {% set total_pages = pagination.totalPages %}
+            {% set current_page = pagination.currentPage %}
+            
+            <ul class="pagination">
+                {% if current_page > 1 %}
+                    <li class="page-item"><a class="page-link" href="/users?page=1{% if query %}&name={{ query['name'] }}&gender={{ query['gender'] }}{% endif %}">&lt;&lt;</a></li>
+                    <li class="page-item"><a class="page-link" href="/users?page={{ current_page - 1 }}{% if query %}&name={{ query['name'] }}&gender={{ query['gender'] }}{% endif %}">&lt;</a></li>
+                {% endif %}
+                
+                {% for page in range(current_page - 5, current_page + 6) %}
+                    {% if page > 0 and page <= total_pages %}
+                        <li class="page-item {% if page == current_page %}active{% endif %}">
+                            <a class="page-link" href="/users?page={{ page }}{% if query %}&name={{ query['name'] }}&gender={{ query['gender'] }}{% endif %}">{{ page }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if current_page < total_pages %}
+                    <li class="page-item"><a class="page-link" href="/users?page={{ current_page + 1 }}{% if query %}&name={{ query['name'] }}&gender={{ query['gender'] }}{% endif %}">&gt;</a></li>
+                    <li class="page-item"><a class="page-link" href="/users?page={{ total_pages }}{% if query %}&name={{ query['name'] }}&gender={{ query['gender'] }}{% endif %}">&gt;&gt;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+{% endblock %}

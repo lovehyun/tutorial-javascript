@@ -1,0 +1,25 @@
+<!-- base.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Customer Management System</title>
+</head>
+<body>
+    <div class="container h-100">
+        <div class="justify-content-center w-100">
+            {% include 'navbar.html' %}
+            <div class="col-md-12 col-sm-12 mx-auto">
+                <div class="h-100 justify-content-center">
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>
