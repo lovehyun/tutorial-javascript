@@ -1,8 +1,8 @@
 {
-  "name": "5.chatbot_saas",
+  "name": "chatbot_be",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "scripts.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
@@ -12,12 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.2",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.4.3",
-    "morgan": "^1.10.0"
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
   }
 }
