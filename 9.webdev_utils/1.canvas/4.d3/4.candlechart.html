@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 주식 차트</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 캔들 막대 스타일 */
+        .candle {
+            stroke: black;
+            stroke-width: 1px;
+        }
+        .candle.up {
+            fill: green;
+        }
+        .candle.down {
+            fill: red;
+        }
+        .wick {
+            stroke: black;
+            stroke-width: 1px;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 샘플 데이터 (OHLC 데이터 형식)
+        const data = [
+            { date: "2023-11-13", open: 100, high: 110, low: 90, close: 105 },
+            { date: "2023-11-14", open: 105, high: 120, low: 100, close: 95 },
+            { date: "2023-11-15", open: 95, high: 105, low: 85, close: 100 },
+            { date: "2023-11-16", open: 100, high: 110, low: 95, close: 90 },
+        ];
+
+        // SVG 크기 설정
+        const width = 500;
+        const height = 300;
+        const margin = { top: 20, right: 20, bottom: 40, left: 40 };
+
+        // 차트의 유효 영역
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+
+        // 날짜와 가격에 대한 스케일 설정
+        const xScale = d3.scaleBand()
+            .domain(data.map(d => d.date))
+            .range([0, chartWidth])
+            .padding(0.3); // 막대 간격
+
+        const yScale = d3.scaleLinear()
+            .domain([
+                d3.min(data, d => d.low), // 가장 낮은 가격
+                d3.max(data, d => d.high), // 가장 높은 가격
+            ])
+            .range([chartHeight, 0]); // 화면에서는 반대로 작동 (위->아래)
+
+        // SVG 생성
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        const chart = svg.append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+        // X축 추가
+        chart.append("g")
+            .attr("transform", `translate(0, ${chartHeight})`)
+            .call(d3.axisBottom(xScale));
+
+        // Y축 추가
+        chart.append("g")
+            .call(d3.axisLeft(yScale));
+
+        // 캔들 차트 생성
+        chart.selectAll(".wick")
+            .data(data)
+            .enter()
+            .append("line")
+            .attr("class", "wick")
+            .attr("x1", d => xScale(d.date) + xScale.bandwidth() / 2)
+            .attr("x2", d => xScale(d.date) + xScale.bandwidth() / 2)
+            .attr("y1", d => yScale(d.high)) // 가장 높은 가격
+            .attr("y2", d => yScale(d.low)); // 가장 낮은 가격
+
+        chart.selectAll(".candle")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("class", d => d.close > d.open ? "candle up" : "candle down")
+            .attr("x", d => xScale(d.date))
+            .attr("y", d => yScale(Math.max(d.open, d.close))) // 막대의 상단
+            .attr("width", xScale.bandwidth()) // 막대의 너비
+            .attr("height", d => Math.abs(yScale(d.open) - yScale(d.close))); // 막대의 높이
+    </script>
+</body>
+</html>

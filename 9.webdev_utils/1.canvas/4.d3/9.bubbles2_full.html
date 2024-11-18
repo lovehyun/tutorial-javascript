@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 Animated Bubble Chart Background</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* 배경에 고정 */
+        }
+
+        .content {
+            position: relative;
+            z-index: 1; /* SVG 위에 텍스트를 올림 */
+            text-align: center;
+            color: white;
+            margin-top: 20vh;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8); /* 텍스트에 그림자 추가 */
+        }
+
+        h1 {
+            font-size: 4em;
+        }
+
+        p {
+            font-size: 2em;
+        }
+
+        circle {
+            fill: steelblue;
+            stroke: white;
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- SVG는 배경으로 사용 -->
+    <script>
+        // 데이터셋 정의
+        const dataset = [
+            { radius: 30, cx: 50, cy: 50 },
+            { radius: 20, cx: 150, cy: 80 },
+            { radius: 40, cx: 250, cy: 120 },
+        ];
+
+        // 화면 크기
+        const svgWidth = window.innerWidth;
+        const svgHeight = window.innerHeight;
+
+        // SVG 생성
+        const svg = d3.select('body').append('svg').attr('width', svgWidth).attr('height', svgHeight);
+
+        // 버블 그리기
+        const bubbles = svg
+            .selectAll('circle')
+            .data(dataset)
+            .enter()
+            .append('circle')
+            .attr('cx', (d) => d.cx)
+            .attr('cy', (d) => d.cy)
+            .attr('r', (d) => d.radius)
+            .attr('opacity', 0.7)
+            .on('mouseover', function () {
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr('r', (d) => d.radius + 10);
+            })
+            .on('mouseout', function () {
+                d3.select(this)
+                    .transition()
+                    .duration(300)
+                    .attr('r', (d) => d.radius);
+            });
+
+        // 움직이는 효과
+        function moveBubbles() {
+            bubbles
+                .transition()
+                .duration(1000)
+                .attr('cx', () => Math.random() * svgWidth)
+                .attr('cy', () => Math.random() * svgHeight);
+        }
+
+        // 반복 이동
+        setInterval(moveBubbles, 2000);
+    </script>
+
+    <!-- 콘텐츠 -->
+    <div class="content">
+        <h1>Welcome to My Page</h1>
+        <p>This is an animated background with D3.js.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 기본 예제</title>
+    <!-- D3 라이브러리를 불러옵니다. -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <style>
+        /* 선택적으로 스타일링을 할 수 있습니다. */
+        /* 막대의 스타일 */
+        rect {
+            fill: steelblue;
+        }
+        /* 텍스트의 스타일 */
+        text {
+            font-size: 12px;
+            fill: white;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 데이터셋을 정의합니다.
+        const dataset = [10, 20, 30, 40, 50];
+
+        // SVG 요소의 너비와 높이를 정의합니다.
+        const svgWidth = 300;
+        const svgHeight = 150;
+
+        // SVG 요소를 생성합니다.
+        const svg = d3
+            .select('body') // body 태그를 선택합니다.
+            .append('svg') // 새로운 <svg> 요소를 body 태그 안에 추가합니다.
+            .attr('width', svgWidth) // SVG의 너비를 설정합니다.
+            .attr('height', svgHeight); // SVG의 높이를 설정합니다.
+
+        // selectAll: SVG 안에서 기존의 요소를 선택하거나, 새로 만들기 위해 준비합니다.
+        // data: 데이터셋을 요소에 연결합니다.
+        // enter: 데이터셋의 각 항목에 대해 새 요소를 추가할 준비를 합니다.
+        // append: 새 SVG 요소(<rect> 또는 <text>)를 추가합니다.
+        // attr: 요소의 속성(x, y, width, height 등)을 설정합니다.
+        // text: 텍스트 요소의 내용을 설정합니다.
+
+        // 막대 그래프를 그립니다.
+        svg.selectAll('rect') // 모든 <rect> 요소를 선택합니다. (현재는 없으므로 빈 선택이 됩니다.)
+            .data(dataset) // 데이터셋을 바인딩합니다.
+            .enter() // 데이터의 각 요소에 대해 새로운 <rect> 요소를 생성할 준비를 합니다.
+            .append('rect') // <rect> 요소를 추가합니다.
+            .attr('x', (d, i) => i * 60) // 막대의 x 위치를 설정합니다. 데이터의 인덱스(i)를 이용해 막대들을 나란히 배치합니다.
+            .attr('y', (d) => svgHeight - d) // 막대의 y 위치를 설정합니다. 값(d)을 이용해 아래에서부터 높이를 계산합니다.
+            .attr('width', 50) // 막대의 너비를 50픽셀로 설정합니다.
+            .attr('height', (d) => d); // 막대의 높이를 데이터 값(d)으로 설정합니다.
+
+        // 막대 위에 텍스트를 추가합니다.
+        svg.selectAll('text') // 모든 <text> 요소를 선택합니다. (현재는 없으므로 빈 선택이 됩니다.)
+            .data(dataset) // 데이터셋을 바인딩합니다.
+            .enter() // 데이터의 각 요소에 대해 새로운 <text> 요소를 생성할 준비를 합니다.
+            .append('text') // <text> 요소를 추가합니다.
+            .text((d) => d) // 텍스트 요소에 데이터를 텍스트로 설정합니다.
+            .attr('x', (d, i) => i * 60 + 25) // 텍스트의 x 위치를 설정합니다. 막대의 가운데에 위치하도록 조정합니다.
+            .attr('y', (d) => svgHeight - d + 15) // 텍스트의 y 위치를 설정합니다. 막대 위에 위치하도록 조정합니다.
+            .attr('text-anchor', 'middle'); // 텍스트를 가운데 정렬합니다.
+    </script>
+</body>
+</html>

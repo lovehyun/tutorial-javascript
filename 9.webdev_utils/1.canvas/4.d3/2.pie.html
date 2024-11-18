@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D3 파이 차트</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        text {
+            font-size: 12px;
+            fill: white;
+            text-anchor: middle;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 데이터셋: 각 항목의 값
+        const data = [10, 20, 30, 40];
+
+        // 차트의 크기 설정
+        const width = 300;
+        const height = 300;
+        const radius = Math.min(width, height) / 2;
+
+        // 색상 스케일
+        const color = d3.scaleOrdinal()
+            .domain(data)
+            .range(d3.schemeCategory10);
+
+        // SVG 생성
+        const svg = d3.select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+        // 파이 차트를 위한 아크 생성
+        const pie = d3.pie();
+
+        // 아크의 크기 설정
+        const arc = d3.arc()
+            .innerRadius(0) // 도넛 차트를 원하면 이 값을 조정
+            .outerRadius(radius);
+
+        // 데이터 바인딩 및 차트 생성
+        svg.selectAll("path")
+            .data(pie(data)) // 데이터 값을 파이 형태로 변환
+            .enter()
+            .append("path")
+            .attr("d", arc) // 아크의 경로를 생성
+            .attr("fill", (d, i) => color(i)); // 색상 지정
+
+        // 데이터 값 텍스트 추가
+        svg.selectAll("text")
+            .data(pie(data))
+            .enter()
+            .append("text")
+            .text(d => d.data) // 데이터 값을 텍스트로 표시
+            .attr("transform", d => `translate(${arc.centroid(d)})`) // 아크 중심에 위치
+            .style("fill", "white");
+    </script>
+</body>
+</html>
