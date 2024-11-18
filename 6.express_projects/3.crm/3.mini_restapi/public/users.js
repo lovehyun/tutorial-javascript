@@ -1,18 +1,14 @@
-const tableHeader = document.getElementById('table-header');
-const tableBody = document.getElementById('table-body');
 const searchButton = document.getElementById('search-button');
-const searchNameInput = document.getElementById('search-name');
-
-let searchName = '';
 
 // 검색 버튼 클릭 이벤트
 searchButton.addEventListener('click', () => {
-    searchName = searchNameInput.value;
-    fetchUsers();
+    const searchInput = document.getElementById('search-name');
+    searchName = searchInput.value;
+    fetchUsers(searchName);
 });
 
 // 사용자 데이터를 API에서 가져오는 함수
-function fetchUsers() {
+function fetchUsers(searchName) {
     const queryString = `?name=${encodeURIComponent(searchName)}`;
 
     fetch(`/api/users${queryString}`)
@@ -27,12 +23,16 @@ function fetchUsers() {
 
 // 테이블 렌더링
 function renderTable(data) {
+    const tableHeader = document.getElementById('table-header');
+    const tableBody = document.getElementById('table-body');
+
     tableHeader.innerHTML = '';
     tableBody.innerHTML = '';
 
     if (data.length > 0) {
         // 테이블 헤더 생성
         const fields = Object.keys(data[0]);
+        
         const headerRow = document.createElement('tr');
         fields.forEach(field => {
             if (field !== 'Id' && field !== 'Address') {
@@ -46,9 +46,11 @@ function renderTable(data) {
         // 테이블 데이터 생성
         data.forEach(row => {
             const rowElement = document.createElement('tr');
+            
             rowElement.addEventListener('click', () => {
                 window.location = `/user/${row.Id}`;
             });
+            
             for (const [key, value] of Object.entries(row)) {
                 if (key !== 'Id' && key !== 'Address') {
                     const td = document.createElement('td');
@@ -62,4 +64,4 @@ function renderTable(data) {
 }
 
 // 초기 데이터 로드
-fetchUsers();
+fetchUsers('');

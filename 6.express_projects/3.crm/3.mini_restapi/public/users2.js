@@ -1,15 +1,12 @@
-const tableHeader = document.getElementById('table-header');
-const tableBody = document.getElementById('table-body');
-const pagination = document.getElementById('pagination');
 const searchButton = document.getElementById('search-button');
-const searchNameInput = document.getElementById('search-name');
 
 let searchName = '';
 let currentPage = 1;
 
 // 검색 버튼 클릭 이벤트
 searchButton.addEventListener('click', () => {
-    searchName = searchNameInput.value;
+    const searchInput = document.getElementById('search-name');
+    searchName = searchInput.value;
     fetchUsers(1); // 검색 시 항상 첫 페이지를 로드
 });
 
@@ -34,12 +31,16 @@ function fetchUsers(page) {
 
 // 테이블 렌더링
 function renderTable(data) {
+    const tableHeader = document.getElementById('table-header');
+    const tableBody = document.getElementById('table-body');
+
     tableHeader.innerHTML = '';
     tableBody.innerHTML = '';
 
     if (data.length > 0) {
         // 테이블 헤더 생성
         const fields = Object.keys(data[0]);
+
         const headerRow = document.createElement('tr');
         fields.forEach(field => {
             if (field !== 'Id' && field !== 'Address') {
@@ -53,6 +54,7 @@ function renderTable(data) {
         // 테이블 데이터 생성
         data.forEach(row => {
             const rowElement = document.createElement('tr');
+
             rowElement.addEventListener('click', () => {
                 window.location = `/user/${row.Id}`;
             });
@@ -71,6 +73,8 @@ function renderTable(data) {
 
 // Pagination 렌더링
 function renderPagination(totalPages, currentPage) {
+    const pagination = document.getElementById('pagination');
+
     pagination.innerHTML = '';
 
     // Previous 출력
@@ -118,7 +122,7 @@ function parseURLParams() {
     const urlParams = new URLSearchParams(window.location.search);
     const page = parseInt(urlParams.get('page')) || 1;
     const name = urlParams.get('name') || '';
-    searchNameInput.value = name;
+    searchInput.value = name;
     searchName = name;
     return { page, name };
 }

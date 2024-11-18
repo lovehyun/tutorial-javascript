@@ -43,12 +43,12 @@ app.get('/api/user/:id', (req, res) => {
 
 // 사용자 상세 페이지를 위한 정적 HTML 파일 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index1.html'));
+    res.sendFile(path.join(__dirname, 'public', 'users.html'));
 });
 
 // 사용자 상세 페이지를 위한 정적 HTML 파일 제공
 app.get('/user/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'user.html'));
+    res.sendFile(path.join(__dirname, 'public', 'user_detail.html'));
 });
 
 app.listen(port, () => {

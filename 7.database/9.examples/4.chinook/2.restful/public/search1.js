@@ -5,6 +5,15 @@ document.getElementById('searchForm').addEventListener('submit', async (event) =
 
     // Use fetch to call the server's API endpoint
     const response = await fetch(`/api/search?searchQuery=${encodeURIComponent(searchQuery)}`);
+    // GET 에 BODY 를 추가하는것은 비표준 방식. 추천하지 않음. 이렇게 할거면 POST로...
+    // const response = await fetch('/api/search', {
+    //     method: 'GET',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ searchQuery }),
+    // });
+
     const data = await response.json();
 
     // Clear previous results
