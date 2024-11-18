@@ -1,14 +1,24 @@
 const searchButton = document.getElementById('search-button');
+const searchInput = document.getElementById('search-name');
+
+let searchName = '';
 
 // 검색 버튼 클릭 이벤트
 searchButton.addEventListener('click', () => {
-    const searchInput = document.getElementById('search-name');
     searchName = searchInput.value;
-    fetchUsers(searchName);
+    fetchUsers();
+});
+
+// 검색창에서 Enter 키 이벤트
+searchInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        searchName = searchInput.value;
+        fetchUsers();
+    }
 });
 
 // 사용자 데이터를 API에서 가져오는 함수
-function fetchUsers(searchName) {
+function fetchUsers() {
     const queryString = `?name=${encodeURIComponent(searchName)}`;
 
     fetch(`/api/users${queryString}`)
@@ -64,4 +74,4 @@ function renderTable(data) {
 }
 
 // 초기 데이터 로드
-fetchUsers('');
+fetchUsers();

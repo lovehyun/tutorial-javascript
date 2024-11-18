@@ -1,13 +1,21 @@
 const searchButton = document.getElementById('search-button');
+const searchInput = document.getElementById('search-name');
 
 let searchName = '';
 let currentPage = 1;
 
 // 검색 버튼 클릭 이벤트
 searchButton.addEventListener('click', () => {
-    const searchInput = document.getElementById('search-name');
     searchName = searchInput.value;
     fetchUsers(1); // 검색 시 항상 첫 페이지를 로드
+});
+
+// 검색창에서 Enter 키 이벤트
+searchInput.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter') {
+        searchName = searchInput.value;
+        fetchUsers(1);
+    }
 });
 
 // 사용자 데이터를 API에서 가져오는 함수
