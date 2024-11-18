@@ -34,36 +34,45 @@ app.use((req, res, next) => {
 });
 // <-- 성능 개선을 위한 측정
 
+let data = []; // 데이터를 저장할 배열
+
+// 파일을 읽어 데이터를 메모리에 로드하는 함수
+function loadDataIntoMemory() {
+    fs.createReadStream('data.csv', 'utf-8')
+        .pipe(csv())
+        .on('data', (row) => {
+            data.push(row);
+        })
+        .on('end', () => {
+            console.log('Data loaded into memory');
+        })
+        .on('error', (error) => {
+            console.error(error.message);
+        });
+}
+
+// 서버 시작 시 파일 데이터를 메모리에 로드
+loadDataIntoMemory();
+
 app.get('/', (req, res) => {
     const page = req.query.page || 1;
     const perPage = 10;
 
-    // Read CSV file
-    const data = [];
-    
-    fs.createReadStream('data.csv', 'utf-8')
-        .pipe(csv())
-        .on('data', (row) => {
-            // console.log(row);
-            data.push(row);
-        })
-        .on('end', () => {
-            // Calculate total pages
-            const totalPages = Math.ceil(data.length / perPage);
+    // Calculate total pages
+    const totalPages = Math.ceil(data.length / perPage);
 
-            // Calculate start and end indices for the current page
-            const startIndex = (page - 1) * perPage;
-            const endIndex = startIndex + perPage;
+    // Calculate start and end indices for the current page
+    const startIndex = (page - 1) * perPage;
+    const endIndex = startIndex + perPage;
 
-            // Extract rows for the current page
-            const currentPageRows = data.slice(startIndex, endIndex);
+    // Extract rows for the current page
+    const currentPageRows = data.slice(startIndex, endIndex);
 
-            res.render('index.html', {
-                data: currentPageRows,
-                page: parseInt(page),
-                total_pages: totalPages,
-            });
-        });
+    res.render('index.html', {
+        data: currentPageRows,
+        page: parseInt(page),
+        total_pages: totalPages,
+    });
 });
 
 app.listen(port, () => {
