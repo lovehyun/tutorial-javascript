@@ -1,0 +1,27 @@
+{
+    "name": "express-debug-example",
+    "version": "1.0.0",
+    "description": "An Express app demonstrating debug and production mode",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "start:prod": "cross-env NODE_ENV=production node app.js"
+    },
+    "keywords": [
+        "express",
+        "debug",
+        "production"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2"
+    },
+    "engines": {
+        "node": ">=14"
+    },
+    "devDependencies": {
+        "cross-env": "^7.0.3"
+    }
+}

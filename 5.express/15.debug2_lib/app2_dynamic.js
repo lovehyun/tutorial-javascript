@@ -1,5 +1,5 @@
 const express = require('express');
-const { debugS, debugU, debugR, setupDebugMiddleware } = require('./debugadvanced');
+const { debugS, debugU, debugR, setupDebugMiddleware } = require('./debug_dynamic');
 
 const app = express();
 const port = 3000;

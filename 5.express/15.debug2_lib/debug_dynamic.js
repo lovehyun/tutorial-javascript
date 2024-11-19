@@ -41,7 +41,7 @@ module.exports = {
 
 // 이 모듈을 사용하는곳에서...
 // app.js
-// const { debugS, debugU, debugR, setupDebugMiddleware } = require('./debugadvanced');
+// const { debugS, debugU, debugR, setupDebugMiddleware } = require('./debug_dynamic');
 
 // 디버그 미들웨어 설정
 // setupDebugMiddleware(app);

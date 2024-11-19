@@ -10,7 +10,9 @@ const port = 3000;
 
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 
+// 파일에 combined, 화면에는 dev
 app.use(morgan('combined', { stream: accessLogStream }));
+app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
     res.send('Hello, World!');
