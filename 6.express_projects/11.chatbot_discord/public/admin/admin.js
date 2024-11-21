@@ -69,7 +69,13 @@ document.getElementById('sendResponse').addEventListener('click', function() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ userId: selectedUserId, message, timestamp: new Date(), fromAdmin: true })
+            body: JSON.stringify({ 
+                userId: selectedUserId, 
+                message, 
+                timestamp: new Date(), 
+                fromAdmin: true,
+                author: 'WebAdmin' // Set author to WebAdmin
+            })
         })
         .then(response => response.json())
         .then(data => {

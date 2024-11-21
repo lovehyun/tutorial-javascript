@@ -36,6 +36,15 @@ app.post('/api/messages', async (req, res) => {
             } catch (error) {
                 console.error('Error sending message to Discord:', error.message);
             }
+        } else if (author === 'WebAdmin') {
+            // WebAdmin 메시지 처리
+            const discordMessage = `Admin (${author}): ${message}`;
+            try {
+                await discordBot.sendMessageToThread(userId, discordMessage);
+                console.log(`Sent to Discord: ${discordMessage}`);
+            } catch (error) {
+                console.error('Error sending WebAdmin message to Discord:', error.message);
+            }
         }
 
         res.status(201).send({ status: 'Message received' });
