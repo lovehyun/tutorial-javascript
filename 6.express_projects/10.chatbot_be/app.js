@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const app = express();
@@ -8,7 +7,7 @@ const app = express();
 const messages = [];
 
 app.use(cors()); // CORS 설정 허용
-app.use(bodyParser.json()); // JSON 형식의 요청 본문 처리
+app.use(express.json()); // JSON 형식의 요청 본문 처리
 app.use(express.static(path.join(__dirname, 'public'))); // 정적 파일 제공
 
 // 메시지 POST 요청 처리
