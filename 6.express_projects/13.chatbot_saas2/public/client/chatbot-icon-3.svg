@@ -1,0 +1,26 @@
+<svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Head -->
+  <rect x="12" y="18" width="40" height="30" rx="10" ry="10" fill="#00A1FF" stroke="#005F99" stroke-width="2"/>
+
+  <!-- Antennas -->
+  <line x1="22" y1="8" x2="22" y2="18" stroke="#00A1FF" stroke-width="2"/>
+  <circle cx="22" cy="7" r="3" fill="#00A1FF" stroke="#005F99" stroke-width="2"/>
+  
+  <line x1="42" y1="8" x2="42" y2="18" stroke="#00A1FF" stroke-width="2"/>
+  <circle cx="42" cy="7" r="3" fill="#00A1FF" stroke="#005F99" stroke-width="2"/>
+  
+  <!-- Eyes -->
+  <path d="M22 28 C24 26, 28 26, 30 28" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  <path d="M34 28 C36 26, 40 26, 42 28" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+  
+  <!-- Smile -->
+  <path d="M24 38 C26 42, 38 42, 40 38" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+
+  <!-- Ears -->
+  <rect x="5" y="25" width="6" height="20" rx="3" ry="3" fill="#00A1FF" stroke="#005F99" stroke-width="2"/>
+  <rect x="53" y="25" width="6" height="20" rx="3" ry="3" fill="#00A1FF" stroke="#005F99" stroke-width="2"/>
+  
+  <!-- Details -->
+  <path d="M16 45 Q32 55 48 45" stroke="#005F99" stroke-width="2" fill="none"/>
+  <circle cx="32" cy="52" r="2" fill="#005F99"/>
+</svg>
