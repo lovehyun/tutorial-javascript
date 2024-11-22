@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const itemsPerPage = 15;
+    const itemsPerPage = 15; // 페이지당 항목 수
 
     fetch('/logs', {
         method: 'GET',
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     .then(logs => {
         const logsContainer = document.getElementById('logsContainer');
 
-        // API 키 별로 그룹화
+        // API 키 별로 로그 그룹화
         const logsByApiKey = logs.reduce((acc, log) => {
             acc[log.apiKey] = acc[log.apiKey] || [];
             acc[log.apiKey].push(log);
@@ -32,18 +32,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const accordionItem = document.createElement('div');
             accordionItem.className = 'card';
 
+            // 아코디언 헤더 생성
             const accordionHeader = document.createElement('div');
             accordionHeader.className = 'card-header';
             accordionHeader.id = `heading-${index}`;
+            accordionHeader.setAttribute('data-index', index); // 헤더에 인덱스 저장
             accordionHeader.innerHTML = `
                 <h2 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse-${index}" aria-expanded="false" aria-controls="collapse-${index}">
+                    <button class="btn btn-link w-100 text-left" type="button" data-toggle="collapse" data-target="#collapse-${index}" aria-expanded="false" aria-controls="collapse-${index}">
                         Logs for API Key: ${apiKey}
                     </button>
                 </h2>
             `;
             accordionItem.appendChild(accordionHeader);
 
+            // 아코디언 바디 생성
             const accordionBody = document.createElement('div');
             accordionBody.id = `collapse-${index}`;
             accordionBody.className = 'collapse';
@@ -72,6 +75,17 @@ document.addEventListener('DOMContentLoaded', function () {
             renderPagination(totalPages, index, page => {
                 renderTable(logsForApiKey, page, index, itemsPerPage);
             });
+        });
+
+        // 아코디언 전체 헤더 클릭 이벤트 추가 (헤더의 모든 영역을 클릭할 수 있음)
+        logsContainer.addEventListener('click', function (event) {
+            const header = event.target.closest('.card-header');
+            if (header) {
+                const button = header.querySelector('button');
+                if (button) {
+                    button.click(); // 버튼 클릭 이벤트를 트리거
+                }
+            }
         });
     })
     .catch(error => console.error('Error fetching logs:', error));
@@ -129,17 +143,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const tbody = document.createElement('tbody');
         logsForPage.forEach(log => {
             const row = document.createElement('tr');
-            const timestampCell = document.createElement('td');
-            const messageCell = document.createElement('td');
-            const replyCell = document.createElement('td');
-
-            timestampCell.textContent = new Date(log.timestamp).toLocaleString();
-            messageCell.textContent = log.message;
-            replyCell.textContent = log.reply;
-
-            row.appendChild(timestampCell);
-            row.appendChild(messageCell);
-            row.appendChild(replyCell);
+            row.innerHTML = `
+                <td>${new Date(log.timestamp).toLocaleString()}</td>
+                <td>${log.message}</td>
+                <td>${log.reply}</td>
+            `;
             tbody.appendChild(row);
         });
 

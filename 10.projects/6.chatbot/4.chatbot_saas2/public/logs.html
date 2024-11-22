@@ -7,6 +7,17 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .accordion-header {
+            cursor: pointer; /* 클릭 가능 커서 */
+        }
+        .accordion-button {
+            text-align: left; /* 텍스트를 왼쪽 정렬 */
+            width: 100%; /* 부모 크기와 동일하게 확장 */
+            border: none; /* 버튼 기본 테두리 제거 */
+            background: transparent; /* 배경 제거 */
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
@@ -47,11 +58,8 @@
     <div class="container-fluid mt-5">
         <h1 class="text-center mb-4">User Logs</h1>
         <div id="logsContainer" class="accordion" role="tablist">
-            <!-- API Key 별로 테이블이 동적으로 추가됩니다 -->
+            <!-- Logs will be dynamically inserted here -->
         </div>
-        <nav>
-            <ul id="pagination" class="pagination justify-content-center mt-4"></ul>
-        </nav>
     </div>
     
     <script src="/js/common/auth.js"></script>
