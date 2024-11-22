@@ -50,7 +50,8 @@ router.delete('/apikeys', authenticate, async (req, res) => {
         return res.status(404).send('User not found');
     }
 
-    const index = user.apiKeys.indexOf(apiKey);
+    // API 키 검색
+    const index = user.apiKeys.findIndex(item => String(item.key) === String(apiKey));
     if (index === -1) {
         return res.status(404).send({ error: 'API key not found.' });
     }

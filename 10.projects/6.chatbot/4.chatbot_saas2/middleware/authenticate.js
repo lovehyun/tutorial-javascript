@@ -23,17 +23,19 @@ const authenticateApiKey = async (req, res, next) => {
     }
 
     const apiKey = authHeader.replace('Bearer ', '');
-    console.log(apiKey);
     
     try {
         // Find user where the provided API key exists in the apiKeys array
-        const user = await User.findOne({ apiKeys: apiKey });
+        const user = await User.findOne({ 
+            apiKeys: { $elemMatch: { key: apiKey } } // 하위 문서에서 검색
+        });
+
         if (!user) {
             return res.status(401).send('Invalid API key.');
         }
 
         req.userId = user._id;
-        req.apiKey = apiKey; // 요청에 API 키 추가
+        req.apiKey = apiKey;
 
         next();
     } catch (error) {

@@ -9,7 +9,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <a class="navbar-brand" href="/">SaaS Service</a>
         <button
             class="navbar-toggler"
@@ -24,171 +24,45 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register.html">Register</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login.html" id="loginLink">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/apikey.html">API Key</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/snippet.html">Snippet</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logs.html">Logs</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/apikey.html">API Key</a></li>
+                <li class="nav-item"><a class="nav-link" href="/snippet.html">Snippet</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logs.html">Logs</a></li>
             </ul>
         </div>
-    </nav>
-     <!-- 사용자 정보를 표시할 요소 추가 -->
-     <div id="accountInfo" class="alert alert-info" style="margin: 20px;">
-        Not logged in. Please log in to view your account information.
-    </div>
-
-    <!-- 키 정보를 표시할 요소 추가 -->
-    <div class="content">
-        <h1>Your API Key</h1>
-        <ul id="apikeys"></ul>
-        <div>
-            <input type="text" id="apiKeyTitle" placeholder="Enter API Key Title" />
-            <button id="generateApiKey">Generate New API Key</button>
+        <!-- 로그인/로그아웃 버튼 -->
+        <div id="loginLogout" class="login-logout">
+            <a href="/register.html" class="btn btn-outline-success">Register</a>
+            <a href="/login.html" id="loginLink" class="btn btn-outline-primary">Login</a>
         </div>
-        <script>
-            function fetchApiKeys() {
-                fetch('/apikeys', {
-                    method: 'GET',
-                    headers: {
-                        'x-auth': localStorage.getItem('token'),
-                    },
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const apikeysList = document.getElementById('apikeys');
-                    apikeysList.innerHTML = ''; // Clear existing list
-                    
-                    // Check if data is an array and has keys
-                if (Array.isArray(data) && data.length > 0) {
-                    data.forEach(apiKey => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <strong>${apiKey.title}</strong>: ${apiKey.key}
-                            <button class="btn btn-warning btn-sm ml-2 edit-button">Edit</button>
-                            <button class="btn btn-danger btn-sm ml-2 delete-button">Delete</button>
-                        `;
+    </nav>
 
-                        const editButton = li.querySelector('.edit-button');
-                        const deleteButton = li.querySelector('.delete-button');
-
-                        editButton.addEventListener('click', () => editApiKeyTitle(apiKey.key, apiKey.title));
-                        deleteButton.addEventListener('click', () => deleteApiKey(apiKey.key));
-
-                        apikeysList.appendChild(li);
-                    });
-                    } else {
-                        // If no keys, display a placeholder message
-                        const li = document.createElement('li');
-                        li.textContent = 'No API keys available. Please generate one.';
-                        apikeysList.appendChild(li);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to fetch API keys.');
-                });
-            }
-
-            function generateApiKey() {
-                const title = document.getElementById('apiKeyTitle').value.trim();
-                if (!title) {
-                    alert('Please enter a title for the API key.');
-                    return;
-                }
-                
-                fetch('/apikeys', {
-                    method: 'POST',
-                    headers: {
-                        'x-auth': localStorage.getItem('token'),
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ title }),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then(() => {
-                    fetchApiKeys(); // Refresh the list after generating
-                    document.getElementById('apiKeyTitle').value = ''; // Clear input
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error);
-                });
-            }
-
-            function deleteApiKey(apiKey) {
-                fetch('/apikeys', {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-auth': localStorage.getItem('token'),
-                    },
-                    body: JSON.stringify({ apiKey }),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then(() => fetchApiKeys()) // Refresh the list after deletion
-                .catch(error => console.error('Error:', error));
-            }
-
-            function editApiKeyTitle(apiKey, currentTitle) {
-            const newTitle = prompt('Enter a new title:', currentTitle);
-            if (!newTitle || newTitle.trim() === currentTitle) {
-                alert('No changes made.');
-                return;
-            }
-
-            fetch('/apikeys/title', {
-                method: 'PATCH',
-                headers: {
-                    'x-auth': localStorage.getItem('token'),
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ apiKey, newTitle: newTitle.trim() }),
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then(() => fetchApiKeys()) // Refresh the list after editing
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to update API key title.');
-                });
-            }
-
-            document.getElementById('generateApiKey').addEventListener('click', generateApiKey);
-            document.addEventListener('DOMContentLoaded', fetchApiKeys);
-        </script>
+    <div id="accountInfo" class="alert alert-info alert-dismissible fade show" role="alert" style="margin: 20px;">
+        Not logged in. Please log in to view your account information.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <script src="/js/auth.js"></script>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Your API Key</h1>
+        <ul id="apikeys" class="list-group mb-4"></ul>
+        <div class="input-group mb-3">
+            <input 
+                type="text" 
+                id="apiKeyTitle" 
+                class="form-control auth-required" 
+                placeholder="Enter API Key Title" 
+                aria-label="API Key Title" 
+                disabled
+            />
+            <div class="input-group-append">
+                <button id="generateApiKey" class="btn btn-primary auth-required" disabled>Generate New API Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common/auth.js"></script>
+    <script src="/js/apikey.js"></script>
 </body>
 </html>

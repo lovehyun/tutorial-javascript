@@ -8,18 +8,23 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 8);
-    const user = new User({ email, password: hashedPassword });
+
     try {
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(409).send({ error: 'Email is already in use.' });
+        }
+    
+        const hashedPassword = await bcrypt.hash(password, 8);
+        const user = new User({ email, password: hashedPassword });
         await user.save();
-        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-        res.header('x-auth', token).send({ token });
+    
+        res.status(201).send({ message: 'User registered successfully' });
     } catch (error) {
         res.status(400).send(error);
     }
 });
 
-// Route to login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });

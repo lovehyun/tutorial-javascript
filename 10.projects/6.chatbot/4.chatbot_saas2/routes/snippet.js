@@ -19,7 +19,7 @@ router.get('/snippet', authenticate, async (req, res) => {
                 bot.type = 'text/javascript';
                 bot.async = true;
                 bot.icon = 2;
-                bot.src = 'http://${req.headers.host}/client/chatbot.js?apiKey=${apiKeysParams}';
+                bot.src = 'http://${req.headers.host}/client/chatbot.js?${apiKeysParams}';
                 document.head.appendChild(bot);
             })();
         </script>

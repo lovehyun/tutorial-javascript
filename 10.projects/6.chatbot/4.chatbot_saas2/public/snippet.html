@@ -9,7 +9,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <a class="navbar-brand" href="/">SaaS Service</a>
         <button
             class="navbar-toggler"
@@ -24,53 +24,41 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register.html">Register</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login.html" id="loginLink">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/apikey.html">API Key</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/snippet.html">Snippet</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logs.html">Logs</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/apikey.html">API Key</a></li>
+                <li class="nav-item"><a class="nav-link" href="/snippet.html">Snippet</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logs.html">Logs</a></li>
             </ul>
         </div>
+        <!-- 로그인/로그아웃 버튼 -->
+        <div id="loginLogout" class="login-logout">
+            <a href="/register.html" class="btn btn-outline-success">Register</a>
+            <a href="/login.html" id="loginLink" class="btn btn-outline-primary">Login</a>
+        </div>
     </nav>
-    <div class="content">
-        <h1>Your Snippet</h1>
-        <pre id="snippet"></pre>
-        <script>
-            function fetchSnippet() {
-                fetch('/snippet', {
-                    method: 'GET',
-                    headers: {
-                        'x-auth': localStorage.getItem('token'),
-                    },
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    document.getElementById('snippet').innerText = data.snippet;
-                })
-                .catch((error) => console.error('Error:', error));
-            }
-
-            document.addEventListener('DOMContentLoaded', fetchSnippet);
-        </script>
+    
+    <div id="accountInfo" class="alert alert-info alert-dismissible fade show" role="alert" style="margin: 20px;">
+        Not logged in. Please log in to view your account information.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
-    <script src="/js/auth.js"></script>
+
+    <!-- container-fluid를 사용하여 화면의 전체 너비를 사용 -->
+    <div class="container-fluid mt-5">
+        <h1 class="text-center mb-4">Your Snippet</h1>
+        <div class="card mx-auto" style="max-width: 90%;">
+            <div class="card-header text-white bg-primary">
+                Copy Your Snippet
+            </div>
+            <div class="card-body">
+                <pre id="snippet" class="bg-light p-3 rounded" style="overflow-x: auto;"></pre>
+                <button id="copySnippet" class="btn btn-success mt-3">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/common/auth.js"></script>
+    <script src="/js/snippet.js"></script>
 </body>
 </html>

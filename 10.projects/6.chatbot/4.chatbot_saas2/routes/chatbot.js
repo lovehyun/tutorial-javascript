@@ -16,9 +16,9 @@ router.post('/chatbot-message', authenticateApiKey, async (req, res) => {
     // Save log with apiKey
     await Log.create({
         userId: req.userId,
-        apiKey: req.apiKey, // Middleware에서 설정된 API 키
         message,
-        reply: botReply
+        reply: botReply,
+        apiKey: req.apiKey, // Middleware에서 설정된 API 키
     });
 
     res.send({ reply: botReply });

@@ -164,37 +164,59 @@
             chatbotIcon.innerHTML = `<img src="/client/chatbot-icon-${iconType}.svg" alt="Chatbot" style="width: 100%; height: 100%; border-radius: 50%;">`;
         }
 
-        document.getElementById('chatbot-send').addEventListener('click', function () {
+        function sendMessage() {
             var message = document.getElementById('chatbot-input').value;
-            if (message && selectedApiKey) {
-                var messageElement = document.createElement('div');
-                messageElement.textContent = 'You: ' + message;
-                document.getElementById('chatbot-messages').appendChild(messageElement);
-                document.getElementById('chatbot-input').value = '';
 
-                // Send message to the server
-                fetch('/chatbot-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${selectedApiKey}`
-                    },
-                    body: JSON.stringify({ message })
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        var botMessageElement = document.createElement('div');
-                        botMessageElement.textContent = 'Bot: ' + data.reply;
-                        document.getElementById('chatbot-messages').appendChild(botMessageElement);
-                    })
-                    .catch(error => console.error('Error:', error));
-            } else {
+            if (!selectedApiKey) {
                 alert('Please select a chatbot before sending a message.');
+                return;
+            }
+        
+            if (!message.trim()) { // 메시지가 비어있거나 공백만 있는 경우 확인
+                alert('Please enter a message before sending.');
+                return;
+            }
+            
+            var messageElement = document.createElement('div');
+            messageElement.textContent = 'You: ' + message;
+            document.getElementById('chatbot-messages').appendChild(messageElement);
+            document.getElementById('chatbot-input').value = ''; // 입력 필드 초기화
+
+            // 서버에 메시지 전송
+            fetch('/chatbot-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${selectedApiKey}` // API 키를 헤더에 추가
+                },
+                body: JSON.stringify({ message }) // 메시지를 JSON 형식으로 전송
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // 응답 데이터를 JSON으로 파싱
+            })
+            .then(data => {
+                // 서버에서 받은 응답 메시지를 챗봇 메시지 목록에 추가
+                var botMessageElement = document.createElement('div');
+                botMessageElement.textContent = 'Bot: ' + data.reply;
+                document.getElementById('chatbot-messages').appendChild(botMessageElement);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 오류 메시지를 챗봇 메시지 목록에 추가
+                var errorMessageElement = document.createElement('div');
+                errorMessageElement.style.color = 'red'; // 오류 메시지는 빨간색으로 표시
+                errorMessageElement.textContent = 'Error: Unable to send message. ' + error.message;
+                document.getElementById('chatbot-messages').appendChild(errorMessageElement);
+            });
+        }
+
+        document.getElementById('chatbot-send').addEventListener('click', sendMessage);
+        document.getElementById('chatbot-input').addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                sendMessage();
             }
         });
     })();
