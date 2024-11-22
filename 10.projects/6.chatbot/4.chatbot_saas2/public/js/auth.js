@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const accountInfo = document.getElementById('accountInfo');
+
     function updateLoginStatus() {
         const token = localStorage.getItem('token');
         const loginLink = document.getElementById('loginLink');

@@ -8,7 +8,7 @@ router.get('/snippet', authenticate, async (req, res) => {
     
     // API 키를 URL 파라미터 형태로 생성
     const apiKeysParams = user.apiKeys
-        .map((key, index) => `apiKey${index + 1}=${key}`)
+        .map((apiKeyObj, index) => `apiKey${index + 1}=${apiKeyObj.key}`)
         .join('&');
 
     const snippet = `

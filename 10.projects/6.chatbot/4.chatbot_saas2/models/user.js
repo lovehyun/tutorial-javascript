@@ -13,10 +13,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 6,
     },
-    apiKeys: {
-        type: [String], // API 키를 배열로 저장
-        default: [],
-    },
+    apiKeys: [
+        {
+            key: { type: String, required: true },
+            title: { type: String, required: true },
+        },
+    ],
 });
 
 module.exports = mongoose.model('User', userSchema);

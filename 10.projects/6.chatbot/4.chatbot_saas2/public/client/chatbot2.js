@@ -1,142 +1,201 @@
 (function () {
-    function getApiKeys() {
+    async function fetchTitles(apiKeys) {
+        try {
+            const response = await fetch('/apikeys/titles', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth': localStorage.getItem('token'),
+                },
+                body: JSON.stringify({ apiKeys }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch API key titles.');
+            }
+
+            const data = await response.json();
+            console.log('Fetched titles:', data.titles);
+
+            // 유효하지 않은 키 확인 및 콘솔에 출력
+            if (data.missingKeys && data.missingKeys.length > 0) {
+                console.warn('Invalid API keys:', data.missingKeys);
+            }
+
+            return data.titles; // [{ key: 'key1', title: 'Title1' }, ...]
+        } catch (error) {
+            console.error('Error fetching titles:', error);
+            return [];
+        }
+    }
+
+    async function getApiKeys() {
         const currentScript = document.currentScript || (function () {
             const scripts = document.getElementsByTagName('script');
             return scripts[scripts.length - 1];
         })();
         const scriptSrc = currentScript.src;
         const urlParams = new URLSearchParams(scriptSrc.split('?')[1]);
-        const apiKey1 = urlParams.get('apiKey1');
-        const apiKey2 = urlParams.get('apiKey2');
-        return { apiKey1, apiKey2 };
+        const apiKeys = [];
+
+        if (urlParams.get('apiKey1')) {
+            apiKeys.push(urlParams.get('apiKey1'));
+        }
+        if (urlParams.get('apiKey2')) {
+            apiKeys.push(urlParams.get('apiKey2'));
+        }
+
+        console.log('Extracted API keys:', apiKeys);
+
+        // Fetch titles and merge with keys
+        const titles = await fetchTitles(apiKeys);
+        return apiKeys.map((key, index) => ({
+            key,
+            title: titles[index]?.title || `Chatbot ${index + 1}`,
+            isValid: !!titles[index], // 키가 유효한지 여부
+        }));
     }
 
-    var { apiKey1, apiKey2 } = getApiKeys();
+    (async function () {
+        const apiKeys = await getApiKeys();
 
-    if (!apiKey1) {
-        console.error('At least one API key is required');
-        return;
-    }
+        if (apiKeys.length === 0) {
+            console.error('At least one API key is required');
+            return;
+        }
 
-    console.log('Chatbot loaded with API keys:', { apiKey1, apiKey2 });
+        console.log('Chatbot loaded with API keys:', apiKeys);
 
-    // Create chatbot icon
-    var chatbotIcon = document.createElement('div');
-    chatbotIcon.id = 'chatbot-icon';
-    chatbotIcon.innerHTML = `<img src="/client/chatbot-icon-3.svg" alt="Chatbot" style="width: 100%; height: 100%; border-radius: 50%;">`;
-    document.body.appendChild(chatbotIcon);
+        // Create chatbot icon
+        var chatbotIcon = document.createElement('div');
+        chatbotIcon.id = 'chatbot-icon';
+        chatbotIcon.innerHTML = `<img src="/client/chatbot-icon-3.svg" alt="Chatbot" style="width: 100%; height: 100%; border-radius: 50%;">`;
+        document.body.appendChild(chatbotIcon);
 
-    // Create chatbot selection popup
-    if (apiKey1 && apiKey2) {
-        var chatbotSelection = document.createElement('div');
-        chatbotSelection.id = 'chatbot-selection';
-        chatbotSelection.innerHTML = `
-            <div id="chatbot-selection-header">Select a Chatbot</div>
-            <button id="chatbot1" class="chatbot-option">Chatbot1 Q&A</button>
-            <button id="chatbot2" class="chatbot-option">Chatbot2 Q&A</button>
-        `;
-        chatbotSelection.style.display = 'none';
-        document.body.appendChild(chatbotSelection);
-    }
+        // Declare chatbotSelection as a variable
+        let chatbotSelection;
 
-    // Chatbot container
-    var chatbotContainer = document.createElement('div');
-    chatbotContainer.id = 'chatbot-container';
-    chatbotContainer.style.display = 'none';
-    chatbotContainer.innerHTML = `
-        <div id="chatbot-header">Chatbot</div>
-        <div id="chatbot-messages"></div>
-        <div id="chatbot-input-container">
-            <input type="text" id="chatbot-input" placeholder="Type a message..."/>
-            <button id="chatbot-send">Send</button>
-        </div>
-    `;
-    document.body.appendChild(chatbotContainer);
-
-    let selectedApiKey = apiKey1; // Default to apiKey1 if only one is present
-    let selectedChatbot = 'Chatbot1'; // Default to Chatbot1
-
-    // Toggle chatbot icon functionality
-    chatbotIcon.addEventListener('click', function () {
-        if (chatbotContainer.style.display === 'block') {
-            // If chat is open, close it
-            chatbotContainer.style.display = 'none';
-            updateIcon(3); // Reset to default icon (icon 3)
-            selectedApiKey = apiKey1; // Reset to default key
-            selectedChatbot = 'Chatbot1';
-            console.log('Chatbot closed.');
-        } else if (apiKey1 && apiKey2 && (chatbotSelection.style.display === 'none' || chatbotSelection.style.display === '')) {
-            // Open selection popup if there are two keys
-            chatbotSelection.style.display = 'block';
-        } else if (apiKey1 && apiKey2) {
-            // Close selection popup
+        // Create chatbot selection popup
+        if (apiKeys.length > 1) {
+            chatbotSelection = document.createElement('div');
+            chatbotSelection.id = 'chatbot-selection';
             chatbotSelection.style.display = 'none';
-        } else {
-            // Open chat directly for single API key
-            openChatbot('Chatbot1', apiKey1, 1);
-        }
-    });
 
-    // Event listeners for chatbot options (only if 2 keys are available)
-    if (apiKey1 && apiKey2) {
-        document.getElementById('chatbot1').addEventListener('click', function () {
-            openChatbot('Chatbot1', apiKey1, 1);
+            const selectionHeader = document.createElement('div');
+            selectionHeader.id = 'chatbot-selection-header';
+            selectionHeader.textContent = 'Select a Chatbot';
+            chatbotSelection.appendChild(selectionHeader);
+
+            apiKeys.forEach((apiKey, index) => {
+                const button = document.createElement('button');
+                button.className = 'chatbot-option';
+                button.textContent = apiKey.title; // Use the title for the button
+                button.addEventListener('click', function () {
+                    openChatbot(apiKey.title, apiKey.key, index + 1, apiKey.isValid); // Pass title, key, and validity
+                });
+                chatbotSelection.appendChild(button);
+            });
+
+            document.body.appendChild(chatbotSelection);
+        }
+
+        // Chatbot container
+        const chatbotContainer = document.createElement('div');
+        chatbotContainer.id = 'chatbot-container';
+        chatbotContainer.style.display = 'none';
+        chatbotContainer.innerHTML = `
+            <div id="chatbot-header">Chatbot</div>
+            <div id="chatbot-messages"></div>
+            <div id="chatbot-input-container">
+                <input type="text" id="chatbot-input" placeholder="Type a message..."/>
+                <button id="chatbot-send">Send</button>
+            </div>
+        `;
+        document.body.appendChild(chatbotContainer);
+
+        let selectedApiKey = null;
+        let selectedChatbot = null;
+
+        // Toggle chatbot icon functionality
+        chatbotIcon.addEventListener('click', function () {
+            if (chatbotContainer.style.display === 'block') {
+                // If chat is open, close it
+                chatbotContainer.style.display = 'none';
+                updateIcon(3); // Reset to default icon (icon 3)
+                selectedApiKey = null; // Reset to default key
+                selectedChatbot = null;
+                console.log('Chatbot closed.');
+            } else if (apiKeys.length > 1 && (chatbotSelection.style.display === 'none' || chatbotSelection.style.display === '')) {
+                // Open selection popup if there are multiple keys
+                chatbotSelection.style.display = 'block';
+            } else if (apiKeys.length > 1) {
+                // Close selection popup
+                chatbotSelection.style.display = 'none';
+            } else {
+                // Open chat directly for single API key
+                openChatbot(apiKeys[0].title, apiKeys[0].key, 1, apiKeys[0].isValid);
+            }
         });
 
-        document.getElementById('chatbot2').addEventListener('click', function () {
-            openChatbot('Chatbot2', apiKey2, 2);
-        });
-    }
+        function openChatbot(title, apiKey, iconType, isValid) {
+            if (apiKeys.length > 1) document.getElementById('chatbot-selection').style.display = 'none'; // Hide selection if present
+            chatbotContainer.style.display = 'block';
 
-    function openChatbot(type, apiKey, iconType) {
-        if (apiKey1 && apiKey2) chatbotSelection.style.display = 'none'; // Hide selection if present
-        chatbotContainer.style.display = 'block';
+            selectedApiKey = apiKey;
+            selectedChatbot = title;
 
-        selectedApiKey = apiKey;
-        selectedChatbot = type;
+            document.getElementById('chatbot-header').textContent = title;
+            updateIcon(iconType); // Set icon to the selected chatbot's type
+            document.getElementById('chatbot-messages').innerHTML = ''; // Clear previous messages
+            
+            // Show error in chat if the key is invalid
+            if (!isValid) {
+                const errorElement = document.createElement('div');
+                errorElement.textContent = 'Error: The selected API key is invalid. Unable to send messages.';
+                document.getElementById('chatbot-messages').appendChild(errorElement);
+                console.warn(`Invalid API key selected for ${title}`);
+            }
 
-        document.getElementById('chatbot-header').textContent = type;
-        updateIcon(iconType); // Set icon to the selected chatbot's type
-        document.getElementById('chatbot-messages').innerHTML = ''; // Clear previous messages
-        console.log(`${type} chatbot started with API key: ${apiKey}`);
-    }
-
-    function updateIcon(iconType) {
-        // Update the chatbot icon dynamically
-        chatbotIcon.innerHTML = `<img src="/client/chatbot-icon-${iconType}.svg" alt="Chatbot" style="width: 100%; height: 100%; border-radius: 50%;">`;
-    }
-
-    document.getElementById('chatbot-send').addEventListener('click', function () {
-        var message = document.getElementById('chatbot-input').value;
-        if (message && selectedApiKey) {
-            var messageElement = document.createElement('div');
-            messageElement.textContent = 'You: ' + message;
-            document.getElementById('chatbot-messages').appendChild(messageElement);
-            document.getElementById('chatbot-input').value = '';
-
-            // Send message to the server
-            fetch('/chatbot-message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${selectedApiKey}`
-                },
-                body: JSON.stringify({ message })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    var botMessageElement = document.createElement('div');
-                    botMessageElement.textContent = 'Bot: ' + data.reply;
-                    document.getElementById('chatbot-messages').appendChild(botMessageElement);
-                })
-                .catch(error => console.error('Error:', error));
-        } else {
-            alert('Please select a chatbot before sending a message.');
+            console.log(`${title} chatbot started with API key: ${apiKey}`);
         }
-    });
+
+        function updateIcon(iconType) {
+            // Update the chatbot icon dynamically
+            chatbotIcon.innerHTML = `<img src="/client/chatbot-icon-${iconType}.svg" alt="Chatbot" style="width: 100%; height: 100%; border-radius: 50%;">`;
+        }
+
+        document.getElementById('chatbot-send').addEventListener('click', function () {
+            var message = document.getElementById('chatbot-input').value;
+            if (message && selectedApiKey) {
+                var messageElement = document.createElement('div');
+                messageElement.textContent = 'You: ' + message;
+                document.getElementById('chatbot-messages').appendChild(messageElement);
+                document.getElementById('chatbot-input').value = '';
+
+                // Send message to the server
+                fetch('/chatbot-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${selectedApiKey}`
+                    },
+                    body: JSON.stringify({ message })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        var botMessageElement = document.createElement('div');
+                        botMessageElement.textContent = 'Bot: ' + data.reply;
+                        document.getElementById('chatbot-messages').appendChild(botMessageElement);
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please select a chatbot before sending a message.');
+            }
+        });
+    })();
 })();

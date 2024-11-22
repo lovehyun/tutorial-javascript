@@ -9,12 +9,11 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 8);
-    const apiKey = generateApiKey();
-    const user = new User({ email, password: hashedPassword, apiKey });
+    const user = new User({ email, password: hashedPassword });
     try {
         await user.save();
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
-        res.header('x-auth', token).send({ apiKey });
+        res.header('x-auth', token).send({ token });
     } catch (error) {
         res.status(400).send(error);
     }

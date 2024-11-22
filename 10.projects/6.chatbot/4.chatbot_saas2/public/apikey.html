@@ -45,10 +45,19 @@
             </ul>
         </div>
     </nav>
+     <!-- 사용자 정보를 표시할 요소 추가 -->
+     <div id="accountInfo" class="alert alert-info" style="margin: 20px;">
+        Not logged in. Please log in to view your account information.
+    </div>
+
+    <!-- 키 정보를 표시할 요소 추가 -->
     <div class="content">
         <h1>Your API Key</h1>
         <ul id="apikeys"></ul>
-        <button id="generateApiKey">Generate New API Key</button>
+        <div>
+            <input type="text" id="apiKeyTitle" placeholder="Enter API Key Title" />
+            <button id="generateApiKey">Generate New API Key</button>
+        </div>
         <script>
             function fetchApiKeys() {
                 fetch('/apikeys', {
@@ -66,29 +75,52 @@
                 .then(data => {
                     const apikeysList = document.getElementById('apikeys');
                     apikeysList.innerHTML = ''; // Clear existing list
-                    data.apiKeys.forEach(apiKey => {
+                    
+                    // Check if data is an array and has keys
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(apiKey => {
                         const li = document.createElement('li');
-                        li.textContent = apiKey;
-                        const deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Delete';
-                        deleteButton.className = 'btn btn-danger btn-sm ml-2';
-                        deleteButton.addEventListener('click', () => deleteApiKey(apiKey));
-                        li.appendChild(deleteButton);
+                        li.innerHTML = `
+                            <strong>${apiKey.title}</strong>: ${apiKey.key}
+                            <button class="btn btn-warning btn-sm ml-2 edit-button">Edit</button>
+                            <button class="btn btn-danger btn-sm ml-2 delete-button">Delete</button>
+                        `;
+
+                        const editButton = li.querySelector('.edit-button');
+                        const deleteButton = li.querySelector('.delete-button');
+
+                        editButton.addEventListener('click', () => editApiKeyTitle(apiKey.key, apiKey.title));
+                        deleteButton.addEventListener('click', () => deleteApiKey(apiKey.key));
+
                         apikeysList.appendChild(li);
                     });
+                    } else {
+                        // If no keys, display a placeholder message
+                        const li = document.createElement('li');
+                        li.textContent = 'No API keys available. Please generate one.';
+                        apikeysList.appendChild(li);
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert(error);
+                    alert('Failed to fetch API keys.');
                 });
             }
 
             function generateApiKey() {
-                fetch('/apikey', {
+                const title = document.getElementById('apiKeyTitle').value.trim();
+                if (!title) {
+                    alert('Please enter a title for the API key.');
+                    return;
+                }
+                
+                fetch('/apikeys', {
                     method: 'POST',
                     headers: {
                         'x-auth': localStorage.getItem('token'),
+                        'Content-Type': 'application/json',
                     },
+                    body: JSON.stringify({ title }),
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -96,7 +128,10 @@
                     }
                     return response.json();
                 })
-                .then(() => fetchApiKeys()) // Refresh the list after generating
+                .then(() => {
+                    fetchApiKeys(); // Refresh the list after generating
+                    document.getElementById('apiKeyTitle').value = ''; // Clear input
+                })
                 .catch(error => {
                     console.error('Error:', error);
                     alert(error);
@@ -104,7 +139,7 @@
             }
 
             function deleteApiKey(apiKey) {
-                fetch('/apikey', {
+                fetch('/apikeys', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
@@ -120,6 +155,34 @@
                 })
                 .then(() => fetchApiKeys()) // Refresh the list after deletion
                 .catch(error => console.error('Error:', error));
+            }
+
+            function editApiKeyTitle(apiKey, currentTitle) {
+            const newTitle = prompt('Enter a new title:', currentTitle);
+            if (!newTitle || newTitle.trim() === currentTitle) {
+                alert('No changes made.');
+                return;
+            }
+
+            fetch('/apikeys/title', {
+                method: 'PATCH',
+                headers: {
+                    'x-auth': localStorage.getItem('token'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ apiKey, newTitle: newTitle.trim() }),
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return window.handleError(response);
+                    }
+                    return response.json();
+                })
+                .then(() => fetchApiKeys()) // Refresh the list after editing
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update API key title.');
+                });
             }
 
             document.getElementById('generateApiKey').addEventListener('click', generateApiKey);
