@@ -71,7 +71,7 @@ client.on('messageCreate', async (message) => {
                     timestamp: new Date(),
                     fromAdmin: true, // Discord에서 온 메시지
                 });
-                console.log(`Message sent to server for user ${userId} from ${authorName}: ${content}`);
+                console.log(`Message sent to server for user ${userId} from ${displayName}: ${content}`);
             } catch (error) {
                 console.error('Error sending message to server:', error.message);
             }
