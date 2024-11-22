@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const morgan = require('morgan');
@@ -19,7 +18,7 @@ mongoose
         console.error('MongoDB connection error:', err);
     });
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 // Set up morgan to log requests in 'combined' format, which is similar to Nginx logs
 const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });

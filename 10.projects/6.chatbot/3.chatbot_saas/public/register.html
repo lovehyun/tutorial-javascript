@@ -9,7 +9,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <a class="navbar-brand" href="/">SaaS Service</a>
         <button
             class="navbar-toggler"
@@ -24,27 +24,19 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register.html">Register</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login.html" id="loginLink">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/apikey.html">API Key</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/snippet.html">Snippet</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/logs.html">Logs</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/apikey.html">API Key</a></li>
+                <li class="nav-item"><a class="nav-link" href="/snippet.html">Snippet</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logs.html">Logs</a></li>
+            </ul>
+             <!-- 오른쪽 정렬된 메뉴 -->
+             <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/register.html">Register</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login.html" id="loginLink">Login</a></li>
             </ul>
         </div>
     </nav>
+
     <div class="content">
         <h1>Register</h1>
         <form id="registerForm">
@@ -54,33 +46,44 @@
             <input type="password" id="password" name="password" required /><br />
             <button type="submit">Register</button>
         </form>
-        <script>
-            document.getElementById('registerForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                fetch('/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: document.getElementById('email').value,
-                        password: document.getElementById('password').value,
-                    }),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return window.handleError(response);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    alert('Registration successful!');
-                    localStorage.setItem('token', data.token);
-                })
-                .catch((error) => console.error('Error:', error));
-            });
-        </script>
     </div>
+
+    <script>
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email.value,
+                    password: password.value,
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return window.handleError(response);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                if (data) {
+                    email.value = '';
+                    password.value = '';
+                    alert(data.message);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert(error);
+            });
+        });
+    </script>
+
     <script src="/js/auth.js"></script>
 </body>
 </html>
