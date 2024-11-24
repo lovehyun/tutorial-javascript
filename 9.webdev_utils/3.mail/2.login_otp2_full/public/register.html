@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>회원가입</title>
+</head>
+<body>
+    <h1>회원가입</h1>
+    <input type="email" id="email" placeholder="이메일" />
+    <button id="sendCodeBtn" onclick="sendCode()">인증 코드 전송</button>
+    <br />
+    <input type="text" id="code" placeholder="인증 코드" />
+    <button id="verifyCodeBtn" onclick="verifyCode()">인증 코드 확인</button>
+    <br />
+    <input type="password" id="password" placeholder="비밀번호" />
+    <input type="password" id="password_check" placeholder="비밀번호 확인" />
+    <button onclick="register()">회원가입</button>
+    <p>이미 회원이신가요? <a href="/login">로그인</a></p>
+
+    <script>
+        async function sendCode() {
+            const email = document.getElementById('email').value;
+            const response = await fetch('/auth/email-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            alert((await response.json()).message);
+        }
+
+        async function verifyCode() {
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('code').value;
+            const response = await fetch('/auth/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                // 이메일 필드 비활성화 처리
+                document.getElementById('email').disabled = true;
+                document.getElementById('sendCodeBtn').disabled = true;
+                document.getElementById('verifyCodeBtn').disabled = true;
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const password_check = document.getElementById('password_check').value;
+            const response = await fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, password_check }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/success';
+            } else {
+                alert(data.error);
+            }
+        }
+    </script>
+</body>
+</html>

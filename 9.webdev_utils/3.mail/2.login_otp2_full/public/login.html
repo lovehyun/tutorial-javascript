@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>로그인</title>
+</head>
+<body>
+    <h1>로그인</h1>
+    <input type="email" id="email" placeholder="이메일" />
+    <input type="password" id="password" placeholder="비밀번호" />
+    <button onclick="login()">로그인</button>
+    <p>회원이 아니신가요? <a href="/register">회원가입</a></p>
+
+    <script>
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = data.dashboard;
+            } else {
+                alert(data.error);
+            }
+        }
+    </script>
+</body>
+</html>

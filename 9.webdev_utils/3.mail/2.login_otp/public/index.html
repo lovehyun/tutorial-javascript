@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            text-align: center;
+        }
+        input,
+        button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: 250px;
+        }
+        #verify-section {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>회원가입</h1>
+
+    <!-- 회원가입 폼 -->
+    <div>
+        <input type="email" id="email" placeholder="이메일" required /><br />
+        <button onclick="sendCode()">인증 코드 보내기</button>
+    </div>
+    <div id="verify-section">
+        <input type="text" id="code" placeholder="인증 코드" /><br />
+        <button onclick="verifyCode()">코드 확인</button>
+    </div>
+    <div>
+        <input type="password" id="password" placeholder="비밀번호" /><br />
+        <input type="password" id="password_check" placeholder="비밀번호 확인" /><br />
+        <button onclick="register()">회원가입</button>
+    </div>
+
+    <script>
+        async function sendCode() {
+            const email = document.getElementById('email').value;
+            const response = await fetch('/send-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                document.getElementById('verify-section').style.display = 'block';
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function verifyCode() {
+            const email = document.getElementById('email').value;
+            const code = document.getElementById('code').value;
+            const response = await fetch('/verify-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, code }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+            } else {
+                alert(data.error);
+            }
+        }
+
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const password_check = document.getElementById('password_check').value;
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, password_check }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/success';
+            } else {
+                alert(data.error);
+            }
+        }
+    </script>
+</body>
+</html>
