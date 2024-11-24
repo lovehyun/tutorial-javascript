@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tooltip & Popover</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5 text-center">
+        <h2>툴팁과 팝오버</h2>
+        <!-- 툴팁 -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="툴팁 예제입니다!">
+            툴팁 보기
+        </button>
+
+        <!-- 팝오버 -->
+        <button type="button" class="btn btn-secondary" data-bs-toggle="popover" title="팝오버 제목" data-bs-content="팝오버 내용입니다.">
+            팝오버 보기
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 툴팁 및 팝오버 활성화
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        popoverTriggerList.map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+    </script>
+</body>
+</html>

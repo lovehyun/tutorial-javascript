@@ -1,0 +1,137 @@
+<!-- https://getbootstrap.com/docs/5.3/getting-started/introduction/ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Layout Examples</title>
+</head>
+<body>
+    <!-- 2. Grid System -->
+    <div class="container">
+        <h2 class="text-center my-4">Bootstrap Grid System Example</h2>
+        <div class="row">
+            <div class="col">1번 열</div>
+            <div class="col">2번 열</div>
+            <div class="col">3번 열</div>
+            <div class="col">4번 열</div>
+            <div class="col">5번 열</div>
+            <div class="col">6번 열</div>
+            <div class="col">7번 열</div>
+            <div class="col">8번 열</div>
+            <div class="col">9번 열</div>
+            <div class="col">10번 열</div>
+            <div class="col">11번 열</div>
+            <div class="col">12번 열</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">4칸 열</div>
+            <div class="col-md-8">8칸 열</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <!-- 4칸 열 -->
+            <div class="col-4" style="background-color: lightblue">4칸 열</div>
+
+            <!-- 6칸 열 -->
+            <div class="col-6" style="background-color: lightgreen">6칸 열</div>
+
+            <!-- 8칸 열 -->
+            <div class="col-8" style="background-color: lightcoral">8칸 열</div>
+        </div>
+    </div>
+
+    <!-- 3. Offset (열 간격 조정) -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 offset-md-4" style="background-color: lightblue">중앙에 정렬된 열</div>
+        </div>
+    </div>
+
+    <!-- 4. Order (열 순서 변경) -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 order-md-3">3번째 열</div>
+            <div class="col-md-4 order-md-1">1번째 열</div>
+            <div class="col-md-4 order-md-2">2번째 열</div>
+        </div>
+    </div>
+
+    <!-- 5. Display (디스플레이 속성) -->
+    <div class="container">
+        <h2 class="text-center my-4">Bootstrap Display Example</h2>
+        <div class="d-none d-md-block">
+            이 요소는 작은 화면에서는 숨겨지고, 중간 크기 화면에서 나타납니다.
+        </div>
+    </div>
+
+    <!-- 6. Flex (플렉스박스 지원) -->
+    <!-- - **`d-flex`**: 요소를 플렉스 컨테이너로 설정.
+         - **`justify-content-{value}`**: 주 축 정렬 (시작, 끝, 중앙 등).
+         - **`align-items-{value}`**: 교차 축 정렬 (위, 아래, 중앙 등). -->
+    <div class="contaienr">
+        <div class="d-flex">
+                <div class="p-2">Flex Item 1</div>
+                <div class="p-2">Flex Item 2</div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+            가운데 정렬된 내용
+        </div>
+    </div>
+
+    <!-- 7. Breakpoints (반응형 브레이크포인트) -->
+    <!-- - `sm` (576px 이상)
+         - `md` (768px 이상)
+         - `lg` (992px 이상)
+         - `xl` (1200px 이상) -->
+    <div class="container">
+        <h2 class="text-center my-4">Bootstrap Breakpoints Example</h2>
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-primary text-white p-3">
+                Box 1
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-success text-white p-3">
+                Box 2
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-danger text-white p-3">
+                Box 3
+            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-warning text-white p-3">
+                Box 4
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="text-center my-4">Bootstrap Display Utilities Example</h2>
+
+        <!-- Visible only on small screens -->
+        <div class="d-block d-md-none bg-success text-white p-3 text-center">
+            작은 화면에서만 보입니다 (576px 미만).
+        </div>
+
+        <!-- Visible only on medium screens -->
+        <div class="d-none d-md-block d-lg-none bg-primary text-white p-3 text-center">
+            중간 크기의 화면에서만 보입니다 (768px 이상, 992px 미만).
+        </div>
+
+        <!-- Visible only on large screens -->
+        <div class="d-none d-lg-block d-xl-none bg-warning text-white p-3 text-center">
+            큰 화면에서만 보입니다 (992px 이상, 1200px 미만).
+        </div>
+
+        <!-- Visible only on extra-large screens -->
+        <div class="d-none d-xl-block bg-danger text-white p-3 text-center">
+            매우 큰 화면에서만 보입니다 (1200px 이상).
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

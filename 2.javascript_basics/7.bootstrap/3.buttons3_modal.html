@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>Different Buttons</title>
+</head>
+<body>
+    <!-- 9. 모달 트리거 버튼 -->
+    <div class="container my-4">
+        <!-- Trigger button -->
+        <button
+            id="triggerButton"
+            type="button"
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+        >
+            Open Modal
+        </button>
+
+        <!-- Modal -->
+        <!-- 모달 클래스는 기본적으로 display: none; 으로 설정되어 있음 -->
+        <div
+            class="modal fade"
+            id="exampleModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">Modal body content</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 참고: Aria-hidden 으로 인해 발생하는 오류는 스크립트를 통해 해결 -->
+    <!-- 이벤트 흐름
+        부트스트랩 모달 컴포넌트의 주요 이벤트 순서:
+        
+        - show.bs.modal: 모달이 열리기 직전.
+        - shown.bs.modal: 모달이 열리고 나서.
+        - hide.bs.modal: 모달이 닫히기 직전.
+        - hidden.bs.modal: 모달이 닫히고 나서. -->
+    <script>
+        const modal = document.getElementById('exampleModal');
+      
+        // 모달이 열릴 때 aria-hidden="false"로 설정
+        modal.addEventListener('show.bs.modal', () => {
+            modal.setAttribute('aria-hidden', 'false');
+        });
+      
+        // 모달이 닫힐 때 aria-hidden="true"로 설정
+        modal.addEventListener('hidden.bs.modal', () => {
+            modal.setAttribute('aria-hidden', 'true');
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 팝오버는 부트스트랩이 로딩 된 이후에 스크립트가 로딩 되어야 함 -->
+
+    <!-- 10. 팝오버 버튼 -->
+    <div class="container my-4">
+        <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-toggle="popover"
+            title="Popover Title"
+            data-bs-content="This is the popover content."
+        >
+            Click me for Popover
+        </button>
+    </div>
+
+    <script>
+        // Enable popovers
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+    </script>
+
+    <!-- 11. 툴팁 트리거 -->
+    <div class="container my-4">
+        <button
+            type="button"
+            class="btn btn-info"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            title="This is a tooltip!"
+        >
+            Hover me for Tooltip
+        </button>
+    </div>
+
+    <script>
+        // Enable tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    </script>
+</body>
+</html>

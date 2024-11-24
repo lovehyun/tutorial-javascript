@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 검증 폼</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-4">
+        <h2>회원가입 폼</h2>
+        <form id="validationForm" novalidate>
+            <!-- 사용자명 -->
+            <div class="mb-3">
+                <label for="username" class="form-label">사용자명</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" placeholder="3~10글자로 입력하세요" required>
+                    <div class="invalid-feedback">
+                        사용자명은 3글자 이상 10글자 이하로 입력해야 합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 비밀번호 -->
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="password" placeholder="대소문자, 숫자/특수문자 포함 8자 이상" required>
+                    <div class="invalid-feedback">
+                        비밀번호는 대소문자, 숫자 또는 특수문자 중 3가지 이상 조합하여 8자 이상 입력해야 합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 이름 -->
+            <div class="mb-3">
+                <label for="name" class="form-label">이름</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                    <input type="text" class="form-control" id="name" placeholder="1~10글자로 입력하세요" required>
+                    <div class="invalid-feedback">
+                        이름은 최소 1글자, 최대 10글자까지 입력 가능합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 생년월일 -->
+            <div class="mb-3">
+                <label for="birthdate" class="form-label">생년월일</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                    <input type="date" class="form-control" id="birthdate" required>
+                    <div class="invalid-feedback">
+                        생년월일을 입력하세요.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 관심 분야 -->
+            <div class="mb-3">
+                <label class="form-label">관심 분야 (최소 1개, 최대 3개 선택)</label>
+                <div>
+                    <!-- 체크박스 목록 -->
+                    <div class="form-check">
+                        <input class="form-check-input interest-checkbox" type="checkbox" id="interest1">
+                        <label class="form-check-label" for="interest1">관심 분야 1</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input interest-checkbox" type="checkbox" id="interest2">
+                        <label class="form-check-label" for="interest2">관심 분야 2</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input interest-checkbox" type="checkbox" id="interest3">
+                        <label class="form-check-label" for="interest3">관심 분야 3</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input interest-checkbox" type="checkbox" id="interest4">
+                        <label class="form-check-label" for="interest4">관심 분야 4</label>
+                    </div>
+                </div>
+                <div class="invalid-feedback">
+                    관심 분야는 최소 1개, 최대 3개만 선택할 수 있습니다.
+                </div>
+            </div>
+
+            <!-- 제출 버튼 -->
+            <button type="submit" class="btn btn-primary">제출</button>
+        </form>
+        <div id="result" class="mt-4"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('validationForm');
+        const resultDiv = document.getElementById('result');
+
+        // 각 입력 필드에서 포커스 아웃할 때 검증
+        document.getElementById('username').addEventListener('blur', validateUsername);
+        document.getElementById('password').addEventListener('blur', validatePassword);
+        document.getElementById('name').addEventListener('blur', validateName);
+        document.getElementById('birthdate').addEventListener('blur', validateBirthdate);
+        document.querySelectorAll('.interest-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', validateInterests);
+        });
+
+        // 사용자명 검증
+        function validateUsername() {
+            const username = document.getElementById('username');
+            if (username.value.length < 3 || username.value.length > 10) {
+                username.classList.add('is-invalid');
+            } else {
+                username.classList.remove('is-invalid');
+                username.classList.add('is-valid');
+            }
+        }
+
+        // 비밀번호 검증
+        function validatePassword() {
+            const password = document.getElementById('password');
+            const passwordValue = password.value;
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d|.*[!@#$%^&*]).{8,}$/;
+            if (!passwordRegex.test(passwordValue)) {
+                password.classList.add('is-invalid');
+            } else {
+                password.classList.remove('is-invalid');
+                password.classList.add('is-valid');
+            }
+        }
+
+        // 이름 검증
+        function validateName() {
+            const name = document.getElementById('name');
+            if (name.value.length < 1 || name.value.length > 10) {
+                name.classList.add('is-invalid');
+            } else {
+                name.classList.remove('is-invalid');
+                name.classList.add('is-valid');
+            }
+        }
+
+        // 생년월일 검증
+        function validateBirthdate() {
+            const birthdate = document.getElementById('birthdate');
+            if (!birthdate.value) {
+                birthdate.classList.add('is-invalid');
+            } else {
+                birthdate.classList.remove('is-invalid');
+                birthdate.classList.add('is-valid');
+            }
+        }
+
+        // 관심 분야 검증
+        function validateInterests() {
+            const interests = document.querySelectorAll('.interest-checkbox');
+            const selectedInterests = Array.from(interests).filter(checkbox => checkbox.checked);
+            if (selectedInterests.length < 1 || selectedInterests.length > 3) {
+                interests.forEach(checkbox => checkbox.classList.add('is-invalid'));
+            } else {
+                interests.forEach(checkbox => checkbox.classList.remove('is-invalid'));
+            }
+        }
+
+        // 폼 제출 시 최종 검증
+        form.addEventListener('submit', (event) => {
+            event.preventDefault(); // 기본 제출 동작 방지
+            validateUsername();
+            validatePassword();
+            validateName();
+            validateBirthdate();
+            validateInterests();
+
+            const invalidElements = form.querySelectorAll('.is-invalid');
+            if (invalidElements.length === 0) {
+                resultDiv.innerHTML = `<div class="alert alert-success">모든 입력이 올바릅니다!</div>`;
+            } else {
+                resultDiv.innerHTML = `<div class="alert alert-danger">입력 항목을 확인하세요.</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

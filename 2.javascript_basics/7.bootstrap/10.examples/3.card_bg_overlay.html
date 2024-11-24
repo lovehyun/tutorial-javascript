@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Background Overlay</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* background: url('https://via.placeholder.com/1920x1080') no-repeat center center; */
+        .background {
+            background: url('https://picsum.photos/1920/1080') no-repeat center center;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        .overlay-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="overlay-card text-center" id="overlayCard">
+            <h1 class="mb-4">환영합니다!</h1>
+            <p class="mb-4">이 페이지는 화려한 배경과 투명한 카드 오버레이로 구성되었습니다.</p>
+            <button class="btn btn-primary" onclick="closeCard()">시작하기</button>
+        </div>
+    </div>
+
+    <script>
+        // 카드 닫기 함수
+        function closeCard() {
+            const card = document.getElementById('overlayCard');
+            card.style.display = 'none'; // 카드만 숨김
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
