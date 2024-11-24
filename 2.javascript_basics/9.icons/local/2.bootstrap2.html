@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bootstrap Icons Showcase</title>
+    <link rel="stylesheet" href="node_modules/bootstrap-icons/font/bootstrap-icons.css" />
+    <style>
+        .icon-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        .icon-box {
+            text-align: center;
+        }
+        .icon-box i {
+            display: block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bootstrap Icons Showcase</h1>
+    <div class="icon-showcase">
+        <!-- Default size -->
+        <div class="icon-box">
+            <i class="bi bi-alarm"></i>
+            <span>Default</span>
+        </div>
+
+        <!-- Large size -->
+        <div class="icon-box">
+            <i class="bi bi-bell" style="font-size: 2rem; color: red"></i>
+            <span>Large Red</span>
+        </div>
+
+        <!-- Extra Large size -->
+        <div class="icon-box">
+            <i class="bi bi-camera" style="font-size: 3rem; color: blue"></i>
+            <span>Extra Large Blue</span>
+        </div>
+
+        <!-- Small size -->
+        <div class="icon-box">
+            <i class="bi bi-check-circle" style="font-size: 1rem; color: green"></i>
+            <span>Small Green</span>
+        </div>
+
+        <!-- Black and white style -->
+        <div class="icon-box">
+            <i class="bi bi-cloud" style="font-size: 2.5rem; color: black"></i>
+            <span>Black Cloud</span>
+        </div>
+
+        <!-- Gradient effect -->
+        <div class="icon-box">
+            <i class="bi bi-heart" style="font-size: 2rem; color: #ff69b4"></i>
+            <span>Pink Heart</span>
+        </div>
+
+        <!-- Rotated Icon -->
+        <div class="icon-box">
+            <i
+                class="bi bi-arrow-right-circle"
+                style="font-size: 2rem; color: orange; transform: rotate(45deg)"
+            ></i>
+            <span>Rotated</span>
+        </div>
+
+        <!-- Shadow effect -->
+        <div class="icon-box">
+            <i
+                class="bi bi-star-fill"
+                style="font-size: 2rem; color: gold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5)"
+            ></i>
+            <span>With Shadow</span>
+        </div>
+
+        <!-- Transparent icon -->
+        <div class="icon-box">
+            <i class="bi bi-trash" style="font-size: 2rem; color: rgba(255, 0, 0, 0.5)"></i>
+            <span>Transparent</span>
+        </div>
+    </div>
+</body>
+</html>
