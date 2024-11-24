@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'monthly_revenue4.html'));
+    res.sendFile(path.join(__dirname, 'public', 'monthly_revenue4.html'));
 });
 
 app.get('/chart_data', (req, res) => {

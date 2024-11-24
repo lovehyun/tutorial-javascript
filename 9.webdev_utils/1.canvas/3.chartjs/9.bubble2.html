@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bubble Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="bubbleChart" width="400" height="400"></canvas>
+    <script>
+        const ctx = document.getElementById('bubbleChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    {
+                        label: 'Red Bubbles',
+                        data: [
+                            { x: 10, y: 20, r: 15 },
+                            { x: 15, y: 10, r: 10 },
+                            { x: 20, y: 30, r: 25 },
+                        ],
+                        backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                    },
+                    {
+                        label: 'Blue Bubbles',
+                        data: [
+                            { x: 30, y: 20, r: 20 },
+                            { x: 25, y: 25, r: 15 },
+                            { x: 35, y: 30, r: 30 },
+                        ],
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                    },
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'X Axis' },
+                    },
+                    y: {
+                        title: { display: true, text: 'Y Axis' },
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>

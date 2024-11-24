@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Line Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="lineChart" width="400" height="400"></canvas>
+    <script>
+        const ctx = document.getElementById('lineChart').getContext('2d');
+
+        const gradient1 = ctx.createLinearGradient(0, 0, 400, 0);
+        gradient1.addColorStop(0, 'rgba(255, 99, 132, 0.5)');
+        gradient1.addColorStop(1, 'rgba(54, 162, 235, 0.5)');
+
+        const gradient2 = ctx.createLinearGradient(0, 0, 400, 0);
+        gradient2.addColorStop(0, 'rgba(75, 192, 192, 0.5)');
+        gradient2.addColorStop(1, 'rgba(255, 159, 64, 0.5)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May'],
+                datasets: [
+                    {
+                        label: 'Dataset 1',
+                        data: [10, 20, 15, 25, 30],
+                        borderColor: gradient1,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false,
+                    },
+                    {
+                        label: 'Dataset 2',
+                        data: [30, 25, 20, 15, 10],
+                        borderColor: gradient2,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.2)',
+                        },
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>

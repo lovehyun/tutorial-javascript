@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixed Width Candlestick Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+</head>
+<body>
+    <canvas id="candlestickChart" width="800" height="400"></canvas>
+
+    <script>
+        const ctx = document.getElementById('candlestickChart').getContext('2d');
+
+        // 랜덤 데이터 생성 함수
+        function generateRandomCandle(basePrice, timestamp) {
+            const open = basePrice + Math.floor(Math.random() * 100 - 50); // Open
+            const high = open + Math.floor(Math.random() * 200); // High
+            const low = open - Math.floor(Math.random() * 200); // Low
+            const close = low + Math.floor(Math.random() * (high - low)); // Close
+
+            return {
+                x: timestamp, // X축에 사용할 타임스탬프
+                o: open,
+                h: high,
+                l: low,
+                c: close,
+            };
+        }
+
+        // 초기 데이터를 20개로 채우기
+        function generateInitialData() {
+            const data = [];
+            const now = new Date();
+
+            // 20초 전부터 현재까지의 데이터 생성
+            for (let i = 20; i > 0; i--) {
+                const timestamp = new Date(now - i * 1000); // 1초 간격 시간 생성
+                data.push({
+                    x: timestamp,
+                    o: 0, // 빈 데이터는 0으로 채우기
+                    h: 0,
+                    l: 0,
+                    c: 0,
+                });
+            }
+
+            return data;
+        }
+
+        // 초기 데이터 생성
+        const candlestickData = generateInitialData();
+
+        // 캔들 차트 생성
+        const chart = new Chart(ctx, {
+            type: 'candlestick',
+            data: {
+                datasets: [
+                    {
+                        label: 'Stock Price',
+                        data: candlestickData,
+                        borderColor: 'rgba(0, 128, 0, 1)',
+                        color: {
+                            up: 'rgba(200, 0, 0, 1)', // 상승 색상
+                            down: 'rgba(0, 0, 200, 1)', // 하락 색상
+                            unchanged: 'rgba(0, 0, 0, 1)', // 변동 없음 색상
+                        },
+                        barThickness: 20, // 고정된 캔들 너비 설정
+                    },
+                ],
+            },
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: { display: true }, // 범례 표시
+                },
+                scales: {
+                    x: {
+                        type: 'time', // 시간 기반 축
+                        time: {
+                            unit: 'second', // 초 단위
+                        },
+                        title: {
+                            display: true,
+                            text: 'Time', // X축 제목
+                        },
+                        ticks: {
+                            autoSkip: true, // 자동으로 일부 라벨 건너뜀
+                            maxRotation: 45, // 라벨 최대 회전 각도
+                            minRotation: 0, // 라벨 최소 회전 각도
+                        },
+                    },
+                    y: {
+                        beginAtZero: true, // Y축 0에서 시작
+                        title: {
+                            display: true,
+                            text: 'Price', // Y축 제목
+                        },
+                    },
+                },
+            },
+        });
+
+        // 실시간 데이터 추가 함수
+        function updateChart() {
+            const now = new Date();
+            const lastCandle = chart.data.datasets[0].data.slice(-1)[0];
+            const basePrice = lastCandle && lastCandle.c > 0 ? lastCandle.c : 1000; // 이전 Close 값 사용
+            const newCandle = generateRandomCandle(basePrice, now);
+
+            // 새로운 데이터 추가
+            chart.data.datasets[0].data.push(newCandle);
+
+            // 항상 20개 유지
+            if (chart.data.datasets[0].data.length > 20) {
+                chart.data.datasets[0].data.shift(); // 가장 오래된 데이터 제거
+            }
+
+            chart.update(); // 차트 업데이트
+        }
+
+        // 매초 새로운 데이터 추가
+        setInterval(updateChart, 1000);
+    </script>
+</body>
+</html>

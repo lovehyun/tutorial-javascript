@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Doughnut Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="doughnutChart" width="400" height="400"></canvas>
+    <script>
+        const ctx = document.getElementById('doughnutChart').getContext('2d');
+
+        // Gradient for the chart
+        const gradient1 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient1.addColorStop(0, 'rgba(255, 99, 132, 0.9)');
+        gradient1.addColorStop(1, 'rgba(255, 159, 64, 0.9)');
+
+        const gradient2 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient2.addColorStop(0, 'rgba(54, 162, 235, 0.9)');
+        gradient2.addColorStop(1, 'rgba(75, 192, 192, 0.9)');
+
+        const gradient3 = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient3.addColorStop(0, 'rgba(153, 102, 255, 0.9)');
+        gradient3.addColorStop(1, 'rgba(255, 205, 86, 0.9)');
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Red', 'Blue', 'Yellow'],
+                datasets: [
+                    {
+                        data: [30, 50, 20],
+                        backgroundColor: [gradient1, gradient2, gradient3],
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>

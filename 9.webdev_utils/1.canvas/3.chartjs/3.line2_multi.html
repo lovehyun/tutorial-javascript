@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Chart with Two Datasets</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="lineChart" width="400" height="400"></canvas>
+    <script>
+        const ctx = document.getElementById('lineChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May'], // X축 라벨
+                datasets: [
+                    {
+                        label: 'Dataset 1',
+                        data: [10, 20, 15, 25, 30], // 첫 번째 데이터셋
+                        borderColor: 'rgba(255, 99, 132, 1)', // 빨간색 선
+                        borderWidth: 2,
+                        tension: 0.4, // 부드러운 곡선
+                        fill: false,
+                    },
+                    {
+                        label: 'Dataset 2',
+                        data: [30, 25, 20, 15, 10], // 두 번째 데이터셋
+                        borderColor: 'rgba(54, 162, 235, 1)', // 파란색 선
+                        borderWidth: 2,
+                        tension: 0.4, // 부드러운 곡선
+                        fill: false,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top', // 범례 위치
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: true, // X축 격자선 표시
+                        },
+                    },
+                    y: {
+                        grid: {
+                            display: true, // Y축 격자선 표시
+                        },
+                        title: {
+                            display: true, // Y축 제목 표시
+                            text: 'Value',
+                        },
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>
