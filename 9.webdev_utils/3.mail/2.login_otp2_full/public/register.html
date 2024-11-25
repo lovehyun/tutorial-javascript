@@ -20,7 +20,7 @@
     <script>
         async function sendCode() {
             const email = document.getElementById('email').value;
-            const response = await fetch('/auth/email-code', {
+            const response = await fetch('/api/auth/email-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
@@ -31,7 +31,7 @@
         async function verifyCode() {
             const email = document.getElementById('email').value;
             const code = document.getElementById('code').value;
-            const response = await fetch('/auth/verify-code', {
+            const response = await fetch('/api/auth/verify-code', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, code }),
@@ -42,6 +42,7 @@
                 // 이메일 필드 비활성화 처리
                 document.getElementById('email').disabled = true;
                 document.getElementById('sendCodeBtn').disabled = true;
+                document.getElementById('code').disabled = true;
                 document.getElementById('verifyCodeBtn').disabled = true;
             } else {
                 alert(data.error);
@@ -52,7 +53,7 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const password_check = document.getElementById('password_check').value;
-            const response = await fetch('/users', {
+            const response = await fetch('/api/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password, password_check }),
@@ -60,6 +61,9 @@
             const data = await response.json();
             if (data.success) {
                 window.location.href = '/success';
+
+                // alert('회원가입 성공! 로그인 페이지로 이동합니다.');
+                // window.location.href = '/login'; // 로그인 페이지로 이동
             } else {
                 alert(data.error);
             }
