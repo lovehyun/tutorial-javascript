@@ -11,7 +11,7 @@ nunjucks.configure('views', {
     express: app,
 });
 
-app.set('view engine', 'html');
+app.set('view engine', 'njk');
 
 app.get('/', (req, res) => {
     const db = new sqlite3.Database('crm.db', sqlite3.OPEN_READWRITE, (err) => {
@@ -27,7 +27,8 @@ app.get('/', (req, res) => {
     db.all(`
         SELECT 
             strftime('%Y-%m', "orders"."OrderAt") AS YearMonth,
-            SUM(items.UnitPrice) AS MonthlyRevenue
+            SUM(items.UnitPrice) AS MonthlyRevenue,
+            COUNT(orderitems.ItemId) AS ItemCount
         FROM 
             "orders"
         JOIN 
@@ -35,7 +36,7 @@ app.get('/', (req, res) => {
         JOIN 
             "items" ON "orderitems"."ItemId" = "items"."Id"
         WHERE 
-            "orders"."OrderAt" >= date('now', '-1 year')
+            "orders"."OrderAt" >= '2023-01-01' AND "orders"."OrderAt" <= '2023-12-31'
         GROUP BY 
             strftime('%Y-%m', "orders"."OrderAt")
         ORDER BY 
@@ -50,12 +51,15 @@ app.get('/', (req, res) => {
                 // 데이터 포맷 변환
                 const labels = rows.map((row) => row.YearMonth);
                 const revenues = rows.map((row) => row.MonthlyRevenue);
+                const itemcounts = rows.map((row) => row.ItemCount);
 
                 // 템플릿에 데이터 전달하여 렌더링
                 res.render('monthly_revenue3', { 
                     rows: rows, 
                     labels: JSON.stringify(labels), 
-                    revenues: JSON.stringify(revenues) });
+                    revenues: JSON.stringify(revenues),
+                    itemcounts: JSON.stringify(itemcounts) 
+                });
             }
         }
     );

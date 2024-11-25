@@ -17,10 +17,10 @@
             // 예제 데이터
             const graphData = {
                 A: 10,
-                B: 20,
+                B: 60,
                 C: 40,
-                D: 60,
-                E: 80,
+                D: 80,
+                E: 120,
             };
 
             // 그래프 그리기 함수 호출
@@ -42,19 +42,20 @@
 
                 if (keys.length > 0) {
                     const startX = 20;
-                    const startY = canvas.height - data[keys[0]];
+                    const barHeightOffset = 20;
+                    const startY = canvas.height - data[keys[0]] - barHeightOffset;
 
                     ctx.moveTo(startX, startY);
 
                     for (let i = 0; i < keys.length; i++) {
                         const key = keys[i];
                         const x = startX + i * 50;
-                        const y = canvas.height - data[key];
+                        const y = canvas.height - data[key] - barHeightOffset;
                         ctx.lineTo(x, y);
 
                         // x축에 텍스트 쓰기
                         ctx.fillStyle = 'black';
-                        ctx.fillText(key, x - 10, canvas.height - 5);
+                        ctx.fillText(key, x, canvas.height - 10);
                     }
 
                     ctx.stroke();

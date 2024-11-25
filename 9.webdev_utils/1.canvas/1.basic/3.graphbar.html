@@ -35,16 +35,17 @@
 
                 // 바 그래프 그리기
                 const barWidth = 30;
+                const barHeightOffset = 20;
                 let startX = 20;
 
                 for (const key in data) {
                     const barHeight = data[key];
                     ctx.fillStyle = 'blue';
-                    ctx.fillRect(startX, canvas.height - barHeight - 20, barWidth, barHeight);
+                    ctx.fillRect(startX, canvas.height - barHeight - barHeightOffset, barWidth, barHeight); // (x, y, width, height)
 
                     // x축에 텍스트 쓰기
                     ctx.fillStyle = 'black';
-                    ctx.fillText(key, startX + barWidth / 2 - 10, canvas.height - 5);
+                    ctx.fillText(key, startX + barWidth / 2, canvas.height - 10);
 
                     startX += 50; // 간격 조절
                 }

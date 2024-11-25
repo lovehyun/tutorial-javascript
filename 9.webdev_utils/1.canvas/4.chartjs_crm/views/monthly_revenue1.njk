@@ -19,5 +19,14 @@
         </tr>
         {% endfor %}
     </table>
+
+    <script>
+        // labels와 revenues를 Nunjucks 템플릿에서 분리
+        const labels = [{% for row in rows %}"{{ row.YearMonth }}"{% if not loop.last %}, {% endif %}{% endfor %}];
+        const revenues = [{% for row in rows %}{{ row.MonthlyRevenue }}{% if not loop.last %}, {% endif %}{% endfor %}];
+
+        console.log(labels);
+        console.log(revenues);
+    </script>
 </body>
 </html>

@@ -1,0 +1,173 @@
+<!-- views/monthly_revenue3.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Revenue</title>
+    <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        h1 {
+            text-align: center;
+        }
+        #revenueChart, #revenueCountChart {
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            height: auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Monthly Revenue</h1>
+    <table>
+        <tr>
+            <th>Year-Month</th>
+            <th>Monthly Revenue</th>
+            <th>Item Counts</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.YearMonth }}</td>
+            <td>{{ row.MonthlyRevenue }}</td>
+            <td>{{ row.ItemCount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    
+    <canvas id="revenueChart"></canvas>
+    <canvas id="revenueCountChart"></canvas>
+
+    <script>
+        {# var labels = {{ labels | safe }}; #}
+        {# var revenues = {{ revenues | safe }}; #}
+        {# var itemcounts = {{ itemcounts | safe }}; #}
+
+        // 데이터 준비
+        var labels = [];
+        var revenues = [];
+        var itemcounts = [];
+
+        {% for row in rows %}
+            labels.push('{{ row.YearMonth }}');
+            revenues.push({{ row.MonthlyRevenue }});
+            itemcounts.push({{ row.ItemCount }});
+        {% endfor %}
+
+        // 차트 그리기
+        var ctx = document.getElementById('revenueChart').getContext('2d');
+        var revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Monthly Revenue',
+                    data: revenues,
+                    fill: false,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // 차트 그리기
+        var ctx = document.getElementById('revenueCountChart').getContext('2d');
+        var revenueCountChart = new Chart(ctx, {
+            type: 'bar', // 'bar' 타입으로 설정, 'line'과 함께 사용 가능
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Monthly Revenue',
+                        data: revenues,
+                        type: 'line', // 이 데이터셋만 'line'으로 설정
+                        borderColor: 'rgba(31, 119, 180, 1)',
+                        backgroundColor: 'rgba(31, 119, 180, 0.2)',
+                        borderWidth: 2,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Item Count',
+                        data: itemcounts,
+                        type: 'bar', // 이 데이터셋은 'bar'로 설정
+                        backgroundColor: 'rgba(255, 127, 14, 0.7)',
+                        borderWidth: 1,
+                        yAxisID: 'y2'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Month'
+                        },
+                        ticks: {
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '매출액'
+                        },
+                        beginAtZero: true
+                    },
+                    y2: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '아이템 개수'
+                        },
+                        grid: {
+                            drawOnChartArea: false // y2 축의 그리드 제거
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

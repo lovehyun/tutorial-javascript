@@ -5,12 +5,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <h1>Monthly Revenue</h1>
+    <h2>Monthly Revenue</h2>
     <canvas id="revenueChart"></canvas>
+
+    <h2>Grouped Bar Chart</h2>
+    <canvas id="groupedBarChart"></canvas>
+
+    <h2>Stacked Bar Chart</h2>
+    <canvas id="stackedBarChart"></canvas>
+
+    <h2>Gender Distribution by Age Group</h2>
+    <canvas id="genderPieChart"></canvas>
 
     <script>
         // 차트 데이터 가져오기
-        fetch('/chart_data')
+        fetch('/revenue_data')
             .then(response => response.json())
             .then(chartData => {
                 // 차트 그리기
@@ -36,7 +45,163 @@
                         }
                     }
                 });
-            });
+        });
+
+        // 차트 데이터 가져오기
+        fetch('/gender_dist_data')
+            .then(response => response.json())
+            .then(chartData => {
+                // Grouped Bar Chart
+                var ctxGrouped = document.getElementById('groupedBarChart').getContext('2d');
+                var groupedBarChart = new Chart(ctxGrouped, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [
+                            {
+                                label: 'Male Count',
+                                data: chartData.maleCounts,
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                            },
+                            {
+                                label: 'Female Count',
+                                data: chartData.femaleCounts,
+                                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Grouped Bar Chart - Gender Distribution'
+                            }
+                        },
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: false
+                            },
+                            y: {
+                                beginAtZero: true,
+                                stacked: false,
+                                title: {
+                                    display: true,
+                                    text: 'Count'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Stacked Bar Chart
+                var ctxStacked = document.getElementById('stackedBarChart').getContext('2d');
+                var stackedBarChart = new Chart(ctxStacked, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [
+                            {
+                                label: 'Male Count',
+                                data: chartData.maleCounts,
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                            },
+                            {
+                                label: 'Female Count',
+                                data: chartData.femaleCounts,
+                                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                            }
+                        ]
+                    },
+                    options: {
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Stacked Bar Chart - Gender Distribution'
+                            }
+                        },
+                        responsive: true,
+                        scales: {
+                            x: {
+                                stacked: true
+                            },
+                            y: {
+                                beginAtZero: true,
+                                stacked: true,
+                                title: {
+                                    display: true,
+                                    text: 'Count'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Doughnut Chart
+                // 도넛 차트 그리기
+                // 연령대별 색상 지정
+                const ageGroupColors = [
+                    'rgba(255, 99, 132, 0.7)', // 10대
+                    'rgba(54, 162, 235, 0.7)', // 20대
+                    'rgba(75, 192, 192, 0.7)', // 30대
+                    'rgba(153, 102, 255, 0.7)', // 40대
+                    'rgba(255, 206, 86, 0.7)'  // 50대
+                ];
+                const borderColors = [
+                    'rgba(255, 99, 132, 1)', 
+                    'rgba(54, 162, 235, 1)', 
+                    'rgba(75, 192, 192, 1)', 
+                    'rgba(153, 102, 255, 1)', 
+                    'rgba(255, 206, 86, 1)'
+                ];
+
+                const pieChart = document.getElementById('genderPieChart').getContext('2d');
+                new Chart(pieChart, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.labels, // 연령대 (예: '10대', '20대' 등)
+                        datasets: [
+                            {
+                                label: 'Male',
+                                data: chartData.maleCounts, // 남성 데이터
+                                backgroundColor: ageGroupColors, // 연령대별 색상
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Female',
+                                data: chartData.femaleCounts, // 여성 데이터
+                                backgroundColor: ageGroupColors.map(color => color.replace('0.7', '0.5')), // 연한 버전
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Gender Distribution by Age Group'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        const datasetLabel = tooltipItem.dataset.label || '';
+                                        const value = tooltipItem.raw;
+                                        const total = tooltipItem.chart.data.datasets
+                                            .map(ds => ds.data[tooltipItem.dataIndex])
+                                            .reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(2);
+                                        return `${datasetLabel}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '50%' // 도넛 차트 중앙 빈 공간 크기 조정
+                    }
+                });
+        });
     </script>
 </body>
 </html>

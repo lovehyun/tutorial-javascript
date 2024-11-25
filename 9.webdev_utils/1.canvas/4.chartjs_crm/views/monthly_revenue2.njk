@@ -4,6 +4,37 @@
 <html>
 <head>
     <title>Monthly Revenue</title>
+        <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        h1 {
+            text-align: center;
+        }
+        #revenueChart {
+            display: block;
+            margin: 20px auto;
+            width: 80%;
+            height: auto;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>

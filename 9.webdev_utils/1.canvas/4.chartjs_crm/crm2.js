@@ -11,7 +11,7 @@ nunjucks.configure('views', {
     express: app,
 });
 
-app.set('view engine', 'html');
+app.set('view engine', 'njk');
 
 app.get('/', (req, res) => {
     const db = new sqlite3.Database('crm.db', sqlite3.OPEN_READWRITE, (err) => {
@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
         JOIN 
             "items" ON "orderitems"."ItemId" = "items"."Id"
         WHERE 
-            "orders"."OrderAt" >= date('now', '-1 year')
+            "orders"."OrderAt" >= '2023-01-01' AND "orders"."OrderAt" <= '2023-12-31'
         GROUP BY 
             strftime('%Y-%m', "orders"."OrderAt")
         ORDER BY 
