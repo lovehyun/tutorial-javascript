@@ -28,6 +28,8 @@ my-sessions/
 
 # 작업 데이터 파일
 file.txt
+*.mp4
+*.mp3
 
 # 패키지 파일 (임시 제외)
 package-lock.json
