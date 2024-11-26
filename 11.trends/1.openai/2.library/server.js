@@ -18,6 +18,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: '1d', // 캐싱 지속 시간 (1일)
 }));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index_tw.html'));
+})
+
 // 엔드포인트: 질문을 받아 OpenAI 응답 반환
 app.post('/api/chat', async (req, res) => {
     const { question } = req.body;
