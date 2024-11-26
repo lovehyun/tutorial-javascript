@@ -29,6 +29,18 @@
 
     <div class="container">
         <div class="row">
+            <!-- https://getbootstrap.com/docs/5.3/layout/grid/ -->
+            <!-- col, medium(md), 4 -->
+            <!-- 
+                xs	extra small (초소형)	<576px
+                sm	small (소형)	        ≥576px
+                md	medium (중간)	        ≥768px
+                lg	large (대형)	        ≥992px
+                xl	extra large (초대형)	≥1200px
+                xxl	extra extra large (초초대형)	≥1400px
+
+                4칸을 차지: md(768px 이상) 화면 크기에서 12칸 그리드 중 4칸을 차지
+             -->
             <div class="col-md-4">4칸 열</div>
             <div class="col-md-8">8칸 열</div>
         </div>
@@ -48,6 +60,7 @@
     </div>
 
     <!-- 3. Offset (열 간격 조정) -->
+    <!-- md(중간) 크기(768px) 이상의 해상도에서, 왼쪽에 4칸 띄고, 4칸을 차지 (즉 화면의 1/3 차지) -->
     <div class="container">
         <div class="row">
             <div class="col-md-4 offset-md-4" style="background-color: lightblue">중앙에 정렬된 열</div>

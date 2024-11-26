@@ -12,7 +12,7 @@
     <!-- 4. 아이콘과 함께 사용 -->
     <div class="container my-4">
         <div class="alert alert-warning d-flex align-items-center" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- me: margin-end -->
             경고 알림 메시지입니다!
         </div>
 
@@ -60,6 +60,7 @@
             if (alert) {
                 alert.classList.remove('show');
                 alert.classList.add('fade');
+                alert.remove(); // 요소를 DOM에서 완전히 제거 (위에 두개는 이미 있음)
             }
         }, 5000);
     </script>
