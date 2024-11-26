@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kooooogle - REST API</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            width: 80%;
+        }
+        .result {
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kooooogle</h1>
+    <form id="searchForm">
+        <input type="text" id="query" placeholder="Search..." required>
+        <button type="button" data-type="web">웹검색</button>
+        <button type="button" data-type="image">이미지검색</button>
+        <button type="button" data-type="vclip">비디오검색</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        // 검색 버튼 클릭 이벤트
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const query = document.getElementById('query').value;
+                const type = e.target.getAttribute('data-type');
+
+                if (!query) {
+                    alert('검색어를 입력하세요.');
+                    return;
+                }
+
+                // REST API 호출
+                try {
+                    const response = await fetch(`/api/search?query=${encodeURIComponent(query)}&type=${type}`);
+                    if (!response.ok) throw new Error('Failed to fetch results');
+                    
+                    const results = await response.json();
+                    displayResults(type, results);
+                } catch (error) {
+                    console.error(error.message);
+                    alert('검색에 실패했습니다.');
+                }
+            });
+        });
+
+        // 결과 표시 함수
+        function displayResults(type, results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = ''; // 기존 결과 제거
+
+            if (!results.documents || results.documents.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            results.documents.forEach(item => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+
+                if (type === 'web') {
+                    resultDiv.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>${item.contents}</p>
+                        <a href="${item.url}" target="_blank">${item.url}</a>
+                    `;
+                } else if (type === 'image') {
+                    resultDiv.innerHTML = `
+                        <img src="${item.thumbnail_url}" alt="Thumbnail">
+                        <p>${item.display_sitename}</p>
+                        <a href="${item.doc_url}" target="_blank">${item.doc_url}</a>
+                        <p>Width: ${item.width}, Height: ${item.height}</p>
+                        <p>Datetime: ${item.datetime}</p>
+                    `;
+                } else if (type === 'vclip') {
+                    resultDiv.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>Author: ${item.author}</p>
+                        <a href="${item.url}" target="_blank">${item.url}</a>
+                        <p>Play Time: ${item.play_time} seconds</p>
+                        <img src="${item.thumbnail}" alt="Thumbnail">
+                        <p>Datetime: ${item.datetime}</p>
+                    `;
+                }
+
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+    </script>
+</body>
+</html>

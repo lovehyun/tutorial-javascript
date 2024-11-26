@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kooooogle - REST API</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            width: 80%;
+        }
+        .result {
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .pagination-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .current-page {
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kooooogle</h1>
+    <form id="searchForm">
+        <input type="text" id="query" placeholder="Search..." required>
+        <button type="button" data-type="web">웹검색</button>
+        <button type="button" data-type="image">이미지검색</button>
+        <button type="button" data-type="vclip">비디오검색</button>
+    </form>
+
+    <div id="results"></div>
+    <div id="pagination" class="pagination">
+        <button id="prevButton" style="display: none;">PREV</button>
+        <span id="currentPageInfo" class="current-page"></span>
+        <button id="nextButton" style="display: none;">NEXT</button>
+    </div>
+
+    <script>
+        let currentQuery = '';
+        let currentType = '';
+        let currentPage = 1;
+
+        // 검색 버튼 클릭 이벤트 (#searchForm 바로 하위의 button 만 선택)
+        document.querySelectorAll('#searchForm > button').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const query = document.getElementById('query').value;
+                const type = e.target.getAttribute('data-type'); // 클릭된 버튼의 type 가져오기
+
+                if (!query) {
+                    alert('검색어를 입력하세요.');
+                    return;
+                }
+
+                // 초기화
+                currentQuery = query;
+                currentType = type;
+                currentPage = 1;
+
+                // 검색 실행
+                await fetchResults(currentQuery, currentType, currentPage);
+            });
+        });
+
+        // REST API 호출 및 결과 표시
+        async function fetchResults(query, type, page) {
+            try {
+                const response = await fetch(`/api/search2?query=${encodeURIComponent(query)}&type=${type}&page=${page}`);
+                if (!response.ok) throw new Error('Failed to fetch results');
+
+                const results = await response.json();
+                displayResults(type, results);
+                setupPagination(query, type, results.meta.pageable_count, page);
+            } catch (error) {
+                console.error(error.message);
+                alert('검색에 실패했습니다.');
+            }
+        }
+
+        // 결과 표시 함수
+        function displayResults(type, results) {
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = ''; // 기존 결과 제거
+
+            if (!results.documents || results.documents.length === 0) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            results.documents.forEach(item => {
+                const resultDiv = document.createElement('div');
+                resultDiv.classList.add('result');
+
+                if (type === 'web') {
+                    resultDiv.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>${item.contents}</p>
+                        <a href="${item.url}" target="_blank">${item.url}</a>
+                    `;
+                } else if (type === 'image') {
+                    resultDiv.innerHTML = `
+                        <img src="${item.thumbnail_url}" alt="Thumbnail">
+                        <p>${item.display_sitename}</p>
+                        <a href="${item.doc_url}" target="_blank">${item.doc_url}</a>
+                        <p>Width: ${item.width}, Height: ${item.height}</p>
+                        <p>Datetime: ${item.datetime}</p>
+                    `;
+                } else if (type === 'vclip') {
+                    resultDiv.innerHTML = `
+                        <h3>${item.title}</h3>
+                        <p>Author: ${item.author}</p>
+                        <a href="${item.url}" target="_blank">${item.url}</a>
+                        <p>Play Time: ${item.play_time} seconds</p>
+                        <img src="${item.thumbnail}" alt="Thumbnail">
+                        <p>Datetime: ${item.datetime}</p>
+                    `;
+                }
+
+                resultsContainer.appendChild(resultDiv);
+            });
+        }
+
+        // 페이지네이션 설정 함수
+        function setupPagination(query, type, totalResults, page) {
+            const totalPages = Math.ceil(totalResults / 10); // 한 페이지에 10개의 결과
+            const currentPageInfo = document.getElementById('currentPageInfo');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+
+            // 현재 페이지 표시
+            currentPage = page;
+            currentPageInfo.textContent = `현재 페이지: ${page}`;
+
+            // 이전 버튼 설정
+            if (page > 1) {
+                prevButton.style.display = 'inline';
+                prevButton.onclick = () => fetchResults(query, type, page - 1);
+            } else {
+                prevButton.style.display = 'none';
+            }
+
+            // 다음 버튼 설정
+            if (page < totalPages) {
+                nextButton.style.display = 'inline';
+                nextButton.onclick = () => fetchResults(query, type, page + 1);
+            } else {
+                nextButton.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
