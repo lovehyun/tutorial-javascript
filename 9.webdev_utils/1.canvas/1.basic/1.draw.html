@@ -19,11 +19,26 @@
         const canvas = document.getElementById('myCanvas');
         const context = canvas.getContext('2d'); // 2D 그래픽 컨텍스트 얻기
 
-        // 사각형 그리기
+        // 1. 사각형 그리기
+        // fillRect(x, y, width, height): 채워진 사각형 그리기.
+        // strokeRect(x, y, width, height): 테두리 사각형 그리기.
+        // clearRect(x, y, width, height): 특정 영역 지우기.
+        
         context.fillStyle = '#FF0000'; // 색상 설정 (빨간색)
         context.fillRect(50, 50, 100, 80); // (x, y, width, height)
+        
+        context.strokeStyle = 'blue'; // 테두리 색상
+        context.strokeRect(50, 100, 100, 80); // 파란 테두리
+        context.clearRect(80, 80, 40, 60); // 일부 영역 지우기
 
-        // 선 그리기
+        // 2. 라인 그리기
+        // beginPath(): 새로운 경로 시작.
+        // moveTo(x, y): 시작 점 이동.
+        // lineTo(x, y): 점 연결.
+        // closePath(): 경로 닫기.
+        // stroke(): 경로 그리기.
+        // fill(): 경로 채우기.
+
         context.strokeStyle = '#0000FF'; // 선 색상 설정 (파란색)
         context.lineWidth = 2; // 선 두께 설정
         context.beginPath();
@@ -32,17 +47,21 @@
         context.stroke(); // 실제로 그리기
         context.closePath();
 
-        // 원 그리기
+        // 3. 원 그리기
+        // arc(x, y, radius, startAngle, endAngle, counterclockwise): 원이나 호 그리기.
+
         context.fillStyle = '#00FF00'; // 색상 설정 (녹색)
         context.beginPath();
         context.arc(350, 50, 30, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
-        context.fill(); // 실제로 그리기
+        context.fill(); // 내용 채우기
         context.closePath(); // 경로 종료
 
         context.fillStyle = '#00FF00'; // 색상 설정 (녹색)
         context.beginPath();
         context.arc(350, 150, 30, 0, Math.PI); // (x, y, radius, startAngle, endAngle)
-        context.fill(); // 실제로 그리기
+        context.fill(); // 내용 채우기
+        context.strokeStyle = 'blue';
+        context.stroke(); // 선 그리기
         context.closePath();
 
         // 0 라디안은 원의 오른쪽에서 시작하며, 

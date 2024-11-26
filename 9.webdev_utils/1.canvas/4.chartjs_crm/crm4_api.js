@@ -79,6 +79,25 @@ app.get('/gender_dist_data', (req, res) => {
     });
 
     // SQL 쿼리 실행
+
+    // 1. 연령대별 사람 수
+    // SELECT
+    //     (Age / 10) * 10 AS AgeGroup, -- 연령대 계산
+    //     COUNT(*) AS UserCount                     -- 연령대별 사용자 수 계산
+    // FROM users
+    // GROUP BY AgeGroup
+    // ORDER BY AgeGroup;
+
+    // 2. 연령대별 성별 사람 수 (CAST는 옵셔널, WHERE도 옵셔널)
+   // SELECT
+    //     CAST(Age AS INTEGER) / 10 * 10 AS AgeGroup, -- 연령대 계산
+    //     Gender,                                    -- 성별 구분
+    //     COUNT(*) AS UserCount                      -- 연령대 및 성별별 사용자 수 계산
+    // FROM users
+    // WHERE Age IS NOT NULL AND Age != ''           -- 나이가 NULL이거나 비어있는 값 제외
+    // GROUP BY AgeGroup, Gender                      -- 연령대 및 성별로 그룹화
+    // ORDER BY AgeGroup, Gender;
+
     db.all(`
         SELECT 
             CASE
@@ -105,7 +124,9 @@ app.get('/gender_dist_data', (req, res) => {
             res.status(500).send('Internal Server Error');
         } else {
             console.log(rows);
+
             // 데이터 포맷 변환
+            // 방법1.
             const ageGroups = {};
             
             for (const row of rows) {
@@ -130,8 +151,26 @@ app.get('/gender_dist_data', (req, res) => {
                 maleCounts: Object.values(ageGroups).map(group => group.male),
                 femaleCounts: Object.values(ageGroups).map(group => group.female)
             };
+            
+            // 방법2. reduce 를 통한 간단한(?) 코드
+            // const ageGroups = rows.reduce((acc, { AgeGroup, Gender, Count }) => {
+            //     acc[AgeGroup] = acc[AgeGroup] || { male: 0, female: 0 };
+            //     acc[AgeGroup][Gender.toLowerCase()] = Count; // 'Male' -> 'male', 'Female' -> 'female'
+            //     return acc;
+            // }, {});
+            // 
+            // const chartData = {
+            //     labels: Object.keys(ageGroups),
+            //     maleCounts: Object.keys(ageGroups).map(key => ageGroups[key].male),
+            //     femaleCounts: Object.keys(ageGroups).map(key => ageGroups[key].female)
+            // };
 
             console.log(chartData);
+            // {
+            //     labels: [ '10대', '20대', '30대', '40대', '50대' ],
+            //     maleCounts: [ 100, 124, 128, 107, 29 ],
+            //     femaleCounts: [ 101, 135, 126, 117, 33 ]
+            // }
 
             res.json(chartData);
         }
