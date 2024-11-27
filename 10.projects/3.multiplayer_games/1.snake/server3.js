@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
+const os = require('os');
 
 const app = express();
 const server = http.createServer(app);
@@ -19,6 +20,10 @@ let clients = new Map();
 
 let snakeSpeed = 200; // 뱀 이동 속도 (밀리초)
 let gameLoopInterval; // 타이머ID
+
+// 서버 메세지 통계
+let sentMessages = 0;
+let receivedMessages = 0;
 
 // 정적 파일 디렉토리 셋업
 app.use(express.static(path.join(__dirname, 'public')));
@@ -40,6 +45,7 @@ wss.on('connection', (ws) => {
     ws.on('message', (message) => {
         const data = JSON.parse(message);
         console.log(`${clientId}: ${message}`);
+        receivedMessages++;
 
         // 키보드 입력 처리
         if (data.type === 'keypress') {
@@ -274,6 +280,7 @@ function broadcastGameData() {
         const socket = client.socket;
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(dataToSend);
+            sentMessages++;
         }
     });
 }
@@ -292,8 +299,17 @@ setInterval(() => {
         }
     });
 
-    // 메모리 사용량 확인
-    console.log('Memory Usage:', process.memoryUsage());
+    // 각종 자원 사용량 확인
+    const { rss, heapTotal, heapUsed } = process.memoryUsage();
+
+    console.log(`
+--- Server Status ---
+CPU Load: ${os.loadavg().join(', ')}
+Memory Usage: (RSS: ${(rss / 1024 / 1024).toFixed(2)} MB, Heap Total: ${(heapTotal / 1024 / 1024).toFixed(2)} MB, Heap Used: ${(heapUsed / 1024 / 1024).toFixed(2)} MB)
+Active clients: ${wss.clients.size}
+Sent messages: ${sentMessages}, Received messages: ${receivedMessages}
+----------------------
+    `);
 }, 10 * 60 * 1000); // 10분마다 확인
 
 const PORT = 3000;
