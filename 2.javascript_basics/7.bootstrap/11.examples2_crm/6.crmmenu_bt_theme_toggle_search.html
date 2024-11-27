@@ -19,115 +19,114 @@
     </style>
 </head>
 <body class="bg-light text-dark">
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">MyLogo</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="#">User</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Order</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Order Item</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Item</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Store</a></li>
-            </ul>
-            <button class="btn btn-outline-secondary" id="theme-toggle">Switch to Dark Mode</button>
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">MyLogo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">User</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Order</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Order Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Item</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Store</a></li>
+                </ul>
+                <button class="btn btn-outline-secondary" id="theme-toggle">Switch to Dark Mode</button>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<main class="container mt-4">
-    <!-- 검색 창 -->
-    <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control bg-light text-dark" placeholder="Search table...">
-    </div>
+    <main class="container mt-4">
+        <!-- 검색 창 -->
+        <div class="mb-3">
+            <input type="text" id="searchInput" class="form-control bg-light text-dark" placeholder="Search table...">
+        </div>
 
-    <!-- 테이블 -->
-    <table class="table table-striped" id="dataTable">
-        <thead>
-            <tr>
-                <th>Column 1</th>
-                <th>Column 2</th>
-                <th>Column 3</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td>Data 1</td><td>Data 2</td><td>Data 3</td></tr>
-            <tr><td>Data 4</td><td>Data 5</td><td>Data 6</td></tr>
-            <tr><td>Data 7</td><td>Data 8</td><td>Data 9</td></tr>
-            <tr><td>Data 10</td><td>Data 11</td><td>Data 12</td></tr>
-            <tr><td>Data 13</td><td>Data 14</td><td>Data 15</td></tr>
-        </tbody>
-    </table>
-</main>
+        <!-- 테이블 -->
+        <table class="table table-striped" id="dataTable">
+            <thead>
+                <tr>
+                    <th>Column 1</th>
+                    <th>Column 2</th>
+                    <th>Column 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Data 1</td><td>Data 2</td><td>Data 3</td></tr>
+                <tr><td>Data 4</td><td>Data 5</td><td>Data 6</td></tr>
+                <tr><td>Data 7</td><td>Data 8</td><td>Data 9</td></tr>
+                <tr><td>Data 10</td><td>Data 11</td><td>Data 12</td></tr>
+                <tr><td>Data 13</td><td>Data 14</td><td>Data 15</td></tr>
+            </tbody>
+        </table>
+    </main>
 
-<nav aria-label="Page navigation example">
-    <ul class="pagination justify-content-center">
-        <li class="page-item"><a class="page-link" href="#" aria-label="Previous">&laquo;</a></li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item"><a class="page-link" href="#" aria-label="Next">&raquo;</a></li>
-    </ul>
-</nav>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#" aria-label="Previous">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#" aria-label="Next">&raquo;</a></li>
+        </ul>
+    </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const searchInput = document.getElementById('searchInput');
-    
-    // 테마 토글 이벤트
-    themeToggleBtn.addEventListener('click', () => {
-        const isDarkMode = document.body.classList.contains('bg-dark');
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const searchInput = document.getElementById('searchInput');
         
-        // 본문 스타일 토글
-        document.body.classList.toggle('bg-dark', !isDarkMode);
-        document.body.classList.toggle('text-light', !isDarkMode);
-        document.body.classList.toggle('bg-light', isDarkMode);
-        document.body.classList.toggle('text-dark', isDarkMode);
+        // 테마 토글 이벤트
+        themeToggleBtn.addEventListener('click', () => {
+            const isDarkMode = document.body.classList.contains('bg-dark');
+            
+            // 본문 스타일 토글
+            document.body.classList.toggle('bg-dark', !isDarkMode);
+            document.body.classList.toggle('text-light', !isDarkMode);
+            document.body.classList.toggle('bg-light', isDarkMode);
+            document.body.classList.toggle('text-dark', isDarkMode);
 
-        // 네비게이션 스타일 토글
-        const navbar = document.querySelector('.navbar');
-        navbar.classList.toggle('navbar-light', isDarkMode);
-        navbar.classList.toggle('bg-light', isDarkMode);
-        navbar.classList.toggle('navbar-dark', !isDarkMode);
-        navbar.classList.toggle('bg-dark', !isDarkMode);
+            // 네비게이션 스타일 토글
+            const navbar = document.querySelector('.navbar');
+            navbar.classList.toggle('navbar-light', isDarkMode);
+            navbar.classList.toggle('bg-light', isDarkMode);
+            navbar.classList.toggle('navbar-dark', !isDarkMode);
+            navbar.classList.toggle('bg-dark', !isDarkMode);
 
-        // 테이블 스타일 토글
-        document.querySelectorAll('.table').forEach(table => {
-            table.classList.toggle('table-dark', !isDarkMode);
+            // 테이블 스타일 토글
+            document.querySelectorAll('.table').forEach(table => {
+                table.classList.toggle('table-dark', !isDarkMode);
+            });
+
+            // 페이지네이션 스타일 토글
+            document.querySelectorAll('.page-link').forEach(link => {
+                link.classList.toggle('bg-dark', !isDarkMode);
+                link.classList.toggle('text-light', !isDarkMode);
+            });
+
+            // 검색 창 스타일 토글
+            searchInput.classList.toggle('bg-dark', !isDarkMode);
+            searchInput.classList.toggle('text-light', !isDarkMode);
+            searchInput.classList.toggle('bg-light', isDarkMode);
+            searchInput.classList.toggle('text-dark', isDarkMode);
+
+            // 버튼 텍스트 업데이트
+            themeToggleBtn.textContent = isDarkMode ? 'Switch to Dark Mode' : 'Switch to Light Mode';
         });
 
-        // 페이지네이션 스타일 토글
-        document.querySelectorAll('.page-link').forEach(link => {
-            link.classList.toggle('bg-dark', !isDarkMode);
-            link.classList.toggle('text-light', !isDarkMode);
+        // 검색 기능
+        searchInput.addEventListener('keyup', function() {
+            const input = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#dataTable tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(input));
+                row.style.display = match ? '' : 'none';
+            });
         });
-
-        // 검색 창 스타일 토글
-        searchInput.classList.toggle('bg-dark', !isDarkMode);
-        searchInput.classList.toggle('text-light', !isDarkMode);
-        searchInput.classList.toggle('bg-light', isDarkMode);
-        searchInput.classList.toggle('text-dark', isDarkMode);
-
-        // 버튼 텍스트 업데이트
-        themeToggleBtn.textContent = isDarkMode ? 'Switch to Dark Mode' : 'Switch to Light Mode';
-    });
-
-    // 검색 기능
-    searchInput.addEventListener('keyup', function() {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#dataTable tbody tr');
-        
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(input));
-            row.style.display = match ? '' : 'none';
-        });
-    });
-</script>
+    </script>
 </body>
 </html>
