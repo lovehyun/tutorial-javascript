@@ -1,12 +1,12 @@
 // 서버 코드 (Node.js 환경)
 const express = require('express');
+const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
-const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ server, reuseAddr: true });
 
 let canvasSize = 500; // 캔버스 크기
 let blockSize = 20; // 블록 크기
@@ -20,11 +20,11 @@ let clients = new Map();
 let snakeSpeed = 200; // 뱀 이동 속도 (밀리초)
 let gameLoopInterval; // 타이머ID
 
-// 정적 파일을 제공하기 위해 express.static 미들웨어를 사용합니다.
+// 정적 파일 디렉토리 셋업
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'snake2.html'));
+    res.sendFile(path.join(__dirname, 'public', 'snake3.html'));
 });
 
 wss.on('connection', (ws) => {
@@ -65,19 +65,13 @@ wss.on('connection', (ws) => {
 function handleKeyPress(clientId, key) {
     const client = clients.get(clientId);
 
-    switch (key) {
-        case 'ArrowUp':
-            client.data.direction = 'up';
-            break;
-        case 'ArrowDown':
-            client.data.direction = 'down';
-            break;
-        case 'ArrowLeft':
-            client.data.direction = 'left';
-            break;
-        case 'ArrowRight':
-            client.data.direction = 'right';
-            break;
+    // 거꾸로 이동 불가
+    if ((key === 'ArrowUp' && client.data.direction !== 'down') ||
+        (key === 'ArrowDown' && client.data.direction !== 'up') ||
+        (key === 'ArrowLeft' && client.data.direction !== 'right') ||
+        (key === 'ArrowRight' && client.data.direction !== 'left')) 
+    {
+        client.data.direction = key.replace('Arrow', '').toLowerCase();
     }
 }
 
@@ -288,6 +282,19 @@ function broadcastGameData() {
 function generateClientId() {
     return Math.random().toString(36).substr(2, 9);
 }
+
+// 주기적으로 연결 상태를 확인하고 닫힌 연결을 정리
+setInterval(() => {
+    wss.clients.forEach((client) => {
+        if (client.readyState !== WebSocket.OPEN) {
+            console.log('Closing stale connection...');
+            client.terminate(); // 닫힌 연결 제거
+        }
+    });
+
+    // 메모리 사용량 확인
+    console.log('Memory Usage:', process.memoryUsage());
+}, 10 * 60 * 1000); // 10분마다 확인
 
 const PORT = 3000;
 server.listen(PORT, () => {

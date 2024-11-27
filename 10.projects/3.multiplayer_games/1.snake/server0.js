@@ -1,5 +1,6 @@
 // 서버 코드 (Node.js 환경)
 const express = require('express');
+const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
 
@@ -11,6 +12,13 @@ let gameData = {
     snake: [{ x: 0, y: 0 }],
     food: { x: 5, y: 5 },
 };
+
+// 정적 파일 디렉토리 셋업
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'snake0.html'));
+});
 
 wss.on('connection', (ws) => {
     console.log('Client connected');

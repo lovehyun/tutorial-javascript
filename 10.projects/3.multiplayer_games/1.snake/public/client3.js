@@ -17,7 +17,7 @@ socket.addEventListener('open', (event) => {
 
 // 게임오버 처리 함수
 function handleGameOver() {
-    // 여기에 게임오버 화면을 표시하고, retry 여부를 물어보고 처리하는 로직을 추가하세요.
+    // 여기에 게임오버 화면을 표시하고, retry 여부를 물어보고 처리하는 로직을 추가
 
     // 예시: 간단한 게임오버 화면을 alert로 표시하고 retry 여부 물어보기
     const retry = window.confirm('Game Over! Retry?');
@@ -41,28 +41,6 @@ socket.addEventListener('message', (event) => {
 
     updateScore(receivedData.clients);
 });
-
-// socket.addEventListener('message', (event) => {
-//     let receivedData;
-
-//     try {
-//         if (typeof event.data === 'string') {
-//             receivedData = JSON.parse(event.data);
-//         } else if (event.data instanceof Blob) {
-//             // Blob 데이터인 경우 처리
-//             console.log('Received Blob data from server:', event.data);
-//             return;
-//         } else {
-//             receivedData = event.data;
-//         }
-
-//         console.log('Received game data from server:', receivedData);
-//         clientsData = receivedData;
-//         drawGame();
-//     } catch (error) {
-//         console.error('Error parsing JSON data:', error);
-//     }
-// });
 
 socket.addEventListener('close', (event) => {
     console.log('Connection to the WebSocket server closed');
@@ -92,7 +70,7 @@ function drawGame(clientsData) {
     context.fillStyle = commonData.foodColor;
     context.fillRect(commonData.food.x * blockSize, commonData.food.y * blockSize, blockSize, blockSize);
     
-    // 클라이언트 데이터를 순회하면서 각각의 뱀과 음식을 그립니다.
+    // 클라이언트 데이터를 순회하면서 각각의 뱀과 음식을 그리기
     clientsData.clients.forEach(clientData => {
         const client = clientData.data;
 

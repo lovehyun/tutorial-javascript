@@ -15,28 +15,6 @@ socket.addEventListener('message', (event) => {
     drawGame(clientsData);
 });
 
-// socket.addEventListener('message', (event) => {
-//     let receivedData;
-
-//     try {
-//         if (typeof event.data === 'string') {
-//             receivedData = JSON.parse(event.data);
-//         } else if (event.data instanceof Blob) {
-//             // Blob 데이터인 경우 처리
-//             console.log('Received Blob data from server:', event.data);
-//             return;
-//         } else {
-//             receivedData = event.data;
-//         }
-
-//         console.log('Received game data from server:', receivedData);
-//         clientsData = receivedData;
-//         drawGame();
-//     } catch (error) {
-//         console.error('Error parsing JSON data:', error);
-//     }
-// });
-
 socket.addEventListener('close', (event) => {
     console.log('Connection to the WebSocket server closed');
 });
@@ -65,7 +43,7 @@ function drawGame(clientsData) {
     context.fillStyle = commonData.foodColor;
     context.fillRect(commonData.food.x * blockSize, commonData.food.y * blockSize, blockSize, blockSize);
     
-    // 클라이언트 데이터를 순회하면서 각각의 뱀과 음식을 그립니다.
+    // 클라이언트 데이터를 순회하면서 각각의 뱀과 음식을 그리기
     clientsData.clients.forEach(clientData => {
         const client = clientData.data;
 
