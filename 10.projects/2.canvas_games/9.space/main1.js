@@ -1,3 +1,6 @@
+// License: GPLv3
+// Original Author: shpark (https://github.com/lovehyun/tutorial-javascript)
+
 // 1. 캔바스 기본 그림 그리기
 
 const canvas = document.createElement("canvas");

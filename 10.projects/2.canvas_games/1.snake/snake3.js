@@ -8,7 +8,8 @@ const SNAKE_SPEED = 200; // 뱀 이동 속도 (밀리초)
 let canvas, context;
 let snake = [{ x: 0, y: 0 }]; // 초기 뱀 위치
 let direction = 'right'; // 뱀 초기 이동 방향
-let food = {x: 7, y: 7}; // 초기 음식 생성
+let food = generateFood(); // 초기 음식 생성
+let gameover = false; // 게임 오버 여부
 
 // 초기화 실행
 window.onload = initialize;
@@ -32,6 +33,11 @@ function setupEventListeners() {
 
 // 키 입력에 따른 방향 전환 함수
 function handleKeyPress(event) {
+    if (gameover) {
+        resetGame(); // 게임 오버 상태에서 키 입력 시 게임 재시작
+        return;
+    }
+
     switch (event.key) {
         // 이동 조건 제한 - 거꾸로 이동 금지
         case 'ArrowUp':
@@ -54,6 +60,9 @@ function gameLoop() {
     // 뱀 이동
     moveSnake();
 
+    // 충돌 체크
+    checkCollision();
+
     // 음식 충돌 체크
     checkFoodCollision();
     
@@ -65,6 +74,14 @@ function gameLoop() {
 function draw() {
     context.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE); // 캔버스 지우기
 
+    if (gameover) {
+        // 게임 오버 메시지 표시
+        context.fillStyle = '#F00';
+        context.font = '30px Arial';
+        context.fillText('Game Over', 80, CANVAS_SIZE / 2);
+        return;
+    }
+    
     // 뱀과 음식 그리기
     drawSnake();
     drawFood();
@@ -101,12 +118,28 @@ function moveSnake() {
             head.x += 1;
             break;
     }
-    
-    // 화면을 벗어나면 반대쪽 끝으로 이동
-    head.x = (head.x + CANVAS_SIZE / BLOCK_SIZE) % (CANVAS_SIZE / BLOCK_SIZE);
-    head.y = (head.y + CANVAS_SIZE / BLOCK_SIZE) % (CANVAS_SIZE / BLOCK_SIZE);
-    
+
     snake.unshift(head); // 뱀의 머리 추가
+}
+
+// 충돌 체크 함수
+function checkCollision() {
+    const head = snake[0];
+    
+    // 화면 밖 이동 확인 or 자기 자신과 충돌 확인
+    if (head.x < 0 || head.x >= CANVAS_SIZE / BLOCK_SIZE ||
+        head.y < 0 || head.y >= CANVAS_SIZE / BLOCK_SIZE ||
+        isSnakeCollision()
+    ) {
+        gameover = true; // 게임 오버 처리
+    }
+}
+
+// 뱀과 자기 자신 충돌 체크 함수
+function isSnakeCollision() {
+    const head = snake[0];
+    // 내 머리가 내 몸안에 있는지 확인
+    return snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y);
 }
 
 // 음식과 뱀의 충돌 체크 및 처리 함수
@@ -121,10 +154,26 @@ function checkFoodCollision() {
 
 // 무작위로 음식 생성 함수
 function generateFood() {
-    const foodPosition = {
-        x: Math.floor(Math.random() * (CANVAS_SIZE / BLOCK_SIZE)),
-        y: Math.floor(Math.random() * (CANVAS_SIZE / BLOCK_SIZE)),
-    };
+    let foodPosition;
+    do {
+        foodPosition = {
+            x: Math.floor(Math.random() * (CANVAS_SIZE / BLOCK_SIZE)),
+            y: Math.floor(Math.random() * (CANVAS_SIZE / BLOCK_SIZE)),
+        };
+    } while (isFoodOnSnake(foodPosition));
 
     return foodPosition;
+}
+
+// 음식이 뱀 위에 있는지 체크 함수
+function isFoodOnSnake(foodPosition) {
+    return snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y);
+}
+
+// 게임 재시작 함수
+function resetGame() {
+    snake = [{ x: 0, y: 0 }]; // 초기 뱀 위치로 설정
+    direction = 'right'; // 초기 이동 방향으로 설정
+    food = generateFood(); // 초기 음식 생성
+    gameover = false; // 게임 오버 상태 초기화
 }

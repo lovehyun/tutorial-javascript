@@ -1,3 +1,6 @@
+// License: GPLv3
+// Original Author: shpark (https://github.com/lovehyun/tutorial-javascript)
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 

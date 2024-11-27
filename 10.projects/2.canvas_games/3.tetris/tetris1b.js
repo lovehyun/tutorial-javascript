@@ -1,3 +1,6 @@
+// License: GPLv3
+// Original Author: shpark (https://github.com/lovehyun/tutorial-javascript)
+
 // HTML에서 tetrisCanvas 요소를 가져와서 2D 컨텍스트를 얻어옵니다.
 const canvas = document.getElementById('tetrisCanvas');
 const context = canvas.getContext('2d');
