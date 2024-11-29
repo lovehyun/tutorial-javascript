@@ -40,40 +40,30 @@ app.use((req, res, next) => {
         return next();
     }
     
-    if (!req.cookies.consentTime) {
-        // 동의하지 않은 사용자는 제외
-        return next();
+    if (req.cookies.userConsent === 'accepted') {
+        // 완전 추적 모드
+        const cookies = req.cookies;
+        const ip = req.ip;
+        let location = { country: 'Unknown', city: 'Unknown' };
+        const browser = detectBrowser(cookies.userAgent);
+
+        const newEntry = {
+            userAgent: cookies.userAgent || 'Unknown',
+            browser,
+            language: cookies.language || 'Unknown',
+            screenResolution: cookies.screenResolution || 'Unknown',
+            clickActivity: JSON.parse(cookies.clickActivity || '[]'),
+            ip,
+            location,
+            consentTime: cookies.consentTime || 'Unknown',
+            timestamp: new Date(),
+        };
+
+        const data = readData();
+        data.push(newEntry);
+        writeData(data);
     }
 
-    const cookies = req.cookies;
-    const ip = req.ip;
-    let location = { country: 'Unknown', city: 'Unknown' }; // 기본값 설정
-
-    // 브라우저 분석
-    const browser = detectBrowser(cookies.userAgent);
-
-    const newEntry = {
-        userAgent: cookies.userAgent || 'Unknown',
-        browser,
-        language: cookies.language || 'Unknown',
-        screenResolution: cookies.screenResolution || 'Unknown',
-        clickActivity: JSON.parse(cookies.clickActivity || '[]'),
-        ip,
-        location,
-        consentTime: cookies.consentTime || 'Unknown',
-        timestamp: new Date(), // 현재 요청 시간
-    };
-
-    // 기존 데이터에 추가
-    const data = readData();
-    data.push(newEntry);
-    writeData(data);
-
-    console.log('Data collected via middleware:', newEntry);
-
-    // 쿠키에서 클릭 데이터 초기화
-    res.cookie('clickActivity', JSON.stringify([]), { path: '/' });
-    
     next();
 });
 
