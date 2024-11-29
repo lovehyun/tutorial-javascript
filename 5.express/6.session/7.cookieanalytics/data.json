@@ -1,0 +1,268 @@
+[
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "language": "ko-KR",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:06:03.543Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:06:03.708Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:06:03.858Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:06:04.248Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:06:04.435Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:06:04.601Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:06:04.765Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "language": "ko-KR",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:10:23.634Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "language": "ko-KR",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:11:38.251Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:11:38.439Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:11:38.920Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "language": "ko",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:19:06.388Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:19:06.590Z"
+      },
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:19:07.161Z"
+      },
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:19:07.400Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "language": "ko",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:20:09.583Z"
+      },
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:20:09.770Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:20:10.131Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:20:10.335Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "language": "ko",
+    "consentTime": "2024-11-29T09:22:20.101Z",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:22:22.109Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:22:22.320Z"
+      },
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:22:22.807Z"
+      },
+      {
+        "elementId": "button3",
+        "timestamp": "2024-11-29T09:22:23.324Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:22:23.790Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "language": "ko",
+    "consentTime": "2024-11-29T09:22:39.983Z",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:22:40.942Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:22:41.423Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    }
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "language": "ko",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:28:08.501Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    },
+    "consentTime": "2024-11-29T09:28:07.618Z",
+    "timestamp": "2024-11-29T09:28:10.540Z"
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "browser": "Edge",
+    "language": "ko",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:39:20.538Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:39:20.718Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    },
+    "consentTime": "2024-11-29T09:39:19.705Z",
+    "timestamp": "2024-11-29T09:39:21.165Z"
+  },
+  {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+    "browser": "Edge",
+    "language": "ko",
+    "screenResolution": "2560x1600",
+    "clickActivity": [
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:39:25.990Z"
+      },
+      {
+        "elementId": "button2",
+        "timestamp": "2024-11-29T09:39:26.140Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:39:26.477Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:39:26.673Z"
+      },
+      {
+        "elementId": "button1",
+        "timestamp": "2024-11-29T09:39:26.905Z"
+      }
+    ],
+    "ip": "::ffff:127.0.0.1",
+    "location": {
+      "country": "Unknown",
+      "city": "Unknown"
+    },
+    "consentTime": "2024-11-29T09:39:25.009Z",
+    "timestamp": "2024-11-29T09:39:27.448Z"
+  }
+]
