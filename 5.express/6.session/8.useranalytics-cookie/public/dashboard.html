@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 기본 스타일 */
+        .chart-container {
+            display: grid;
+            gap: 20px; /* 차트 사이 간격 */
+        }
+
+        /* 해상도가 클 때 (한 줄에 4개) */
+        @media (min-width: 1200px) {
+            .chart-container {
+                grid-template-columns: repeat(4, 1fr); /* 4개의 열 */
+            }
+        }
+
+        /* 중간 크기 해상도 (한 줄에 3개) */
+        @media (min-width: 768px) and (max-width: 1199px) {
+            .chart-container {
+                grid-template-columns: repeat(3, 1fr); /* 3개의 열 */
+            }
+        }
+
+        /* 작은 해상도 (한 줄에 2개) */
+        @media (max-width: 767px) {
+            .chart-container {
+                grid-template-columns: repeat(2, 1fr); /* 2개의 열 */
+            }
+        }
+
+        canvas {
+            width: 100% !important;
+            height: auto !important; /* 높이를 자동으로 조정 */
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+
+    <h2>Raw Data</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>User Agent</th>
+                <th>Language</th>
+                <th>Resolution</th>
+                <th>IP</th>
+                <th>Location</th>
+                <th>Clicks</th>
+                <th>ConsentTime</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="raw-data"></tbody>
+    </table>
+
+    <h2>Analysis</h2>
+    <div class="chart-container">
+        <canvas id="osChart"></canvas>
+        <canvas id="browserChart"></canvas>
+        <canvas id="countryChart"></canvas>
+        <canvas id="clickChart"></canvas>
+    </div>
+
+    <script>
+        fetch('/api/dashboard')
+            .then((res) => res.json())
+            .then(({ rawData, analysis }) => {
+                // Raw Data
+                const rawDataTable = document.getElementById('raw-data');
+                rawData.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item.userAgent}</td>
+                        <td>${item.language}</td>
+                        <td>${item.screenResolution}</td>
+                        <td>${item.ip}</td>
+                        <td>${item.location.country}, ${item.location.city}</td>
+                        <td>${item.clickActivity?.length || 0}</td>
+                        <td>${item.consentTime}</td>
+                        <td>${item.timestamp}</td>
+                    `;
+                    rawDataTable.appendChild(row);
+                });
+
+                const chartOptions = {
+                    maintainAspectRatio: true, // 기본 비율 유지
+                    aspectRatio: 1.5, // 가로:세로 비율 설정
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '', // 제목은 차트마다 설정
+                            font: { 
+                                size: 32, // 제목 폰트 크기
+                                weight: 'bold', // 굵게 설정 
+                            },
+                            padding: { top: 10, bottom: 10 }, // 타이틀 여백 조정
+                        },
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 18, // 범례 폰트 크기
+                                },
+                                padding: 20, // 범례와 항목 간격
+                            },
+                            position: 'top', // 범례 위치
+                        },
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: { size: 12 }, // X축 폰트 크기
+                            },
+                        },
+                        y: {
+                            ticks: {
+                                font: { size: 12 }, // Y축 폰트 크기
+                            },
+                        },
+                    },
+                };
+
+                // OS Chart
+                new Chart(document.getElementById('osChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(analysis.osSummary),
+                        datasets: [{
+                            data: Object.values(analysis.osSummary),
+                        }],
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: { title: { display: true, text: 'Operating System Distribution' } },
+                    },
+                });
+
+                // Browser Chart
+                new Chart(document.getElementById('browserChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(analysis.browserSummary),
+                        datasets: [{
+                            label: 'Browser Usage',
+                            data: Object.values(analysis.browserSummary),
+                        }],
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: { title: { display: true, text: 'Browser Usage' } },
+                    },
+                });
+
+                // Country Chart
+                new Chart(document.getElementById('countryChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(analysis.countrySummary),
+                        datasets: [{
+                            data: Object.values(analysis.countrySummary),
+                        }],
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: { title: { display: true, text: 'Country Distribution' } },
+                    },
+                });
+
+                // Click Activity Chart
+                const clickActivityCounts = rawData.map((item, idx) => ({
+                    x: `User ${idx + 1}`,
+                    y: item.clickActivity?.length || 0,
+                }));
+                new Chart(document.getElementById('clickChart'), {
+                    type: 'line',
+                    data: {
+                        labels: clickActivityCounts.map(item => item.x),
+                        datasets: [{
+                            label: 'Click Activity',
+                            data: clickActivityCounts.map(item => item.y),
+                        }],
+                    },
+                    options: {
+                        ...chartOptions,
+                        plugins: { title: { display: true, text: 'User Click Activity' } },
+                    },
+                });
+            });
+    </script>
+</body>
+</html>

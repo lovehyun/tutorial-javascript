@@ -28,6 +28,7 @@ my-sessions/
 
 # 작업 데이터 파일
 file.txt
+data.json
 *.mp4
 *.mp3
 
