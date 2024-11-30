@@ -88,7 +88,35 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             .catch((error) => console.error('Error fetching messages:', error));
     }
-    
+        
+    const helpButton = document.getElementById('helpButton');
+
+    helpButton.addEventListener('click', function () {
+        // 사용자에게 메시지 표시
+        appendMessage('도움 요청 중...', false);
+
+        // 서버로 요청 전송
+        fetch('/api/help', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userId,
+                message: '사용자가 도움을 요청하고 있습니다.',
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Help request sent:', data);
+                appendMessage('관리자에게 도움 요청을 전송했습니다.', false);
+            })
+            .catch((error) => {
+                console.error('Error sending help request:', error);
+                appendMessage('도움 요청 전송에 실패했습니다.', false);
+            });
+    });
+
     // Fetch messages every 5 seconds
     setInterval(fetchMessages, 5000);
     fetchMessages(); // Initial fetch

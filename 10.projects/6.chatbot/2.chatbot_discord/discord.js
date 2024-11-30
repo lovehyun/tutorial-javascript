@@ -2,6 +2,9 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const axios = require('axios');
 require('dotenv').config();
 
+console.log('DISCORD_BOT_TOKEN:', process.env.DISCORD_BOT_TOKEN ? 'Loaded' : 'Missing');
+console.log('DISCORD_CHANNEL_ID:', process.env.DISCORD_CHANNEL_ID || 'Missing');
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds, // 봇이 서버(guild) 관련 이벤트를 받을 수 있도록 허용.
@@ -12,8 +15,17 @@ const client = new Client({
 
 // 쓰레드 생성 또는 가져오기
 async function getOrCreateThread(userId, channelId) {
-    const channel = await client.channels.fetch(channelId);
+    console.log(`Fetching channel with ID: ${channelId}`);
+    const channel = await client.channels.fetch(channelId).catch((error) => {
+        console.error('Error fetching channel:', error.message);
+    });
 
+    if (!channel) {
+        console.error('Channel not found or bot lacks access.');
+        return;
+    }
+    console.log(`Channel fetched: ${channel.name}`);
+    
     // 기존 쓰레드 검색
     const existingThreads = await channel.threads.fetchActive();
     const existingThread = existingThreads.threads.find(
@@ -27,8 +39,15 @@ async function getOrCreateThread(userId, channelId) {
     // 새로운 쓰레드 생성
     const newThread = await channel.threads.create({
         name: `Session ${userId}`,
-        autoArchiveDuration: 1440, // 24시간 보관
+        autoArchiveDuration: 60, // 1시후 자동 보관
+    }).catch((error) => {
+        console.error('Error creating thread:', error.message);
     });
+
+    if (!newThread) {
+        console.error('Failed to create thread.');
+        return;
+    }
 
     console.log(`Thread created: ${newThread.name}`);
     return newThread;
@@ -84,7 +103,14 @@ async function archiveOldThreads() {
     const channelId = process.env.DISCORD_CHANNEL_ID; // 텍스트 채널 ID
     const maxIdleMinutes = parseInt(process.env.THREAD_DELETE_TIME, 10) || 1440; // 기본값 24시간
 
-    const channel = await client.channels.fetch(channelId);
+    const channel = await client.channels.fetch(channelId).catch((error) => {
+        console.error('Error fetching channel:', error.message);
+    });
+
+    if (!channel) {
+        console.error('Channel not found or bot lacks access.');
+        return;
+    }
 
     // 모든 활성화된 쓰레드 가져오기
     const activeThreads = await channel.threads.fetchActive();
