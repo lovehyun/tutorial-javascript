@@ -1,0 +1,211 @@
+/* 기본 바디 스타일 설정 */
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* 챗봇 아이콘 스타일 */
+.chatbot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* 챗봇 창 스타일 */
+.chatbot-window {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+}
+
+/* 챗봇 헤더 스타일 */
+.chatbot-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    display: flex;
+    justify-content: space-between; /* 공간 균등 분배 */
+    align-items: center;
+}
+
+/* HELP 버튼과 X 버튼 그룹 스타일 */
+.chatbot-header-buttons {
+    display: flex;
+    gap: 8px; /* 버튼 간격 */
+}
+
+/* USER 버튼 스타일 */
+#editUserInfoButton {
+    background-color: #ffcc00; /* 노란색 */
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#editUserInfoButton:hover {
+    background-color: #e6b800; /* hover 시 약간 어두운 노란색 */
+}
+
+/* HELP 버튼 스타일 */
+#helpButton {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#helpButton:hover {
+    background-color: #218838;
+}
+
+/* X 버튼 스타일 */
+#closeChatbot {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#closeChatbot:hover {
+    background-color: #c82333;
+}
+
+/* 챗봇 본문 스타일 */
+.chatbot-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 자식 요소가 스크롤할 수 있도록 설정 */
+}
+
+/* 챗봇 메시지 영역 스타일 */
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto; /* 메시지에 대한 스크롤 추가 */
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.chatbot-input-container {
+    display: flex; /* 입력창과 버튼을 같은 줄에 배치 */
+    align-items: center; /* 입력창과 버튼을 수직 중앙 정렬 */
+}
+
+/* 공통 메시지 스타일 */
+.chat-message {
+    margin-bottom: 10px;
+    max-width: 90%;
+    word-wrap: break-word;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+/* 사용자 메시지 스타일 */
+.chat-message.user {
+    color: blue;
+    background-color: #e0f7ff;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+    text-align: right; /* 텍스트 오른쪽 정렬 */
+}
+
+/* 관리자 메시지 스타일 */
+.chat-message.admin {
+    color: red;
+    background-color: #ffe0e0;
+    align-self: flex-start;
+    border-top-left-radius: 0;
+    text-align: left; /* 텍스트 왼쪽 정렬 */
+}
+
+/* 챗봇 입력 스타일 */
+#chatbotInput {
+    width: calc(100% - 60px);
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+/* 전송 버튼 스타일 */
+#sendMessage {
+    width: 50px;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+/* 추가: GetChannelManagers 버튼 스타일 */
+button#getChannelManagers {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button#getChannelManagers:hover {
+    background-color: #0056b3;
+}
+
+/* 사용자 정보 입력 영역 스타일 */
+.chatbot-user-info {
+    display: none;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.chatbot-user-info label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.chatbot-user-info input {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.chatbot-user-info button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chatbot-user-info button:hover {
+    background-color: #0056b3;
+}

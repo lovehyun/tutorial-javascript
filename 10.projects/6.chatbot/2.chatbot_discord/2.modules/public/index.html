@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Demo</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+    <!-- Chatbot 아이콘 -->
+    <div class="chatbot-icon" id="chatbotIcon">💬</div>
+
+    <!-- Chatbot 창 -->
+    <div class="chatbot-window" id="chatbotWindow">
+        <!-- Chatbot 헤더 -->
+        <div class="chatbot-header">
+            <span>Chatbot</span> <!-- 제목은 왼쪽 -->
+            <div class="chatbot-header-buttons"> <!-- 버튼 그룹 오른쪽 -->
+                <button id="editUserInfoButton">USER</button> <!-- 수정 버튼 -->
+                <button id="helpButton">HELP</button>
+                <button id="closeChatbot">X</button>
+            </div>
+        </div>
+
+        <!-- 사용자 정보 입력 -->
+        <div class="chatbot-user-info" id="userInfoContainer">
+            <h3>Set Your Information</h3>
+            <label for="userNameInput">Name:</label>
+            <input type="text" id="userNameInput" placeholder="Enter your name">
+            <label for="userEmailInput">Email:</label>
+            <input type="email" id="userEmailInput" placeholder="Enter your email">
+            <div class="user-info-buttons">
+                <button id="saveUserInfoButton">Save</button>
+                <button id="cancelUserInfoButton">Cancel</button>
+            </div>
+        </div>
+
+        <!-- 메시지 영역 -->
+        <div class="chatbot-body">
+            <div class="chatbot-messages" id="chatbotMessages"></div>
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbotInput" placeholder="Type a message...">
+                <button id="sendMessage">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 설정 영역 -->
+    <div class="settings-container">
+        <h3>Settings</h3>
+        <div>
+            <label for="selectedManager">Select Main Manager:</label>
+            <select id="selectedManager">
+                <option value="" disabled selected>Loading...</option>
+            </select>
+        </div>
+        <button id="getChannelManagers">GetChannelManagers</button>
+    </div>
+
+    <!-- 스크립트 -->
+    <script src="user.js"></script>
+</body>
+</html>

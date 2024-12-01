@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <h1>Admin Page</h1>
+    <div class="admin-container">
+        <div class="user-list" id="userList"></div>
+        <div class="chat-display" id="chatDisplay">
+            <div class="chat-table">
+                <div class="chat-header" id="chatHeader">Select a user to view messages</div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input">
+                    <input type="text" id="adminInput" placeholder="Type a response...">
+                    <button id="sendResponse">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
