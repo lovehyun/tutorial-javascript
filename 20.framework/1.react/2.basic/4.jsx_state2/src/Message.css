@@ -1,0 +1,8 @@
+.message {
+    background-color: #282c34; /* 배경색 */
+    color: #61dafb;          /* 글자색 */
+    padding: 10px;           /* 내부 여백 */
+    border-radius: 10px;      /* 모서리를 둥글게 */
+    text-align: center;      /* 텍스트 중앙 정렬 */
+    font-weight: bold;       /* 글자 굵게 */
+}

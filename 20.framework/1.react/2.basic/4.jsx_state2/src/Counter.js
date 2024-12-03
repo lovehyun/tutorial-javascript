@@ -10,10 +10,12 @@ const Counter = () => {
   return (
     <div>
       <h2>Counter</h2>
-      {/* Props로 state 전달 */}
-      <Message count={count} />
+
       <button onClick={handleIncrement}>Increase</button>
       <button onClick={handleDecrement}>Decrease</button>
+
+      {/* Props로 state 전달 */}
+      <Message count={count} />
     </div>
   );
 };

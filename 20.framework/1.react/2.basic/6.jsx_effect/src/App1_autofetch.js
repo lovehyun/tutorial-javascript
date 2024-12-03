@@ -14,6 +14,11 @@ const App = () => {
         fetchData();
     }, []); // 빈 배열: 컴포넌트가 처음 렌더링될 때 한 번 실행
 
+    // 페이지 로딩 시 데이터를 가져오기 위해 useEffect 사용
+    // useEffect(() => {
+        // loadData();
+    // }, []); // 빈 배열을 전달하여 컴포넌트가 처음 렌더링될 때만 실행
+
     return (
         <div>
             <h3>{data ? data.title : "Loading..."}</h3>

@@ -1,0 +1,18 @@
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+}
+
+nav ul li {
+    font-size: 18px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: blue;
+}
+
+nav ul li a:hover {
+    color: darkblue;
+}

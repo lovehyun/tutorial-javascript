@@ -2,6 +2,7 @@
 import React from 'react';
 // import ReactDOM from 'react-dom'; // React 17까지
 import ReactDOM from 'react-dom/client'; // React 18이후
+// import App from './App';
 
 const App = () => {
     return <h1>Hello, World!</h1>;

@@ -11,6 +11,8 @@ const App = () => {
         setData(result); // 데이터 상태 업데이트
     };
 
+    // loadData();
+
     return (
         <div style={{ padding: "20px" }}>
             {/* 버튼 */}

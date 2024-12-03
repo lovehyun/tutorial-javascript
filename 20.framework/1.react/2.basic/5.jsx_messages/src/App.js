@@ -7,6 +7,7 @@ import Input from "./Input"; // Input 추가
 
 const App = () => {
     const pageTitle = 'Welcome to My Website';
+    
     const [count, setCount] = useState(0); // Counter 상태
     const [message, setMessage] = useState(''); // Input에서 사용될 메시지 상태
 

@@ -8,9 +8,11 @@ const App = () => {
     return (
         <ThemeProvider>
             <Navbar />
+
             <main className="container mt-4">
                 <Table />
             </main>
+            
             <Pagination />
         </ThemeProvider>
     );
