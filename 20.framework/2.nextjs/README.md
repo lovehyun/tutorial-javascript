@@ -43,3 +43,19 @@ pages/index.js 파일을 열어서 다음과 같이 수정합니다:
 - React 컴포넌트: Next.js는 React 기반으로 동작하며, 각 페이지는 React 컴포넌트로 구성됩니다.
 
 이 기본 예제를 시작으로, Next.js의 다양한 기능(서버 사이드 렌더링, 정적 페이지 생성 등)을 확장해 나갈 수 있습니다.
+
+# 4. 기본 폴더 구조
+    ```
+    my-next-app/
+    ├── pages/
+    │   ├── index.js         # 기본 홈 페이지
+    │   ├── api/hello.js     # API 라우트
+    ├── public/              # 정적 파일 디렉토리 (빈 디렉토리로 시작)
+    ├── styles/
+    │   ├── globals.css      # 글로벌 CSS 파일
+    │   ├── Home.module.css  # 페이지 전용 CSS 모듈
+    ├── next.config.js       # Next.js 설정 파일
+    ├── package.json         # 프로젝트 정보 및 종속성
+    ├── package-lock.json    # 설치된 종속성의 잠금 파일
+    ├── README.md            # 기본 프로젝트 설명 파일
+    ```
