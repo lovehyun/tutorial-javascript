@@ -1,20 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
+
 import Navbar from "./Navbar";
 import Table from "./Table";
 import Pagination from "./Pagination";
-import { ThemeProvider } from "./ThemeContext";
+import { useTheme } from "./ThemeContext";
 
 const App = () => {
-    return (
-        <ThemeProvider>
-            <Navbar />
+    const { isDarkMode } = useTheme();
 
-            <main className="container mt-4">
-                <Table />
-            </main>
-            
+    // 다크 모드 상태에 따라 <body> 클래스 설정
+    useEffect(() => {
+        document.body.className = isDarkMode ? "bg-dark text-light" : "bg-light text-dark";
+    }, [isDarkMode]);
+
+    return (
+        <div>
+            <Navbar />
+            <Table />
             <Pagination />
-        </ThemeProvider>
+        </div>
     );
 };
 

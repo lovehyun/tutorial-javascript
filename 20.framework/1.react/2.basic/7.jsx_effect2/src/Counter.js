@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import Message from './Message';
+import React, { useEffect } from 'react';
 
-const Counter = () => {
-    const [count, setCount] = useState(0);
+const Counter = ({count, setCount }) => {
 
     const handleIncrement = () => setCount(count + 1);
     const handleDecrement = () => setCount(count - 1);
@@ -20,7 +18,6 @@ const Counter = () => {
     return (
         <div>
             <h2>Counter</h2>
-            <Message count={count} />
             <button onClick={handleIncrement}>Increase</button>
             <button onClick={handleDecrement}>Decrease</button>
         </div>

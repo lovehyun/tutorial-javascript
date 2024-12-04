@@ -42,7 +42,7 @@ const Message = ({ count, message }) => {
     // 컴포넌트가 처음 렌더링될 때 초기화 작업
     useEffect(() => {
         console.log('Component mounted');
-        return () => {
+        return () => { // 컴포넌트가 언마운트 될때 ([]일때는 먼저 실행되지 않음)
             console.log('Component unmounted');
         };
     }, []); // 빈 배열: 컴포넌트가 처음 렌더링될 때 한 번 실행

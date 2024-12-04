@@ -1,5 +1,6 @@
 // MyComponent.js
 // https://create-react-app.dev/docs/adding-bootstrap
+// https://react-bootstrap.netlify.app/docs/getting-started/introduction
 // npm install react-bootstrap bootstrap
 
 import React from 'react';
@@ -14,7 +15,7 @@ const MyComponent = () => {
     <Container className="mt-5">
       <Row>
         <Col>
-          <Alert variant="info" className="text-center">
+          <Alert variant="primary" className="text-center">
             <h1>React with Bootstrap</h1>
           </Alert>
         </Col>
@@ -28,10 +29,10 @@ const MyComponent = () => {
       </Row>
       <Row className="mt-3">
         <Col>
-          <Badge variant="secondary">New</Badge>{' '}
-          <Badge variant="success">Success</Badge>{' '}
-          <Badge variant="danger">Danger</Badge>{' '}
-          <Badge variant="warning">Warning</Badge>{' '}
+          <Badge bg="secondary">New</Badge>{" "}
+          <Badge bg="success">Success</Badge>{" "}
+          <Badge bg="danger">Danger</Badge>{" "}
+          <Badge bg="warning">Warning</Badge>{" "}
         </Col>
       </Row>
     </Container>
