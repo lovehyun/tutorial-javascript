@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const multer = require('multer');
 const sharp = require('sharp');
 const cors = require('cors');
+const fs = require('fs') // 동기 작업용
 const fsp = require('fs').promises; // 비동기 작업용
 const path = require('path');
 const debug = require('debug');
@@ -101,6 +102,33 @@ app.post('/api/posts', upload.single('photo'), async (req, res) => {
     res.status(201).json(newPost);
 });
 
+// 파일 상태 확인 및 삭제 함수
+async function checkAndUnlink(filePath) {
+    try {
+        // 파일 상태 읽기
+        const stats = await fsp.stat(filePath);
+        console.log(`File: ${filePath}`);
+        console.log(`Permissions (octal): ${stats.mode.toString(8)}`);
+        console.log(`Readable: ${(stats.mode & fs.constants.R_OK) ? 'Yes' : 'No'}`);
+        console.log(`Writable: ${(stats.mode & fs.constants.W_OK) ? 'Yes' : 'No'}`);
+        console.log(`Executable: ${(stats.mode & fs.constants.X_OK) ? 'Yes' : 'No'}`);
+        
+        await fsp.access(filePath); // 파일 존재 여부 확인
+        await fsp.unlink(filePath); // 파일 삭제
+    } catch (err) {
+        if (err.code === 'ENOENT') {
+            console.warn(`File not found: ${filePath}`);
+        } else if (err.code === 'EPERM') {
+            console.error(`Permission error for file: ${filePath}`);
+            // 권한 변경 후 재시도
+            fs.chmodSync(filePath, 0o666);
+            await fsp.unlink(filePath);
+        } else {
+            throw err; // 예상치 못한 에러는 다시 던짐
+        }
+    }
+}
+
 // Delete a post
 app.delete('/api/posts/:index', async (req, res) => {
     const index = parseInt(req.params.index, 10);
@@ -112,10 +140,14 @@ app.delete('/api/posts/:index', async (req, res) => {
 
     try {
         if (post.filePath) {
-            await fsp.unlink(path.join(__dirname, post.filePath));
+            // await fsp.unlink(path.join(__dirname, post.filePath));
+            const filePath = path.join(__dirname, post.filePath);
+            await checkAndUnlink(filePath);
         }
         if (post.thumbnailPath) {
-            await fsp.unlink(path.join(__dirname, 'public', post.thumbnailPath));
+            // await fsp.unlink(path.join(__dirname, 'public', post.thumbnailPath));
+            const thumbnailPath = path.join(__dirname, 'public', post.thumbnailPath);
+            await checkAndUnlink(thumbnailPath);
         }
         posts.splice(index - 1, 1);
         res.status(200).json({ message: 'Post deleted successfully' });

@@ -1,0 +1,8 @@
+.error-message {
+    color: red;
+    font-weight: bold;
+    background-color: #ffe6e6; /* 연한 빨간색 배경 */
+    padding: 10px;
+    border: 1px solid red;
+    border-radius: 5px;
+}

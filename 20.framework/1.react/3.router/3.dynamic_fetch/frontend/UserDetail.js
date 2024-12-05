@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+// import './UserDetail.css';
 
 const UserDetail = () => {
     const { userId } = useParams(); // URL에서 userId를 추출
@@ -38,6 +39,8 @@ const UserDetail = () => {
 
     if (error) {
         return <p>{error}</p>;
+        // return <p style={{ color: 'red', fontWeight: 'bold' }}>Error: {error}</p>;
+        // return <p className="error-message">Error: {error}</p>;
     }
 
     if (!user) {
