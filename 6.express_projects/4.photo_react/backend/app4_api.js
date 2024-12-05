@@ -105,16 +105,16 @@ app.post('/api/posts', upload.single('photo'), async (req, res) => {
 // 파일 상태 확인 및 삭제 함수
 async function checkAndUnlink(filePath) {
     try {
-        // 파일 상태 읽기
-        const stats = await fsp.stat(filePath);
-        console.log(`File: ${filePath}`);
+        const normalizedPath = path.normalize(filePath); // 경로 노말라이즈
+        await fsp.access(normalizedPath); // 파일 존재 여부 확인
+        const stats = await fsp.stat(normalizedPath); // 파일 상태 읽기
+        console.log(`File: ${normalizedPath}`);
         console.log(`Permissions (octal): ${stats.mode.toString(8)}`);
         console.log(`Readable: ${(stats.mode & fs.constants.R_OK) ? 'Yes' : 'No'}`);
         console.log(`Writable: ${(stats.mode & fs.constants.W_OK) ? 'Yes' : 'No'}`);
         console.log(`Executable: ${(stats.mode & fs.constants.X_OK) ? 'Yes' : 'No'}`);
-        
-        await fsp.access(filePath); // 파일 존재 여부 확인
-        await fsp.unlink(filePath); // 파일 삭제
+        fs.unlinkSync(normalizedPath);
+        // await fsp.unlink(normalizedPath); // 파일 삭제
     } catch (err) {
         if (err.code === 'ENOENT') {
             console.warn(`File not found: ${filePath}`);
