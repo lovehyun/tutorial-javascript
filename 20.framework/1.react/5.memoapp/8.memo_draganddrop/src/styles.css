@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.memo-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.memo-form input[type='text'] {
+    height: 36px;
+    width: 300px;
+    margin-right: 8px;
+    box-sizing: border-box;
+}
+
+.memo-form button {
+    height: 36px;
+}
+
+.memo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.memo-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 300px;
+    background-color: white;
+}
+
+.memo-item:hover { /* 추가 */
+    padding: 8px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+}
+
+.memo-item.dragging { /* 추가 */
+    padding: 8px;
+    background-color: #e3f2fd; /* 드래그 중인 항목에 대한 배경색 */
+    border: 1px solid #2196f3;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.memo-item input[type='text'] {
+    flex: 1;
+    height: 36px;
+    margin-right: 8px;
+}
+
+.memo-item button {
+    height: 36px;
+}
+
+.memo-item.completed input[type='text'] {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* 검색창과 정렬 옵션 컨테이너 */
+.search-and-sort-container {
+    display: flex;
+    justify-content: center;  /* 가로 가운데 정렬 */
+    align-items: center;      /* 세로 가운데 정렬 */
+    gap: 10px;                /* 두 요소 간의 간격 */
+    margin-bottom: 20px;      /* 하단 여백 */
+}
+
+/* 검색창 스타일 */
+.search-and-sort-container input.search-input {
+    padding: 10px;
+    font-size: 14px;
+    width: 200px;             /* 검색창 너비 고정 */
+}
+
+/* 정렬 옵션 스타일 */
+.search-and-sort-container select {
+    padding: 8px 12px;
+    font-size: 14px;
+    width: auto;
+}
+
+.drag-handle {
+    cursor: grab; /* 드래그 가능하다는 것을 표시 */
+    font-size: 20px; /* 아이콘 크기 */
+    margin-left: 10px; /* 적절한 간격 */
+    color: #888; /* 아이콘 색상 */
+}

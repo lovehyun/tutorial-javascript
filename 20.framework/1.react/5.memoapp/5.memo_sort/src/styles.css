@@ -1,0 +1,84 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.memo-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.memo-form input[type='text'] {
+    height: 36px;
+    width: 300px;
+    margin-right: 8px;
+    box-sizing: border-box;
+}
+
+.memo-form button {
+    height: 36px;
+}
+
+.memo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.memo-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 300px;
+}
+
+.memo-item input[type='text'] {
+    flex: 1;
+    height: 36px;
+    margin-right: 8px;
+}
+
+.memo-item button {
+    height: 36px;
+}
+
+.memo-item.completed input[type='text'] {
+    text-decoration: line-through;
+    color: gray;
+}
+
+.checkbox {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+/* 검색창과 정렬 옵션 컨테이너 */
+.search-and-sort-container {
+    display: flex;
+    justify-content: center;  /* 가로 가운데 정렬 */
+    align-items: center;      /* 세로 가운데 정렬 */
+    gap: 10px;                /* 두 요소 간의 간격 */
+    margin-bottom: 20px;      /* 하단 여백 */
+}
+
+/* 검색창 스타일 */
+.search-and-sort-container input.search-input {
+    padding: 10px;
+    font-size: 14px;
+    width: 200px;             /* 검색창 너비 고정 */
+}
+
+/* 정렬 옵션 스타일 */
+.search-and-sort-container select {
+    padding: 8px 12px;
+    font-size: 14px;
+    width: auto;
+}

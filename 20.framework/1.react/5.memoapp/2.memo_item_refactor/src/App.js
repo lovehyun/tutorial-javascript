@@ -28,23 +28,6 @@ const App = () => {
         );
     };
 
-    // Legacy for loop style
-    // const editMemo = (id, newText) => {
-    //     // 상태 불변성을 유지하기 위해 배열 복사
-    //     const updatedMemos = [...memos]; // 앝은 복사 (원본을 참조함)
-    //    
-    //     // for 루프로 ID가 일치하는 메모를 찾아 수정
-    //     for (let i = 0; i < updatedMemos.length; i++) {
-    //         if (updatedMemos[i].id === id) {
-    //             updatedMemos[i] = { ...updatedMemos[i], text: newText }; // 새 객체로 업데이트
-    //             break; // 찾았으므로 루프 종료
-    //         }
-    //     }
-    // 
-    //     // 상태 업데이트
-    //     setMemos(updatedMemos); // React가 상태변경을 감지
-    // };
-
     // 컴포넌트 렌더링
     return (
         <div className="app">
