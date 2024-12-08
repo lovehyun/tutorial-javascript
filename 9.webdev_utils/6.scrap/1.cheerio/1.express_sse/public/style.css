@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.results {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.results div {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow-x: auto; /* 가로 스크롤바 추가 */
+    padding: 10px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap; /* 가로 스크롤을 위해 항목을 한 줄에 배치 */
+}
+
+li {
+    display: block;
+    margin-bottom: 10px;
+    overflow-wrap: break-word; /* 긴 단어 줄바꿈 */
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.highlight-title {
+    background-color: #f0f8ff; /* 하이라이트 배경색 */
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+form input,
+form button {
+    padding: 10px;
+    font-size: 16px;
+}
+
+form input[type="text"] {
+    flex: 2;
+}
+
+form input[type="number"] {
+    flex: 1;
+}
+
+form button {
+    flex: 1;
+    cursor: pointer;
+}

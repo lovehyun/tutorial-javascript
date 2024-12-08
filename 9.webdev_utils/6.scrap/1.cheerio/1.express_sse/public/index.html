@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Web Crawler</h1>
+        <form id="crawlForm">
+            <input type="text" id="urlInput" placeholder="Enter URL" required>
+            <input type="number" id="depthInput" placeholder="Max Depth" required>
+            <button type="submit">Start Crawling</button>
+        </form>
+
+        <div class="results">
+            <div>
+                <h2>Completed</h2>
+                <ul id="completedList"></ul>
+            </div>
+            <div>
+                <h2>Queue</h2>
+                <ul id="queueList"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="crawl.js"></script>
+</body>
+</html>
