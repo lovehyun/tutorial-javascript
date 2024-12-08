@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Scroll Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .item {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+            display: none; /* 초기 상태에서 숨김 */
+        }
+    </style>
+</head>
+<body>
+    <h1>Infinite Scroll Example</h1>
+    <div id="items"></div>
+    <div id="loading">Loading...</div>
+
+    <script>
+        const itemsContainer = document.getElementById('items');
+        const loadingIndicator = document.getElementById('loading');
+        let start = 0;
+        const limit = 20;
+        let totalItems = 0;
+        let isLoading = false;
+
+        // 서버에서 데이터 가져오기
+        async function fetchItems() {
+            isLoading = true;
+            loadingIndicator.style.display = 'block';
+
+            // 1초 대기 후 데이터를 가져옴
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            try {
+                const response = await fetch(`/get-items2?start=${start}&end=${start + limit}`);
+                const data = await response.json();
+
+                // 데이터 렌더링
+                renderItems(data.items);
+                totalItems = data.total;
+
+                start += limit;
+            } catch (error) {
+                console.error('Failed to fetch items:', error);
+            } finally {
+                isLoading = false;
+                loadingIndicator.style.display = start >= totalItems ? 'none' : 'block';
+            }
+        }
+
+        // 데이터를 화면에 렌더링
+        function renderItems(items) {
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.textContent = item;
+                itemsContainer.appendChild(div);
+            });
+        }
+
+        // 스크롤 이벤트 핸들러
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !isLoading && start < totalItems) {
+                fetchItems();
+            }
+        });
+
+        // 초기 데이터 로드
+        fetchItems();
+    </script>
+</body>
+</html>
