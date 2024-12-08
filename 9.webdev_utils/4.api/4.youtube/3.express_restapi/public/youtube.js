@@ -14,25 +14,55 @@ document.getElementById('searchButton').addEventListener('click', async () => {
 
         videos.forEach(video => {
             const listItem = document.createElement('li');
+            // listItem.innerHTML = `
+            //     <img src="${video.snippet.thumbnails.medium.url}" alt="${video.snippet.title}">
+            //     <div>
+            //         <h3>${video.snippet.title}</h3>
+            //         <p>${video.snippet.description}</p>
+            //     </div>
+            // `;
+
+            // 클립보드 복사하기 추가
             listItem.innerHTML = `
                 <img src="${video.snippet.thumbnails.medium.url}" alt="${video.snippet.title}">
-                <div>
-                    <h3>${video.snippet.title}</h3>
-                    <p>${video.snippet.description}</p>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <h3>${video.snippet.title}</h3>
+                        <p>${video.snippet.description}</p>
+                    </div>
+                    <button class="copy-btn" style="margin-left: 10px; cursor: pointer;" title="Copy URL">
+                        📋
+                    </button>
                 </div>
             `;
 
+            // 마우스 오버 시 YouTube URL 표시
+            const videoUrl = `https://www.youtube.com/watch?v=${video.id.videoId}`;
+            // listItem.title = `View on YouTube: ${videoUrl}`;
+
+            // 클릭 이벤트로 플레이어 업데이트
             listItem.addEventListener('click', () => {
                 playerContainer.innerHTML = `
                     <iframe
                         width="560"
                         height="315"
-                        src="https://www.youtube.com/embed/${video.id.videoId}"
+                        src="https://www.youtube.com/embed/${video.id.videoId}?autoplay=1"
                         frameborder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen>
                     </iframe>
                 `;
+            });
+
+            // 복사 버튼 클릭 이벤트 추가
+            listItem.querySelector('.copy-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // 부모 이벤트 전파 방지
+                navigator.clipboard.writeText(videoUrl).then(() => {
+                    alert(`URL copied to clipboard!: \n${videoUrl}`);
+                }).catch(err => {
+                    console.error('Failed to copy URL:', err);
+                    alert('Failed to copy URL.');
+                });
             });
 
             resultsContainer.appendChild(listItem);
