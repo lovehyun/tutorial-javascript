@@ -1,0 +1,19 @@
+{
+  "name": "4.effect",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ]
+  }
+}

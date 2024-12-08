@@ -1,3 +1,6 @@
+// https://developers.google.com/youtube/v3/getting-started?hl=ko
+// https://console.cloud.google.com/apis/dashboard?hl=ko (API 및 서비스 -> 사용자 인증 정보 -> API키)
+// https://developers.google.com/youtube/v3/docs/search/list
 const axios = require('axios');
 
 // YouTube Data API 엔드포인트 및 API 키
