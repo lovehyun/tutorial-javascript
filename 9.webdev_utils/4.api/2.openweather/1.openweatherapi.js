@@ -1,3 +1,5 @@
+// https://openweathermap.org/current#one
+
 const axios = require('axios');
 
 // API 요청을 보낼 URL과 파라미터
@@ -10,6 +12,8 @@ const params = {
 // GET 요청 보내기
 axios.get(url, { params })
     .then(response => {
+        console.log("Response:", response.data);
+
         if (response.status === 200) {
             // JSON 데이터 가져오기
             const weatherData = response.data;
@@ -26,6 +30,8 @@ axios.get(url, { params })
         }
     })
     .catch(error => {
+        // console.log("Response:", error.message);
+
         // 에러 처리
         if (error.response) {
             // 서버에서 응답을 받은 경우

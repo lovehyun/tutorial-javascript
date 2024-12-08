@@ -1,3 +1,5 @@
+// https://openweathermap.org/current#one
+
 require('dotenv').config(); // .env 파일 로드
 const axios = require('axios');
 
@@ -25,6 +27,8 @@ const params = {
 // GET 요청 보내기
 axios.get(url, { params })
     .then(response => {
+        console.log("Response:", response.data);
+        console.log("---\n")
         if (response.status === 200) {
             // JSON 데이터 가져오기
             const weatherData = response.data;
