@@ -8,6 +8,14 @@ const puppeteer = require('puppeteer');
     const browser = await puppeteer.launch({
         headless: 'new', // 'new' 값을 사용하여 새로운 Headless 모드로 설정
     });
+
+    // 헤드리스 모드 비활성화
+    // const browser = await puppeteer.launch({
+    //     headless: false, // 브라우저 창 열기
+    //     defaultViewport: null, // 창 크기 기본값 해제
+    //     args: ['--start-maximized'], // 브라우저 창 최대화
+    // });
+
     const page = await browser.newPage();
 
     await page.goto('https://example.com');
