@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Follow Text</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        .follow-text {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="mouseText" class="follow-text">✨ Follow Me!</div>
+    <script>
+        const mouseText = document.getElementById('mouseText');
+
+        document.addEventListener('mousemove', (e) => {
+            mouseText.style.left = `${e.pageX}px`;
+            mouseText.style.top = `${e.pageY}px`;
+        });
+    </script>
+</body>
+</html>

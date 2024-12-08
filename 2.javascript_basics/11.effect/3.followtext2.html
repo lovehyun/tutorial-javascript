@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Follow Text</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+        }
+
+        .follow-text {
+            position: absolute;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            pointer-events: none; /* 마우스 이벤트 무시 */
+            transform: translate(-50%, -50%); /* 텍스트를 중앙 정렬 */
+        }
+    </style>
+</head>
+<body>
+    <div id="mouseText" class="follow-text">✨ Follow Me!</div>
+    <script>
+        const mouseText = document.getElementById('mouseText');
+
+        document.addEventListener('mousemove', (e) => {
+            const offsetX = 40; // X축 오프셋 (마우스 오른쪽으로 40px 이동)
+            const offsetY = -20; // Y축 오프셋 (마우스 위로 20px 이동)
+
+            mouseText.style.left = `${e.pageX + offsetX}px`;
+            mouseText.style.top = `${e.pageY + offsetY}px`;
+        });
+    </script>
+</body>
+</html>

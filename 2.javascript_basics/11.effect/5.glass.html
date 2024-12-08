@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('https://via.placeholder.com/1920x1080') no-repeat center center;
+            background-size: cover;
+        }
+
+        .glass {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.2);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="glass" class="glass"></div>
+    <script>
+        const glass = document.getElementById('glass');
+
+        document.addEventListener('mousemove', (e) => {
+            glass.style.left = `${e.pageX - 75}px`; // 중앙 정렬
+            glass.style.top = `${e.pageY - 75}px`;
+        });
+    </script>
+</body>
+</html>

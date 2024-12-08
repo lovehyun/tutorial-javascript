@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Sparkle Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black; /* 배경색을 어둡게 하면 반짝이 효과가 더 돋보임 */
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ffffff, rgba(255,255,255,0));
+            border-radius: 50%;
+            pointer-events: none; /* 클릭을 방해하지 않도록 설정 */
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('mousemove', (e) => {
+            // 스파클 요소 생성
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+
+            // 마우스 위치에 스파클 배치
+            sparkle.style.left = `${e.pageX}px`;
+            sparkle.style.top = `${e.pageY}px`;
+
+            // 랜덤한 크기와 색상 추가
+            const size = Math.random() * 20 + 5; // 5px ~ 25px
+            sparkle.style.width = `${size}px`;
+            sparkle.style.height = `${size}px`;
+            sparkle.style.background = `radial-gradient(circle, hsl(${Math.random() * 360}, 100%, 75%), rgba(255, 255, 255, 0))`;
+
+            // 문서에 추가
+            document.body.appendChild(sparkle);
+
+            // 일정 시간 후 스파클 제거
+            setTimeout(() => {
+                sparkle.remove();
+            }, 1000); // 1초 후 제거
+        });
+    </script>
+</body>
+</html>
