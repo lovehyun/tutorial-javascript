@@ -1,0 +1,54 @@
+.wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.box_section {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.product-button,
+.button2,
+.button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+.button {
+    background-color: #0070f3;
+    color: white;
+}
+
+/* 텍스트 정렬 */
+.text--left {
+    text-align: left;
+}
+.text--right {
+    text-align: right;
+}
+
+/* 그리드 레이아웃 */
+.p-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.p-grid-col {
+    flex: 1;
+}
+
+/* 문단 스타일 */
+.typography--p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}

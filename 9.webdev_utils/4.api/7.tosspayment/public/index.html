@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <title>상품 결제</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="box_section" style="padding: 40px 30px 50px 30px; margin-top: 30px; margin-bottom: 50px">
+            <h1>상품 결제</h1>
+            <div id="product-list" style="margin-bottom: 20px;">
+                <button class="product-button" onclick="selectProduct(event, '상품1', 3000)">상품1 - 3000원</button>
+                <button class="product-button" onclick="selectProduct(event, '상품2', 5000)">상품2 - 5000원</button>
+                <button class="product-button" onclick="selectProduct(event, '상품3', 10000)">상품3 - 10000원</button>
+            </div>
+            <div id="payment-method" style="display: flex; margin-bottom: 20px;">
+                <button id="CARD" class="button2" onclick="selectPaymentMethod('CARD')">카드</button>
+                <button id="TRANSFER" class="button2" onclick="selectPaymentMethod('TRANSFER')">계좌이체</button>
+                <button id="VIRTUAL_ACCOUNT" class="button2" onclick="selectPaymentMethod('VIRTUAL_ACCOUNT')">
+                    가상계좌
+                </button>
+            </div>
+            <button class="button" onclick="requestPayment()">결제하기</button>
+        </div>
+    </div>
+
+    <script src="tosspayment.js"></script>
+</body>
+</html>
