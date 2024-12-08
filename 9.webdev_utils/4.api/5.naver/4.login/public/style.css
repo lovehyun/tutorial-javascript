@@ -1,0 +1,85 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.login-button {
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    background-color: #1ec800;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #159c00;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.back-link:hover {
+    background-color: #0056b3;
+}
+
+/* General styling for list items */
+ul#additionalInfo {
+    list-style: none; /* 기본 불렛 제거 */
+    padding: 0;
+    margin: 0;
+}
+
+ul#additionalInfo li {
+    background: #f9f9f9; /* 밝은 배경 */
+    margin: 10px 0; /* 각 항목 간격 */
+    padding: 15px; /* 내부 여백 */
+    border-radius: 8px; /* 모서리를 둥글게 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 약간의 그림자 효과 */
+    display: flex; /* 플렉스 레이아웃으로 아이콘과 텍스트 정렬 */
+    align-items: center; /* 아이콘과 텍스트 수직 정렬 */
+}
+
+/* Icon styling */
+ul#additionalInfo li::before {
+    content: "🔍"; /* 기본 아이콘 */
+    font-size: 1.2em; /* 아이콘 크기 */
+    margin-right: 10px; /* 텍스트와 간격 */
+    color: #0078d4; /* 아이콘 색상 */
+}
+
+/* Hover effect */
+ul#additionalInfo li:hover {
+    background: #eef5ff; /* 호버 시 배경색 */
+    transform: translateY(-2px); /* 약간 위로 이동 */
+    transition: all 0.2s ease-in-out; /* 부드러운 애니메이션 */
+}

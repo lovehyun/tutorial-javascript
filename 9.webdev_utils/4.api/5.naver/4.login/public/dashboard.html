@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, <span id="userName"></span></h1>
+        <p>Email: <span id="userEmail"></span></p>
+        <div id="profileImageContainer"></div>
+        <h2>Additional Information</h2>
+        <ul id="additionalInfo"></ul>
+        <a href="/logout" class="logout-button">Logout</a>
+    </div>
+    <script>
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userName').textContent = user.name || 'Guest';
+                document.getElementById('userEmail').textContent = user.email || 'No email provided';
+
+                if (user.profileImage) {
+                    const img = document.createElement('img');
+                    img.src = user.profileImage;
+                    img.alt = "Profile Image";
+                    img.style = "max-width: 150px; border-radius: 50%;";
+                    document.getElementById('profileImageContainer').appendChild(img);
+                } else {
+                    const noImageText = document.createElement('p');
+                    noImageText.textContent = "No profile image available.";
+                    document.getElementById('profileImageContainer').appendChild(noImageText);
+                }
+
+                const additionalInfoList = document.getElementById('additionalInfo');
+                Object.keys(user).forEach(key => {
+                    if (!['name', 'email', 'profileImage'].includes(key)) {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${key}: ${user[key]}`;
+                        additionalInfoList.appendChild(listItem);
+                    }
+                });
+            })
+            .catch(err => {
+                console.error('Failed to fetch user data:', err);
+            });
+    </script>
+</body>
+</html>
