@@ -40,7 +40,15 @@ async function getRepositories() {
 
             console.log(`\n최근 한 달 내 업데이트된 리포지토리:`);
             recentlyUpdatedRepos.forEach(repo => {
+
                 console.log(`- ${repo.name} (Last Updated: ${repo.updated_at})`);
+                
+                // 한국 시간으로 포맷
+                const koreanTime = new Date(repo.updated_at).toLocaleString('ko-KR', {
+                    timeZone: 'Asia/Seoul',
+                });
+                
+                console.log(`- ${repo.name} (Last Updated: ${koreanTime})`);
             });
         } else {
             console.error("요청 실패: 상태 코드", response.status);

@@ -40,7 +40,8 @@ app.get('/', (req, res) => {
 app.get('/search', async (req, res) => {
     const query = req.query.q;
     if (!query) {
-        return res.render('index', { videos: [], selectedVideo: null });
+        return res.status(400).send('Bad parameter');
+        // return res.render('index', { videos: [], selectedVideo: null });
     }
 
     try {
@@ -54,10 +55,19 @@ app.get('/search', async (req, res) => {
         });
 
         const videos = response.data.items;
-        res.render('index', { videos, selectedVideo: null });
+
+        // response.data.items 에서 필요한 정보만 추출
+        // const videos = response.data.items.map(item => ({
+        //     videoId: item.id.videoId, // 유튜브 영상 ID
+        //     title: item.snippet.title, // 영상 제목
+        //     description: item.snippet.description, // 영상 설명
+        //     thumbnailUrl: item.snippet.thumbnails.medium.url, // 썸네일 URL
+        // }));
+        
+        res.render('index', { videos });
     } catch (error) {
         console.error('Error fetching YouTube API:', error);
-        res.render('index', { videos: [], selectedVideo: null });
+        return res.status(500).send('Fetch Error');
     }
 });
 

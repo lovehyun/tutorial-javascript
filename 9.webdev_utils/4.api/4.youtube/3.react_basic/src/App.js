@@ -8,7 +8,7 @@ const YouTubeAPIExample = () => {
 
     // .env 파일에서 API 키 읽기
     const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
-    const BASE_URL = 'https://www.googleapis.com/youtube/v3';
+    const BASE_URL = 'https://www.googleapis.com/youtube/v3/';
 
     useEffect(() => {
         const fetchVideos = async () => {
@@ -38,7 +38,7 @@ const YouTubeAPIExample = () => {
 
     return (
         <div>
-            <h1>Popular Videos</h1>
+            <h1>KR Popular Videos Top 10</h1>
             <ul>
                 {videos.map((video) => (
                     <li key={video.id}>

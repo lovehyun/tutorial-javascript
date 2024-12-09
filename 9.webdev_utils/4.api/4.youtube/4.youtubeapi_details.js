@@ -1,3 +1,6 @@
+// https://developers.google.com/youtube/v3/docs/search?hl=ko
+// https://developers.google.com/youtube/v3/docs/videos?hl=ko
+
 require('dotenv').config(); // .env 파일 로드
 const axios = require('axios');
 
@@ -13,7 +16,7 @@ const searchUrl = 'https://www.googleapis.com/youtube/v3/search';
 const videosUrl = 'https://www.googleapis.com/youtube/v3/videos';
 
 // 검색 쿼리 설정
-const searchQuery = 'Python programming';
+const searchQuery = '아이유';
 
 // 페이지별 최대 결과 수와 페이지 수 설정
 const maxResultsPerPage = 10;

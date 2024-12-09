@@ -44,3 +44,40 @@ axios.get(url, { params })
             console.error("요청 설정 오류:", error.message);
         }
     });
+
+
+const fetchWeatherData = async () => {
+    try {
+        const response = await axios.get(url, { params });
+
+        if (response.status === 200) {
+            // JSON 데이터 가져오기
+            const weatherData = response.data;
+
+            // 필요한 정보 추출
+            const cityName = weatherData.name;
+            const temperature = weatherData.main.temp;
+            const description = weatherData.weather[0].description;
+
+            // 결과 출력
+            console.log(`도시: ${cityName}`);
+            console.log(`온도: ${temperature} K`);
+            console.log(`날씨: ${description}`);
+        }
+    } catch (error) {
+        // 에러 처리
+        if (error.response) {
+            // 서버에서 응답을 받은 경우
+            console.error("요청 실패:", error.response.status, error.response.data);
+        } else if (error.request) {
+            // 요청이 전송되었으나 응답을 받지 못한 경우
+            console.error("응답 없음:", error.request);
+        } else {
+            // 요청 설정 중에 문제가 발생한 경우
+            console.error("요청 설정 오류:", error.message);
+        }
+    }
+};
+
+// 함수 호출
+// fetchWeatherData();

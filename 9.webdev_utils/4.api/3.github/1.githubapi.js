@@ -1,3 +1,6 @@
+// https://docs.github.com/en/rest?apiVersion=2022-11-28
+// https://docs.github.com/ko/rest?apiVersion=2022-11-28
+
 const axios = require('axios');
 
 // GitHub 사용자 정보 가져오기
@@ -11,3 +14,15 @@ axios.get(url)
     .catch(error => {
         console.error("에러 발생:", error.message);
     });
+
+const fetchGitHubUserInfo = async () => {
+    try {
+        const response = await axios.get(url);
+        console.log("사용자 정보:", response.data);
+    } catch (error) {
+        console.error("에러 발생:", error.message);
+    }
+};
+
+// 함수 호출
+// fetchGitHubUserInfo();

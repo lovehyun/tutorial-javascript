@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .video-list {
+            list-style: none;
+            padding: 0;
+        }
+        .video-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .video-list img {
+            width: 120px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube Search & Play</h1>
+
+        <!-- 검색창 -->
+        <form action="/search" method="GET">
+            <input type="text" name="q" placeholder="Search YouTube videos..." style="padding: 10px; width: 300px; font-size: 16px;">
+            <button type="submit" style="padding: 10px; font-size: 16px;">Search</button>
+        </form>
+
+        <!-- 동영상 재생 -->
+        {% if selectedVideo %}
+        <div style="margin-top: 20px;">
+            <h2>{{ selectedVideo.title }}</h2>
+            <iframe
+                width="560"
+                height="315"
+                src="https://www.youtube.com/embed/{{ selectedVideo.videoId }}"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+        {% endif %}
+
+        <!-- 검색 결과 -->
+        <ul class="video-list">
+            {% for video in videos %}
+            <li>
+                <a href="/play?videoId={{ video.videoId }}&videos={{ videos | stringify | urlencode }}">
+                    <img src="{{ video.thumbnailUrl }}" alt="{{ video.title }}">
+                </a>
+                <div>
+                    <h3>{{ video.title }}</h3>
+                    <p>{{ video.description }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

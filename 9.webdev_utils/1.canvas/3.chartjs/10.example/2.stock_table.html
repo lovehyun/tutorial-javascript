@@ -7,12 +7,53 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        #candlestickChart {
+            display: block;
+            margin: 0 auto;
+            width: 800px; /* 캔버스 폭 */
+        }
+    
+        #candlestickTable {
+            width: 800px; /* 테이블 폭 캔버스와 동일 */
+            margin: 10px auto; /* 화면 중앙 정렬 */
+            border-collapse: collapse; /* 테이블 경계선 간격 제거 */
+        }
+    
+        #candlestickTable th, #candlestickTable td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+    
+        #candlestickTable thead {
+            background-color: #f4f4f4; /* 헤더 배경색 */
+        }
+    </style>
 </head>
 <body>
     <canvas id="candlestickChart" width="800" height="400"></canvas>
+    <div>
+        <h2 style="text-align: center;">Recent 5 Candlesticks Data</h2>
+        <table id="candlestickTable">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data rows will be inserted here -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
         const ctx = document.getElementById('candlestickChart').getContext('2d');
+        const tableBody = document.getElementById('candlestickTable').querySelector('tbody');
 
         // 랜덤 데이터 생성 함수
         function generateRandomCandle(basePrice, timestamp) {
@@ -39,13 +80,7 @@
             // 20초 전부터 현재까지의 데이터 생성
             for (let i = 20; i > 0; i--) {
                 const timestamp = new Date(now - i * 1000); // 1초 간격 시간 생성
-                data.push({
-                    x: timestamp,
-                    o: 0, // 빈 데이터는 0으로 채우기
-                    h: 0,
-                    l: 0,
-                    c: 0,
-                });
+                data.push(generateRandomCandle(1000, timestamp));
             }
 
             return data;
@@ -104,6 +139,39 @@
             },
         });
 
+        // 테이블 업데이트 함수
+        function updateTable(data) {
+            // 테이블 초기화
+            tableBody.innerHTML = '';
+
+            // 최근 5개 데이터만 표시
+            // const recentData = data.slice(-5);
+            const recentData = data.slice(-5).reverse(); // 최신 데이터가 위로 오도록 reverse()
+
+            recentData.forEach(candle => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${candle.x.toLocaleTimeString()}</td>
+                    <td>${candle.o.toFixed(2)}</td>
+                    <td>${candle.h.toFixed(2)}</td>
+                    <td>${candle.l.toFixed(2)}</td>
+                    <td>${candle.c.toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // 생략된 데이터 표시를 위한 빈 행 추가
+            const ellipsisRow = document.createElement('tr');
+            ellipsisRow.innerHTML = `
+                <td>...</td>
+                <td>...</td>
+                <td>...</td>
+                <td>...</td>
+                <td>...</td>
+            `;
+            tableBody.appendChild(ellipsisRow);
+        }
+
         // 실시간 데이터 추가 함수
         function updateChart() {
             const now = new Date();
@@ -119,8 +187,15 @@
                 chart.data.datasets[0].data.shift(); // 가장 오래된 데이터 제거
             }
 
-            chart.update(); // 차트 업데이트
+            // 차트 업데이트
+            chart.update();
+
+            // 테이블 업데이트
+            updateTable(chart.data.datasets[0].data);
         }
+
+        // 초기 테이블 업데이트
+        updateTable(candlestickData);
 
         // 매초 새로운 데이터 추가
         setInterval(updateChart, 1000);
