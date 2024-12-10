@@ -71,9 +71,7 @@ const fetchYouTubeData = async () => {
             const videoData = videoResponse.data;
 
             // 통계 정보에서 조회수 가져오기
-            const viewCount = videoData.items && videoData.items[0]?.statistics?.viewCount
-                ? videoData.items[0].statistics.viewCount
-                : 'N/A';
+            const viewCount = videoData.items?.[0]?.statistics?.viewCount || 'N/A';
 
             table.push({ Index: index + 1, Title: title, 'View Count': viewCount, 'Video URL': videoUrl });
         }
@@ -84,5 +82,85 @@ const fetchYouTubeData = async () => {
     }
 };
 
+// 검색과 통계 요청을 하나의 흐름으로 병렬 처리: Promise.all을 사용하여 모든 비디오의 통계 데이터를 병렬로 가져옴.
+const fetchYouTubeData2 = async () => {
+    let nextPageToken = null;
+    const searchResults = [];
+
+    try {
+        // 검색 결과 가져오기
+        for (let page = 1; page <= totalPages; page++) {
+            const searchParams = {
+                part: 'snippet',
+                q: searchQuery,
+                type: 'video',
+                maxResults: maxResultsPerPage,
+                pageToken: nextPageToken,
+                key: API_KEY,
+            };
+
+            const { data: searchData } = await axios.get(searchUrl, { params: searchParams });
+            searchResults.push(...searchData.items);
+            nextPageToken = searchData.nextPageToken;
+            if (!nextPageToken) break;
+        }
+
+        // 검색 결과에 대한 통계 정보 가져오기
+        const table = await Promise.all( // 모든게 다 성공해야함. 실패시 첫번째 실패로 반납
+        // const table = await Promise.allSettled( // 실패한것 있어도 무방.
+            searchResults.map(async (result, index) => {
+                let title = result.snippet.title;
+                const videoId = result.id.videoId;
+                const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+                // 타이틀 길이 제한
+                // const maxTitleLength = 30; // 원하는 최대 길이
+                // if (title.length > maxTitleLength) {
+                //     title = title.slice(0, maxTitleLength) + "...";
+                // }
+                
+                const videoParams = {
+                    part: 'statistics',
+                    id: videoId,
+                    key: API_KEY,
+                };
+
+                try {
+                    const { data: videoData } = await axios.get(videosUrl, { params: videoParams });
+                    const viewCount = videoData.items?.[0]?.statistics?.viewCount || 'N/A';
+
+                    return {
+                        Index: index + 1,
+                        Title: title,
+                        'View Count': viewCount,
+                        'Video URL': videoUrl,
+                    };
+                } catch {
+                    return {
+                        Index: index + 1,
+                        Title: title,
+                        'View Count': 'Error',
+                        'Video URL': videoUrl,
+                    };
+                }
+            })
+        );
+
+        // await Promise.allSettled 로 처리한 경우, 성공한 데이터만 다시 필터링
+        // const successfulResults = table
+        //     .filter((result) => result.status === "fulfilled") // 성공한 Promise만 필터링
+        //     .map((result) => result.value); // 성공한 값 추출
+
+        console.table(table); // 테이블 형식으로 출력
+    } catch (error) {
+        console.error("Error fetching data from YouTube API:", error.message);
+    }
+};
+
 // 실행
-fetchYouTubeData();
+console.time("Execution Time"); // 타이머 시작
+(async () => { 
+    // await fetchYouTubeData(); // ~7초
+    await fetchYouTubeData2(); // ~2초
+    console.timeEnd("Execution Time"); // 타이머 종료
+})();
