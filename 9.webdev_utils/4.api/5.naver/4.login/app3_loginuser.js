@@ -1,9 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const axios = require('axios');
 const path = require('path');
 const morgan = require('morgan');
-require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
@@ -99,6 +99,7 @@ app.get('/callback', async (req, res) => {
         // 모든 사용자 정보를 세션에 저장
         req.session.user = {
             name: userInfo.name || 'Unknown',
+            nickname: userInfo.nickname || 'N/A',
             email: userInfo.email || 'No email provided',
             profileImage: userInfo.profile_image || null,
             age: userInfo.age || 'N/A',
@@ -132,7 +133,7 @@ app.get('/dashboard', ensureLoggedIn, (req, res) => {
 
 // API: 사용자 데이터 반환
 app.get('/api/user', ensureLoggedIn, (req, res) => {
-    res.json(req.session.user);
+    res.json(req.session?.user);
 });
 
 // 로그아웃

@@ -13,7 +13,9 @@
         <div id="profileImageContainer"></div>
         <h2>Additional Information</h2>
         <ul id="additionalInfo"></ul>
-        <a href="/logout" class="logout-button">Logout</a>
+        <!-- <a href="/logout" class="logout-button">Logout</a> -->
+        <a href="/logout"><img src="/static/naver_logout.png" width="150"></a>
+    </a>
     </div>
     <script>
         fetch('/api/user')
@@ -36,7 +38,7 @@
 
                 const additionalInfoList = document.getElementById('additionalInfo');
                 Object.keys(user).forEach(key => {
-                    if (!['name', 'email', 'profileImage'].includes(key)) {
+                    if (!['name', 'email', 'profileImage'].includes(key)) { // 이거 제외하고 나머지 처리
                         const listItem = document.createElement('li');
                         listItem.textContent = `${key}: ${user[key]}`;
                         additionalInfoList.appendChild(listItem);

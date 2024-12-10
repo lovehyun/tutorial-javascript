@@ -1,7 +1,7 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
@@ -17,11 +17,11 @@ const NAVER_TOKEN_URL = 'https://nid.naver.com/oauth2.0/token';
 const NAVER_USERINFO_URL = 'https://openapi.naver.com/v1/nid/me';
 
 // 정적 파일 제공
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 // 로그인 요청
 app.get('/login', (req, res) => {
-    const state = Math.random().toString(36).substring(7); // 상태 값 생성
+    const state = Math.random().toString(36).substring(7); // 36진수(0-9a-z) 중 7번째 문자 이후~ 즉 6자리값)
     const authUrl = `${NAVER_AUTH_URL}?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${state}`;
     res.redirect(authUrl);
 });

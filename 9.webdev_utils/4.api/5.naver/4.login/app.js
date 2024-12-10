@@ -1,6 +1,6 @@
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
-require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
@@ -17,7 +17,7 @@ const NAVER_USERINFO_URL = 'https://openapi.naver.com/v1/nid/me';
 
 // 로그인 요청
 app.get('/login', (req, res) => {
-    const state = Math.random().toString(36).substr(2); // 상태 코드 생성
+    const state = Math.random().toString(36).slice(2); // 36진수(0-9a-z) 13글자, 상태 코드 생성 (소수점 두번째 글자 이후 나머지)
     const authUrl = `${NAVER_AUTH_URL}?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${state}`;
     res.redirect(authUrl);
 });
