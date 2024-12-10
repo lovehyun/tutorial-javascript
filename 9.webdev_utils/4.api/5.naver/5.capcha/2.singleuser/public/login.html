@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 300px;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        img {
+            margin-bottom: 10px;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        #message.success {
+            color: green;
+        }
+        #message.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="login-form">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+        <div id="captcha-container" style="display: none;">
+            <img id="captcha-image" alt="Captcha"><br>
+            <label for="captcha">Enter Captcha:</label><br>
+            <input type="text" id="captcha" name="captcha">
+        </div>
+        <button type="button" id="login-button">Login</button>
+        <div id="message"></div>
+    </form>
+
+    <script>
+        async function checkCaptcha() {
+            const response = await fetch('/login-status');
+            const data = await response.json();
+
+            const captchaContainer = document.getElementById('captcha-container');
+            const captchaImage = document.getElementById('captcha-image');
+
+            if (data.showCaptcha) {
+                captchaContainer.style.display = 'block';
+                captchaImage.src = `/captcha.jpg?${Date.now()}`; // 캐시 버스팅
+            } else {
+                captchaContainer.style.display = 'none';
+            }
+        }
+
+        document.getElementById('login-button').addEventListener('click', async () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const captcha = document.getElementById('captcha')?.value.trim();
+            const messageElement = document.getElementById('message');
+
+            messageElement.textContent = '';
+            messageElement.className = '';
+
+            if (!username || !password) {
+                messageElement.textContent = 'Username and password are required.';
+                messageElement.className = 'error';
+                return;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, captcha }),
+                });
+
+                const data = await response.text();
+
+                if (response.ok) {
+                    messageElement.textContent = data;
+                    messageElement.className = 'success';
+                } else {
+                    messageElement.textContent = data;
+                    messageElement.className = 'error';
+                }
+
+                await checkCaptcha();
+            } catch (error) {
+                console.error('Error:', error);
+                messageElement.textContent = 'An unexpected error occurred.';
+                messageElement.className = 'error';
+            }
+        });
+
+        checkCaptcha();
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        form {
+            max-width: 300px;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        img {
+            margin-bottom: 10px;
+        }
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        #message.success {
+            color: green;
+        }
+        #message.error {
+            color: red;
+        }
+        #captcha-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="login-form">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+        <div id="captcha-container">
+            <img id="captcha-image" alt="Captcha"><br>
+            <button type="button" id="refresh-captcha">Refresh Captcha</button><br>
+            <label for="captcha">Enter Captcha:</label><br>
+            <input type="text" id="captcha" name="captcha">
+        </div>
+        <button type="button" id="login-button">Login</button>
+        <div id="message"></div>
+    </form>
+
+    <script>
+        async function refreshCaptcha() {
+            try {
+                const response = await fetch('/refresh-captcha');
+                if (!response.ok) {
+                    throw new Error('Failed to refresh captcha');
+                }
+                const data = await response.json();
+                const captchaImage = document.getElementById('captcha-image');
+                captchaImage.src = `/${data.captchaImage}?${Date.now()}`; // 고유 파일명 사용
+                document.getElementById('captcha-container').style.display = 'block';
+            } catch (error) {
+                console.error('Captcha 새로고침 실패:', error);
+            }
+        }
+
+        document.getElementById('refresh-captcha').addEventListener('click', refreshCaptcha);
+
+        document.getElementById('login-button').addEventListener('click', async () => {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const captcha = document.getElementById('captcha').value.trim();
+            const messageElement = document.getElementById('message');
+            const captchaContainer = document.getElementById('captcha-container');
+
+            messageElement.textContent = '';
+            messageElement.className = '';
+
+            if (!username || !password) {
+                messageElement.textContent = 'Username and password are required.';
+                messageElement.className = 'error';
+                return;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, captcha }),
+                });
+
+                if (response.ok) {
+                    messageElement.textContent = 'You are logged in!';
+                    messageElement.className = 'success';
+                    captchaContainer.value = ''; // 이전 캡챠 초기화
+                    captchaContainer.style.display = 'none'; // 캡차 숨기기
+                } else {
+                    const data = await response.json();
+                    messageElement.textContent = data.message || 'An unexpected error occurred.';
+                    messageElement.className = 'error';
+                    if (response.status === 400) {
+                        refreshCaptcha(); // 캡차 새로고침
+                    }
+                }
+            } catch (error) {
+                console.error('Login 요청 실패:', error);
+                messageElement.textContent = 'An unexpected error occurred.';
+                messageElement.className = 'error';
+            }
+        });
+
+        refreshCaptcha();
+    </script>
+</body>
+</html>
