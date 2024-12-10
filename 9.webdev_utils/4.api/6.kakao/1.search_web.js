@@ -23,6 +23,7 @@ const params = {
     size: 10          // 10개의 문서
 };
 
+// Promise 기반 체이닝 (ES6 = ES2015)
 // GET 요청 보내기
 axios.get(url, { headers, params })
     .then(response => {
@@ -51,3 +52,37 @@ axios.get(url, { headers, params })
     .catch(error => {
         console.error(`Error Code: ${error.response?.status || error.message}`);
     });
+
+// async/await 방식 (ES8 = ES2017)
+const fetchSearchResults = async () => {
+    try {
+        // GET 요청 보내기
+        const response = await axios.get(url, { headers, params });
+        const data = response.data;
+
+        // 검색 결과 출력
+        console.log(`Total Count: ${data.meta.total_count}`);
+        console.log(`Pageable Count: ${data.meta.pageable_count}`);
+        console.log(`Is End: ${data.meta.is_end}`);
+        console.log('-'.repeat(40));
+
+        // 검색 결과 문서 출력
+        data.documents.forEach(item => {
+            const title = item.title.replace(/<b>/g, "").replace(/<\/b>/g, "");
+            const url = item.url;
+            const contents = item.contents.replace(/<b>/g, "").replace(/<\/b>/g, "");
+            const datetime = item.datetime;
+
+            console.log(`Title: ${title}`);
+            console.log(`URL: ${url}`);
+            console.log(`Contents: ${contents}`);
+            console.log(`Datetime: ${datetime}`);
+            console.log('-'.repeat(40));
+        });
+    } catch (error) {
+        console.error(`Error Code: ${error.response?.status || error.message}`);
+    }
+};
+
+// 함수 호출
+// fetchSearchResults();

@@ -1,0 +1,195 @@
+/* 검색 결과 컨테이너 스타일 */
+#results {
+    margin: 0 auto; /* 중앙 정렬 */
+    width: 90%; /* 화면 너비의 90% 사용 */
+    max-width: 1200px; /* 최대 너비 제한 */
+    padding: 10px;
+    word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
+    overflow-wrap: break-word;
+}
+
+/* 개별 결과 항목 스타일 */
+.result {
+    margin-bottom: 20px; /* 결과 간격 */
+    padding: 15px;
+    border: 1px solid #ddd; /* 경계선 */
+    border-radius: 8px; /* 둥근 모서리 */
+    background-color: #ffffff; /* 흰색 배경 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 그림자 */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* 결과 항목 호버 스타일 */
+.result:hover {
+    transform: translateY(-5px); /* 위로 약간 이동 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 더 강한 그림자 */
+}
+
+/* 제목 스타일 */
+.result-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333; /* 진한 색상 */
+    text-decoration: none;
+}
+
+/* 본문 텍스트 스타일 */
+.result-contents {
+    font-size: 16px;
+    line-height: 1.5; /* 줄 간격 */
+    color: #666; /* 회색 텍스트 */
+    margin-bottom: 10px;
+}
+
+/* 링크 스타일 */
+.result-link {
+    color: #0073e6; /* 파란색 */
+    text-decoration: none; /* 밑줄 제거 */
+    font-weight: bold;
+    word-wrap: break-word; /* 긴 단어를 줄바꿈 */
+}
+
+.result-link:hover {
+    text-decoration: underline; /* 호버 시 밑줄 */
+}
+
+/* 이미지 스타일 */
+.result-thumbnail {
+    max-width: 100%; /* 부모 컨테이너에 맞춤 */
+    height: auto; /* 비율 유지 */
+    margin-bottom: 10px;
+    border-radius: 4px; /* 이미지 둥근 모서리 */
+}
+
+/* 사이트 이름 스타일 */
+.result-sitename {
+    font-size: 14px;
+    font-style: italic; /* 기울임꼴 */
+    color: #999; /* 연한 회색 */
+    margin-bottom: 5px;
+}
+
+/******************** image *********************/
+
+/* 이미지 결과 - 가로 정렬 */
+.image-result {
+    display: flex; /* Flexbox로 좌우 정렬 */
+    gap: 15px; /* 이미지와 텍스트 간의 간격 */
+    align-items: flex-start; /* 세로 정렬 */
+}
+
+/* 이미지 결과의 텍스트 컨텐츠 */
+.image-result .result-content {
+    display: flex;
+    flex-direction: column; /* 세로로 정렬 */
+    gap: 10px; /* 텍스트 요소 간격 */
+    flex: 1; /* 텍스트 영역 확장 */
+}
+
+/* 공통 p 태그 스타일 */
+.result-content p {
+    margin: 0; /* 기본 마진 제거 */
+    margin-bottom: 8px; /* 사용자 정의 하단 간격 */
+    font-size: 14px; /* 글꼴 크기 */
+    line-height: 1.5; /* 줄 간격 */
+    color: #666;
+}
+
+/* 마지막 p 태그의 하단 간격 제거 */
+.result-content p:last-child {
+    margin-bottom: 0;
+}
+
+/******************** vclip *********************/
+
+/* vclip 결과 - 좌우 정렬 */
+.vclip-result {
+    display: flex;
+    justify-content: space-between; /* 좌우로 간격 분리 */
+    gap: 15px; /* 좌우 간격 */
+    align-items: flex-start; /* 상단 정렬 */
+}
+
+/* vclip 텍스트 (왼쪽) */
+.vclip-text {
+    flex: 1; /* 남은 공간 차지 */
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    gap: 10px; /* 텍스트 간격 */
+}
+
+.vclip-text h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+}
+
+.vclip-text p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* vclip 미디어 (오른쪽) */
+.vclip-media {
+    display: flex;
+    flex-direction: column; /* 세로 정렬 */
+    align-items: center; /* 중앙 정렬 */
+    gap: 10px; /* 간격 */
+}
+
+.vclip-media img {
+    max-width: 150px; /* 이미지 크기 제한 */
+    height: auto; /* 비율 유지 */
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.vclip-media p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 반응형 처리 */
+@media (max-width: 768px) {
+    #results {
+        width: 100%; /* 모바일 화면에서 전체 너비 사용 */
+        padding: 5px;
+    }
+
+    .result {
+        padding: 10px;
+    }
+
+    .result-title {
+        font-size: 18px;
+    }
+
+    .result-contents {
+        font-size: 14px;
+    }
+
+    /* 이미지 결과 - 세로 정렬 */
+    .image-result {
+        flex-direction: column; /* 모바일에서 위아래로 배치 */
+        align-items: center; /* 중앙 정렬 */
+    }
+
+    .result-thumbnail {
+        max-width: 100%; /* 이미지 최대 너비 */
+        margin-bottom: 10px;
+    }
+
+    /* 비디오 클립 - 세로 정렬 */
+    .vclip-result {
+        flex-direction: column; /* 모바일에서 세로 정렬 */
+        align-items: center; /* 중앙 정렬 */
+    }
+
+    .vclip-media img {
+        max-width: 100%; /* 모바일에서 이미지 전체 너비 사용 */
+    }
+}

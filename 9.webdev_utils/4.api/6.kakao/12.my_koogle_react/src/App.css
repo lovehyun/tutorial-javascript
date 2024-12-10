@@ -1,0 +1,42 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+#results {
+    margin-top: 20px;
+    width: 100%; /* 컨테이너 너비를 화면에 맞춤 */
+    max-width: 800px; /* 최대 너비 제한 */
+    word-wrap: break-word; /* 긴 텍스트를 줄바꿈 */
+    overflow-wrap: break-word; /* 긴 단어가 깨지지 않도록 줄바꿈 */
+}
+.result {
+    margin-bottom: 20px;
+}
+.result a {
+    display: inline-block; /* 링크를 줄바꿈 가능하게 */
+    max-width: 100%; /* 링크 텍스트가 컨테이너를 넘지 않게 */
+    white-space: normal; /* 링크가 한 줄에 머물지 않고 줄바꿈 가능하게 */
+}
+.result img {
+    max-width: 100%; /* 이미지가 컨테이너를 넘지 않도록 */
+    height: auto; /* 비율 유지 */
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+.pagination-buttons {
+    display: flex;
+    gap: 10px;
+}
+.current-page {
+    font-weight: bold;
+    font-size: 16px;
+}
