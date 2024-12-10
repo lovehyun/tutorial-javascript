@@ -1,8 +1,8 @@
+require('dotenv').config();
 const axios = require('axios');
-require('dotenv').config(); // dotenv를 사용하여 환경 변수 로드
 
-const client_id = process.env.CLIENT_ID; // dotenv로부터 클라이언트 ID 가져오기
-const client_secret = process.env.CLIENT_SECRET; // dotenv로부터 클라이언트 시크릿 가져오기
+const client_id = process.env.NAVER_CLIENT_ID;
+const client_secret = process.env.NAVER_CLIENT_SECRET;
 
 const text = '반갑습니다';
 const encText = encodeURIComponent(text);

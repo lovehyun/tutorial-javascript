@@ -1,9 +1,9 @@
-const axios = require('axios');
 require('dotenv').config(); // dotenv를 사용하여 환경 변수 로드
+const axios = require('axios');
 
 // 환경 변수에서 클라이언트 ID와 시크릿 가져오기
-const client_id = process.env.CLIENT_ID;
-const client_secret = process.env.CLIENT_SECRET;
+const client_id = process.env.NAVER_CLIENT_ID;
+const client_secret = process.env.NAVER_CLIENT_SECRET;
 
 // 검색할 텍스트와 API URL
 const text = '반갑습니다';
