@@ -15,10 +15,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(morgan('dev'));
 
+// 단일 페이지
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'search.html'));
 });
 
+// 페이징 처리 추가
 app.get('/v2', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'search2.html'));
 });

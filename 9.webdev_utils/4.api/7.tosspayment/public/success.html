@@ -69,7 +69,7 @@
                         throw new Error(data.message || '결제 검증에 실패했습니다.');
                     }
 
-                    // 결제 승인 성공 시 응답 데이터를 표시합니다.
+                    // 결제 승인 성공 시 응답 데이터를 표시합니다. (data, replacer(null=모든키와값), space(4칸))
                     document.getElementById('response').textContent = JSON.stringify(data, null, 4);
                 } catch (error) {
                     console.error('결제 검증 실패:', error);

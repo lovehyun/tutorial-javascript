@@ -4,16 +4,16 @@ require('dotenv').config(); // .env 파일 로드
 const axios = require('axios');
 
 // .env 파일에서 REST API 키 가져오기
-const REST_API_KEY = process.env.KAKAO_RESTAPI_KEY;
-
-// 검색할 텍스트
-const query = "아이유";
+const RESTAPI_KEY = process.env.KAKAO_RESTAPI_KEY;
 
 // API 요청 URL 및 헤더 설정
 const url = "https://dapi.kakao.com/v2/search/web";
 const headers = {
-    Authorization: `KakaoAK ${REST_API_KEY}`
+    Authorization: `KakaoAK ${RESTAPI_KEY}`
 };
+
+// 검색할 텍스트
+const query = "아이유";
 
 // 요청 파라미터 설정
 const params = {

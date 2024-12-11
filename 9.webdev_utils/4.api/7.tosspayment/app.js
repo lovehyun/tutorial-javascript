@@ -15,10 +15,14 @@ const apiSecretKey = process.env.TOSS_SECRET_KEY;
 if (!apiSecretKey) {
     throw new Error('API_SECRET_KEY 환경 변수를 설정해주세요.');
 }
-const encryptedApiSecretKey = 'Basic ' + Buffer.from(apiSecretKey + ':').toString('base64');
+const encodedApiSecretKey = 'Basic ' + Buffer.from(apiSecretKey + ':').toString('base64');
 
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'product.html'));
+})
 
 // 결제 승인 요청
 app.post('/confirm/payment', async (req, res) => {
@@ -34,7 +38,7 @@ app.post('/confirm/payment', async (req, res) => {
             },
             {
                 headers: {
-                    Authorization: encryptedApiSecretKey,
+                    Authorization: encodedApiSecretKey,
                     'Content-Type': 'application/json',
                 },
             }
@@ -43,8 +47,8 @@ app.post('/confirm/payment', async (req, res) => {
         // 결제 승인 성공
         res.status(200).json(response.data);
     } catch (error) {
-        console.error('결제 승인 요청 실패:', error.response?.data || error.message);
-        res.status(400).json({ error: error.response?.data || '결제 승인 실패' });
+        console.error('결제 승인 요청 실패:', error.message);
+        res.status(400).json({ message: error.message || '결제 승인 실패' });
     }
 });
 
@@ -67,7 +71,7 @@ app.get('/payment/success', async (req, res) => {
             },
             {
                 headers: {
-                    Authorization: encryptedApiSecretKey,
+                    Authorization: encodedApiSecretKey,
                     'Content-Type': 'application/json',
                 },
             }

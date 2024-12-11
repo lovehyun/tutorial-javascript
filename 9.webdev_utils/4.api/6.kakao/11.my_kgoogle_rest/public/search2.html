@@ -83,9 +83,18 @@
             });
         });
 
+        // 유틸리티 함수: 객체를 URLSearchParams로 변환
+        // function buildQueryParams(params) {
+        //     const urlParams = new URLSearchParams(params);
+        //     return urlParams.toString(); // 쿼리 문자열 반환
+        // }
+
         // REST API 호출 및 결과 표시
         async function fetchResults(query, type, page) {
             try {
+                // const queryParams = buildQueryParams({ query, type }); // 객체로 전달
+                // const response = await fetch(`/api/search2?${queryParams}`);
+
                 const response = await fetch(`/api/search2?query=${encodeURIComponent(query)}&type=${type}&page=${page}`);
                 if (!response.ok) throw new Error('Failed to fetch results');
 
