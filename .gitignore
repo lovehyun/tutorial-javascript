@@ -40,3 +40,4 @@ package-lock.json
 # 민감정보 (credentials)
 **/.env
 cookie.txt
+gapi-*.json
