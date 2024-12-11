@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.build
+      args: # 빌드 시 사용할 ARG 값
+        REACT_APP_KAKAO_RESTAPI_KEY: ${REACT_APP_KAKAO_RESTAPI_KEY}
+        REACT_APP_USE_BACKEND: ${REACT_APP_USE_BACKEND}
+        REACT_APP_BACKEND_URL: ${REACT_APP_BACKEND_URL}
+    ports:
+      - "80:80"
+    env_file: # 런타임에 실행되는 값 (React에서는 사용되지 않음)
+      - ./client/env
+    depends_on:
+      - server
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Express 앱은 3000번 포트에서 실행
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./server/.env # Express 전용 환경 변수 파일 참조
