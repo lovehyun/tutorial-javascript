@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find My Location</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+    <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Find My Location with Leaflet</h1>
+    <div id="map"></div>
+
+    <script>
+        // 지도 초기화
+        // const map = L.map('map').setView([0, 0], 2); // 초기 지도 위치 (세계 지도)
+        const map = L.map('map').setView([37.5665, 126.9780], 12); // 서울 중심 좌표
+
+        // OpenStreetMap 타일 추가
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        // L.control.locate 플러그인을 사용하여 내 위치 찾기 버튼 추가
+        L.control.locate({
+            position: 'bottomleft', // 버튼 위치
+            flyTo: true, // 위치를 찾은 후 지도를 부드럽게 이동
+            setView: 'once', // 위치를 한 번 찾으면 지도 이동
+            // icon: 'fa fa-location-arrow', // 아이콘 변경 (선택 사항, FontAwesome 필요)
+            icon: 'fa fa-bullseye', // 과녁 아이콘 (FontAwesome 사용)
+            strings: {
+                title: "Show me where I am" // 버튼 툴팁
+            }
+        }).addTo(map);
+    </script>
+</body>
+</html>

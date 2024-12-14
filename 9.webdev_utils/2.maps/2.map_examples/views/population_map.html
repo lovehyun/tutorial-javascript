@@ -67,8 +67,8 @@
             var maxRadius = 80;
 
             // 최소 인구수와 최대 인구수 설정 (예시 값, 실제 데이터에 맞게 수정)
-            var minPopulation = 100000;
-            var maxPopulation = 1000000;
+            var minPopulation = 100_000;
+            var maxPopulation = 1_000_000;
 
             // 인구수에 따른 크기 계산
             var radius = minRadius + ((population - minPopulation) / (maxPopulation - minPopulation)) * (maxRadius - minRadius);

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seoul Weather Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+        .weather-popup {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Seoul Weather Map</h1>
+    <div id="map"></div>
+
+    <script>
+        // 서울의 중심 좌표
+        const map = L.map('map').setView([37.5665, 126.9780], 12);
+
+        // OpenStreetMap 타일 추가
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // 서울시 구별 중심 좌표 (샘플 데이터)
+        const seoulDistricts = [
+            { name: "Jongno-gu", lat: 37.573050, lng: 126.979189 },
+            { name: "Jung-gu", lat: 37.561128, lng: 126.994303 },
+            { name: "Yongsan-gu", lat: 37.532598, lng: 126.990257 },
+            { name: "Gangnam-gu", lat: 37.517236, lng: 127.047325 },
+            { name: "Seocho-gu", lat: 37.483570, lng: 127.032646 },
+            { name: "Songpa-gu", lat: 37.514575, lng: 127.105981 },
+            { name: "Mapo-gu", lat: 37.563756, lng: 126.908421 },
+            { name: "Gangdong-gu", lat: 37.530125, lng: 127.123764 }
+        ];
+
+        // OpenWeatherMap API 키
+        const apiKey = 'YOUR_API_KEY'; // OpenWeatherMap API 키 입력
+
+        // 구별 날씨 데이터를 가져와 지도에 마커 추가
+        seoulDistricts.forEach((district) => {
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${district.lat}&lon=${district.lng}&units=metric&appid=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const temp = data.main.temp; // 현재 온도
+                    const weather = data.weather[0].description; // 날씨 설명
+                    const icon = data.weather[0].icon; // 날씨 아이콘 코드
+
+                    // 날씨 아이콘 URL
+                    const iconUrl = `https://openweathermap.org/img/wn/${icon}.png`;
+
+                    // 마커 추가
+                    const marker = L.marker([district.lat, district.lng]).addTo(map);
+                    marker.bindPopup(`
+                        <div class="weather-popup">
+                            <img src="${iconUrl}" alt="${weather}" /><br />
+                            <strong>${district.name}</strong><br />
+                            ${weather}<br />
+                            🌡️ ${temp}°C
+                        </div>
+                    `).openPopup();
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+        });
+    </script>
+</body>
+</html>
