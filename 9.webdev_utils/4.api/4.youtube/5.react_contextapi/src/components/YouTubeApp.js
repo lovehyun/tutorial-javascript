@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { setQuery, setVideos, setSelectedVideo } from './store';
 import axios from 'axios';
 import SearchBar from './components/SearchBar';
 import VideoPlayer from './components/VideoPlayer';
 import VideoList from './components/VideoList';
-// import VideoList from './components/VideoListTotal';
 
 const YouTubeApp = () => {
-    const [query, setQuery] = useState('');
-    const [videos, setVideos] = useState([]);
-    const [selectedVideo, setSelectedVideo] = useState(null);
+    const dispatch = useDispatch();
+    const query = useSelector((state) => state.videos.query);
+    const videos = useSelector((state) => state.videos.videos);
+    const selectedVideo = useSelector((state) => state.videos.selectedVideo);
 
     const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
     const BASE_URL = 'https://www.googleapis.com/youtube/v3';
@@ -26,8 +28,8 @@ const YouTubeApp = () => {
                 },
             });
 
-            setVideos(response.data.items);
-            setSelectedVideo(null);
+            dispatch(setVideos(response.data.items));
+            dispatch(setSelectedVideo(null));
         } catch (err) {
             console.error('Error fetching videos:', err);
         }
@@ -36,9 +38,13 @@ const YouTubeApp = () => {
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1>YouTube Search & Play</h1>
-            <SearchBar query={query} onInputChange={setQuery} onSearch={handleSearch} />
+            <SearchBar
+                query={query}
+                onInputChange={(q) => dispatch(setQuery(q))}
+                onSearch={handleSearch}
+            />
             <VideoPlayer video={selectedVideo} />
-            <VideoList videos={videos} onVideoSelect={setSelectedVideo} />
+            <VideoList videos={videos} onVideoSelect={(video) => dispatch(setSelectedVideo(video))} />
         </div>
     );
 };

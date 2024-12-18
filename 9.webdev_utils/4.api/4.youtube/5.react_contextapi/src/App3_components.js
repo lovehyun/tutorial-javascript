@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
+import { VideoContext } from './context/VideoContext';
 import axios from 'axios';
 import SearchBar from './components/SearchBar';
 import VideoPlayer from './components/VideoPlayer';
 import VideoList from './components/VideoList';
-// import VideoList from './components/VideoListTotal';
+// import videoList from './components/VideoListTotal';
 
 const YouTubeApp = () => {
-    const [query, setQuery] = useState('');
-    const [videos, setVideos] = useState([]);
-    const [selectedVideo, setSelectedVideo] = useState(null);
+    const { query, setQuery, videos, setVideos, selectedVideo, setSelectedVideo } = useContext(VideoContext);
 
     const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
     const BASE_URL = 'https://www.googleapis.com/youtube/v3';
