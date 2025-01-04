@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Processing with REST API</title>
+</head>
+<body>
+    <h1>Image Processing with REST API</h1>
+    <form id="uploadForm">
+        <label for="image">Upload an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required /><br />
+
+        <h2>Options:</h2>
+        <label for="resize">Resize (width x height):</label>
+        <input type="text" id="resize" name="resize" placeholder="e.g., 300x300" /><br />
+
+        <label for="rotate">Rotate (degrees):</label>
+        <input type="number" id="rotate" name="rotate" placeholder="e.g., 90" /><br />
+
+        <label for="blur">Blur (level):</label>
+        <input type="number" id="blur" name="blur" placeholder="e.g., 5" /><br />
+
+        <label for="quality">Quality (1-100):</label>
+        <input type="number" id="quality" name="quality" placeholder="e.g., 80" /><br />
+
+        <button type="submit">Process Image</button>
+    </form>
+
+    <h2>Results:</h2>
+    <p>Original Image:</p>
+    <img id="originalImage" style="max-width: 300px;" />
+    <p>Processed Image:</p>
+    <img id="processedImage" style="max-width: 300px;" />
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            formData.append('image', document.getElementById('image').files[0]);
+            formData.append('resize', document.getElementById('resize').value);
+            formData.append('rotate', document.getElementById('rotate').value);
+            formData.append('blur', document.getElementById('blur').value);
+            formData.append('quality', document.getElementById('quality').value);
+
+            const response = await fetch('http://localhost:3000/api/process', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById('originalImage').src = data.originalImageUrl;
+                document.getElementById('processedImage').src = data.processedImageUrl;
+            } else {
+                alert('Error processing the image');
+            }
+        };
+    </script>
+</body>
+</html>
