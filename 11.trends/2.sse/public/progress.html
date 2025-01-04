@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Progress Bar Example</title>
+</head>
+<body>
+    <h1>Progress Bar with SSE</h1>
+    <button id="startButton" onclick="startProgress()">Start Process</button>
+    <div id="progress-container" style="margin-top:20px;">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <p id="statusText">Click the button to start!</p>
+    </div>
+
+    <script>
+        function startProgress() {
+            const eventSource = new EventSource('http://localhost:3000/start-process');
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            const startButton = document.getElementById('startButton');
+
+            // 버튼 비활성화
+            startButton.disabled = true;
+            statusText.textContent = "Processing... Please wait.";
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                progressBar.value = data.progress;
+                statusText.textContent = `Progress: ${data.progress}%`;
+
+                if (data.progress >= 100) {
+                    eventSource.close();
+                    statusText.textContent = "Completed!";
+                    startButton.disabled = false; // 버튼 재활성화
+                    // alert('Process completed!');
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error('SSE Error:', error);
+                eventSource.close();
+                startButton.disabled = false; // 오류 발생 시 버튼 재활성화
+                statusText.textContent = "An error occurred. Please try again.";
+            };
+        }
+    </script>
+</body>
+</html>

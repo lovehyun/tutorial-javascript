@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Progress Bar</title>
+</head>
+<body>
+    <h1>WebSocket Progress Bar Example</h1>
+    <button id="startButton" onclick="startProgress()">Start Process</button>
+    <div style="margin-top: 20px;">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <p id="statusText">Click the button to start!</p>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3000/ws');
+
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const startButton = document.getElementById('startButton');
+
+        // 웹소켓 연결 시
+        socket.onopen = () => {
+            console.log('WebSocket connection established');
+        };
+
+        // 버튼 클릭 시 메시지 전송
+        function startProgress() {
+            if (socket.readyState === WebSocket.OPEN) {
+                startButton.disabled = true;
+                socket.send('start');
+            } else {
+                alert('WebSocket is not connected!');
+            }
+        }
+
+        // 서버로부터 진행 상태 수신
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            progressBar.value = data.progress;
+            statusText.textContent = `Progress: ${data.progress}%`;
+
+            if (data.progress >= 100) {
+                statusText.textContent = "Completed!";
+                startButton.disabled = false;
+            }
+        };
+
+        // 연결 오류 시
+        socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        // 연결 종료 시
+        socket.onclose = () => {
+            console.warn('WebSocket closed');
+            statusText.textContent = "Connection closed. Refresh to reconnect.";
+            startButton.disabled = true;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Progress Bar</title>
+</head>
+<body>
+    <h1>WebSocket Progress Bar Example</h1>
+    <button id="startButton" onclick="startProgress()">Start Process</button>
+    <div style="margin-top: 20px;">
+        <progress id="progressBar" value="0" max="100"></progress>
+        <p id="statusText">Click the button to start!</p>
+    </div>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:3000');
+        
+        const progressBar = document.getElementById('progressBar');
+        const statusText = document.getElementById('statusText');
+        const startButton = document.getElementById('startButton');
+
+        // 서버에 요청 전송
+        function startProgress() {
+            startButton.disabled = true;
+            socket.send('start');
+        }
+
+        // 서버로부터 진행 상태 수신
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            progressBar.value = data.progress;
+            statusText.textContent = `Progress: ${data.progress}%`;
+
+            if (data.progress >= 100) {
+                statusText.textContent = "Completed!";
+                startButton.disabled = false;
+            }
+        };
+
+        // 연결 오류 시
+        socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+
+        // 연결 종료 시
+        socket.onclose = () => {
+            console.log('WebSocket closed');
+        };
+    </script>
+</body>
+</html>

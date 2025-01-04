@@ -16,9 +16,12 @@
         // 메시지 수신 시
         eventSource.onmessage = (event) => {
             const outputDiv = document.getElementById('output');
-            const newMessage = document.createElement('p');
-            newMessage.textContent = `Message from server: ${event.data}`;
-            outputDiv.appendChild(newMessage);
+            outputDiv.textContent = `Message from server: ${event.data}`;
+
+            // 메세지 누적 출력
+            // const newMessage = document.createElement('p');
+            // newMessage.textContent = `Message from server: ${event.data}`;
+            // outputDiv.appendChild(newMessage);
         };
 
         // 연결 오류 처리

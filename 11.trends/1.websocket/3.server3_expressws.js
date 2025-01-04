@@ -9,7 +9,7 @@ const app = express();
 expressWs(app);
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'chat3_clients.html'));
+    res.sendFile(path.join(__dirname, 'public', 'chat3_clients.html'));
 });
 
 // Store WebSocket clients with their session IDs in a map

@@ -12,7 +12,7 @@ const app = express();
 const wss = new WebSocket.Server({ port: port });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'chat2_design.html'));
+    res.sendFile(path.join(__dirname, 'public', 'chat2_design.html'));
 });
 
 // 서버 시작 시 이벤트 처리
