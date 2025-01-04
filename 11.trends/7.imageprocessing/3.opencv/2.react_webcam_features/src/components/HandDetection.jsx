@@ -55,13 +55,24 @@ const HandDetection = ({ canvasRef }) => {
         try {
             // 원본 이미지 저장
             const canvas = canvasRef.current;
-            const ctx = canvas.getContext('2d');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
             const originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
+            console.log("🔍 손 감지 시작...");
             const hands = await modelRef.current.estimateHands(canvas);
             console.log("✅ 감지된 손의 개수:", hands.length);
             
-            // 캔버스 초기화
+            if (hands.length > 0) {
+                hands.forEach((hand, index) => {
+                    console.log(`👋 손 ${index + 1}:`, {
+                        landmarks: `${hand.landmarks.length}개의 포인트`
+                    });
+                });
+            } else {
+                console.log("⚠️ 감지된 손이 없습니다");
+            }
+
             ctx.putImageData(originalImageData, 0, 0);
             hands.forEach(hand => {
                 drawHand(ctx, hand);
