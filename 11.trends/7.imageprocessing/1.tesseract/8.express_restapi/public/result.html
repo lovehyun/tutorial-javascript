@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Result</title>
+</head>
+<body>
+    <h1>OCR Result</h1>
+    <div>
+        <h2>Uploaded Image:</h2>
+        <img id="uploadedImage" alt="Uploaded Image" style="max-width: 100%; height: auto;">
+    </div>
+    <div>
+        <h2>Extracted Text:</h2>
+        <pre id="extractedText"></pre>
+    </div>
+    <a href="index.html">Back to Upload</a>
+
+    <script>
+        // URL 파라미터에서 OCR 데이터 가져오기
+        const params = new URLSearchParams(window.location.search);
+        const imageUrl = params.get('imageUrl');
+        const extractedText = params.get('extractedText');
+
+        if (imageUrl && extractedText) {
+            document.getElementById('uploadedImage').src = `http://localhost:3000${imageUrl}`;
+            document.getElementById('extractedText').textContent = extractedText;
+        } else {
+            alert('No data available.');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

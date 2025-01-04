@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Image Upload with Progress</title>
+</head>
+<body>
+    <h1>Upload an Image for OCR (with Progress)</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="image">Select an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+        <button type="button" onclick="uploadImage()">Upload</button>
+    </form>
+
+    <!-- 진행률 표시 및 OCR 결과 -->
+    <h3>Progress:</h3>
+    <progress id="progressBar" value="0" max="1" style="width:100%;"></progress>
+    <p><strong>Extracted Text:</strong></p>
+    <pre id="extractedText"></pre>
+
+    <script>
+        async function uploadImage() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('image');
+
+            if (!fileInput.files.length) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                // 업로드 시작
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Image upload failed');
+                }
+
+                // SSE 연결 설정
+                const eventSource = new EventSource('http://localhost:3000/progress');
+
+                eventSource.onmessage = (event) => {
+                    const { progress, text } = JSON.parse(event.data);
+                    document.getElementById('progressBar').value = progress;
+                    document.getElementById('extractedText').textContent = text;
+
+                    if (progress === 1) {
+                        eventSource.close();  // 진행 완료 후 연결 종료
+                    }
+                };
+
+                eventSource.onerror = () => {
+                    alert('Error in receiving progress updates.');
+                    eventSource.close();
+                };
+
+            } catch (error) {
+                alert('Error uploading image.');
+                console.error('Upload error:', error);
+            }
+
+            // 파일 업로드 후 SSE를 통해 진행률 수신
+            // fetch('http://localhost:3000/upload', {
+            //         method: 'POST',
+            //         body: formData
+            // }).then(() => {
+            //     const eventSource = new EventSource('http://localhost:3000/progress');
+
+            //     eventSource.onmessage = (event) => {
+            //         const { progress, text } = JSON.parse(event.data);
+            //         document.getElementById('progressBar').value = progress;
+            //         document.getElementById('extractedText').textContent = text;
+
+            //         if (progress === 1) {
+            //             eventSource.close(); // 진행 완료 후 연결 종료
+            //         }
+            //     };
+
+            //     eventSource.onerror = () => {
+            //         alert('Error receiving progress updates.');
+            //         eventSource.close();
+            //     };
+            // }).catch(error => {
+            //     alert('Error uploading image.');
+            //     console.error('Upload error:', error);
+            // });
+
+        }
+    </script>
+</body>
+</html>

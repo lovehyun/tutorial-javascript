@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Image Upload</title>
+</head>
+<body>
+    <h1>Upload an Image for OCR</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="image">Select an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required>
+        <button type="button" onclick="uploadImage()">Upload</button>
+    </form>
+
+    <script>
+        async function uploadImage() {
+            const formData = new FormData();
+            const fileInput = document.getElementById('image');
+
+            if (!fileInput.files.length) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Image upload failed');
+                }
+
+                const result = await response.json();
+                window.location.href = `result.html?imageUrl=${encodeURIComponent(result.imageUrl)}&extractedText=${encodeURIComponent(result.extractedText)}`;
+            } catch (error) {
+                alert('Error uploading image.');
+                console.error('Upload error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Image Upload with Progress</title>
+</head>
+<body>
+    <h1>Upload an Image for OCR</h1>
+    <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="POST">
+        <label for="image">Select an image:</label>
+        <input type="file" id="image" name="image" accept="image/*" required />
+        <button type="submit">Upload</button>
+    </form>
+
+    <progress id="progressBar" value="0" max="1" style="width: 100%;"></progress>
+    <p id="statusText">Progress: 0%</p>
+    <pre id="ocrResult"></pre>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function (e) {
+            e.preventDefault(); // 기본 동작 방지 (폼 제출 막기)
+            
+            const formData = new FormData(this);
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            const ocrResult = document.getElementById('ocrResult');
+
+            // SSE 연결 시작
+            const eventSource = new EventSource('/progress');
+
+            eventSource.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                progressBar.value = data.progress;
+                statusText.innerText = `Progress: ${(data.progress * 100).toFixed(2)}%`;
+                console.log(data)
+                if (data.progress === 1) {
+                    // 완료 시 OCR 결과 출력
+                    ocrResult.innerText = data.text || 'No text extracted.';
+                    eventSource.close(); // 연결 종료
+                }
+            };
+
+            eventSource.onerror = function () {
+                statusText.innerText = 'An error occurred. Please try again.';
+                eventSource.close();
+            };
+
+            // 서버에 이미지 업로드
+                await fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            });
+        };
+    </script>
+</body>
+</html>
