@@ -24,7 +24,7 @@
         let faceCascade;
         const faceCascadeURL = 'https://raw.githubusercontent.com/opencv/opencv/master/data/haarcascades/haarcascade_frontalface_default.xml';
 
-        // ✅ OpenCV 초기화 및 XML 파일 로딩
+        // OpenCV 초기화 및 XML 파일 로딩
         function loadCascadeFile() {
             fetch(faceCascadeURL)
                 .then(response => response.arrayBuffer())
@@ -47,7 +47,7 @@
             };
         };
 
-        // ✅ 이미지 업로드 및 캔버스에 로드
+        // 이미지 업로드 및 캔버스에 로드
         document.getElementById('imageUpload').addEventListener('change', function (e) {
             const file = e.target.files[0];
             const reader = new FileReader();
@@ -70,7 +70,7 @@
             reader.readAsDataURL(file);
         });
 
-        // ✅ Canny Edge Detection
+        // Canny Edge Detection
         function detectEdges() {
             if (!gray) {
                 alert("이미지를 먼저 업로드해주세요.");
@@ -83,7 +83,7 @@
             console.log('✅ Canny Edge Detection 적용 완료');
         }
 
-        // ✅ 얼굴 인식 (Haar Cascade 사용)
+        // 얼굴 인식 (Haar Cascade 사용)
         function detectFaces() {
             if (!gray) {
                 alert("이미지를 먼저 업로드해주세요.");
@@ -97,17 +97,17 @@
             const faces = new cv.RectVector();
             const faceGray = new cv.Mat();
 
-            // ✅ 이미지 크기 축소 (성능 개선)
+            // 이미지 크기 축소 (성능 개선)
             cv.resize(gray, faceGray, new cv.Size(300, 300));
 
-            // ✅ 얼굴 탐지 수행
+            // 얼굴 탐지 수행
             faceCascade.detectMultiScale(faceGray, faces, 1.1, 3, 0);
 
-            // ✅ 스케일링 비율 계산
+            // 스케일링 비율 계산
             const scaleX = gray.cols / 300;
             const scaleY = gray.rows / 300;
 
-            // ✅ 얼굴 탐지 결과를 원본 크기로 변환하여 그리기
+            // 얼굴 탐지 결과를 원본 크기로 변환하여 그리기
             for (let i = 0; i < faces.size(); ++i) {
                 const face = faces.get(i);
                 cv.rectangle(src,
