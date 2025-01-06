@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live News Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #news-container {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            max-width: 400px;
+            min-height: 200px;
+        }
+        .news-item {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .highlight {
+            background-color: yellow;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live News Feed</h1>
+    <div id="news-container"></div>
+
+    <script>
+        const eventSource = new EventSource('/news-stream');
+        const newsContainer = document.getElementById('news-container');
+        let newsList = [];
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            newsList.unshift(data.news);  // 최신 뉴스 맨 앞에 추가
+            if (newsList.length > 5) {
+                newsList.pop();  // 5개 초과 시 오래된 기사 제거
+            }
+
+            // 뉴스 업데이트
+            // newsContainer.innerHTML = newsList.map(news => `<div class="news-item">${news}</div>`).join('');
+
+            // 뉴스 업데이트 (하이라이트 효과 추가)
+            newsContainer.innerHTML = newsList.map((news, index) => {
+                return `<div class="news-item ${index === 0 ? 'highlight' : ''}">${news}</div>`;
+            }).join('');
+
+            // 하이라이트 효과 제거 (1초 후)
+            setTimeout(() => {
+                const highlightedItem = document.querySelector('.highlight');
+                if (highlightedItem) {
+                    highlightedItem.classList.remove('highlight');
+                }
+            }, 1000);
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('EventSource failed:', error);
+        };
+    </script>
+</body>
+</html>

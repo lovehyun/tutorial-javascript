@@ -17,6 +17,11 @@ app.get('/start-process', cors(sseCorsOptions), (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
+    // 접속을 맺을 때 로그 출력 (클라이언트 IP와 User-Agent 출력)
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+    console.log(`Client connected: IP=${clientIp}, User-Agent=${userAgent}`);
+
     let progress = 0;
 
     const interval = setInterval(() => {
@@ -32,11 +37,6 @@ app.get('/start-process', cors(sseCorsOptions), (req, res) => {
     req.on('close', () => {
         clearInterval(interval);
         // console.log('Client disconnected');
-
-        // 클라이언트 IP와 User-Agent 출력
-        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        const userAgent = req.headers['user-agent'];
-    
         console.log(`Client disconnected: IP=${clientIp}, User-Agent=${userAgent}`);
     });
 });
