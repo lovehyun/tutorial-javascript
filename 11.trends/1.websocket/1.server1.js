@@ -1,6 +1,6 @@
 const WebSocket = require('ws');
 
-const port = 8080;
+const port = 8000;
 
 // 웹소켓 서버 생성
 const wss = new WebSocket.Server({ port: port });
@@ -17,17 +17,24 @@ wss.on('connection', (ws, req) => {
 
     // 클라이언트로부터 메시지 수신 시 이벤트 처리
     ws.on('message', (message) => {
-        const messageString = message.toString('utf8');
-        console.log(`Received message from [${clientIp}]: `, messageString);
+        const parsedMessage = JSON.parse(message);
+        console.log(`Received message from [${clientIp}]: ${JSON.stringify(parsedMessage)}`);
 
-        // 현재 클라이언트에게 메시지 전송
-        // ws.send(JSON.stringify({ type: 'chat', content: message }));
+        // 현재 클라이언트에게 메시지 그대로 전송
+        // ws.send(JSON.stringify(parsedMessage));
+
+        // 메세지 가공
+        const modifiedMessage = {
+            type: 'chat',
+            content: `Echo: ${parsedMessage.content}`
+        };
 
         // 모든 클라이언트에게 메시지 전송
         wss.clients.forEach((client) => {
+            // if (client !== ws && client.readyState === WebSocket.OPEN) {  // 보낸 사람 제외
+
             if (client.readyState === WebSocket.OPEN) {
-                // client.send(`[${clientIp}]: ${messageString}`);
-                client.send(JSON.stringify({ type: 'chat', content: message }));
+                client.send(JSON.stringify(modifiedMessage));
             }
         });
     });

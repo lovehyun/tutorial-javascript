@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1>WebSocket Progress Bar Example</h1>
-    <button id="startButton" onclick="startProgress()">Start Process</button>
+    <button id="startButton">Start Process</button>
+    <button id="stopButton">Stop Process</button>
     <div style="margin-top: 20px;">
         <progress id="progressBar" value="0" max="100"></progress>
         <p id="statusText">Click the button to start!</p>
@@ -19,17 +20,33 @@
         const progressBar = document.getElementById('progressBar');
         const statusText = document.getElementById('statusText');
         const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
 
         // 웹소켓 연결 시
         socket.onopen = () => {
             console.log('WebSocket connection established');
         };
 
+        // 이벤트 리스너를 이용해 클릭 이벤트 연결
+        startButton.addEventListener('click', startProgress);
+        stopButton.addEventListener('click', stopProgress);
+
         // 버튼 클릭 시 메시지 전송
         function startProgress() {
             if (socket.readyState === WebSocket.OPEN) {
                 startButton.disabled = true;
+                stopButton.disabled = false;
                 socket.send('start');
+            } else {
+                alert('WebSocket is not connected!');
+            }
+        }
+
+        function stopProgress() {
+            if (socket.readyState === WebSocket.OPEN) {
+                startButton.disabled = false;
+                stopButton.disabled = true;
+                socket.send('stop');
             } else {
                 alert('WebSocket is not connected!');
             }
@@ -38,8 +55,12 @@
         // 서버로부터 진행 상태 수신
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            progressBar.value = data.progress;
-            statusText.textContent = `Progress: ${data.progress}%`;
+            if (data.message) {
+                statusText.textContent = `${data.message}`
+            } else {
+                progressBar.value = data.progress;
+                statusText.textContent = `Progress: ${data.progress}%`;
+            }
 
             if (data.progress >= 100) {
                 statusText.textContent = "Completed!";

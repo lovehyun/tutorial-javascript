@@ -2,14 +2,14 @@ const WebSocket = require('ws');
 const express = require('express');
 const path = require('path');
 
-const port = 8080;
+const ws_port = 8000;
 const express_port = 3000;
 
 const app = express();
 
 
 // 웹소켓 서버 생성
-const wss = new WebSocket.Server({ port: port });
+const wss = new WebSocket.Server({ port: ws_port });
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'chat2_design.html'));
@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 
 // 서버 시작 시 이벤트 처리
 wss.on('listening', () => {
-    console.log(`WebSocket server started and listening on port ${port}`);
+    console.log(`WebSocket server started and listening on port ${ws_port}`);
 });
 
 // 클라이언트 연결 시 이벤트 처리

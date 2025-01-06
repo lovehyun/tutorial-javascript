@@ -13,17 +13,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // 루트 경로로 접속 시 progress.html 제공
 app.get('/', (req, res) => {
+    // res.sendFile(path.join(__dirname, 'public', 'progress.html'));
     res.sendFile(path.join(__dirname, 'public', 'progress2.html'));
 });
 
 // WebSocket 엔드포인트
-app.ws('/ws', (ws, req) => {
+// app.ws('/', (ws, req) => {  // progress.html
+app.ws('/ws', (ws, req) => {  // progress2.html
     console.log('Client connected via express-ws');
+    let interval;
 
     ws.on('message', (message) => {
         if (message.toString() === 'start') {
             let progress = 0;
-            const interval = setInterval(() => {
+            interval = setInterval(() => {
                 progress += 10;
                 ws.send(JSON.stringify({ progress }));
 
@@ -31,7 +34,10 @@ app.ws('/ws', (ws, req) => {
                     clearInterval(interval);
                     console.log('Progress completed for client');
                 }
-            }, 500);
+            }, 500); // ms
+        } else if (message.toString() === 'stop') {
+            clearInterval(interval);
+            ws.send(JSON.stringify({ message: "Process stopped by user" }));
         }
     });
 

@@ -1,5 +1,4 @@
 const express = require('express');
-const { WebSocketServer } = require('ws');
 const path = require('path');
 
 const app = express();
@@ -17,7 +16,9 @@ const server = app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });
 
-// WebSocket 서버 생성
+// WebSocket 서버 생성 (HTTP Upgrade 메커니즘)
+const { WebSocketServer } = require('ws');
+
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
@@ -26,6 +27,7 @@ wss.on('connection', (ws) => {
     ws.on('message', (message) => {
         if (message.toString() === 'start') {
             let progress = 0;
+
             const interval = setInterval(() => {
                 progress += 10;
                 ws.send(JSON.stringify({ progress }));
@@ -34,7 +36,7 @@ wss.on('connection', (ws) => {
                     clearInterval(interval);
                     console.log('Progress completed for client');
                 }
-            }, 500);
+            }, 500); // 500 ms
         }
     });
 

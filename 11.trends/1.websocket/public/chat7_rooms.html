@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>WebSocket 채팅</title>
+    <style>
+        /* CSS styles for the chat message container */
+        #messageContainer {
+            height: 400px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* CSS styles for the input box */
+        #inputMessage {
+            width: 300px;
+            padding: 5px;
+        }
+
+        /* CSS styles for the message bubbles */
+        .messageBubble {
+            max-width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+
+        /* CSS styles for sent messages */
+        .sentMessage {
+            text-align: right;
+            background-color: lightgreen;
+            color: black;
+            align-self: flex-end;
+            border-radius: 10px 10px 0px 10px;
+        }
+
+        /* CSS styles for received messages */
+        .receivedMessage {
+            text-align: left;
+            background-color: lightblue;
+            color: black;
+            align-self: flex-start;
+            border-radius: 10px 10px 10px 0px;
+        }
+
+        /* CSS styles for broadcast messages */
+        .broadcastMessage {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+        }
+
+        /* CSS styles for error messages */
+        .errorMessage {
+            text-align: center;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>WebSocket 채팅</h2>
+
+    <label for="roomSelect">방 선택:</label>
+    <select id="roomSelect"></select>
+    <button onclick="joinRoom()">방 입장</button>
+    <button onclick="createRoom()">새 방 만들기</button>
+
+    <div id="userCount"></div>
+    <div id="messageContainer"></div>
+    <input type="text" id="inputMessage" />
+    <button id="sendButton">전송</button>
+
+    <script>
+        let socket;
+        let username;
+        let selectedRoom;
+
+        // 방 목록 가져오기
+        async function fetchRooms() {
+            const response = await fetch('/rooms');
+            const rooms = await response.json();
+            const roomSelect = document.getElementById('roomSelect');
+            roomSelect.innerHTML = rooms.map(room => `<option>${room}</option>`).join('');
+        }
+        fetchRooms();
+
+        // 방 입장 처리
+        function joinRoom() {
+            username = prompt('이름을 입력하세요:', ''); // 기본값으로 빈 문자열 (브라우저 자동완성 기능으로 일부 값이 나올 수 있음)
+            selectedRoom = document.getElementById('roomSelect').value;
+
+            // 빈 방 선택 시 오류 메시지 출력
+            if (!selectedRoom || selectedRoom.trim() === "") {
+                alert('방을 선택해야 합니다.');
+                displayErrorMessage('방을 선택하지 않았습니다.');
+                return;
+            }
+
+            // 빈 사용자명 입력 방지
+            if (!username || username.trim() === "") {
+                alert('이름을 입력해야 합니다.');
+                displayErrorMessage('이름을 입력하지 않았습니다.');
+                return;
+            }
+            
+            // WebSocket 연결
+            socket = new WebSocket(`ws://localhost:3000/chat/${selectedRoom}`);
+            
+            socket.onopen = () => {
+                socket.send(JSON.stringify({ type: 'session', username }));
+            };
+
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log(data);
+
+                if (data.type === 'chat') {
+                    displayMessage(data);
+                } else if (data.type === 'broadcast') {
+                    displayBroadcastMessage(data)
+                } else if (data.type === 'error') {
+                    alert(data.content);
+                    displayErrorMessage(data.content);
+                    socket.close();
+                    return;
+                } else if (data.type === 'userCount') {
+                    document.getElementById('userCount').textContent = data.content;
+                }
+            };
+
+            // 오류 발생 시 처리
+            socket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                displayErrorMessage('웹소켓 연결에 오류가 발생했습니다.');
+            };
+
+            // 연결 종료 시 처리
+            socket.onclose = () => {
+                displayErrorMessage('서버와의 연결이 종료되었습니다.');
+            };
+        }
+
+        // 방 생성 처리
+        async function createRoom() {
+            const roomName = prompt('생성할 방 이름을 입력하세요:', ''); // 기본값으로 빈 문자열 (브라우저 자동완성 기능으로 일부 값이 나올 수 있음)
+             // 빈 방 선택 시 오류 메시지 출력
+             if (!roomName || roomName.trim() === "") {
+                alert('방 이름을 입력하세요.');
+                displayErrorMessage('올바른 방 이름을 입력해야 합니다.');
+                return;
+            }
+
+            const response = await fetch('/create-room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roomName })
+            });
+            if (response.ok) {
+                alert('방이 생성되었습니다!');
+                fetchRooms(); // 방 목록 업데이트
+            } else {
+                alert('이미 존재하는 방입니다.');
+            }
+        }
+
+        // 버튼 클릭 시 메시지 전송 이벤트 추가
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const message = document.getElementById('inputMessage').value;
+            sendMessage(message);
+        });
+
+        // 엔터키 입력 시 메시지 전송 추가
+        document.getElementById('inputMessage').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage(event.target.value);
+            }
+        });
+
+        // 메시지 전송
+        function sendMessage(message) {
+            if (!message || message.trim() === "") {
+                alert('메시지를 입력해야 합니다.');
+                return;
+            }
+
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되어 있지 않습니다.');
+                return;
+            }
+
+            socket.send(JSON.stringify({ type: 'message', username, content: message }));
+            document.getElementById('inputMessage').value = ''; // 전송 후 입력란 비우기
+        }
+
+        // 메시지 화면에 표시
+        function displayMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${message.sender}: ${message.content}`;
+
+            // CSS 디자인 추가
+            messageElement.classList.add('messageBubble');
+            messageElement.classList.add(message.sender === username ? 'sentMessage' : 'receivedMessage');
+            
+            // 메세지 추가
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // 브로드캐스트 메시지 화면에 표시
+        function displayBroadcastMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `${message.content}`;
+
+            // CSS 디자인 추가
+            messageElement.classList.add('messageBubble', 'broadcastMessage');
+
+            // 메세지 추가
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        // 오류 메시지 화면에 표시
+        function displayErrorMessage(message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `Error: ${message}`;
+
+            // CSS 디자인 추가
+            messageElement.classList.add('messageBubble', 'errorMessage');
+
+            // 메세지 추가
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+    </script>
+</body>
+
+</html>

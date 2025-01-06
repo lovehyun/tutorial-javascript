@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1>WebSocket Progress Bar Example</h1>
-    <button id="startButton" onclick="startProgress()">Start Process</button>
+    <!-- <button id="startButton" onclick="startProgress()">Start Process</button> -->
+    <button id="startButton">Start Process</button>
     <div style="margin-top: 20px;">
         <progress id="progressBar" value="0" max="100"></progress>
         <p id="statusText">Click the button to start!</p>
@@ -19,6 +20,9 @@
         const progressBar = document.getElementById('progressBar');
         const statusText = document.getElementById('statusText');
         const startButton = document.getElementById('startButton');
+
+        // 이벤트 리스너를 이용해 클릭 이벤트 연결
+        startButton.addEventListener('click', startProgress);
 
         // 서버에 요청 전송
         function startProgress() {
