@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Chat</title>
+</head>
+<body>
+    <h1>Socket.IO Chat</h1>
+    <ul id="messages"></ul>
+    <input id="messageInput" autocomplete="off" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <!-- Socket.IO 클라이언트 라이브러리 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const messageInput = document.getElementById('messageInput');
+
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing');
+        });
+
+        messageInput.addEventListener('blur', () => {
+            socket.emit('stop typing');
+        });
+
+        socket.on('typing', (msg) => {
+            document.getElementById('messages').innerHTML = `<li>${msg}</li>`;
+        });
+
+        socket.on('stop typing', () => {
+            document.getElementById('messages').innerHTML = '';
+        });
+        
+        // 메시지 전송
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            socket.emit('chat message', message);
+            messageInput.value = '';
+        }
+
+        // 메시지 수신
+        socket.on('chat message', (msg) => {
+            const messages = document.getElementById('messages');
+            const li = document.createElement('li');
+            li.textContent = msg;
+            messages.appendChild(li);
+        });
+    </script>
+</body>
+</html>

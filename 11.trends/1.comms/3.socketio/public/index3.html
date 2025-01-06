@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Messenger Chat</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: #f0f2f5; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #chatContainer { 
+            width: 400px; 
+            height: 90vh; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #messages { 
+            flex: 1; 
+            padding: 10px; 
+            margin: 0; 
+            list-style: none; 
+            overflow-y: auto;
+        }
+        /* 말풍선 사이 여백 추가 */
+        #messages li {
+            margin-bottom: 10px; /* 말풍선 사이의 간격 추가 */
+        }
+        #inputContainer { 
+            display: flex; 
+            padding: 10px; 
+            border-top: 1px solid #ddd;
+            position: sticky; /* 항상 하단 고정 */
+            bottom: 0;
+            background: white;
+            gap: 5px; /* 각 입력 필드 간 여백 추가 */
+        }
+        /* 입력칸 스타일 수정 (테두리 + 그림자) */
+        #usernameInput, #messageInput { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 20px; 
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+        }
+        /* 포커스 시 강조 */
+        #usernameInput:focus, #messageInput:focus { 
+            border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
+        }
+        #usernameInput { 
+            width: 20%; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            outline: none;
+        }
+        #messageInput { 
+            flex: 1; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            outline: none;
+        }
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            background: #007BFF; 
+            color: white; 
+            border-radius: 20px; 
+            cursor: pointer;
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+        }
+        button:hover { background: #0056b3; }
+        
+        /* 말풍선 디자인 개선 */
+        .myMessage { text-align: right; }
+        .myMessage .bubble { 
+            background: #007BFF; 
+            color: white; 
+            border-radius: 15px 15px 0 15px; 
+            padding: 10px; 
+            display: inline-block;
+        }
+        .otherMessage { text-align: left; }
+        .otherMessage .bubble { 
+            background: #EAEAEA; 
+            border-radius: 15px 15px 15px 0; 
+            padding: 10px; 
+            display: inline-block;
+        }
+        .typing { 
+            color: gray; 
+            font-style: italic; 
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <h1 style="text-align: center;">Messenger Chat</h1>
+        <ul id="messages"></ul>
+        <p class="typing" id="typingIndicator"></p>
+        <div id="inputContainer">
+            <input id="usernameInput" placeholder="Enter your name" required>
+            <input id="messageInput" autocomplete="off" placeholder="Type a message..." required>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Socket.IO 라이브러리 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let username = '';
+
+        const usernameInput = document.getElementById('usernameInput');
+        const messageInput = document.getElementById('messageInput');
+        const messages = document.getElementById('messages');
+
+        // 사용자명 설정
+        usernameInput.addEventListener('change', () => {
+            username = usernameInput.value;
+        });
+
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', username);
+        });
+
+        messageInput.addEventListener('blur', () => {
+            socket.emit('stop typing');
+        });
+
+        // Enter 키로 메시지 전송 가능하도록 추가
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 메시지 전송 및 읽음 상태 초기화
+        function sendMessage() {
+            const message = messageInput.value;
+            if (!username) {
+                alert('Please enter your name first.');
+                return;
+            }
+            if (message.trim()) {
+                // 내 메시지는 바로 오른쪽에 추가하고, 서버에 전달
+                appendMessage(`You: ${message}`, 'myMessage');
+                socket.emit('chat message', { username, message });
+                messageInput.value = '';
+                scrollToBottom();
+            }
+        }
+
+        // 다른 사용자 메시지 수신
+        socket.on('chat message', ({ username: sender, message }) => {
+            if (sender !== username) {
+                appendMessage(`${sender}: ${message}`, 'otherMessage');
+            }
+            scrollToBottom();
+        });
+
+        // 타이핑 표시
+        socket.on('typing', (typingUser) => {
+            if (typingUser !== username) {
+                document.getElementById('typingIndicator').textContent = `${typingUser} is typing...`;
+            }
+        });
+
+        socket.on('stop typing', () => {
+            document.getElementById('typingIndicator').textContent = '';
+        });
+
+        // 말풍선 메시지 추가
+        function appendMessage(message, className) {
+            const li = document.createElement('li');
+            li.className = className;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = message;
+            li.appendChild(bubble);
+            messages.appendChild(li);
+        }
+
+        // 항상 스크롤을 아래로 유지
+        function scrollToBottom() {
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

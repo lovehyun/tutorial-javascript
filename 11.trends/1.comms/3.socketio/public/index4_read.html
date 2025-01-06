@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger Chat with Read Receipts</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: #f0f2f5; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #chatContainer { 
+            width: 400px; 
+            height: 90vh; 
+            background: white; 
+            border-radius: 15px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #messages { 
+            flex: 1; 
+            padding: 10px; 
+            margin: 0; 
+            list-style: none; 
+            overflow-y: auto;
+        }
+        #messages li { 
+            margin-bottom: 10px; 
+            position: relative; 
+        }
+        #inputContainer { 
+            display: flex; 
+            padding: 10px; 
+            border-top: 1px solid #ddd;
+            position: sticky; /* 항상 하단 고정 */
+            bottom: 0;
+            background: white;
+            gap: 5px; /* 각 입력 필드 간 여백 추가 */
+        }
+        /* 입력칸 스타일 수정 (테두리 + 그림자) */
+        #usernameInput, #messageInput { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 20px; 
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+        }
+        /* 포커스 시 강조 */
+        #usernameInput:focus, #messageInput:focus { 
+            border-color: #007BFF;
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.7);
+        }
+        #usernameInput { 
+            width: 20%; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            outline: none;
+        }
+        #messageInput { 
+            flex: 1; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 20px; 
+            outline: none;
+        }
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            background: #007BFF; 
+            color: white; 
+            border-radius: 20px; 
+            cursor: pointer;
+            white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+        }
+        button:hover { background: #0056b3; }
+        
+        /* 말풍선 디자인 개선 */
+        .myMessage { text-align: right; }
+        .myMessage .bubble { 
+            background: #007BFF; 
+            color: white; 
+            border-radius: 15px 15px 0 15px; 
+            padding: 10px; 
+            display: inline-block;
+        }
+        .otherMessage { text-align: left; }
+        .otherMessage .bubble { 
+            background: #EAEAEA; 
+            border-radius: 15px 15px 15px 0; 
+            padding: 10px; 
+            display: inline-block;
+        }
+
+        /* 읽음 카운트 (말풍선 오른쪽) */
+        .readCount { 
+            font-size: 0.8rem; 
+            color: gray; 
+            position: absolute;
+            bottom: 0; 
+        }
+        /* 내 메시지인 경우 오른쪽으로 */
+        .myMessage .readCount {
+            right: -10px;
+        }
+        /* 상대 메시지인 경우 오른쪽으로 */
+        .otherMessage .readCount {
+            left: -10px;
+        }
+        .typing { 
+            color: gray; 
+            font-style: italic; 
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <h1 style="text-align: center; margin: 10px 0;">Messenger Chat with Read Receipts</h1>
+        <ul id="messages"></ul>
+        <p class="typing" id="typingIndicator"></p>
+        <div id="inputContainer">
+            <input id="usernameInput" placeholder="Name" required>
+            <input id="messageInput" autocomplete="off" placeholder="Type a message..." required>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- Socket.IO 라이브러리 -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let username = '';
+        let typingUsers = []; // 여러 사용자 타이핑 추적을 위한 배열
+        let totalUsers = 0;
+
+        const usernameInput = document.getElementById('usernameInput');
+        const messageInput = document.getElementById('messageInput');
+        const messages = document.getElementById('messages');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // 서버로부터 소켓 ID를 수신하고 저장
+        socket.on('connect', () => {
+            console.log(`🔗 Connected with socket ID: ${socket.id}`);
+        });
+
+        // 사용자명 설정
+        usernameInput.addEventListener('change', () => {
+            username = usernameInput.value;
+            socket.emit('user joined', username);
+        });
+
+        // 타이핑 표시
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing');
+        });
+
+        messageInput.addEventListener('blur', () => {
+            socket.emit('stop typing');
+        });
+
+        // Enter 키로 메시지 전송 가능하도록 추가
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 메시지 전송 및 읽음 상태 초기화
+        function sendMessage() {
+            const message = messageInput.value;
+            if (!username) {
+                alert('Please enter your name first.');
+                return;
+            }
+            if (message.trim()) {
+                const timestamp = Date.now();
+                appendMessage(`You: ${message}`, 'myMessage', totalUsers - 1, timestamp); // 나를 제외하고 Unread 카운트 셋업
+                socket.emit('chat message', { username, message, timestamp });
+                messageInput.value = '';
+                scrollToBottom();
+            }
+        }
+
+        // 메시지 수신
+        socket.on('chat message', ({ username: sender, message, timestamp, unreadUsers }) => {
+            if (sender !== username) {
+                console.log(`메시지수신: ${message} (${unreadUsers.length}) ${unreadUsers}`)
+                appendMessage(`${sender}: ${message}`, 'otherMessage', unreadUsers.length, timestamp);
+            }
+            scrollToBottom();
+        });
+
+        // 타이핑 표시 수신
+        socket.on('typing', (typingUser) => {
+            if (!typingUsers.includes(typingUser)) {
+                typingUsers.push(typingUser);
+            }
+            updateTypingIndicator();
+        });
+
+        socket.on('stop typing', (typingUser) => {
+            typingUsers = typingUsers.filter(user => user !== typingUser);
+            updateTypingIndicator();
+        });
+
+        // 타이핑 인디케이터 업데이트 함수
+        function updateTypingIndicator() {
+            if (typingUsers.length > 0) {
+                typingIndicator.textContent = `${typingUsers.join(', ')} is typing...`;
+            } else {
+                typingIndicator.textContent = '';
+            }
+        }
+
+        // 포커스 시, 읽지 않은 메시지에 대해 서버로 알림
+        window.addEventListener('focus', () => {
+            const unreadMessages = document.querySelectorAll('.readCount');
+            unreadMessages.forEach((element) => {
+                const messageTimestamp = element.getAttribute('data-timestamp');
+                socket.emit('read message', { timestamp: messageTimestamp });
+            });
+        });
+
+        // 읽음 확인 업데이트
+        socket.on('update read receipt', ({ timestamp, unreadUsers }) => {
+            const readCountElement = document.querySelector(`.readCount[data-timestamp="${timestamp}"]`);
+            console.log(`수신메시지(읽음): ${timestamp}, 안읽은사용자: ${unreadUsers}`)
+            if (readCountElement) {
+                readCountElement.innerText = unreadUsers.length;
+            }
+        });
+
+        socket.on('user count', (count) => {
+            totalUsers = count;
+        });
+
+        // 말풍선 메시지 추가 (읽음 수 포함)
+        function appendMessage(message, className, unreadCount, timestamp) {
+            const li = document.createElement('li');
+            li.className = className;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = message;
+
+            const readCount = document.createElement('span');
+            readCount.className = 'readCount';
+            readCount.textContent = unreadCount;
+            readCount.setAttribute('data-timestamp', timestamp);
+            
+            li.appendChild(bubble);
+            li.appendChild(readCount);
+            messages.appendChild(li);
+        }
+
+        // 항상 스크롤을 아래로 유지
+        function scrollToBottom() {
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+</body>
+</html>

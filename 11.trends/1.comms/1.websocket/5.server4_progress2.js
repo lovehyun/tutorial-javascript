@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const { WebSocketServer } = require('ws');
 const path = require('path');
 
@@ -6,7 +7,7 @@ const app = express();
 const PORT = 3000;
 
 // 1. HTTP 서버를 먼저 생성
-const server = require('http').createServer(app);
+const server = http.createServer(app);
 
 // 2. WebSocket 서버를 먼저 바인딩
 const wss = new WebSocketServer({ server });
