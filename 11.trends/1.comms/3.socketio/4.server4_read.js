@@ -83,7 +83,7 @@ sio.on('connection', (socket) => {
             message.unreadUsers = message.unreadUsers.filter(id => id !== socket.id);
         });
 
-        // ✅ 사용자 수 업데이트 및 메시지 갱신
+        // 사용자 수 업데이트 및 메시지 갱신
         sio.emit('user count', sio.sockets.sockets.size);
         sio.emit('update read receipt', {
             timestamp: null,  // 모든 메시지 갱신

@@ -8,20 +8,25 @@
 <body>
     <h1>Progress Bar with SSE</h1>
     <button id="startButton" onclick="startProgress()">Start Process</button>
+    <button id="stopButton" onclick="stopProgress()" disabled>Stop Process</button>
     <div id="progress-container" style="margin-top:20px;">
         <progress id="progressBar" value="0" max="100"></progress>
         <p id="statusText">Click the button to start!</p>
     </div>
 
     <script>
+        let eventSource;
+
         function startProgress() {
-            const eventSource = new EventSource('http://localhost:3000/start-process');
+            eventSource = new EventSource('http://localhost:3000/progress');
             const progressBar = document.getElementById('progressBar');
             const statusText = document.getElementById('statusText');
             const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
 
             // 버튼 비활성화
             startButton.disabled = true;
+            stopButton.disabled = false;
             statusText.textContent = "Processing... Please wait.";
 
             eventSource.onmessage = (event) => {
@@ -33,6 +38,7 @@
                     eventSource.close();
                     statusText.textContent = "Completed!";
                     startButton.disabled = false; // 버튼 재활성화
+                    stopButton.disabled = true;
                     // alert('Process completed!');
                 }
             };
@@ -43,6 +49,20 @@
                 startButton.disabled = false; // 오류 발생 시 버튼 재활성화
                 statusText.textContent = "An error occurred. Please try again.";
             };
+        }
+
+        function stopProgress() {
+            if (eventSource) {
+                fetch('http://localhost:3000/stop'); // 서버에 중지 요청
+                eventSource.close();
+                eventSource = null;
+            }
+            const statusText = document.getElementById('statusText');
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+            statusText.textContent = "Process stopped manually.";
+            startButton.disabled = false;
+            stopButton.disabled = true;
         }
     </script>
 </body>

@@ -27,6 +27,7 @@
         // 연결 오류 처리
         eventSource.onerror = (error) => {
             console.error('SSE connection error:', error);
+            eventSource.close(); // 재접속 시도 중지
         };
     </script>
 </body>

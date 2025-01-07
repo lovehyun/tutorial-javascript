@@ -1,3 +1,5 @@
+// curl -N http://localhost:3000/news-stream
+
 const express = require('express');
 const path = require('path');
 const cors = require('cors');

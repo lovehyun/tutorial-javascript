@@ -61,7 +61,9 @@
     <button id="sendButton">전송</button>
 
     <script>
-        const socket = new WebSocket(`ws://localhost:3000/chat`);
+        // const socket = new WebSocket(`ws://localhost:3000/chat`);
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const socket = new WebSocket(`${protocol}://${window.location.host}/chat`);
 
         // 클라이언트 (사용자) 이름
         let username;

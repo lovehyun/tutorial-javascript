@@ -36,9 +36,10 @@
 
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            newsList.unshift(data.news);  // 최신 뉴스 맨 앞에 추가
+
+            newsList.unshift(data.news);  // 최신 뉴스 배열 맨 앞에 추가
             if (newsList.length > 5) {
-                newsList.pop();  // 5개 초과 시 오래된 기사 제거
+                newsList.pop();  // 5개 초과 시 오래된 기사 제거 (배열 마지막 요소 삭제)
             }
 
             // 뉴스 업데이트

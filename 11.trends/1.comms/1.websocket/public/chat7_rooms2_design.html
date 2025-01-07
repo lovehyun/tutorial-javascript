@@ -74,6 +74,12 @@
         fetchRooms();
 
         function joinRoom(roomName) {
+            // 기존 연결이 있으면 해제
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.close();
+                alert(`이전 방 "${selectedRoom}"을 나가고 새 방 "${roomName}"에 입장합니다.`);
+            }
+            
             username = prompt('사용자 이름을 입력하세요:');
             if (!username) {
                 alert('사용자 이름은 필수입니다.');
@@ -81,7 +87,12 @@
             }
 
             selectedRoom = roomName;
-            socket = new WebSocket(`ws://localhost:3000/chat/${roomName}`);
+            // 채팅방에 입장할 때 채팅창 초기화
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = '';  // 이전 채팅 내용 제거
+
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            socket = new WebSocket(`${protocol}://${window.location.host}/chat/${roomName}`);
 
             socket.onopen = () => {
                 socket.send(JSON.stringify({ type: 'session', username }));
@@ -121,7 +132,7 @@
 
             socket.onclose = () => {
                 alert('서버와의 연결이 종료되었습니다.');
-                // document.getElementById('chatInterface').style.display = 'none';
+                document.getElementById('chatInterface').style.display = 'none';
             };
         }
 

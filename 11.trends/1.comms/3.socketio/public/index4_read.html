@@ -159,12 +159,30 @@
         });
 
         // 타이핑 표시
+        // messageInput.addEventListener('input', () => {
+        //     socket.emit('typing');
+        // });
+
+        // 타이핑 표시 (debounce를 통한 개선)
+        let typingTimer;
+        let isTyping = false;  // 첫 입력 여부를 체크하는 플래그
         messageInput.addEventListener('input', () => {
-            socket.emit('typing');
+            if (!isTyping) {
+                socket.emit('typing');  // 첫 입력 시 즉시 전송
+                isTyping = true;
+            }
+    
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                socket.emit('stop typing');  // 2000ms 입력 없으면 중지 이벤트 전송
+                isTyping = false;  // 플래그 초기화
+            }, 2000);
         });
 
         messageInput.addEventListener('blur', () => {
-            socket.emit('stop typing');
+            if (isTyping) {
+                socket.emit('stop typing');
+            }
         });
 
         // Enter 키로 메시지 전송 가능하도록 추가

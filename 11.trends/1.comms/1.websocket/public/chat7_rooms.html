@@ -109,7 +109,9 @@
             }
             
             // WebSocket 연결
-            socket = new WebSocket(`ws://localhost:3000/chat/${selectedRoom}`);
+            // socket = new WebSocket(`ws://localhost:3000/chat/${selectedRoom}`);
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            socket = new WebSocket(`${protocol}://${window.location.host}/chat/${roomName}`);
             
             socket.onopen = () => {
                 socket.send(JSON.stringify({ type: 'session', username }));
