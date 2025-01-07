@@ -13,14 +13,30 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+    res.redirect('/v4');
+});
+
+app.get('/v4', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index4_stream_tw.html'));
+});
+
+app.get('/v3', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index3_nostream_tw.html'));
+});
+
+app.get('/v2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index2_stream.html'));
+});
+
+app.get('/v1', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index1_nostream.html'));
+});
+
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: '1d', // 캐싱 지속 시간 (1일)
 }));
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index_tw.html'));
-})
 
 // 엔드포인트: 질문을 받아 OpenAI 응답 반환
 app.post('/api/chat', async (req, res) => {

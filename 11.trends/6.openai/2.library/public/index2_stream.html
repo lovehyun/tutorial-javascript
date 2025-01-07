@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 챗봇</title>
+    <style>
+        /* 기본 페이지 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 컨테이너 */
+        .chat-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 헤더 */
+        h1 {
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* 채팅 박스 */
+        #chatContainer {
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+         /* 메시지 공통 스타일 */
+         .message {
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 5px;
+            max-width: 70%;
+        }
+
+        /* 사용자 메시지 (오른쪽 정렬) */
+        .user-message {
+            background: #d1e7ff;
+            text-align: right;
+            margin-left: auto;
+        }
+
+        /* 챗봇 메시지 (왼쪽 정렬) */
+        .bot-message {
+            background: #e2e2e2;
+            text-align: left;
+            margin-right: auto;
+        }
+
+        /* 입력 및 버튼 */
+        #questionInput, #sendButton {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        #questionInput {
+            width: calc(100% - 100px);
+        }
+
+        #sendButton {
+            width: 70px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>AI 챗봇 (Stream)</h1>
+        
+        <!-- 채팅 영역 -->
+        <div id="chatContainer">
+            <p>대화를 시작해보세요!</p>
+        </div>
+        
+        <!-- 입력 필드 및 버튼 -->
+        <input 
+            type="text" 
+            id="questionInput" 
+            placeholder="질문을 입력하세요..."
+        >
+        <button id="sendButton">전송</button>
+    </div>
+
+    <script src="script2_stream.js"></script>
+</body>
+</html>
