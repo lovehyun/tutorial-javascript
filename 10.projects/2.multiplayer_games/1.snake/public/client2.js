@@ -1,7 +1,8 @@
 const canvas = document.getElementById('snakeCanvas');
 const context = canvas.getContext('2d');
 
-const socket = new WebSocket('ws://localhost:3000');
+// const socket = new WebSocket('ws://localhost:3000/');
+const socket = new WebSocket(`ws://${window.location.host}/`);
 
 socket.addEventListener('open', (event) => {
     console.log('Connected to the WebSocket server');

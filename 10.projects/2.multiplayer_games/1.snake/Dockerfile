@@ -10,4 +10,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# exec 사용을 위해 쉘 모드로 CMD 작성
+CMD ["sh", "-c", "exec npm start"]

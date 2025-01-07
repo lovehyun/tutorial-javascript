@@ -202,8 +202,11 @@ function checkFood(clientId) {
 function gameLoop() {
     // 각 클라이언트에 대해 게임 로직 적용
     clients.forEach((client, clientId) => {
-        moveSnake(clientId); // 뱀 이동
-        checkFood(clientId); // 음식 체크 및 처리
+        // client.data가 있는 경우에만 게임 로직 실행
+        if (client.data) {
+            moveSnake(clientId); // 뱀 이동
+            checkFood(clientId); // 음식 체크 및 처리
+        }
     });
 
     broadcastGameData(); // 게임 상태 전파

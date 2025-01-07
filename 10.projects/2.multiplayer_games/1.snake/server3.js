@@ -37,9 +37,16 @@ wss.on('connection', (ws) => {
     const clientId = generateClientId();
     console.log('Client connected, id: ', clientId);
 
-    // 클라이언트 소켓 저장
+    // 클라이언트 소켓 저장과 동시에 data 초기화
     clients.set(clientId, {
         socket: ws,
+        data: {
+            snake: [{ x: 0, y: 0 }],
+            direction: 'right',
+            snakeColor: generateRandomColor(),
+            score: 0,
+            gameover: false
+        }
     });
 
     ws.on('message', (message) => {
@@ -68,16 +75,19 @@ wss.on('connection', (ws) => {
 });
 
 // 게임 로직: 키 입력 처리
+const directionOpposites = {
+    up: 'down',
+    down: 'up',
+    left: 'right',
+    right: 'left'
+};
+
 function handleKeyPress(clientId, key) {
     const client = clients.get(clientId);
-
-    // 거꾸로 이동 불가
-    if ((key === 'ArrowUp' && client.data.direction !== 'down') ||
-        (key === 'ArrowDown' && client.data.direction !== 'up') ||
-        (key === 'ArrowLeft' && client.data.direction !== 'right') ||
-        (key === 'ArrowRight' && client.data.direction !== 'left')) 
-    {
-        client.data.direction = key.replace('Arrow', '').toLowerCase();
+    const newDirection = key.replace('Arrow', '').toLowerCase();
+    
+    if (directionOpposites[newDirection] !== client.data.direction) {
+        client.data.direction = newDirection;
     }
 }
 
@@ -112,13 +122,10 @@ function resetCommonData() {
 
 // 랜덤 색상을 생성하는 함수
 function generateRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#00'; // R 을 제외하고 GB로만 생성
-    for (let i = 0; i < 4; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
+    // R을 제외하고 #00GGBB 색상으로 생성 - RR은 사과와 비슷
+    const green = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+    const blue = Math.floor(Math.random() * 256).toString(16).padStart(2, '0');
+    return `#00${green}${blue}`;}
 
 // 게임 로직: 뱀 이동 함수
 function moveSnake(clientId) {
@@ -214,16 +221,24 @@ function generateFood() {
 }
 
 // 게임 로직: 음식이 뱀 위에 있는지 체크 함수
+// function isFoodOnSnake(foodPosition) {
+//     for (const [clientId, client] of clients) {
+//         if (clients.hasOwnProperty(clientId)) {
+//             if (client.data.snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y)) {
+//                 return true;
+//             }
+//         }
+//     }
+//     return false;
+// }
 function isFoodOnSnake(foodPosition) {
-    for (const [clientId, client] of clients) {
-        if (clients.hasOwnProperty(clientId)) {
-            if (client.data.snake.some(segment => segment.x === foodPosition.x && segment.y === foodPosition.y)) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return [...clients.values()].some(client =>
+        client.data?.snake.some(segment => 
+            segment.x === foodPosition.x && segment.y === foodPosition.y
+        )
+    );
 }
+
 
 // 게임 로직: 음식 체크 및 처리
 function checkFood(clientId) {
@@ -245,44 +260,43 @@ function checkFood(clientId) {
 function gameLoop() {
     // 각 클라이언트에 대해 게임 로직 적용
     clients.forEach((client, clientId) => {
-        if (!client.data) {
-            console.log('client not initialized, ', clientId);
-        } else {
-            // 종료된 플레이어는 이동 중지
-            if (client.data.gameover) return;
+        // 초기화가 안되었거나, 종료된 플레이어는 게임 루프 중단
+        if (!client.data || client.data.gameover) {
+            return;
+        }
 
+        try {
             moveSnake(clientId); // 뱀 이동
             checkFood(clientId); // 음식 체크 및 처리
             collisionCheck(clientId); // 충돌 체크
+        } catch (error) {
+            console.error(`Error during game loop for client ${clientId}:`, error);
         }
     });
 
     broadcastGameData(); // 게임 상태 전파
 }
 
+function sendSafe(client, data) {
+    if (client.socket.readyState === WebSocket.OPEN) {
+        client.socket.send(JSON.stringify(data));
+        sentMessages++;
+    }
+}
+
 // 게임 로직: 게임 상태를 모든 클라이언트에 전파
 function broadcastGameData() {
-    const gameData = [];
+    const gameData = Array.from(clients.entries()).map(([clientId, client]) => ({
+        clientId,
+        data: client.data
+    }));
 
-    clients.forEach((client, clientId) => {
-        gameData.push({
-            clientId: clientId,
-            data: client.data
-        });
-    });
-
-    const dataToSend = JSON.stringify({
+    const dataToSend = {
         common: clients.common,
         clients: gameData
-    });
+    };
 
-    clients.forEach((client, clientId) => {
-        const socket = client.socket;
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(dataToSend);
-            sentMessages++;
-        }
-    });
+    clients.forEach(client => sendSafe(client, dataToSend));
 }
 
 // 클라이언트에게 고유한 clientId 생성
