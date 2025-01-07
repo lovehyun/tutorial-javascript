@@ -45,6 +45,61 @@
                     myElement2.fadeToggle(1000); // 1초 동안 페이드 인/아웃
                 });
             });
+
+            // document.addEventListener('DOMContentLoaded', function () {
+            //     const myElement1 = document.getElementById('mySquare1');
+            //     const myElement2 = document.getElementById('mySquare2');
+            //     const toggleBtn = document.getElementById('toggleBtn');
+            //     const toggleBtn2 = document.getElementById('toggleBtn2');
+
+            //     // Box 1 toggle (기본 토글 효과)
+            //     toggleBtn.addEventListener('click', function () {
+            //         if (myElement1.style.display === 'none' || myElement1.style.display === '') {
+            //             myElement1.style.display = 'block';
+            //         } else {
+            //             myElement1.style.display = 'none';
+            //         }
+            //     });
+
+            //     // 요소의 가시성을 토글하는 함수
+            //     function fadeToggle(element) {
+            //         if (window.getComputedStyle(element).display === 'none') {
+            //             element.style.display = 'block';
+            //             setTimeout(() => {
+            //                 element.style.opacity = '1';
+            //             }, 10); // 약간의 지연을 주어 transition 효과 적용
+            //         } else {
+            //             element.style.opacity = '0';
+            //             element.addEventListener('transitionend', function handler() {
+            //                 element.style.display = 'none';
+            //                 element.removeEventListener('transitionend', handler);
+            //             });
+            //         }
+            //     }
+
+            //     // Box 2 toggle (페이드 토글 효과)
+            //     toggleBtn2.addEventListener('click', function () {
+            //         fadeToggle(myElement2);
+            //     });
+
+            //     // Box 2 toggle (페이드 토글 효과)
+            //     toggleBtn2.addEventListener('click', function () {
+            //         if (myElement2.style.display === 'none' || myElement2.style.display === '') {
+            //             myElement2.style.display = 'block';
+            //             myElement2.style.opacity = '0';
+            //             myElement2.style.transition = 'opacity 1s';
+            //             setTimeout(() => {
+            //                 myElement2.style.opacity = '1';
+            //             }, 10);
+            //         } else {
+            //             myElement2.style.transition = 'opacity 1s';
+            //             myElement2.style.opacity = '0';
+            //             setTimeout(() => {
+            //                 myElement2.style.display = 'none';
+            //             }, 1000); // 페이드 아웃 후 숨김
+            //         }
+            //     });
+            // });
         </script>
     </body>
 </html>

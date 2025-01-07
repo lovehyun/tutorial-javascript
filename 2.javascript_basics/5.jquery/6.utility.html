@@ -45,23 +45,44 @@
         <h2>jQuery extend Example</h2>
         <script>
             $(document).ready(function () {
-                // each 메서드 예제
+                // each 메서드 예제 (리스트 순회)
                 $('#myList li').each(function (index, element) {
                     console.log('Index: ' + index + ', Text: ' + $(element).text());
                 });
 
-                // grep 메서드 예제
+                // grep 메서드 예제 (배열 필터링)
                 var fruits = $.grep($('#myList2 li'), function (element, index) {
                     return $(element).hasClass('fruit');
                 });
                 console.log(fruits);
 
-                // extend 메서드 예제
+                // extend 메서드 예제 (객체 병합)
                 var object1 = { apple: 0, banana: { weight: 52, price: 100 }, cherry: 97 };
                 var object2 = { banana: { price: 200 }, durian: 100 };
                 var result = $.extend({}, object1, object2);
                 console.log(result);
             });
+
+            // document.addEventListener('DOMContentLoaded', function () {
+            //     // each 메서드 재구현 (forEach 사용)
+            //     const myListItems = document.querySelectorAll('#myList li');
+            //     myListItems.forEach((element, index) => {
+            //         console.log(`Index: ${index}, Text: ${element.textContent}`);
+            //     });
+
+            //     // grep 메서드 재구현 (filter 사용)
+            //     const myList2Items = Array.from(document.querySelectorAll('#myList2 li'));
+            //     const fruits = myList2Items.filter(item => item.classList.contains('fruit'));
+            //     console.log(fruits);
+
+            //     // extend 메서드 재구현 (Object.assign 사용)
+            //     const object1 = { apple: 0, banana: { weight: 52, price: 100 }, cherry: 97 };
+            //     const object2 = { banana: { price: 200 }, durian: 100 };
+
+            //     // Object.assign은 얕은 복사만 수행 (깊은 병합을 원하면 추가 코드 필요)
+            //     const result = Object.assign({}, object1, object2);
+            //     console.log(result);
+            // });
         </script>
     </body>
 </html>

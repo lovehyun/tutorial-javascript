@@ -44,6 +44,37 @@
                     );
                 });
             });
+
+            // DOMContentLoaded를 사용하여 DOM이 로드된 후 실행
+            // document.addEventListener('DOMContentLoaded', function () {
+
+            //     // box1 클릭 시 fadeIn 애니메이션 (순차적으로 fadeOut 후 fadeIn)
+            //     document.getElementById('box1').addEventListener('click', function () {
+            //         const box = this;
+            //         box.style.transition = 'opacity 0.5s';
+            //         box.style.opacity = '0';
+            //         setTimeout(() => {
+            //             box.style.opacity = '1';
+            //         }, 500);
+            //     });
+
+            //     // box2 클릭 시 slideDown 애니메이션 (slideUp 후 slideDown)
+            //     document.getElementById('box2').addEventListener('click', function () {
+            //         const box = this;
+            //         box.style.transition = 'height 0.5s';
+            //         box.style.height = '0px';
+            //         setTimeout(() => {
+            //             box.style.height = '100px';
+            //         }, 500);
+            //     });
+
+            //     // box3 클릭 시 animate 애니메이션 (크기와 투명도 변경)
+            //     document.getElementById('box3').addEventListener('click', function () {
+            //         this.style.transition = 'opacity 1s, width 1s';
+            //         this.style.opacity = '0.5';
+            //         this.style.width = '50%';
+            //     });
+            // });
         </script>
     </body>
 </html>
