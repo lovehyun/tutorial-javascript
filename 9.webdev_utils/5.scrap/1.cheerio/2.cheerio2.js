@@ -15,20 +15,42 @@ const html = `
     </html>
 `;
 
-// 1. HTML 파싱 및 선택자 사용
+// 0. HTML 파싱 및 선택자 사용
 const $ = cheerio.load(html);
+// console.log($);
+console.log($.html());
+
+// DOM 파싱
+// 1. 요소 가져오기
 const paragraphs = $('p');
 paragraphs.each((index, element) => {
     console.log(`첫 번째 예제: ${$(element).text()}`);
 });
 
-// 2. 속성 값 가져오기
-const linkHref = $('a').attr('href');
-console.log(`두 번째 예제: ${linkHref}`);
+// 1-1. 특정 파라그래프 가져오기
+console.log(`첫 번째 P: ${$('p').eq(0).text()}`);
+console.log(`두 번째 P: ${$('p').eq(1).text()}`);
 
-// 3. 텍스트 내용 변경
+// 1-2. 특정 depth 요소 가져오기
+const secondParagraph = $('body > div > p').eq(1).text();
+console.log(`두 번째 p 태그 내용: ${secondParagraph}`);
+
+// 2. 속성 값 가져오기
+const link = $('a');
+const linkUrl = $('a').attr('href');
+console.log(`두 번째 예제: ${link.text()} ${linkUrl}`);
+
+// DOM 수정
+// 3. 텍스트 내용 변경 (모든 p태그 다 변경)
 $('p').text('새로운 텍스트');
 console.log(`세 번째 예제: ${$.html()}`);
+
+// 3-1. 첫번째 p 태그만, 두번째 p 태그만
+$('p').eq(0).text('첫 번째 p 태그가 변경되었습니다!');
+$('p').eq(1).text('두 번째 p 태그가 변경되었습니다!');
+$('p').first().text('첫 번째 p 태그만 변경되었습니다!');
+$('p').last().text('마지막 p 태그만 변경되었습니다!');
+$('p:nth-of-type(1)').text('첫 번째 p 태그 (CSS 선택자)!');
 
 // 4. 클래스 추가 및 제거
 $('div').addClass('highlight');

@@ -31,14 +31,19 @@
                 });
 
                 // 랜덤한 색상을 생성하는 함수
+                // function getRandomColor() {
+                //     var letters = '0123456789ABCDEF';
+                //     var color = '#';
+                //     for (var i = 0; i < 6; i++) {
+                //         color += letters[Math.floor(Math.random() * 16)];
+                //     }
+                //     return color;
+                // }
+
                 function getRandomColor() {
-                    var letters = '0123456789ABCDEF';
-                    var color = '#';
-                    for (var i = 0; i < 6; i++) {
-                        color += letters[Math.floor(Math.random() * 16)];
-                    }
-                    return color;
+                    return '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
                 }
+
 
                 // 마우스가 요소에 진입했을 때 실행되는 함수
                 myDiv.hover(
