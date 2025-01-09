@@ -9,13 +9,7 @@ let loading = false; // 데이터를 불러오는 중인지 여부
 
 const container = document.getElementById('scroll-container');
 
-loadInitialData(); // 페이지 로딩 시 초기 데이터 로딩
-
-// 초기 데이터 로딩
-function loadInitialData() {
-    console.log(`초기 데이터 로딩 시작...`)
-    fetchData();
-}
+fetchData(); // 페이지 로딩 시 초기 데이터 로딩
 
 function fetchData() {
     loading = true; // 데이터를 불러오는 중임을 표시
@@ -32,12 +26,23 @@ function fetchData() {
             });
 
             // 화면에 최대로 표시될 아이템 개수를 넘으면 이전 아이템 삭제
-            const itemsToRemove = container.children.length - maxItemsOnScreen;
+            let itemsToRemove = container.children.length - maxItemsOnScreen;
             if (itemsToRemove > 0) {
                 console.log(`OLD 데이터 앞 삭제: ${itemsToRemove} 개`)
-                for (let i = 0; i < itemsToRemove; i++) {
-                    container.removeChild(container.firstElementChild); // 앞 데이터 삭제
+                // 방법1. old legacy
+                // for (let i = 0; i < itemsToRemove; i++) {
+                //     container.removeChild(container.firstElementChild); // 앞 데이터 삭제
+                // }
+
+                // 방법2. simple
+                while (itemsToRemove-- > 0) {
+                    container.removeChild(container.firstElementChild);
                 }
+
+                // 방법3. modern style
+                // for (const _ of Array(itemsToRemove)) {
+                //     container.removeChild(container.firstElementChild);
+                // }
             }
 
             // 다음 데이터를 가져오기 위해 start 값 업데이트
@@ -63,18 +68,18 @@ function fetchPreviousData() {
     fetch(`/get-items?start=${pStart}&end=${pEnd}`)
         .then((response) => response.json())
         .then((items) => {
-            items.reverse(); // 역순으로 가져오기
             items.forEach((item) => {
                 const itemElement = document.createElement('div');
                 itemElement.classList.add('item');
                 itemElement.textContent = item;
-                container.insertBefore(itemElement, container.firstElementChild);
+                container.insertBefore(itemElement, firstItem);
             });
 
             // 화면 스크롤을 새로 추가된 아이템에 맞춰 조정
             const firstItemHeight = firstItem.clientHeight;
             const scrollBeforePos = firstItemHeight * items.length;
-            window.scrollTo(0, window.scrollY + scrollBeforePos);
+            // window.scrollTo(0, window.scrollY + scrollBeforePos); // (x, y) 좌표로 이동
+            window.scrollBy(0, scrollBeforePos); // (dx, dy) 상대 좌표로 이동
 
             // 화면에 최대로 표시될 아이템 개수를 넘으면 이전 아이템 삭제
             const itemsToRemove = container.children.length - maxItemsOnScreen;

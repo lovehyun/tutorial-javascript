@@ -25,23 +25,6 @@ app.get('/get-items', (req, res) => {
     res.json(items);
 });
 
-app.get('/get-items2', (req, res) => {
-    const { start, end } = req.query;
-
-    // start와 end를 숫자로 변환
-    const startIndex = parseInt(start, 10);
-    const endIndex = parseInt(end, 10);
-
-    // 입력값 검증
-    if (isNaN(startIndex) || isNaN(endIndex) || startIndex < 0 || endIndex > data.length) {
-        return res.status(400).json({ error: 'Invalid range' });
-    }
-
-    // 요청된 범위의 데이터와 총 데이터 개수 반환
-    const items = getItems(startIndex, endIndex);
-    res.json({ items, total: data.length });
-});
-
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

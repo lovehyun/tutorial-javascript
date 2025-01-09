@@ -64,7 +64,7 @@ function fetchPreviousData(pStart, pEnd) {
             const firstItem = container.firstElementChild;
             const firstItemHeight = firstItem.clientHeight;
             const scrollBeforePos = firstItemHeight * items.length;
-            window.scrollTo(0, window.scrollY + scrollBeforePos);
+            window.scrollBy(0, scrollBeforePos);
 
             // 화면에 최대로 표시될 아이템 개수를 넘으면 이전 아이템 삭제
             const itemsToRemove = container.children.length - maxItemsOnScreen;

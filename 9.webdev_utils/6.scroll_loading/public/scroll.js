@@ -19,6 +19,7 @@ fetch(`/get-items?start=${start}&end=${end}`)
 
         // 다음 데이터를 가져오기 위해 start 값 업데이트
         start += itemsPerLoad;
+        end = start + itemsPerLoad;
     });
 
 // 무한스크롤 이벤트 감지
@@ -40,6 +41,7 @@ window.addEventListener('scroll', () => {
 
                 // 다음 데이터를 가져오기 위해 start 값 업데이트
                 start += itemsPerLoad;
+                end = start + itemsPerLoad;
             });
     }
 });

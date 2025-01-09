@@ -6,13 +6,7 @@ let loading = false; // 데이터를 불러오는 중인지 여부
 
 const container = document.getElementById('scroll-container');
 
-loadInitialData(); // 페이지 로딩 시 초기 데이터 로딩
-
-// 초기 데이터 로딩
-function loadInitialData() {
-    console.log(`초기 데이터 로딩 ${start}..${end}`)
-    fetchData();
-}
+fetchData(); // 페이지 로딩 시 초기 데이터 로딩
 
 function fetchData() {
     loading = true; // 데이터를 불러오는 중임을 표시
@@ -30,6 +24,7 @@ function fetchData() {
             // 다음 데이터를 가져오기 위해 start 값 업데이트
             start += items.length; // 가져온 데이터의 개수만큼 start를 증가
             end = start + itemsPerLoad;
+            
             loading = false; // 데이터 로딩이 완료되었음을 표시
         });
 }
