@@ -29,9 +29,6 @@ const puppeteer = require('puppeteer');
             // 페이지 열기
             await page.goto(url, { waitUntil: 'networkidle2' });
 
-            // 추가 대기 (3초)
-            // await page.waitForTimeout(3000); // 동적 콘텐츠 로드 대기
-
             // PDF 저장
             const pdfPath = `output_${resolution.name}.pdf`;
             await page.pdf({
