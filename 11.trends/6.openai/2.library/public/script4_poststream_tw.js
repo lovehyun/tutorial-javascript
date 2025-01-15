@@ -32,6 +32,22 @@ function addMessage(content, isUser = true, isStreaming = false) {
     return messageDiv;
 }
 
+// 버튼을 비활성화하고 스타일을 변경하는 함수
+function disableButton(button) {
+    button.disabled = true;
+    button.innerHTML = '전송 중...';
+    button.classList.add('bg-blue-300', 'cursor-not-allowed');
+    button.classList.remove('bg-blue-500');
+}
+
+// 버튼을 활성화하고 스타일을 원래대로 되돌리는 함수
+function enableButton(button) {
+    button.disabled = false;
+    button.innerHTML = '전송';
+    button.classList.remove('bg-blue-300', 'cursor-not-allowed');
+    button.classList.add('bg-blue-500');
+}
+
 // 메시지 전송 함수
 async function sendMessage() {
     const question = questionInput.value.trim();
@@ -40,8 +56,7 @@ async function sendMessage() {
     // 사용자 메시지 추가
     addMessage(question);
     questionInput.value = '';
-    sendButton.disabled = true;
-    sendButton.innerHTML = '전송 중...';
+    disableButton(sendButton);
 
     try {
         // AI 응답 메시지 준비 (스트리밍용)
@@ -109,8 +124,7 @@ async function sendMessage() {
         console.error('Error:', error);
         addMessage('네트워크 오류가 발생했습니다.', false);
     } finally {
-        sendButton.disabled = false;
-        sendButton.innerHTML = '전송';
+        enableButton(sendButton);
     }
 }
 

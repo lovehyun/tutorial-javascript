@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan');
 const OpenAI = require('openai'); // Updated import
 const path = require('path');
 require('dotenv').config(); // .env 파일 로드
@@ -12,6 +13,7 @@ const openai = new OpenAI({
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(morgan('dev'));
 
 app.get('/', (req, res) => {
     res.redirect('/v4');
@@ -56,7 +58,44 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// 스트리밍 엔드포인트
+// EventSource는 GET만 지원하므로, POST 방식의 스트리밍을 사용하려면 Fetch API + ReadableStream을 사용
+// 스트리밍 엔드포인트 (2.javascript_basic/20.demo 내의 프런트엔드)
+// GET 방식으로 스트리밍을 제공하는 엔드포인트
+app.get('/api/chat-stream', async (req, res) => {
+    const question = req.query.question; // 쿼리스트링으로 사용자 입력 받음
+
+    // SSE 헤더 설정 (스트리밍 활성화)
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    try {
+        const stream = await openai.chat.completions.create({
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: question }],
+            stream: true
+        });
+
+        // OpenAI 스트리밍 데이터 처리
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content || '';
+            if (content) {
+                res.write(`data: ${JSON.stringify({ content })}\n\n`);
+            }
+        }
+        
+        // 스트리밍 완료
+        res.write('data: [DONE]\n\n');
+        res.end();
+
+    } catch (error) {
+        console.error('Streaming error:', error);
+        res.write('data: [ERROR]\n\n');
+        res.end();
+    }
+});
+
+// 스트리밍 엔드포인트 (11.trends/6.openai/2.library 내의 index1/2/3/4)
 app.post('/api/chat-stream', async (req, res) => {
     const { question } = req.body;
 
