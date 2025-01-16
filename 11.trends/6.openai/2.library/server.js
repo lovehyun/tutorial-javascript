@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const OpenAI = require('openai'); // Updated import
+const OpenAI = require('openai');
 const path = require('path');
 require('dotenv').config(); // .env 파일 로드
 
@@ -36,6 +36,7 @@ app.get('/v1', (req, res) => {
 });
 
 // 정적 파일 제공
+// app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: '1d', // 캐싱 지속 시간 (1일)
 }));
@@ -46,7 +47,7 @@ app.post('/api/chat', async (req, res) => {
 
     try {
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo', // 사용할 모델 선택
+            model: 'gpt-3.5-turbo', // 사용할 모델 선택 gpt-4o-mini
             messages: [{ role: 'user', content: question }],
         });
 

@@ -10,13 +10,15 @@ const axios = require('axios');
 require('dotenv').config(); // dotenv를 사용하여 .env 파일을 읽어옵니다.
 
 const openaiApiKey = process.env.OPENAI_API_KEY;
+const url = 'https://api.openai.com/v1/chat/completions';
 
 async function getChatGPTResponse(userInput) {
     try {
         const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
+            // 이자 순서 주의 (url, data, headers)
+            url,
             {
-                model: 'gpt-3.5-turbo',
+                model: 'gpt-3.5-turbo', // gpt-4o-mini
                 messages: [
                     { role: 'system', content: 'You are a helpful assistant.' },
                     { role: 'user', content: userInput },
@@ -28,7 +30,7 @@ async function getChatGPTResponse(userInput) {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${openaiApiKey}`,
                 },
-            }
+            },
         );
 
         return response.data.choices[0].message.content;

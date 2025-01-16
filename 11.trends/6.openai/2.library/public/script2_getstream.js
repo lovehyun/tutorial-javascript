@@ -65,6 +65,9 @@ async function sendMessage() {
                     fullResponse += parsed.content;
                     aiMessageContentElement.textContent = fullResponse;
                     chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    // 챗봇 메시지를 읽어주는 기능
+                    // readTextAloud(parsed.content);
                 }
             } catch (parseError) {
                 console.error('Parsing error:', parseError);
@@ -92,4 +95,20 @@ async function sendMessage() {
 sendButton.addEventListener('click', sendMessage);
 questionInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
+});
+
+// ------------------------------------------------------------------
+// 텍스트를 음성으로 읽어주는 함수
+function readTextAloud(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ko-KR'; // 한국어로 설정
+    utterance.rate = 3.0; // 음성 속도를 빠르게 설정 (기본값: 1)
+    speechSynthesis.speak(utterance);
+}
+
+// 페이지 리로드 시 음성 중지
+window.addEventListener('beforeunload', () => {
+    if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+    }
 });

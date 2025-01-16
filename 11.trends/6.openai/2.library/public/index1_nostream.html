@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 챗봇</title>
+    <!-- https://www.woowahan.com/#/fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* 기본 페이지 스타일 */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             margin: 0;
             padding: 20px;
         }
@@ -39,6 +41,7 @@
             border-radius: 10px;
             margin-bottom: 5px;
             max-width: 70%;
+            font-size: 0.9rem;
         }
 
         /* 사용자 메시지 (오른쪽 정렬) */
@@ -81,11 +84,7 @@
         </div>
         
         <!-- 입력 필드 및 버튼 -->
-        <input 
-            type="text" 
-            id="questionInput" 
-            placeholder="질문을 입력하세요..."
-        >
+        <input type="text" id="questionInput" placeholder="질문을 입력하세요...">
         <button id="sendButton">전송</button>
     </div>
 

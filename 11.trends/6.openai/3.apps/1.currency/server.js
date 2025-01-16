@@ -75,7 +75,7 @@ app.post('/api/chat-currency', async (req, res) => {
         `;
 
         const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-3.5-turbo', // 사용할 모델 선택 gpt-4o-mini
             messages: [
                 { role: 'system', content: 'You are a helpful assistant that explains currency conversion.' },
                 // { role: 'user', content: `Explain this in both Korean: ${message}` }

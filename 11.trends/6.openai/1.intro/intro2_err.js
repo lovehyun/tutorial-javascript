@@ -2,6 +2,7 @@ const axios = require('axios');
 require('dotenv').config(); // .env 파일을 로드합니다.
 
 const openaiApiKey = process.env.OPENAI_API_KEY;
+const url = 'https://api.openai.com/v1/chat/completions';
 
 // API 키 유효성 검사
 if (!openaiApiKey) {
@@ -13,7 +14,7 @@ if (!openaiApiKey) {
 async function getChatGPTResponse(userInput) {
     try {
         const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
+            url,
             {
                 model: 'gpt-3.5-turbo',
                 messages: [

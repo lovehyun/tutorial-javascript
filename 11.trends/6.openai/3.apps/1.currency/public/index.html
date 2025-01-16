@@ -26,14 +26,14 @@
         <h2>환율 변환</h2>
         <input type="number" id="amountInput" placeholder="금액 입력">
         <select id="currencyFromSelect">
-            <option value="KRW">KRW</option>
+            <option value="KRW" selected>KRW</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
         </select>
         <span>→</span>
         <select id="currencyToSelect">
-            <option value="USD">USD</option>
             <option value="KRW">KRW</option>
+            <option value="USD" selected>USD</option>
             <option value="EUR">EUR</option>
         </select>
         <button onclick="convertCurrency()">환율 변환</button>
