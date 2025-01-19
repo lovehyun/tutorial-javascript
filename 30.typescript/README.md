@@ -14,13 +14,27 @@ TypeScript를 효과적으로 학습하기 위해 알아야 할 기본적인 챕
 ### 1.1 JavaScript로 컴파일 후 실행
 TypeScript 컴파일러(TSC)를 사용하여 .ts 파일을 JavaScript로 변환합니다.
 
+#### TSC 설치
+
+전역으로 TSC를 설치하려면 다음 명령어를 사용합니다:
+```bash
+npm install -g typescript
+```
+
+설치 후, 버전을 확인하여 정상적으로 설치되었는지 확인합니다:
+```
+tsc --version
+```
+
+#### 컴파일 및 실행
+
+컴파일
 ```bash
 tsc 파일명.ts
 ```
 이 명령을 실행하면 동일한 이름의 .js 파일이 생성됩니다. 예: 파일명.js.
 
 생성된 .js 파일을 Node.js로 실행합니다.
-
 ```bash
 node 파일명.js
 ```

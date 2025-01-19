@@ -74,6 +74,11 @@ tsc  # tsconfig.json 설정에 따라 컴파일
 node dist/index.js  # 컴파일된 파일 실행 (컴파일 결과물 위치에 따라 경로가 달라질 수 있음)
 ```
 
+tsc 실행 시 옵션을 직접 지정하여 컴파일 할 수도 있습니다.
+```bash
+tsc index.ts --target ES6 --outDir dist
+```
+
 ## 5. 컴파일된 JavaScript 실행
 컴파일된 index.js 파일을 Node.js로 실행합니다.
 
