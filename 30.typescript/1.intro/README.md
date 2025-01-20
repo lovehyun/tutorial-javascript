@@ -10,6 +10,8 @@
 
 ```bash
 npm install -g typescript
+npm list -g
+npm root -g
 ```
 
 이 명령어는 TypeScript를 전역으로 설치합니다. 만약 프로젝트 내에만 설치하고 싶다면, 아래 명령어를 사용합니다.
@@ -134,4 +136,19 @@ let favoriteColor: Color = Color.Green;
 
 ```bash
 tsc --watch
+```
+
+기본적으로 tsconfig.json 내의 파일들을 보고 동작합니다.
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"], // 예: src 폴더에 있는 모든 .ts 파일 포함
+  "exclude": ["node_modules"] // node_modules 폴더는 제외
+}
 ```

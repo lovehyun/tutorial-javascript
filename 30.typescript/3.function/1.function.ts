@@ -3,5 +3,14 @@ function add(a: number, b: number): number {
     return a + b;
 }
 
-const sum = add(10, 20);
+const sum: number = add(10, 20);
 console.log(`Sum: ${sum}`); // Sum: 30
+
+
+// 리턴 타입이 없는 경우
+function logMessage(message: string): void {
+    console.log(`Message: ${message}`);
+}
+
+// 함수 호출
+logMessage("Hello, TypeScript!");

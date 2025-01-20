@@ -14,4 +14,8 @@ const product: Product = {
 
 console.log(`Product ID: ${product.id}, Name: ${product.name}, Price: ${product.price}`);
 
+product.name = "Phone";
+product.price = 1000;
 // product.id = 2; // 오류 발생: 읽기 전용 속성은 수정할 수 없음
+
+console.log(`Product ID: ${product.id}, Name: ${product.name}, Price: ${product.price}`);

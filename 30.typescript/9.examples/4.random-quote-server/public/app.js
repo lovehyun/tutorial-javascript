@@ -1,3 +1,4 @@
+// window.onload = () => {
 document.addEventListener('DOMContentLoaded', () => {
     const quoteElement = document.getElementById('quote');
     const button = document.getElementById('new-quote');

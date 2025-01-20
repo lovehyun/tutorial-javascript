@@ -19,3 +19,21 @@ class Circle extends Shape {
 
 const circle = new Circle(10);
 circle.printArea(); // Area: 314.159...
+circle.radius = 20;
+circle.printArea(); // Area: 1256.637...
+
+
+class Square extends Shape {
+    constructor(private sideLength: number) {
+        super();
+    }
+
+    // 추상 메서드 구현
+    getArea(): number {
+        return this.sideLength * this.sideLength;
+    }
+}
+
+const square = new Square(5);
+square.printArea(); // Area: 25
+// square.length = 10; // 변경 불가

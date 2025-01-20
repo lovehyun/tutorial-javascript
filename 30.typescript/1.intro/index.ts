@@ -6,5 +6,5 @@ function add(a: number, b: number): number {
 }
 
 // 결과 출력
-const result = add(5, 10);
-console.log(`결과: ${result}`);
+const result: number = add(5, 10);
+console.log(`결과:2 ${result}`);

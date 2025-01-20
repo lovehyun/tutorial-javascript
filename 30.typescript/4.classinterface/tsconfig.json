@@ -1,25 +1,21 @@
 {
     "compilerOptions": {
-        /* 기본 옵션 */
-        "target": "es5", // 컴파일된 JavaScript의 버전 (es5, es6 등)
-        "module": "commonjs", // 모듈 시스템 (commonjs, es6 등)
-        "lib": ["dom", "es6"], // 사용할 라이브러리 (DOM, ES6 기능 포함)
-        "allowJs": true, // .js 파일을 함께 컴파일할지 여부
-        "checkJs": false, // .js 파일에서 오류를 체크할지 여부
-        "outDir": "./dist", // 컴파일된 파일이 저장될 디렉터리
-        "rootDir": "./src", // 소스 파일이 위치한 디렉터리
-        "strict": true, // 모든 엄격한 타입 검사 옵션 활성화
-
-        /* 추가 옵션 */
-        "esModuleInterop": true, // ES6 모듈 호환성 향상
-        "skipLibCheck": true, // .d.ts 파일 검사 생략으로 컴파일 속도 증가
-        "forceConsistentCasingInFileNames": true, // 파일 이름 대소문자 일관성 검사
-        "noImplicitAny": true, // `any` 타입이 암시적으로 사용되지 않도록 설정
-        "strictNullChecks": true, // `null`과 `undefined`를 엄격히 체크
-        "noEmitOnError": true, // 오류 발생 시 파일을 생성하지 않음
-        "declaration": true, // .d.ts 타입 선언 파일 생성
-        "sourceMap": true // 소스 맵 생성 (디버깅 시 유용)
+        "target": "ES2020",               // Node.js에서 사용하는 최신 JavaScript 문법 지원
+        "module": "CommonJS",             // Node.js는 CommonJS 모듈 시스템을 사용
+        "outDir": "./dist",               // 컴파일된 JavaScript 파일 출력 디렉터리
+        "rootDir": "./src",               // TypeScript 소스 파일이 위치한 디렉터리
+        "strict": true,                   // 엄격한 타입 검사 활성화
+        "esModuleInterop": true,          // CommonJS 및 ES6 모듈 호환성을 보장
+        "forceConsistentCasingInFileNames": true, // 파일 이름 대소문자 일관성 유지
+        "skipLibCheck": true,             // 라이브러리 타입 검사 생략 (컴파일 속도 향상)
+        "moduleResolution": "node",       // Node.js 방식으로 모듈을 탐색
+        "resolveJsonModule": true,        // JSON 파일 import 지원
+        "allowSyntheticDefaultImports": true, // ES6 모듈의 기본 import 지원
+        "noImplicitAny": true,            // 암시적인 `any` 타입 금지
+        "noImplicitReturns": true,        // 모든 함수에서 명시적인 반환값 필요
+        "noUnusedLocals": true,           // 사용되지 않는 지역 변수 금지
+        "noUnusedParameters": true        // 사용되지 않는 함수 매개변수 금지
     },
-    "include": ["src/**/*"], // 컴파일할 파일의 경로
-    "exclude": ["node_modules", "**/*.spec.ts"] // 컴파일에서 제외할 파일의 경로
+    "include": ["src/**/*"],            // 포함할 파일 경로
+    "exclude": ["node_modules", "dist"] // 제외할 디렉터리
 }
