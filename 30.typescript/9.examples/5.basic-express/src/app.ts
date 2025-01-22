@@ -1,3 +1,7 @@
+// app.ts
+// npm install express
+// npm install --save-dev @types/express
+
 // "esModuleInterop": true 를 추가하거나 또는 import 대신 require 방식을 통해서 로딩
 // const express = require('express');
 
@@ -29,6 +33,7 @@ app.listen(PORT, (): void => {
 // const port = 3000;
 //
 // app.get('/', (req: Request, res: Response) => {
+// app.get('/', (req: any, res: any) => {
 //   res.send('Hello, World!');
 // });
 //

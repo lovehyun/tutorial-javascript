@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
-        "module": "ESNext", // ESM 모듈 지원
+        "module": "ESNext", // ESM 모듈 지원 (node-fetch v3 부터는 esm 전용 모듈임)
+        // "module": "CommonJS",
         "target": "ES2020", // 최신 JavaScript 버전으로 컴파일
         "strict": true, // 엄격한 타입 검사
         "esModuleInterop": true, // ESM 호환성 지원
-        "moduleResolution": "Node", // Node.js 모듈 해석 방식
+        "moduleResolution": "node",
         "outDir": "./dist", // 컴파일된 파일 출력 경로
         "rootDir": "./src" // 소스 파일 루트 경로
     },

@@ -1,4 +1,4 @@
-import { User, users } from './user';
+import { User, users } from '../interfaces/user';
 
 export class UserController {
     // 사용자 추가

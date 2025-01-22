@@ -1,6 +1,8 @@
+// npm install express morgan cors
+// npm install --save-dev @types/express @types/morgan @types/body-parser @types/cors
+
 import express, { Application, Request, Response, NextFunction } from 'express';
 import morgan from 'morgan';
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs/promises'; // 파일 시스템 비동기 API
 
@@ -9,8 +11,8 @@ const port: number = 3000;
 
 // Middleware 설정
 app.use(morgan('dev')); // HTTP 요청 로깅
-app.use(bodyParser.json()); // JSON 본문 파싱
-app.use(bodyParser.urlencoded({ extended: true })); // URL-encoded 본문 파싱
+app.use(express.json()); // JSON 본문 파싱
+app.use(express.urlencoded({ extended: true })); // URL-encoded 본문 파싱
 app.use(cors()); // CORS 허용
 
 // 라우트 설정
@@ -32,6 +34,14 @@ app.get('/read-file', async (req: Request, res: Response, next: NextFunction) =>
     } catch (error) {
         next(error); // 에러를 핸들링 미들웨어로 전달
     }
+});
+
+// 404 핸들링 미들웨어
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.status(404).json({
+        success: false,
+        message: 'Page not found',
+    });
 });
 
 // 에러 핸들링 미들웨어
