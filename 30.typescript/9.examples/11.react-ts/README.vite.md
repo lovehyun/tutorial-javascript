@@ -6,12 +6,17 @@
 ---
 
 ## 1. Vite 설치 및 초기화
+Vite는 "비트"로 발음합니다. 프랑스어로 "빠른"이라는 뜻에서 이름이 유래되었으며, Vite는 현대적인 JavaScript 애플리케이션 개발을 위한 빠르고 경량화된 빌드 도구입니다.
 
 ### 1.1 프로젝트 생성
 다음 명령어를 사용하여 Vite 기반 React + TypeScript 프로젝트를 생성합니다:
 
 ```bash
 npm create vite@latest my-react-app -- --template react-ts
+```
+또는
+```bash
+npx create-vite@latest my-react-app --template react-ts
 ```
 
 - `my-react-app`: 생성할 프로젝트 폴더 이름입니다.
@@ -112,6 +117,13 @@ npm run preview
 
 - 빌드된 파일을 로컬 서버에서 미리보기합니다.
 
+### 4.4 결과물 실행
+```bash
+npx serve -s dist
+```
+
+- 빌드된 파일을 로컬 서버에서 제공합니다.
+
 ---
 
 ## 5. 주요 명령어 요약
@@ -127,4 +139,3 @@ npm run preview
 ## 6. 참고
 - Vite 공식 문서: [https://vitejs.dev/](https://vitejs.dev/)
 - TypeScript: [https://www.typescriptlang.org/](https://www.typescriptlang.org/)
-
