@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Grid 반응형</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 기본: 3열 */
+                            /* repeat(3, 1fr)	    동일한 너비로 3열
+                                1fr 2fr 1fr	        가운데 열을 2배로 크게
+                                200px 1fr	        첫 열은 고정, 나머지는 자동
+                                100px 1fr 100px     중앙 열만 유동적, 나머지는 고정.
+                                auto auto auto	    각 셀의 내용에 따라 너비 자동
+                                minmax(100px, 1fr)	최소 100px, 최대 가용 공간 */
+
+            gap: 15px;
+            background-color: #fefefe;
+            padding: 10px;
+            border: 2px solid #aaa;
+        }
+
+        .grid-item {
+            background-color: #e67e22;
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .grid-item.big {
+            grid-column: span 2;
+        }
+
+        /* 반응형: 화면 너비가 600px 이하일 때 */
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: 1fr; /* 1열로 변경 */
+            }
+
+            .grid-item.big {
+                grid-column: span 1; /* 한 칸만 차지 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🔳 Grid 반응형 레이아웃</h1>
+    <div class="grid-container">
+        <div class="grid-item big">박스 1 (2칸 → 모바일에서는 1칸)</div>
+        <div class="grid-item">박스 2</div>
+        <div class="grid-item">박스 3</div>
+        <div class="grid-item">박스 4</div>
+        <div class="grid-item">박스 5</div>
+    </div>
+</body>
+</html>

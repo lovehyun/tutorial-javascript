@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Flexbox 반응형</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex; /* 플렉스 컨테이너 설정 */
+            flex-direction: row; /* 요소를 가로 방향으로 나열 */
+                            /* row	        가로 방향 (기본값)
+                               row-reverse	가로 반대 방향
+                               column	        세로 방향
+                               column-reverse	세로 반대 방향 */
+
+            justify-content: space-between; /* 좌우 간격을 균등하게 배분 */
+                            /* flex-start	왼쪽 정렬 (기본값)
+                               flex-end	    오른쪽 정렬
+                               center	    가운데 정렬
+                               space-between	양쪽 끝에 붙이고, 중간 간격 균등
+                               space-around	    모든 요소 양 옆에 동일한 간격
+                               space-evenly	    요소 간 간격이 정확히 동일 */
+
+            align-items: center; /* 세로 가운데 정렬 */
+                            /* stretch	    높이가 자동으로 채워짐 (기본값)
+                               flex-start	위쪽 정렬
+                               flex-end	    아래쪽 정렬
+                               center	    수직 가운데 정렬
+                               baseline	    텍스트 기준선 기준 정렬 */
+
+            height: 200px;
+            background-color: #f0f8ff;
+            border: 2px dashed #888;
+            gap: 10px;
+        }
+
+        .item {
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+            width: 100px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        /* 반응형: 화면 너비가 600px 이하일 때 */
+        @media (max-width: 600px) {
+            .container {
+                flex-direction: column; /* 세로 정렬로 변경 */
+                height: auto;
+            }
+
+            .item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Flexbox 반응형 레이아웃</h1>
+    <div class="container">
+        <div class="item">박스 1</div>
+        <div class="item">박스 2</div>
+        <div class="item">박스 3</div>
+    </div>
+</body>
+</html>
