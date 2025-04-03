@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 폼 디자인</title>
+    
+    <!-- 공통 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <!-- 스타일시트 (기본값: 스타일1) -->
+    <link rel="stylesheet" href="style1.css" id="style-sheet">
+</head>
+<body>
+    <div id="login-container">
+        <!-- 스타일 1 (Slide Navbar) -->
+        <div class="main" id="style1-container">  	
+            <input type="checkbox" id="chk" aria-hidden="true">
+
+            <div class="signup">
+                <form>
+                    <label for="chk" aria-hidden="true">Sign up</label>
+                    <input type="text" name="txt" placeholder="User name" required="">
+                    <input type="email" name="email" placeholder="Email" required="">
+                    <input type="password" name="pswd" placeholder="Password" required="">
+                    <button>Sign up</button>
+                </form>
+            </div>
+
+            <div class="login">
+                <form>
+                    <label for="chk" aria-hidden="true">Login</label>
+                    <input type="email" name="email" placeholder="Email" required="">
+                    <input type="password" name="pswd" placeholder="Password" required="">
+                    <button>Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 스타일 2 (Glassmorphism) -->
+        <div id="style2-container">
+            <div class="background">
+                <div class="shape"></div>
+                <div class="shape"></div>
+            </div>
+            <form>
+                <h3>Login Here</h3>
+
+                <label for="username">Username</label>
+                <input type="text" placeholder="Email or Phone" id="username">
+
+                <label for="password">Password</label>
+                <input type="password" placeholder="Password" id="password">
+
+                <button>Log In</button>
+                <div class="social">
+                    <div class="go"><i class="fab fa-google"></i>  Google</div>
+                    <div class="fb"><i class="fab fa-facebook"></i>  Facebook</div>
+                </div>
+            </form>
+        </div>
+
+        <!-- 스타일 3 (Simple) -->
+        <div id="style3-container">
+            <div class="container">
+                <div class="top"></div>
+                <div class="bottom"></div>
+                <div class="center">
+                    <h2>Please Sign In</h2>
+                    <input type="email" placeholder="email">
+                    <input type="password" placeholder="password">
+                    <h2>&nbsp;</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스타일 전환 버튼 -->
+    <div class="style-switcher">
+        <button onclick="changeStyle(1)">스타일 1</button>
+        <button onclick="changeStyle(2)">스타일 2</button>
+        <button onclick="changeStyle(3)">스타일 3</button>
+    </div>
+
+    <script>
+        // 페이지 로드 시 기본 스타일 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            changeStyle(1);
+        });
+
+        // 스타일 변경 함수
+        function changeStyle(styleNumber) {
+            // 스타일시트 변경
+            document.getElementById('style-sheet').href = `style${styleNumber}.css`;
+            
+            // 모든 컨테이너 숨기기
+            document.getElementById('style1-container').style.display = 'none';
+            document.getElementById('style2-container').style.display = 'none';
+            document.getElementById('style3-container').style.display = 'none';
+            
+            // 선택된 스타일 컨테이너만 표시
+            document.getElementById(`style${styleNumber}-container`).style.display = 'block';
+        }
+    </script>
+</body>
+</html>
