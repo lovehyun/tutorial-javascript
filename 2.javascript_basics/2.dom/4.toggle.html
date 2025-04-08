@@ -27,6 +27,17 @@
                 textElement.style.color = "red";
             }
         }
+
+        function toggleTextColor2() {
+            const textElement = document.getElementById("myText");
+            const currentColor = getComputedStyle(textElement).color;
+
+            if (currentColor === "rgb(255, 0, 0)") {
+                textElement.style.color = "blue";
+            } else {
+                textElement.style.color = "red";
+            }
+        }
     </script>
 </body>
 </html>

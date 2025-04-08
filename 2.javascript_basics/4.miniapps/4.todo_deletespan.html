@@ -4,12 +4,16 @@
     <title>To-Do List</title>
     <style>
         /* To-Do 리스트 항목 스타일 */
+        /* li 영역 전체가 block 영역으로 가로를 꽉 채워서 빈곳에서도 클릭이 가능함, span 을 추가해서 해결 */ 
         #todo-list li {
             margin-bottom: 5px; /* 아래쪽 마진 */
+        }
+        #todo-list li span {
             cursor: pointer; /* 마우스 오버 시 커서를 손가락 모양으로 변경 */
+            display: inline-block;
         }
         /* 완료된 항목에 적용될 스타일 */
-        #todo-list li.completed {
+        #todo-list li.completed span {
             text-decoration: line-through; /* 취소선 */
         }
     </style>
@@ -31,27 +35,22 @@
             if (newTodo.trim() === '') return;
 
             // 새로운 리스트 항목(li) 요소 생성
-            const new_li = document.createElement('li');
-            new_li.textContent = newTodo; // 리스트 항목에 입력된 텍스트 설정
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            span.textContent = newTodo; // 리스트 항목에 입력된 텍스트 설정
+
+            li.appendChild(span);
 
             // 리스트 항목에 클릭 이벤트 리스너 추가
-            new_li.addEventListener('click', function() {
+            span.addEventListener('click', function() {
                 // 항목을 클릭하면 'completed' 클래스를 토글 (추가/제거)
-                new_li.classList.toggle('completed');
+                li.classList.toggle('completed');
             });
 
             // 새로운 항목을 To-Do 리스트에 추가
-            document.getElementById('todo-list').appendChild(new_li);
-            
-            // 기능개선1: 입력 필드를 비워서 초기화
+            document.getElementById('todo-list').appendChild(li);
+            // 입력 필드를 비워서 초기화
             document.getElementById('new-todo').value = '';
-        });
-
-        // 기능개선2: Enter 키로도 추가 가능하게 처리
-        document.getElementById('new-todo').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                document.getElementById('add-todo').click(); // 버튼 클릭과 동일한 동작 실행
-            }
         });
     </script>
 </body>

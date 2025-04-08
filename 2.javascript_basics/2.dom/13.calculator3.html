@@ -59,6 +59,7 @@
 
         // 입력된 값이 연산자인지 확인하는 함수
         function isSymbol(value) {
+            // return "=-*/".includes(value)
             return ['+', '-', '*', '/'].includes(value);
         }
 
@@ -83,6 +84,14 @@
                 return;
             }
 
+            // 마지막에 심볼로 끝나는지 확인
+            const lastChar = expression.slice(-1);
+            if (isSymbol(lastChar)) {
+                resultInput.value = "ERROR";
+                return;
+            }
+
+            // 일반 오류들 예외처리
             try {
                 const result = eval(resultInput.value);
                 resultInput.value = result;
@@ -98,6 +107,24 @@
                     let j = i + 1;
                     if (expression[j] === '0') {
                         return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function isDivisionByZero2(expression) {
+            for (let i = 0; i < expression.length; i++) {
+                if (expression[i] === '/') {
+                    let j = i + 1;
+
+                    // 0으로 시작하는 경우 검사
+                    if (expression[j] === '0') {
+                        // 0 다음이 없거나 숫자가 아니면 0으로 나누는 것으로 판단
+                        let next = expression[j + 1];
+                        if (!next || isNaN(Number(next))) {
+                            return true;
+                        }
                     }
                 }
             }

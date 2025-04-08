@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Slider</title>
     <style>
+        h1 {
+            text-align: center;
+        }
         .slider {
             display: flex;
             flex-direction: column;
@@ -47,27 +50,55 @@
     <script>
         const images = document.querySelectorAll('.slider img');
         let currentIndex = 0;
+        updateFilename(currentIndex); // 최초 로딩시 파일명 업데이트
 
-        function updateFilename() {
+        function updateFilename(index) {
             const filename = document.getElementById('filename');
-            filename.textContent = images[currentIndex].src.split('/').pop(); // 파일명만 표시
+            // filename.textContent = images[index].src
+            filename.textContent = images[index].src.split('/').pop(); // 파일명만 표시
         }
-
+        
+        // 방법1. 3항연산자로 비교후 앞뒤 이동 -->
         document.getElementById('prevBtn').addEventListener('click', () => {
             images[currentIndex].classList.remove('active');
             currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
             images[currentIndex].classList.add('active');
-            updateFilename();
+            updateFilename(currentIndex);
         });
 
         document.getElementById('nextBtn').addEventListener('click', () => {
             images[currentIndex].classList.remove('active');
             currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
             images[currentIndex].classList.add('active');
-            updateFilename();
+            updateFilename(currentIndex);
         });
+        // 방법1. 3항연산자로 비교후 앞뒤 이동 <--
 
-        updateFilename(); // 최초 로딩시 파일명 업데이트
+
+        // 방법2. 현재 위치를 active로 가져와서, % 모듈러 연산으로 처리 -->
+        // function getCurrentIndex() {
+        //     return [...images].findIndex(img => img.classList.contains('active'));
+        // }
+
+        // document.getElementById('prevBtn').addEventListener('click', () => {
+        //     const currentIndex = getCurrentIndex();
+        //     const nextIndex = (currentIndex - 1 + images.length) % images.length;
+
+        //     images[currentIndex].classList.remove('active');
+        //     images[nextIndex].classList.add('active');
+        //     updateFilename(nextIndex);
+        // });
+
+        // document.getElementById('nextBtn').addEventListener('click', () => {
+        //     const currentIndex = getCurrentIndex();
+        //     const nextIndex = (currentIndex + 1) % images.length;
+
+        //     images[currentIndex].classList.remove('active');
+        //     images[nextIndex].classList.add('active');
+        //     updateFilename(nextIndex);
+        // });
+        // 방법2. 현재 위치를 active로 가져와서, % 모듈러 연산으로 처리 <--
+
     </script>
 </body>
 </html>

@@ -8,6 +8,8 @@
     <textarea id="myTextArea">Try copying this text</textarea>
     <script>
         document.getElementById('myTextArea').addEventListener('copy', function() {
+            // event.preventDefault();
+            // event.clipboardData.setData('text/plain', '복사 금지!!');
             alert('Text copied!');
         });
     </script>

@@ -7,8 +7,23 @@
     <button onclick="changeColor()">Change Background Color</button>
 
     <script>
+        const colors = ["red", "blue", "green"];  // 순환할 색상 목록
+        let currentIndex = 0;  // 현재 색상 인덱스
+
         function changeColor() {
-            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+            document.body.style.backgroundColor = colors[currentIndex];
+            currentIndex += 1;
+
+            if (currentIndex > 2) {
+                currentIndex = 0;
+            }
+
+            // currentIndex = (currentIndex + 1) % colors.length;  // 다음 인덱스로 이동 (순환)
+        }
+
+
+        function randomColor() {
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
             document.body.style.backgroundColor = randomColor;
         }
     </script>

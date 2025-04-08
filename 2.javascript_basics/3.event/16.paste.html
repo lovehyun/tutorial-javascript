@@ -8,6 +8,7 @@
     <textarea id="myTextArea">Paste some text here</textarea>
     <script>
         document.getElementById('myTextArea').addEventListener('paste', function(event) {
+            // event.preventDefault();
             alert('Text pasted!');
         });
     </script>

@@ -61,6 +61,19 @@
             return `rgb(${r}, ${g}, ${b})`;
         }
 
+        function getRandomColorHEX() {
+            const r = Math.floor(Math.random() * 256); // 0~255
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+
+            // 2자리 16진수 문자열로 변환 (padStart로 자리수 보장)
+            const hexR = r.toString(16).padStart(2, '0');
+            const hexG = g.toString(16).padStart(2, '0');
+            const hexB = b.toString(16).padStart(2, '0');
+
+            return `#${hexR}${hexG}${hexB}`;
+        }
+        
         document.getElementById('changeColorBtn').addEventListener('click', () => {
             const randomColor = getRandomColor();
             document.getElementById('fullScreenDiv').style.backgroundColor = randomColor;

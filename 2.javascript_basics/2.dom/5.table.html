@@ -47,12 +47,21 @@
 
             // 테이블 셀의 배경색을 변경하는 함수입니다.
             var cells = document.getElementsByTagName("td");
-            // for (const cell of cells) {
-            //     cell.style.backgroundColor = "lightblue";
-            // }
+                        
+            // 예1) for
             for (var i = 0; i < cells.length; i++) {
                 cells[i].style.backgroundColor = "lightblue"; // 변경할 색상을 여기에 입력하세요.
             }
+
+            // 예2) for .. of  (BEST)
+            // for (const cell of cells) {
+            //     cell.style.backgroundColor = "lightblue";
+            // }
+
+            // 예3) foreach : HTMLCollection → 배열로 변환
+            // Array.from(cells).forEach(cell => {
+            //     cell.style.backgroundColor = "lightblue";
+            // });
         }
         
         function changeOddCellColor() {

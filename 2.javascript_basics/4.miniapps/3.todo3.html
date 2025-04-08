@@ -4,54 +4,19 @@
     <title>To-Do List</title>
     <style>
         /* To-Do 리스트 항목 스타일 */
-        #todo-list {
-            list-style-type: none; /* 목록 스타일 없음 (bullet 제거) */
-            padding-left: 0; /* 기본 패딩 제거 */
-        }
-        
         #todo-list li {
-            margin-bottom: 10px; /* 아래쪽 마진 */
-            font-size: 20px; /* 글자 크기 */
+            margin-bottom: 5px; /* 아래쪽 마진 */
+            cursor: pointer; /* 마우스 오버 시 커서를 손가락 모양으로 변경 */
         }
         /* 완료된 항목에 적용될 스타일 */
         #todo-list li.completed {
             text-decoration: line-through; /* 취소선 */
         }
-        /* 체크박스와 삭제 아이콘 사이의 간격 */
-        .todo-text {
-            margin-left: 10px;
-        }
-        .delete-icon {
-            cursor: pointer;
-            color: red;
-            margin-left: 10px; /* 텍스트와 아이콘 사이의 간격 */
-        }
-
-        /* 입력박스 크기 조정 */
-        input[type="text"] {
-            font-size: 18px;
-            padding: 5px;
-        }
-
-        /* 체크박스 크기 조정 */
-        input[type="checkbox"] {
-            /* 아래 둘중 하나: width x height 또는 transform */
-            width: 15px; /* 너비 설정 */
-            height: 15px; /* 높이 설정 */
-            transform: scale(1.5); /* 크기 조정 */
-        }
-
-        button {
-            font-size: 18px;
-            padding: 5px 10px;
-        }
     </style>
 </head>
 <body>
     <h1>To-Do List</h1>
-    <!-- 새로운 To-Do 항목을 입력받는 텍스트 필드 -->
     <input type="text" id="new-todo" placeholder="New to-do">
-    <!-- To-Do 항목을 추가하는 버튼 -->
     <button id="add-todo">Add</button>
     <!-- To-Do 리스트를 표시하는 비순서형 목록 -->
     <ul id="todo-list"></ul>
@@ -61,40 +26,39 @@
         document.getElementById('add-todo').addEventListener('click', function() {
             // 입력 필드의 값을 가져옴
             const newTodo = document.getElementById('new-todo').value;
-
+            
             // 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
             if (newTodo.trim() === '') return;
 
             // 새로운 리스트 항목(li) 요소 생성
-            const li = document.createElement('li');
+            const new_li = document.createElement('li');
+            new_li.innerHTML = `${newTodo} <button class="delete-btn">삭제</button>`;
 
-            // 체크박스 생성 및 추가
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.addEventListener('change', function() {
-                li.classList.toggle('completed');
+            // 완료 토글 - 리스트 항목에 클릭 이벤트 리스너 추가
+            new_li.addEventListener('click', function() {
+                // 항목을 클릭하면 'completed' 클래스를 토글 (추가/제거)
+                new_li.classList.toggle('completed');
             });
-            li.appendChild(checkbox);
 
-            // 텍스트 노드 생성 및 추가
-            const todoText = document.createElement('span');
-            todoText.textContent = newTodo;
-            todoText.classList.add('todo-text');
-            li.appendChild(todoText);
-
-            // 삭제 아이콘 생성 및 추가
-            const deleteIcon = document.createElement('span');
-            deleteIcon.textContent = '❌';
-            deleteIcon.classList.add('delete-icon');
-            deleteIcon.addEventListener('click', function() {
-                li.remove();
+            // 삭제 버튼 기능 추가
+            const deleteBtn = new_li.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 부모 li의 클릭 이벤트가 발생하지 않게 막음
+                new_li.remove(); // li 삭제
             });
-            li.appendChild(deleteIcon);
 
             // 새로운 항목을 To-Do 리스트에 추가
-            document.getElementById('todo-list').appendChild(li);
-            // 입력 필드를 비워서 초기화
+            document.getElementById('todo-list').appendChild(new_li);
+            
+            // 기능개선1: 입력 필드를 비워서 초기화
             document.getElementById('new-todo').value = '';
+        });
+
+        // 기능개선2: Enter 키로도 추가 가능하게 처리
+        document.getElementById('new-todo').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('add-todo').click(); // 버튼 클릭과 동일한 동작 실행
+            }
         });
     </script>
 </body>
