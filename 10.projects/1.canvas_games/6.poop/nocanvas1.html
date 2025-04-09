@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>똥피하기 게임</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+        }
+
+        #game {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            background: linear-gradient(#aee, #ddf);
+            border: 3px solid #fff;
+            overflow: hidden;
+        }
+
+        #player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            bottom: 20px;
+            left: 175px;
+        }
+
+        .poop {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: brown;
+            border-radius: 50%;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #000;
+        }
+
+        #gameOver {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="player"></div>
+        <div id="score">Score: 0</div>
+        <div id="gameOver">Game Over!</div>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const game = document.getElementById('game');
+        const scoreEl = document.getElementById('score');
+        const gameOverEl = document.getElementById('gameOver');
+
+        let playerX = 175;
+        let velocity = 0;
+        const acceleration = 0.7;
+        const friction = 0.92;
+        const playerWidth = 50;
+        const gameWidth = 400;
+
+        let keys = {};
+        let score = 0;
+        let gameRunning = true;
+
+        document.addEventListener('keydown', (e) => (keys[e.key] = true));
+        document.addEventListener('keyup', (e) => (keys[e.key] = false));
+
+        function movePlayer() {
+            if (keys['ArrowLeft']) velocity -= acceleration;
+            if (keys['ArrowRight']) velocity += acceleration;
+
+            velocity *= friction;
+            playerX += velocity;
+
+            // 벽 충돌
+            if (playerX < 0) {
+                playerX = 0;
+                velocity = 0;
+            }
+            if (playerX > gameWidth - playerWidth) {
+                playerX = gameWidth - playerWidth;
+                velocity = 0;
+            }
+
+            player.style.left = playerX + 'px';
+        }
+
+        function createPoop() {
+            if (!gameRunning) return;
+            const poop = document.createElement('div');
+            poop.className = 'poop';
+            poop.style.left = Math.floor(Math.random() * (gameWidth - 30)) + 'px';
+            poop.style.top = '0px';
+            game.appendChild(poop);
+
+            let poopY = 0;
+            const fallSpeed = 4;
+
+            const poopInterval = setInterval(() => {
+                if (!gameRunning) {
+                    clearInterval(poopInterval);
+                    poop.remove();
+                    return;
+                }
+
+                poopY += fallSpeed;
+                poop.style.top = poopY + 'px';
+
+                // 충돌 감지
+                const poopRect = poop.getBoundingClientRect();
+                const playerRect = player.getBoundingClientRect();
+
+                const isHit = !(
+                    poopRect.right < playerRect.left ||
+                    poopRect.left > playerRect.right ||
+                    poopRect.bottom < playerRect.top ||
+                    poopRect.top > playerRect.bottom
+                );
+
+                if (isHit) {
+                    gameOver();
+                }
+
+                if (poopY > 600) {
+                    poop.remove();
+                    clearInterval(poopInterval);
+                    score++;
+                    scoreEl.textContent = `Score: ${score}`;
+                }
+            }, 20);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            gameOverEl.style.display = 'flex';
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                movePlayer();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        setInterval(() => {
+            if (gameRunning) createPoop();
+        }, 1000); // 똥 생성 간격
+
+        gameLoop();
+    </script>
+</body>
+</html>

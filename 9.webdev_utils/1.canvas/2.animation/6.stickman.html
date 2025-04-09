@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>스틱맨 달리기</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            background: #eef;
+            border: 3px solid white;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let stickman = {
+            x: 50,
+            y: 300,
+            vx: 2,
+            step: 0,
+        };
+
+        function drawStickman(x, y, step) {
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 4;
+
+            // 머리
+            ctx.beginPath();
+            ctx.arc(x, y - 30, 10, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 몸통
+            ctx.beginPath();
+            ctx.moveTo(x, y - 20);
+            ctx.lineTo(x, y + 10);
+            ctx.stroke();
+
+            // 팔 흔들기 (sin 기반)
+            const swing = Math.sin(step / 5) * 10;
+            ctx.beginPath();
+            ctx.moveTo(x, y - 15);
+            ctx.lineTo(x - 15 + swing, y);
+            ctx.moveTo(x, y - 15);
+            ctx.lineTo(x + 15 - swing, y);
+            ctx.stroke();
+
+            // 다리 흔들기
+            ctx.beginPath();
+            ctx.moveTo(x, y + 10);
+            ctx.lineTo(x - 10 + swing, y + 30);
+            ctx.moveTo(x, y + 10);
+            ctx.lineTo(x + 10 - swing, y + 30);
+            ctx.stroke();
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawStickman(stickman.x, stickman.y, stickman.step);
+
+            // 이동
+            stickman.x += stickman.vx;
+            stickman.step++;
+
+            // 벽 튕기기
+            if (stickman.x < 20 || stickman.x > canvas.width - 20) {
+                stickman.vx *= -1;
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

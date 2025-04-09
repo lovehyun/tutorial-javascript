@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>똥피하기 게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            background: linear-gradient(#aee, #ddf);
+            border: 3px solid #fff;
+            overflow: hidden;
+        }
+
+        #player {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: red;
+            border-radius: 50%;
+            bottom: 20px;
+            left: 175px;
+        }
+
+        .poop {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: brown;
+            border-radius: 50%;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #000;
+        }
+
+        #gameOver {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            z-index: 2;
+        }
+
+        /* 모바일 터치 영역 */
+        .touch-zone {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #leftZone {
+            left: 0;
+        }
+        #rightZone {
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="game">
+        <div id="player"></div>
+        <div id="score">Score: 0</div>
+        <div id="gameOver">Game Over!</div>
+
+        <!-- 터치 영역 -->
+        <div class="touch-zone" id="leftZone"></div>
+        <div class="touch-zone" id="rightZone"></div>
+
+        <!-- 오디오 -->
+        <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/10/11/audio_104a960c98.mp3?filename=cheerful-whistling-song-121758.mp3" loop autoplay></audio>
+        <audio id="hitSound" src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_3ae4fc4f13.mp3?filename=wrong-2-46134.mp3"></audio>
+    </div>
+
+    <script>
+        const player = document.getElementById('player');
+        const game = document.getElementById('game');
+        const scoreEl = document.getElementById('score');
+        const gameOverEl = document.getElementById('gameOver');
+        const bgm = document.getElementById('bgm');
+        const hitSound = document.getElementById('hitSound');
+
+        let playerX = 175;
+        let velocity = 0;
+        const acceleration = 0.7;
+        const friction = 0.92;
+        const playerWidth = 50;
+        const gameWidth = 400;
+
+        let keys = {};
+        let score = 0;
+        let gameRunning = true;
+        let poopSpeed = 4;
+
+        document.addEventListener('keydown', (e) => (keys[e.key] = true));
+        document.addEventListener('keyup', (e) => (keys[e.key] = false));
+
+        // 모바일 터치 대응
+        document.getElementById('leftZone').addEventListener('touchstart', () => (keys['ArrowLeft'] = true));
+        document.getElementById('leftZone').addEventListener('touchend', () => (keys['ArrowLeft'] = false));
+        document.getElementById('rightZone').addEventListener('touchstart', () => (keys['ArrowRight'] = true));
+        document.getElementById('rightZone').addEventListener('touchend', () => (keys['ArrowRight'] = false));
+
+        function movePlayer() {
+            if (keys['ArrowLeft']) velocity -= acceleration;
+            if (keys['ArrowRight']) velocity += acceleration;
+
+            velocity *= friction;
+            playerX += velocity;
+
+            if (playerX < 0) {
+                playerX = 0;
+                velocity = 0;
+            }
+            if (playerX > gameWidth - playerWidth) {
+                playerX = gameWidth - playerWidth;
+                velocity = 0;
+            }
+
+            player.style.left = playerX + 'px';
+        }
+
+        function createPoop() {
+            if (!gameRunning) return;
+
+            const poop = document.createElement('div');
+            poop.className = 'poop';
+            poop.style.left = Math.floor(Math.random() * (gameWidth - 30)) + 'px';
+            poop.style.top = '0px';
+            game.appendChild(poop);
+
+            let poopY = 0;
+
+            const poopInterval = setInterval(() => {
+                if (!gameRunning) {
+                    clearInterval(poopInterval);
+                    poop.remove();
+                    return;
+                }
+
+                poopY += poopSpeed;
+                poop.style.top = poopY + 'px';
+
+                const poopRect = poop.getBoundingClientRect();
+                const playerRect = player.getBoundingClientRect();
+
+                const isHit = !(
+                    poopRect.right < playerRect.left ||
+                    poopRect.left > playerRect.right ||
+                    poopRect.bottom < playerRect.top ||
+                    poopRect.top > playerRect.bottom
+                );
+
+                if (isHit) {
+                    hitSound.play();
+                    gameOver();
+                }
+
+                if (poopY > 600) {
+                    poop.remove();
+                    clearInterval(poopInterval);
+                    score++;
+                    scoreEl.textContent = `Score: ${score}`;
+
+                    // 난이도 조절
+                    if (score % 10 === 0) {
+                        poopSpeed += 1;
+                    }
+                }
+            }, 20);
+        }
+
+        function gameOver() {
+            gameRunning = false;
+            gameOverEl.style.display = 'flex';
+            bgm.pause();
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                movePlayer();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        setInterval(() => {
+            if (gameRunning) createPoop();
+        }, 1000); // 똥 생성 주기
+
+        gameLoop();
+    </script>
+</body>
+</html>

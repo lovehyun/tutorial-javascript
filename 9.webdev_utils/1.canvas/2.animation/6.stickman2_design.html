@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stickman Runner</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 400px;
+        }
+        
+        canvas {
+            border: 2px solid #333;
+            background-color: #fff;
+        }
+        
+        #instructions {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="instructions">Use left and right arrow keys to move the stickman</div>
+    </div>
+
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const frameRate = 60;
+        
+        // Stickman properties
+        const stickman = {
+            x: 400,
+            y: 300,
+            width: 50,
+            height: 80,
+            speed: 5,
+            direction: 1, // 1 for right, -1 for left
+            isMoving: false,
+            frameCount: 0,
+            currentFrame: 0,
+            totalFrames: 6, // Number of animation frames
+            animationSpeed: 4 // Lower is faster
+        };
+        
+        // Ground level
+        const groundY = 350;
+        
+        // Input handling
+        const keys = {};
+        
+        document.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                stickman.isMoving = true;
+                
+                if (e.key === 'ArrowLeft') {
+                    stickman.direction = -1;
+                } else {
+                    stickman.direction = 1;
+                }
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            keys[e.key] = false;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                // Only stop if the other direction key isn't pressed
+                if (!(keys['ArrowLeft'] || keys['ArrowRight'])) {
+                    stickman.isMoving = false;
+                    stickman.currentFrame = 0;
+                }
+            }
+        });
+        
+        // Draw background
+        function drawBackground() {
+            // Sky
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, groundY);
+            
+            // Ground
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            
+            // Sun
+            ctx.fillStyle = '#FFFF00';
+            ctx.beginPath();
+            ctx.arc(700, 80, 40, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Draw stickman frame
+        function drawStickman() {
+            // Save context for transformation
+            ctx.save();
+            
+            // Translate to stickman position
+            ctx.translate(stickman.x, stickman.y);
+            
+            // Scale for direction (flip horizontally if moving left)
+            ctx.scale(stickman.direction, 1);
+            
+            // Select frame based on movement
+            if (stickman.isMoving) {
+                // Update frame counter
+                stickman.frameCount++;
+                
+                if (stickman.frameCount >= stickman.animationSpeed) {
+                    stickman.frameCount = 0;
+                    stickman.currentFrame = (stickman.currentFrame + 1) % stickman.totalFrames;
+                }
+                
+                drawRunningFrame(stickman.currentFrame);
+            } else {
+                // Standing pose
+                drawStandingStickman();
+            }
+            
+            // Restore context
+            ctx.restore();
+        }
+        
+        // Draw standing stickman
+        function drawStandingStickman() {
+            // Head
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, -30, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(0, 10);
+            ctx.stroke();
+            
+            // Arms
+            ctx.beginPath();
+            ctx.moveTo(-15, -10);
+            ctx.lineTo(15, -10);
+            ctx.stroke();
+            
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(-10, 40);
+            ctx.moveTo(0, 10);
+            ctx.lineTo(10, 40);
+            ctx.stroke();
+        }
+        
+        // Draw running animation frames
+        function drawRunningFrame(frame) {
+            // Head (remains the same in all frames)
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, -30, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Body (remains the same in all frames)
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(0, 10);
+            ctx.stroke();
+            
+            // Arms and legs change based on frame
+            switch(frame) {
+                case 0:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-15, -20);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(15, 0);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-10, 30);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(10, 40);
+                    ctx.stroke();
+                    break;
+                    
+                case 1:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-10, -15);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(10, -5);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-5, 20);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(15, 35);
+                    ctx.stroke();
+                    break;
+                    
+                case 2:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-5, -5);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(5, -15);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-5, 15);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(15, 25);
+                    ctx.stroke();
+                    break;
+                    
+                case 3:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(15, -20);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-15, 0);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(10, 30);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-10, 40);
+                    ctx.stroke();
+                    break;
+                    
+                case 4:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(10, -15);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-10, -5);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(5, 20);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-15, 35);
+                    ctx.stroke();
+                    break;
+                    
+                case 5:
+                    // Arms
+                    ctx.beginPath();
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(5, -5);
+                    ctx.moveTo(0, -10);
+                    ctx.lineTo(-5, -15);
+                    ctx.stroke();
+                    
+                    // Legs
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(5, 15);
+                    ctx.moveTo(0, 10);
+                    ctx.lineTo(-15, 25);
+                    ctx.stroke();
+                    break;
+            }
+        }
+        
+        // Update game state
+        function update() {
+            // Move stickman based on input
+            if (keys['ArrowLeft']) {
+                stickman.x -= stickman.speed;
+                stickman.direction = -1;
+                stickman.isMoving = true;
+            } else if (keys['ArrowRight']) {
+                stickman.x += stickman.speed;
+                stickman.direction = 1;
+                stickman.isMoving = true;
+            } else {
+                stickman.isMoving = false;
+            }
+            
+            // Keep stickman within canvas bounds
+            if (stickman.x < stickman.width / 2) {
+                stickman.x = stickman.width / 2;
+            } else if (stickman.x > canvas.width - stickman.width / 2) {
+                stickman.x = canvas.width - stickman.width / 2;
+            }
+        }
+        
+        // Main game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update game state
+            update();
+            
+            // Draw game elements
+            drawBackground();
+            drawStickman();
+            
+            // Request next frame
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>

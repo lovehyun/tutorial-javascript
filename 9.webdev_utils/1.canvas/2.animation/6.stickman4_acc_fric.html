@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Stickman Runner</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 800px;
+            height: 400px;
+        }
+        
+        canvas {
+            border: 2px solid #333;
+            background-color: #fff;
+        }
+        
+        #instructions {
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="instructions">← 왼쪽 화살표키와 → 오른쪽 화살표키로 스틱맨을 이동하세요</div>
+    </div>
+
+    <script>
+        // Game variables
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Stickman properties
+        const stickman = {
+            x: 400,
+            y: 300,
+            width: 50,
+            height: 80,
+            velocity: 0,
+            maxSpeed: 15,         
+            acceleration: 0.7,    // 가속도
+            friction: 0.97,       // 마찰 계수 감소 (미끄러지는 시간 단축)
+            directionChangePenalty: 0.3, // 방향 전환 시 감속 페널티
+            direction: 1, // 1 for right, -1 for left
+            isMoving: false,
+            frameCount: 0,
+            currentFrame: 0,
+            totalFrames: 8, // Number of animation frames
+            animationSpeed: 3 // Lower is faster
+        };
+        
+        // Ground level
+        const groundY = 350;
+        
+        // Input handling
+        const keys = {};
+        
+        document.addEventListener('keydown', function(e) {
+            keys[e.key] = true;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                stickman.isMoving = true;
+                
+                if (e.key === 'ArrowLeft') {
+                    stickman.direction = -1;
+                } else {
+                    stickman.direction = 1;
+                }
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            keys[e.key] = false;
+            
+            // The key release doesn't immediately stop the movement now
+            // It will slow down gradually due to friction
+        });
+        
+        // Draw background
+        function drawBackground() {
+            // Sky
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(0, 0, canvas.width, groundY);
+            
+            // Ground
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+            
+            // Sun
+            ctx.fillStyle = '#FFFF00';
+            ctx.beginPath();
+            ctx.arc(700, 80, 40, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Draw stickman frame
+        function drawStickman() {
+            // Save context for transformation
+            ctx.save();
+            
+            // Translate to stickman position
+            ctx.translate(stickman.x, stickman.y);
+            
+            // Scale for direction (flip horizontally if moving left, corrected to match movement direction)
+            ctx.scale(-stickman.direction, 1);
+            
+            // Select frame based on movement
+            if (stickman.isMoving) {
+                // Update frame counter
+                stickman.frameCount++;
+                
+                if (stickman.frameCount >= stickman.animationSpeed) {
+                    stickman.frameCount = 0;
+                    stickman.currentFrame = (stickman.currentFrame + 1) % stickman.totalFrames;
+                }
+                
+                drawRunningFrame(stickman.currentFrame);
+            } else {
+                // Standing pose
+                drawStandingStickman();
+            }
+            
+            // Restore context
+            ctx.restore();
+        }
+        
+        // Draw standing stickman with 45-degree angled arms
+        function drawStandingStickman() {
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(0, -40, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(0, -30);
+            ctx.lineTo(0, 10);
+            ctx.stroke();
+            
+            // Arms with 45-degree angle (two joints)
+            // Upper arm - right
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(10, -10);
+            
+            // Lower arm - right
+            ctx.lineTo(20, 0);
+            ctx.stroke();
+            
+            // Upper arm - left
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(-10, -10);
+            
+            // Lower arm - left
+            ctx.lineTo(-20, 0);
+            ctx.stroke();
+            
+            // Legs (two joints)
+            // Upper leg - right
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(8, 25);
+            
+            // Lower leg - right
+            ctx.lineTo(12, 40);
+            ctx.stroke();
+            
+            // Upper leg - left
+            ctx.beginPath();
+            ctx.moveTo(0, 10);
+            ctx.lineTo(-8, 25);
+            
+            // Lower leg - left
+            ctx.lineTo(-12, 40);
+            ctx.stroke();
+        }
+        
+        // Draw running animation frames with two-joint limbs
+        function drawRunningFrame(frame) {
+            // Common elements for all frames
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            // Head
+            ctx.beginPath();
+            ctx.arc(0, -40, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(0, -30);
+            ctx.lineTo(0, 10);
+            ctx.stroke();
+            
+            // Running animations with two joints for arms and legs
+            switch(frame) {
+                case 0:
+                    // Right Arm (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(12, -25); // Elbow
+                    ctx.lineTo(20, -15); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-15, -15); // Elbow
+                    ctx.lineTo(-25, -25); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(15, 20); // Knee
+                    ctx.lineTo(25, 25); // Foot (lowered)
+                    ctx.stroke();
+                    
+                    // Left Leg (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(-10, 25); // Knee
+                    ctx.lineTo(-15, 35); // Foot (lowered)
+                    ctx.stroke();
+                    break;
+                
+                case 1:
+                    // Right Arm (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(15, -22); // Elbow
+                    ctx.lineTo(25, -10); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-12, -10); // Elbow
+                    ctx.lineTo(-20, -20); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(15, 18); // Knee
+                    ctx.lineTo(22, 15); // Foot (lowered)
+                    ctx.stroke();
+                    
+                    // Left Leg (backward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(-5, 25); // Knee
+                    ctx.lineTo(-12, 30); // Foot (lowered)
+                    ctx.stroke();
+                    break;
+                
+                case 2:
+                    // Right Arm (forward-to-backward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(15, -15); // Elbow
+                    ctx.lineTo(20, 0); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (backward-to-forward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-5, -10); // Elbow
+                    ctx.lineTo(-10, -5); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (forward to down)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(10, 5); // Knee
+                    ctx.lineTo(15, 15); // Foot
+                    ctx.stroke();
+                    
+                    // Left Leg (starting forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(0, 25); // Knee
+                    ctx.lineTo(-5, 30); // Foot
+                    ctx.stroke();
+                    break;
+                
+                case 3:
+                    // Right Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(10, -10); // Elbow
+                    ctx.lineTo(5, 5); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (starting forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(0, -15); // Elbow
+                    ctx.lineTo(-5, 0); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (down position)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(5, 20); // Knee
+                    ctx.lineTo(10, 30); // Foot
+                    ctx.stroke();
+                    
+                    // Left Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(5, 15); // Knee
+                    ctx.lineTo(0, 25); // Foot
+                    ctx.stroke();
+                    break;
+                
+                case 4:
+                    // Right Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-15, -15); // Elbow
+                    ctx.lineTo(-25, -25); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(12, -25); // Elbow
+                    ctx.lineTo(20, -15); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(-10, 25); // Knee
+                    ctx.lineTo(-15, 35); // Foot (lowered)
+                    ctx.stroke();
+                    
+                    // Left Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(15, 20); // Knee
+                    ctx.lineTo(25, 25); // Foot (lowered)
+                    ctx.stroke();
+                    break;
+                
+                case 5:
+                    // Right Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-12, -10); // Elbow
+                    ctx.lineTo(-20, -20); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(15, -22); // Elbow
+                    ctx.lineTo(25, -10); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (backward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(-5, 25); // Knee
+                    ctx.lineTo(-12, 30); // Foot (lowered)
+                    ctx.stroke();
+                    
+                    // Left Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(15, 18); // Knee
+                    ctx.lineTo(22, 15); // Foot (lowered and position adjusted)
+                    ctx.stroke();
+                    break;
+                
+                case 6:
+                    // Right Arm (backward-to-forward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(-5, -10); // Elbow
+                    ctx.lineTo(-10, -5); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (forward-to-backward transition)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(15, -15); // Elbow
+                    ctx.lineTo(20, 0); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (starting forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(0, 25); // Knee
+                    ctx.lineTo(-5, 30); // Foot
+                    ctx.stroke();
+                    
+                    // Left Leg (forward to down)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(10, 5); // Knee
+                    ctx.lineTo(15, 15); // Foot
+                    ctx.stroke();
+                    break;
+                
+                case 7:
+                    // Right Arm (starting forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(0, -15); // Elbow
+                    ctx.lineTo(-5, 0); // Hand
+                    ctx.stroke();
+                    
+                    // Left Arm (backward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, -20); // Shoulder
+                    ctx.lineTo(10, -10); // Elbow
+                    ctx.lineTo(5, 5); // Hand
+                    ctx.stroke();
+                    
+                    // Right Leg (forward swing)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(5, 15); // Knee
+                    ctx.lineTo(0, 25); // Foot
+                    ctx.stroke();
+                    
+                    // Left Leg (down position)
+                    ctx.beginPath();
+                    ctx.moveTo(0, 10); // Hip
+                    ctx.lineTo(5, 20); // Knee
+                    ctx.lineTo(10, 30); // Foot
+                    ctx.stroke();
+                    break;
+            }
+        }
+        
+        // Update game state
+        function update() {
+            // Apply minimal friction when no keys are pressed
+            if (!keys['ArrowLeft'] && !keys['ArrowRight']) {
+                stickman.velocity *= stickman.friction;
+            }
+            
+            // Consider the stickman at rest if the velocity is very small
+            if (Math.abs(stickman.velocity) < 0.1) {
+                stickman.velocity = 0;
+            }
+            
+            // Track desired movement direction based on key press
+            let desiredDirection = 0;
+            if (keys['ArrowLeft']) {
+                desiredDirection = -1;
+                stickman.isMoving = true;
+            } else if (keys['ArrowRight']) {
+                desiredDirection = 1;
+                stickman.isMoving = true;
+            } else if (Math.abs(stickman.velocity) < 0.5) {
+                // Only stop animation if nearly stopped
+                stickman.isMoving = false;
+            }
+            
+            // Update visual direction immediately when keys are pressed
+            if (desiredDirection !== 0) {
+                stickman.direction = desiredDirection;
+            }
+            
+            // Apply acceleration based on input - with strong inertia
+            if (desiredDirection === -1) { // Left key pressed
+                // If going right, apply only friction to gradually slow down
+                if (stickman.velocity > 0) {
+                    // Still sliding right due to inertia but trying to go left
+                    stickman.velocity *= stickman.friction;
+                    // Apply stronger counter-force
+                    stickman.velocity -= stickman.acceleration * 0.5;
+                } else {
+                    // Already going left - normal acceleration
+                    stickman.velocity -= stickman.acceleration;
+                }
+            } else if (desiredDirection === 1) { // Right key pressed
+                // If going left, apply only friction to gradually slow down
+                if (stickman.velocity < 0) {
+                    // Still sliding left due to inertia but trying to go right
+                    stickman.velocity *= stickman.friction;
+                    // Apply stronger counter-force
+                    stickman.velocity += stickman.acceleration * 0.5;
+                } else {
+                    // Already going right - normal acceleration
+                    stickman.velocity += stickman.acceleration;
+                }
+            }
+            
+            // Limit max speed
+            if (stickman.velocity > stickman.maxSpeed) {
+                stickman.velocity = stickman.maxSpeed;
+            } else if (stickman.velocity < -stickman.maxSpeed) {
+                stickman.velocity = -stickman.maxSpeed;
+            }
+            
+            // Update position
+            stickman.x += stickman.velocity;
+            
+            // Keep stickman within canvas bounds with strong bounce effect
+            if (stickman.x < stickman.width / 2) {
+                stickman.x = stickman.width / 2;
+                stickman.velocity = -stickman.velocity * 0.4; // Stronger bounce
+            } else if (stickman.x > canvas.width - stickman.width / 2) {
+                stickman.x = canvas.width - stickman.width / 2;
+                stickman.velocity = -stickman.velocity * 0.4; // Stronger bounce
+            }
+            
+            // Adjust animation speed based on movement speed
+            stickman.animationSpeed = Math.max(1, 4 - Math.abs(stickman.velocity) / 3);
+        }
+        
+        // Main game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Update game state
+            update();
+            
+            // Draw game elements
+            drawBackground();
+            drawStickman();
+            
+            // Request next frame
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
