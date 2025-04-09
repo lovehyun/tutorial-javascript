@@ -11,8 +11,10 @@
 
     <script>
         function startRecognition() {
+            // window.SpeechRecognition: 최신 표준 SpeechRecognition API를 의미
+            // window.webkitSpeechRecognition: 크롬 등 일부 브라우저에서 아직 SpeechRecognition 대신 접두사 webkit이 붙은 버전을 사용함
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
+            recognition.lang = 'en-US'; // 'ko-KR'
 
             recognition.onresult = function(event) {
                 const transcript = event.results[0][0].transcript;

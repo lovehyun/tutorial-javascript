@@ -40,6 +40,14 @@
             ball.y += ball.dy;
 
             // 캔버스 경계에서 반사하도록 함
+            // if (ball.x > canvas.width || ball.x < 0) {
+            //     ball.dx = -ball.dx;
+            // }
+
+            // if (ball.y > canvas.height || ball.y < 0) {
+            //     ball.dy = -ball.dy;
+            // }
+
             if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) {
                 ball.dx = -ball.dx;
             }

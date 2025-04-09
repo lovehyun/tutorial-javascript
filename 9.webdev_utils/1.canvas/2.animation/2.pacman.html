@@ -33,7 +33,7 @@
         // let endAngle = 0.8 * Math.PI;
 
         let angleIncrement = 0.02 * Math.PI; // 각도 증가량을 줄여서 움직임을 느리게 설정
-        let direction = 1;
+        let mouthOpen = 1; /* 1 = open, -1 = close */
 
         function drawPacman() {
             context.clearRect(0, 0, canvas.width, canvas.height); // 캔버스 초기화
@@ -49,11 +49,11 @@
 
         function updateAngles() {
             if (startAngle <= 0 || startAngle >= 0.25 * Math.PI) {
-            // if (startAngle <= 1 * Math.PI || startAngle >= 1.25 * Math.PI) {
-                direction *= -1;
+            // if (startAngle <= 1 * Math.PI || startAngle >= 1.25 * Math.PI) { // 굳이 위에 각도는 안봐도 대칭으로...
+                mouthOpen *= -1;
             }
-            startAngle += direction * angleIncrement;
-            endAngle -= direction * angleIncrement;
+            startAngle += mouthOpen * angleIncrement;
+            endAngle -= mouthOpen * angleIncrement;
         }
 
         function animate() {

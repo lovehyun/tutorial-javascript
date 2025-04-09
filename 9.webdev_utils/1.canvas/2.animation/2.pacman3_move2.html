@@ -42,7 +42,7 @@
             directionX: 1,
             directionY: 0,
             speed: 3,  // 이동 속도 설정
-            mouthOpen: true,
+            mouthOpen: 1,  // 1 = open, -1 = close
             minStart: angles.right.minStart,
             maxStart: angles.right.maxStart,
         };
@@ -59,51 +59,45 @@
             context.closePath();
         }
 
+        function updateAngles() {
+            if (pacman.startAngle <= pacman.minStart || pacman.startAngle >= pacman.maxStart) {
+            // if (startAngle <= 1 * Math.PI || startAngle >= 1.25 * Math.PI) { // 굳이 위에 각도는 안봐도 대칭으로...
+                pacman.mouthOpen *= -1;
+            }
+            pacman.startAngle += pacman.mouthOpen * pacman.angleIncrement;
+            pacman.endAngle -= pacman.mouthOpen * pacman.angleIncrement;
+        }
+
         function updatePacmanPosition() {
             pacman.x += pacman.directionX * pacman.speed;
             pacman.y += pacman.directionY * pacman.speed;
 
-            // 화면을 벗어나지 않도록 제한 (예시로 벽은 캔버스 크기 내부로 가정)
-            if (pacman.x < pacman.radius) {
-                pacman.x = pacman.radius;
-            }
-            if (pacman.x > canvas.width - pacman.radius) {
-                pacman.x = canvas.width - pacman.radius;
-            }
-            if (pacman.y < pacman.radius) {
-                pacman.y = pacman.radius;
-            }
-            if (pacman.y > canvas.height - pacman.radius) {
-                pacman.y = canvas.height - pacman.radius;
-            }
-
-            // 화면을 벗어나서 상하좌우로 화면 넘어가서 이동
-            // if (pacman.x < -pacman.radius) {
-            //     pacman.x = canvas.width + pacman.radius;
+            // 1. 화면을 벗어나지 않도록 제한 (예시로 벽은 캔버스 크기 내부로 가정)
+            // if (pacman.x < pacman.radius) {
+            //     pacman.x = pacman.radius;
             // }
-            // if (pacman.x > canvas.width + pacman.radius) {
-            //     pacman.x = -pacman.radius;
+            // if (pacman.x > canvas.width - pacman.radius) {
+            //     pacman.x = canvas.width - pacman.radius;
             // }
-            // if (pacman.y < -pacman.radius) {
-            //     pacman.y = canvas.height + pacman.radius;
+            // if (pacman.y < pacman.radius) {
+            //     pacman.y = pacman.radius;
             // }
-            // if (pacman.y > canvas.height + pacman.radius) {
-            //     pacman.y = -pacman.radius;
+            // if (pacman.y > canvas.height - pacman.radius) {
+            //     pacman.y = canvas.height - pacman.radius;
             // }
 
-            // Pac-Man 입 모양 애니메이션 조절
-            if (pacman.mouthOpen) {
-                pacman.startAngle += pacman.angleIncrement;
-                pacman.endAngle -= pacman.angleIncrement;
-                if (pacman.startAngle >= pacman.maxStart) {
-                    pacman.mouthOpen = false;
-                }
-            } else {
-                pacman.startAngle -= pacman.angleIncrement;
-                pacman.endAngle += pacman.angleIncrement;
-                if (pacman.startAngle <= pacman.minStart) {
-                    pacman.mouthOpen = true;
-                }
+            // 2. 화면을 벗어나서 상하좌우로 화면 넘어가서 이동
+            if (pacman.x < -pacman.radius) {
+                pacman.x = canvas.width + pacman.radius;
+            }
+            if (pacman.x > canvas.width + pacman.radius) {
+                pacman.x = -pacman.radius;
+            }
+            if (pacman.y < -pacman.radius) {
+                pacman.y = canvas.height + pacman.radius;
+            }
+            if (pacman.y > canvas.height + pacman.radius) {
+                pacman.y = -pacman.radius;
             }
         }
 
@@ -148,8 +142,9 @@
         }
 
         function animate() {
-            updatePacmanPosition();
             drawPacman();
+            updateAngles();
+            updatePacmanPosition();
             requestAnimationFrame(animate);
         }
 
