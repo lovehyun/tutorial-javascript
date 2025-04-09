@@ -1,32 +1,41 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Pie Chart Example</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    </head>
-    <body>
-        <canvas id="pieChart" width="400" height="200"></canvas>
+<head>
+    <title>Pie Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="pieChart" width="400" height="200"></canvas>
 
-        <script>
-            var ctx = document.getElementById('pieChart').getContext('2d');
-            var pieChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Red', 'Blue', 'Yellow'],
-                    datasets: [
-                        {
-                            data: [30, 20, 50],
-                            backgroundColor: ['red', 'blue', 'yellow'],
-                        },
-                    ],
-                },
-                // 1. 기본 : 반응형 무지하고 화면 꽉 채움
-                options: {},
-                // 2. 반응형 끄고 기본 캔바스 사이즈 유지
-                // options: {
-                //     responsive: false, // 응답형 비활성화
-                // },
-            });
-        </script>
-    </body>
+    <script>
+        // 1. 데이터 정의
+        const data = {
+            labels: ['Red', 'Blue', 'Yellow'],
+            datasets: [{
+                label: 'My Dataset',
+                data: [30, 20, 50],
+                // backgroundColor: ['red', 'blue', 'yellow'],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                ],
+                hoverOffset: 10 // 마우스 오버 시 튀어나오는 거리
+            }]
+        };
+
+        // 2. 설정 정의
+        const config = {
+            type: 'pie', // 도넛 차트의 경우 'doughnut' 사용
+            data: data,
+            options: {
+                // responsive: false // 반응형 비활성화
+            }
+        };
+
+        // 3. 차트 생성
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(ctx, config);
+    </script>
+</body>
 </html>

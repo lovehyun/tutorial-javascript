@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Area Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="areaChart" width="600" height="300"></canvas>
+
+    <script>
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Sales',
+                data: [30, 50, 40, 60, 75, 70, 90],
+                fill: true, // 이게 "area chart"의 핵심
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.4
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Area Chart Example'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+
+        const ctx = document.getElementById('areaChart').getContext('2d');
+        new Chart(ctx, config);
+    </script>
+</body>
+</html>

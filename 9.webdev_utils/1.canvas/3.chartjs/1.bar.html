@@ -1,28 +1,47 @@
+<!-- https://www.chartjs.org/docs/latest/ 
+     https://www.chartjs.org/docs/latest/charts/bar.html -->
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Bar Chart Example</title>
+        <title>Chart.js 예제</title>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <body>
-        <canvas id="barChart" width="400" height="200"></canvas>
+        <canvas id="myChart"></canvas>
 
         <script>
-            var ctx = document.getElementById('barChart').getContext('2d');
-            var barChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [
-                        {
-                            label: 'Data',
-                            data: [12, 19, 3, 5, 2, 3],
-                            backgroundColor: ['red', 'blue', 'yellow', 'green', 'purple', 'orange'],
+            // 차트를 그릴 데이터를 설정합니다.
+            const data = {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [
+                    {
+                        label: 'My Dataset',
+                        data: [12, 19, 3, 5, 2, 3],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)', // 막대 색상
+                        borderColor: 'rgba(255, 99, 132, 1)', // 막대 테두리 색상
+                        borderWidth: 1, // 막대 테두리 두께
+                    },
+                ],
+            };
+
+            // 차트 설정 객체를 정의합니다.
+            const config = {
+                type: 'bar', // 차트 유형: 막대 차트
+                data: data, // 차트 데이터
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true, // y축이 0부터 시작하도록 설정
                         },
-                    ],
+                    },
+                    // responsive: false, // 자동 크기 조절 비활성화
+                    // maintainAspectRatio: false // 비율 유지하지 않고, 부모에 맞춰 늘리기
                 },
-                options: {},
-            });
+            };
+
+            // 차트 객체를 생성하고, 차트를 그릴 캔버스를 설정합니다.
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const myChart = new Chart(ctx, config);
         </script>
     </body>
 </html>
