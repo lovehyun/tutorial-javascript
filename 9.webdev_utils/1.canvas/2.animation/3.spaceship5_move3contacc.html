@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Image Movement</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas 요소 추가 -->
+    <canvas id="imageCanvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('imageCanvas');
+        const context = canvas.getContext('2d');
+
+        const player = {
+            x: 150,
+            y: 100,
+            speed: 2,
+            directionX: 0,
+            directionY: 0,
+        };
+
+        const image = new Image();
+        image.src = 'ship.png'; // 이미지 파일 경로
+        image.onload = function () {
+            // 1. 이미지가 로드된 후에 플레이어 위치 설정
+            player.x = (canvas.width - image.width) / 2;
+            player.y = canvas.height - image.height;
+            draw();
+        };
+
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 플레이어 이미지 그리기
+            context.drawImage(image, player.x, player.y, image.width, image.height);
+
+            updatePosition();
+
+            requestAnimationFrame(draw);
+        }
+
+        function updatePosition() {
+            player.x += player.directionX * player.speed;
+            player.y += player.directionY * player.speed;
+
+            // 화면을 벗어나지 않도록 제한 (가속도시 통과)
+            if (player.x < 0) {
+                if (Math.abs(player.directionX) < 5) {
+                    player.x = 0;
+                    player.directionX = 0; // 속도 멈춤
+                } else {
+                    player.x = canvas.width - image.width;
+                }
+            }
+            if (player.x > canvas.width - image.width) {
+                if (player.directionX < 5) {
+                    player.x = canvas.width - image.width;
+                    player.directionX = 0; // 속도 멈춤
+                } else {
+                    player.x = 0;
+                }
+            }
+            if (player.y < 0) {
+                player.y = 0;
+                player.directionY = 0; // 속도 멈춤
+            }
+            if (player.y > canvas.height - image.height) {
+                player.y = canvas.height - image.height;
+                player.directionY = 0; // 속도 멈춤
+            }
+        }
+
+        // 키보드 이벤트 처리 (상하 좌우 가속)
+        window.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    player.directionX += -1;
+                    if (player.directionX === 0) player.directionX += -1; // 멈춤 방지
+                    if (player.directionX == -2) player.directionY = 0;   // 가속시 왼쪽으로만 이동
+                    if (player.directionX < -10) player.directionX = -10; // 최대 속도
+                    break;
+                case 'ArrowRight':
+                    player.directionX += 1;
+                    if (player.directionX === 0) player.directionX += 1; // 멈춤 방지
+                    if (player.directionX == 2) player.directionY = 0;   // 가속시 오른쪽으로만 이동
+                    if (player.directionX > 10) player.directionX = 10;  // 최대 속도
+                    break;
+                case 'ArrowUp':
+                    player.directionY += -1;
+                    if (player.directionY == -2) player.directionX = 0;  // 가속시 위로만 이동
+                    if (player.directionY < -2) player.directionY = -2;  // 최대 속도
+                    break;
+                case 'ArrowDown':
+                    player.directionY += 1;
+                    if (player.directionY == 2) player.directionX = 0;   // 가속시 아래로만 이동
+                    if (player.directionY > 2) player.directionY = 2;    // 최대 속도
+                    break;
+            }
+        });
+
+        // Start animation
+        draw();
+    </script>
+</body>
+</html>

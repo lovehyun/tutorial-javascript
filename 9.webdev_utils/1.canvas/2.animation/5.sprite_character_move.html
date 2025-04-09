@@ -78,11 +78,6 @@
 
                 // 방향에 따라 캐릭터 이동 - 캔바스 안에서만 이동 가능
                 switch (direction) {
-                    case 'ArrowDown':
-                        if (spriteY + spriteHeight * imageScale < canvas.height) {
-                            spriteY += spriteDY;
-                        }
-                        break;
                     case 'ArrowLeft':
                         if (spriteX > 0) {
                             spriteX -= spriteDX;
@@ -96,6 +91,11 @@
                     case 'ArrowUp':
                         if (spriteY > 0) {
                             spriteY -= spriteDY;
+                        }
+                        break;
+                    case 'ArrowDown':
+                        if (spriteY + spriteHeight * imageScale < canvas.height) {
+                            spriteY += spriteDY;
                         }
                         break;
                 }
