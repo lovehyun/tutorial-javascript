@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        #result {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Search</h1>
+        <input type="number" id="userId" placeholder="Enter User ID">
+        <button onclick="searchUser()">Search</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function searchUser() {
+            const userId = document.getElementById('userId').value;
+            const url = `https://jsonplaceholder.typicode.com/users/${userId}`;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('User not found');
+                }
+
+                const user = await response.json();
+                displayUser(user);
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = 'User not found';
+                console.error(error);
+            }
+        }
+
+        function displayUser(user) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <p><strong>Name:</strong> ${user.name}</p>
+                <p><strong>Email:</strong> ${user.email}</p>
+                <p><strong>Phone:</strong> ${user.phone}</p>
+                <p><strong>Website:</strong> ${user.website}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
