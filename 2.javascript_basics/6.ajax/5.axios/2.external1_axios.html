@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vanilla JS AJAX Example (Axios)</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h2>Load Content with Axios</h2>
+    <button id="loadContentBtn">Load Content</button>
+
+    <div id="contentContainer">
+        <!-- AJAX로 가져온 내용이 여기에 표시될 것입니다. -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('loadContentBtn').addEventListener('click', async function () {
+                const container = document.getElementById('contentContainer');
+
+                try {
+                    const response = await axios.get('https://jsonplaceholder.typicode.com/posts/1');
+                    const data = response.data;
+
+                    container.innerHTML =
+                        '<p>Title: ' + data.title + '</p><p>Body: ' + data.body + '</p>';
+                } catch (error) {
+                    alert('Failed to load content.');
+                    console.error('There was a problem with the axios operation:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

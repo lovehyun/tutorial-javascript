@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name": "Alice Kim",
+        "username": "alicek",
+        "email": "alice.kim@example.com",
+        "phone": "010-1234-5678",
+        "website": "alice.dev"
+    },
+    {
+        "id": 2,
+        "name": "Bob Lee",
+        "username": "boblee",
+        "email": "bob.lee@example.com",
+        "phone": "010-2345-6789",
+        "website": "bobsite.com"
+    }
+]

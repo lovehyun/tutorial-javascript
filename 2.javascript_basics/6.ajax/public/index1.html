@@ -1,0 +1,21 @@
+<!-- public/ajax_localhost.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localhost CRUD Test</title>
+</head>
+<body>
+    <h1>CRUD Test</h1>
+    <button onclick="getAll()">Get All</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function getAll() {
+            const res = await fetch('http://localhost:3000/posts');
+            const data = await res.json();
+            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CRUD with Axios</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        button { margin: 5px; }
+        input, textarea { width: 300px; display: block; margin-bottom: 10px; }
+        pre { background: #f0f0f0; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h2>CRUD Example (Axios)</h2>
+
+    <label>Base URL: <input id="baseUrl" value="http://localhost:3000"></label>
+
+    <h3>Create</h3>
+    <input type="text" id="createTitle" placeholder="Title">
+    <textarea id="createBody" placeholder="Body"></textarea>
+    <button onclick="createPost()">Create Post</button>
+
+    <h3>Read All</h3>
+    <button onclick="getAll()">Get All Posts</button>
+
+    <h3>Read One (by ID)</h3>
+    <input type="number" id="readId" placeholder="ID">
+    <button onclick="getOne()">Get One</button>
+
+    <h3>Update</h3>
+    <input type="number" id="updateId" placeholder="ID">
+    <input type="text" id="updateTitle" placeholder="New Title">
+    <textarea id="updateBody" placeholder="New Body"></textarea>
+    <button onclick="updatePost()">Update Post</button>
+
+    <h3>Delete</h3>
+    <input type="number" id="deleteId" placeholder="ID">
+    <button onclick="deletePost()">Delete Post</button>
+
+    <h3>Result</h3>
+    <pre id="result"></pre>
+
+    <script>
+        function getBaseUrl() {
+            return document.getElementById('baseUrl').value;
+        }
+
+        function showResult(data) {
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function createPost() {
+            const title = document.getElementById('createTitle').value;
+            const body = document.getElementById('createBody').value;
+            const res = await axios.post(`${getBaseUrl()}/posts`, { title, body });
+            showResult(res.data);
+        }
+
+        async function getAll() {
+            const res = await axios.get(`${getBaseUrl()}/posts`);
+            showResult(res.data);
+        }
+
+        async function getOne() {
+            const id = document.getElementById('readId').value;
+            try {
+                const res = await axios.get(`${getBaseUrl()}/posts/${id}`);
+                showResult(res.data);
+            } catch (err) {
+                showResult(err.response.data);
+            }
+        }
+
+        async function updatePost() {
+            const id = document.getElementById('updateId').value;
+            const title = document.getElementById('updateTitle').value;
+            const body = document.getElementById('updateBody').value;
+            try {
+                const res = await axios.put(`${getBaseUrl()}/posts/${id}`, { title, body });
+                showResult(res.data);
+            } catch (err) {
+                showResult(err.response.data);
+            }
+        }
+
+        async function deletePost() {
+            const id = document.getElementById('deleteId').value;
+            try {
+                const res = await axios.delete(`${getBaseUrl()}/posts/${id}`);
+                showResult(res.data);
+            } catch (err) {
+                showResult(err.response.data);
+            }
+        }
+    </script>
+</body>
+</html>

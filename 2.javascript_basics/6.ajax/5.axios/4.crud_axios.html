@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSONPlaceholder Axios Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h2>JSONPlaceholder API Example (Axios)</h2>
+
+    <div>
+        <h3>Create a Post</h3>
+        <button id="createPostBtn">Create Post</button>
+    </div>
+    <div>
+        <h3>Retrieve a Post</h3>
+        <button id="retrievePostBtn">Retrieve Post</button>
+    </div>
+    <div>
+        <h3>Update a Post</h3>
+        <button id="updatePostBtn">Update Post</button>
+    </div>
+    <div>
+        <h3>Delete a Post</h3>
+        <button id="deletePostBtn">Delete Post</button>
+    </div>
+    <div>
+        <h3>Result:</h3>
+        <div id="result" style="white-space: pre-wrap; border: 1px solid #ccc; padding: 10px;"></div>
+    </div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+
+        document.getElementById('createPostBtn').addEventListener('click', async () => {
+            try {
+                const postData = {
+                    title: 'foo',
+                    body: 'bar',
+                    userId: 1
+                };
+
+                const response = await axios.post('https://jsonplaceholder.typicode.com/posts', postData);
+                resultDiv.innerText = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                resultDiv.innerText = 'Error creating post:\n' + error;
+            }
+        });
+
+        document.getElementById('updatePostBtn').addEventListener('click', async () => {
+            try {
+                const updateData = {
+                    id: 1,
+                    title: 'foo',
+                    body: 'bar',
+                    userId: 1
+                };
+
+                const response = await axios.put('https://jsonplaceholder.typicode.com/posts/1', updateData);
+                resultDiv.innerText = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                resultDiv.innerText = 'Error updating post:\n' + error;
+            }
+        });
+
+        document.getElementById('retrievePostBtn').addEventListener('click', async () => {
+            try {
+                const response = await axios.get('https://jsonplaceholder.typicode.com/posts/1');
+                resultDiv.innerText = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                resultDiv.innerText = 'Error retrieving post:\n' + error;
+            }
+        });
+
+        document.getElementById('deletePostBtn').addEventListener('click', async () => {
+            try {
+                const response = await axios.delete('https://jsonplaceholder.typicode.com/posts/1');
+                resultDiv.innerText = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                resultDiv.innerText = 'Error deleting post:\n' + error;
+            }
+        });
+    </script>
+</body>
+</html>

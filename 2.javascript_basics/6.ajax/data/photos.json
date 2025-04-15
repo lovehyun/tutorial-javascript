@@ -1,0 +1,16 @@
+[
+    {
+        "albumId": 1,
+        "id": 1,
+        "title": "Beach photo",
+        "url": "http://example.com/photo1.jpg",
+        "thumbnailUrl": "http://example.com/thumb1.jpg"
+    },
+    {
+        "albumId": 2,
+        "id": 2,
+        "title": "Family photo",
+        "url": "http://example.com/photo2.jpg",
+        "thumbnailUrl": "http://example.com/thumb2.jpg"
+    }
+]
