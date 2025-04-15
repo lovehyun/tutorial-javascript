@@ -1,7 +1,7 @@
 // 모듈을 로딩합니다.
 const http = require('http');
 
-// server 객체를 생성합니다.
+// 0. server 객체를 생성합니다.
 const server = http.createServer();
 
 // 1. server 객체에 이벤트를 연결합니다.
@@ -29,6 +29,14 @@ server.on('request', function() {
 server.on('close', function() {
 	console.log('Close On');
 });
+
+// 4. 오류 발생 시
+server.on('error', (err) => {
+    console.error(`서버 실행 중 오류 발생: ${err.message}`);
+    process.exit(1); // 필요 시 서버 종료
+});
+
+// 5. 서버 대기 시작
 
 // listen() 메서드를 실행합니다.
 // server.listen(3000);

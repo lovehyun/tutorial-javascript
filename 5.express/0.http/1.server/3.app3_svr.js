@@ -1,9 +1,7 @@
 const http = require('http');
 
 // HTTP 서버 생성
-
-
-const server = http.createServer(callback);
+const server = http.createServer();
 
 server.on('request', (req, res) => {
     // 요청 내용중 유용한 내용 출력

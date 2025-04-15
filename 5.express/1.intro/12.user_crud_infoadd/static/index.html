@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Node 웹서버</title>
+    </head>
+    <body>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/users">User</a>
+        </nav>
+        <section>
+            <h1>Hello Node!</h1>
+            <p>Hello Server!</p>
+        </section>
+        <section>
+            <h2>Users!</h2>
+            <form id="form">
+                <input type="text" id="username" placeholder="닉네임" />
+                <input type="text" id="fullname" placeholder="이름" />
+                <input type="number" id="age" placeholder="나이" />
+                <button type="submit">등록</button>
+            </form>
+
+            <div id="confirmModal" style="display:none; position:fixed; top:30%; left:35%; background:#fff; padding:20px; border:1px solid #aaa; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index:1000;">
+                <p>정말로 삭제하시겠습니까?</p>
+                <button id="confirmYes">예</button>
+                <button id="confirmNo">아니오</button>
+            </div>
+            
+            <div id="editModal" style="display:none; position:fixed; top:20%; left:30%; background:#fff; padding:20px; border:1px solid #ccc;">
+                <h3>사용자 수정</h3>
+                <input type="text" id="editName" placeholder="닉네임" /><br/>
+                <input type="text" id="editFullName" placeholder="이름" /><br/>
+                <input type="number" id="editAge" placeholder="나이" /><br/>
+                <button id="saveEdit">저장</button>
+                <button id="cancelEdit">취소</button>
+            </div>
+
+            <!-- 여기에 테이블을 보여줄 div 추가 -->
+            <div id="userTable"></div>
+        </section>
+        <script src="/static/js/user3_then.js"></script>
+        <!-- <script src="/static/js/user3_await.js"></script> -->
+    </body>
+</html>

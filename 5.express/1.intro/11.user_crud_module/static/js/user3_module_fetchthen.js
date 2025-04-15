@@ -4,7 +4,7 @@
 
 // 사용자 정보를 받아오는 함수
 export function getUsers() {
-    return fetch('/user')
+    return fetch('/users')
         .then(response => {
             if (!response.ok) {
                 throw new Error('사용자 정보 불러오기 실패');
@@ -19,7 +19,7 @@ export function getUsers() {
 
 // 사용자 추가 함수
 export function addUser(name) {
-    return fetch('/user', {
+    return fetch('/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ export function addUser(name) {
 
 // 사용자 정보를 업데이트하는 함수
 export function updateUser(userId, data) {
-    return fetch(`/user/${userId}`, {
+    return fetch(`/users/${userId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export function updateUser(userId, data) {
 
 // 사용자 정보를 삭제하는 함수
 export function deleteUserById(userId) {
-    return fetch(`/user/${userId}`, {
+    return fetch(`/users/${userId}`, {
         method: 'DELETE',
     })
     .then(response => {

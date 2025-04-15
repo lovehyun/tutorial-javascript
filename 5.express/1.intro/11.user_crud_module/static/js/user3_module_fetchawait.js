@@ -5,7 +5,7 @@
 // 사용자 정보를 받아오는 함수
 export async function getUsers() {
     try {
-        const response = await fetch('/user');
+        const response = await fetch('/users');
         if (!response.ok) {
             throw new Error('사용자 정보 불러오기 실패');
         }
@@ -18,7 +18,7 @@ export async function getUsers() {
 
 // 사용자 추가 함수
 export async function addUser(name) {
-    const response = await fetch('/user', {
+    const response = await fetch('/users', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export async function addUser(name) {
 
 // 사용자 정보를 업데이트하는 함수
 export async function updateUser(userId, data) {
-    const response = await fetch(`/user/${userId}`, {
+    const response = await fetch(`/users/${userId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -50,7 +50,7 @@ export async function updateUser(userId, data) {
 
 // 사용자 정보를 삭제하는 함수
 export async function deleteUserById(userId) {
-    const response = await fetch(`/user/${userId}`, {
+    const response = await fetch(`/users/${userId}`, {
         method: 'DELETE',
     });
 

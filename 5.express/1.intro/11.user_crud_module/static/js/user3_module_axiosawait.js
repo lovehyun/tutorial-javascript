@@ -15,7 +15,7 @@
 // 사용자 정보를 받아오는 함수
 export async function getUsers() {
     try {
-        const response = await axios.get('/user');
+        const response = await axios.get('/users');
         return response.data;
     } catch (error) {
         console.error('사용자 정보 불러오기 실패:', error);
@@ -26,7 +26,7 @@ export async function getUsers() {
 // 사용자 추가 함수
 export async function addUser(name) {
     try {
-        await axios.post('/user', { name });
+        await axios.post('/users', { name });
     } catch (error) {
         const errorMessage = error.response ? error.response.data : '등록 실패';
         throw new Error(`등록 실패: ${errorMessage}`);
@@ -36,7 +36,7 @@ export async function addUser(name) {
 // 사용자 정보를 업데이트하는 함수
 export async function updateUser(userId, data) {
     try {
-        await axios.put(`/user/${userId}`, data);
+        await axios.put(`/users/${userId}`, data);
     } catch (error) {
         const errorMessage = error.response ? error.response.data : '수정 실패';
         throw new Error(`수정 실패: ${errorMessage}`);
@@ -46,7 +46,7 @@ export async function updateUser(userId, data) {
 // 사용자 정보를 삭제하는 함수
 export async function deleteUserById(userId) {
     try {
-        await axios.delete(`/user/${userId}`);
+        await axios.delete(`/users/${userId}`);
     } catch (error) {
         const errorMessage = error.response ? error.response.data : '삭제 실패';
         throw new Error(`삭제 실패: ${errorMessage}`);

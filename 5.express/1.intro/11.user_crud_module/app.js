@@ -1,7 +1,10 @@
 // curl -X POST -H "Content-Type: application/json" -d "{\"id\": \"1\", \"name\": \"John Doe\", \"age\": 25}" http://127.0.0.1:3000/users
+
 // curl -X GET http://127.0.0.1:3000/users
 // curl -X GET http://127.0.0.1:3000/users/1
+
 // curl -X PUT -H "Content-Type: application/json" -d "{\"name\": \"John Smith\", \"age\": 30}" http://127.0.0.1:3000/users/1
+
 // curl -X DELETE http://127.0.0.1:3000/users/1
 
 const express = require('express');
@@ -18,8 +21,10 @@ const PORT = 3000;
 app.use(express.json())
 
 const users = {};
+let nextId = 1;
 
 // 정적 파일 및 동적 이미지 요청 처리
+// app.use(express.static('public'));
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/image', express.static(path.join(__dirname, 'static/image')));
 
@@ -39,7 +44,7 @@ app.get('/about', (req, res) => {
 });
 
 // 사용자 정보 요청 처리
-app.get('/user', (req, res) => {
+app.get('/users', (req, res) => {
     // res.send 시의 기본값은 'text/html; charset=utf-8'
     // res.json 시의 기본값은 'application/json'
     // 변경 시 res.type('text/plain');
@@ -49,11 +54,14 @@ app.get('/user', (req, res) => {
 });
 
 // 사용자 등록
-app.post('/user', (req, res) => {
+app.post('/users', (req, res) => {
     try {
         const { name } = req.body;
-        const id = Date.now(); // id를 시간으로 할수도 아니면 name 으로 할수도..
+
+        const id = nextId++;
+        // const id = Date.now(); // id를 시간으로 할수도 아니면 name 으로 할수도..
         // const id = name;
+        
         users[id] = name;
         res.status(201).send('등록 성공');
     } catch (error) {
@@ -63,10 +71,12 @@ app.post('/user', (req, res) => {
 });
 
 // 사용자 정보 수정
-app.put('/user/:id', (req, res) => {
+app.put('/users/:id', (req, res) => {
     try {
         const id = req.params.id;
+
         users[id] = req.body.name;
+        
         // res.json(users);
         res.status(200).send('수정 성공');
     } catch (error) {
@@ -76,10 +86,12 @@ app.put('/user/:id', (req, res) => {
 });
 
 // 사용자 삭제
-app.delete('/user/:id', (req, res) => {
+app.delete('/users/:id', (req, res) => {
     try {
         const id = req.params.id;
+        
         delete users[id];
+        
         res.status(204).send(); // 204 No Content
     } catch (error) {
         console.error('DELETE 요청 처리 중 오류 발생: ', error);
