@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>게시판</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap; /* 텍스트가 너무 길어질 경우 줄 바꿈을 방지합니다. */
+            border: 1px solid #e0e0e0; /* 옅은색 컬럼 보더 추가 */
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* 각 열의 너비를 조절합니다. */
+        th:first-child, td:first-child {
+            width: 5%;
+        }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 15%;
+        }
+
+        th:nth-child(3), td:nth-child(3) {
+            width: 50%;
+        }
+
+        th:nth-child(4), td:nth-child(4) {
+            width: 15%;
+        }
+
+        th:last-child, td:last-child {
+            width: 10%;
+        }
+    </style>
+</head>
+<body>
+    <h1>게시판</h1>
+    <table id="postTable">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>내용</th>
+                <th>작성일</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <a href="write.html">글 작성</a>
+
+    <script>
+        async function fetchPosts() {
+            const res = await fetch('/api/posts');
+            const posts = await res.json();
+            const tbody = document.querySelector('#postTable tbody');
+            tbody.innerHTML = '';
+
+            posts.forEach((post, i) => {
+                const tr = document.createElement('tr');
+
+                const formatDate = new Date(post.date).toLocaleString('ko-KR');
+
+                tr.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${post.title}</td>
+                    <td>${post.content}</td>
+                    <td>${formatDate}</td>
+                    <td><button onclick="deletePost(${i})">삭제</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deletePost(index) {
+            await fetch(`/api/posts/${index}`, {
+                method: 'DELETE'
+            });
+            fetchPosts();
+        }
+
+        fetchPosts();
+    </script>
+</body>
+</html>

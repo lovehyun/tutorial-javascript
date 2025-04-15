@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        #todo-list li { margin-bottom: 5px; cursor: pointer; }
+        #todo-list li.completed { text-decoration: line-through; }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list"></ul>
+
+    <script>
+        const todoList = document.getElementById('todo-list');
+        const input = document.getElementById('new-todo');
+        const addBtn = document.getElementById('add-todo');
+
+        // To-Do 항목 렌더링
+        function renderTodos(todos) {
+            todoList.innerHTML = '';
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.textContent = todo.text;
+                li.classList.toggle('completed', todo.completed);
+
+                // 토글
+                li.addEventListener('click', () => {
+                    fetch(`/api/todos/${todo.id}/toggle`, { method: 'PUT' })
+                        .then(() => fetchTodos());
+                });
+
+                // 삭제 버튼
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '삭제';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fetch(`/api/todos/${todo.id}`, { method: 'DELETE' })
+                        .then(() => fetchTodos());
+                });
+
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
+        }
+
+        // To-Do 목록 불러오기
+        function fetchTodos() {
+            fetch('/api/todos')
+                .then(res => res.json())
+                .then(renderTodos);
+        }
+
+        // To-Do 추가
+        addBtn.addEventListener('click', () => {
+            const text = input.value.trim();
+            if (!text) return;
+            fetch('/api/todos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            }).then(() => {
+                input.value = '';
+                fetchTodos();
+            });
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addBtn.click();
+        });
+
+        // 초기 로딩
+        fetchTodos();
+    </script>
+</body>
+</html>
