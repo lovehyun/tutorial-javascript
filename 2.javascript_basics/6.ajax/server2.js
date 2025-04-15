@@ -16,9 +16,6 @@ const db = {
     users: require('./data/users.json'),
 };
 
-// 모든 리소스에 대해 CRUD 생성
-['posts', 'comments', 'albums', 'photos', 'todos', 'users'].forEach(createRoutes);
-
 // 유틸: ID로 찾기
 const findById = (list, id) => list.find((item) => item.id == id);
 
@@ -77,6 +74,9 @@ app.get('/posts/:id/comments', (req, res) => {
     const result = db.comments.filter((c) => c.postId === postId);
     res.json(result);
 });
+
+// 모든 리소스에 대해 CRUD 생성
+['posts', 'comments', 'albums', 'photos', 'todos', 'users'].forEach(createRoutes);
 
 app.listen(port, () => {
     console.log(`🟢 Mock JSONPlaceholder server running at http://localhost:${port}`);
