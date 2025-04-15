@@ -12,6 +12,11 @@ app.use(express.json()); // JSON 파싱
 
 let posts = [];
 
+// 메인 라우트
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index1.html'));
+});
+
 app.get('/api/posts', (req, res) => {
     res.json(posts);
 });

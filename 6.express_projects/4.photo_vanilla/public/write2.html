@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>글 작성</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
             max-width: 500px;
@@ -24,7 +28,9 @@
         }
 
         button {
-            padding: 8px 16px;
+            display: block;
+            width: 100%;
+            margin-top: 10px;
             font-size: 14px;
         }
 
@@ -40,29 +46,17 @@
     <form id="postForm">
         <input type="text" name="title" placeholder="제목" required><br>
         <textarea name="content" placeholder="내용" required></textarea><br>
+        <input type="file" name="photo"><br>
         <button type="submit">작성</button>
     </form>
-    <a href="index.html">목록으로</a>
-
+    <a href="/index.html">목록</a>
     <script>
-        document.getElementById('postForm').addEventListener('submit', async function(e) {
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
-            const formData = new FormData(this);
-            const data = {
-                title: formData.get('title'),
-                content: formData.get('content')
-            };
-
-            await fetch('/api/posts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-
-            location.href = 'index.html';
+            const formData = new FormData(e.target);
+            await fetch('/api/posts', { method: 'POST', body: formData });
+            location.href = '/index2.html';
+            // history.back(); // 뒤로가기
         });
     </script>
 </body>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f9f9f9; /* #f2f2f2, #eeeeee */ }
+        img { max-width: 100px; max-height: 100px; }
+    </style>
+</head>
+<body>
+    <h1>게시판</h1>
+    <a href="/write2.html">글 작성</a>
+    <table>
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>제목</th>
+                <th>내용</th>
+                <th>이미지</th>
+                <th>작성일</th>
+                <th>삭제</th>
+            </tr>
+        </thead>
+        <tbody id="postTable"></tbody>
+    </table>
+    <script>
+        async function loadPosts() {
+            const res = await fetch('/api/posts');
+            const posts = await res.json();
+
+            const tbody = document.getElementById('postTable');
+            tbody.innerHTML = '';
+
+            posts.forEach(post => {
+                const tr = document.createElement('tr');
+
+                tr.innerHTML = `
+                    <td>${post.id}</td>
+                    <td>${post.title}</td>
+                    <td>${post.content}</td>
+                    <td>${post.filename ? `<a href="/images/${post.filename}" target="_blank"><img src="/images/${post.filename}" /></a>` : '(없음)'}</td>
+                    <td>${new Date(post.date).toLocaleString('ko-KR')}</td>
+                    <td><button onclick="deletePost(${post.id})">삭제</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function deletePost(id) {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+                loadPosts();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPosts);
+    </script>
+</body>
+</html>
