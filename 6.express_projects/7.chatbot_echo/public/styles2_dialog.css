@@ -1,0 +1,18 @@
+/* 메세지 좌우 align */
+/* 사용자 메시지 (오른쪽 정렬) */
+.chatbot-messages .user,
+.chatbot-messages .bot {
+    display: flex;
+    align-items: center;       /* 아이콘과 텍스트를 수직 중앙 정렬 */
+    margin-bottom: 5px;
+    gap: 6px;                  /* 아이콘과 텍스트 사이 여백 */
+}
+
+.chatbot-messages .user {
+    justify-content: flex-end; /* 오른쪽 정렬 */
+}
+
+/* 챗봇 메시지 (왼쪽 정렬) */
+.chatbot-messages .bot {
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}

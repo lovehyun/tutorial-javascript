@@ -24,7 +24,11 @@ document.addEventListener("DOMContentLoaded", function() {
     function addMessage(message, sender = 'user') {
         const messageElement = document.createElement('div'); // 새로운 div 요소 생성
         // messageElement.textContent = message; // div 요소에 메시지 텍스트 설정
-        messageElement.textContent = sender === 'user' ? `👤: ${message}` : `🤖: ${message}`;
+        // messageElement.textContent = sender === 'user' ? `👤: ${message}` : `🤖: ${message}`;
+        messageElement.innerHTML = sender === 'user'
+            ? `<i class="bi bi-person"></i> ${message}`
+            : `<i class="bi bi-robot"></i> ${message}`;
+        messageElement.classList.add(sender); // CSS 디자인 추가
         chatbotMessages.appendChild(messageElement); // 메시지 창에 div 요소 추가
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight; // 스크롤을 맨 아래로 이동
     }

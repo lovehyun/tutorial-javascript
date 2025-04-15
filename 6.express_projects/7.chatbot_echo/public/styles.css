@@ -18,6 +18,10 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 아이콘에 그림자를 추가하여 입체감 부여 */
 }
 
+.chatbot-icon i {
+    font-size: 24px; /* 또는 1.5rem, 상황에 따라 조정 */
+}
+
 .chatbot-window {
     position: fixed; /* 화면의 고정된 위치에 챗봇 창 배치 */
     bottom: 20px; /* 화면 아래에서 20px 위로 위치 */

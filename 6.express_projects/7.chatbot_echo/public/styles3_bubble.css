@@ -1,0 +1,18 @@
+/* 말풍선 추가 */
+.chatbot-messages .user {
+    background-color: #e1f5fe;
+    /* border-radius: 12px; */
+    border-radius: 12px 12px 0 12px;  /* ↘ 직각 */
+    padding: 6px 10px;
+    max-width: 80%;
+    margin-left: auto;      /* 오른쪽으로 정렬되도록 */
+}
+
+.chatbot-messages .bot {
+    background-color: #f1f1f1;
+    /* border-radius: 12px; */
+    border-radius: 12px 12px 12px 0;  /* ↙ 직각 */
+    padding: 6px 10px;
+    max-width: 80%;
+    margin-right: auto;     /* 왼쪽으로 정렬되도록 */
+}
