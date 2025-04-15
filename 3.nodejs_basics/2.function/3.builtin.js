@@ -23,6 +23,16 @@ const number = parseInt(stringNumber);
 console.log(typeof number); // number 출력
 console.log(number); // 42 출력
 
+// 참고. Number 객체
+// https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Number
+const number2 = Number(stringNumber);
+console.log(typeof number2);
+console.log(number2);
+const biggestNum = Number.MAX_VALUE;
+const smallestNum = Number.MIN_VALUE;
+const infiniteNum = Number.POSITIVE_INFINITY;
+console.log(biggestNum, smallestNum, infiniteNum)
+
 
 // 3. JSON
 const user = {
