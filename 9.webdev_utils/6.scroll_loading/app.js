@@ -12,6 +12,20 @@ function getItems(start, end) {
     return data.slice(start, end);
 }
 
+// filter
+// function getItems(start, end) {
+//     return data.filter((_, index) => index >= start && index < end);
+// }
+
+// legacy for style
+// function getItems(start, end) {
+//     const items = [];
+//     for (let i = start; i < end && i < data.length; i++) {
+//         items.push(data[i]);
+//     }
+//     return items;
+// }
+
 app.use(morgan('dev'));
 app.use(express.static('public'));
 

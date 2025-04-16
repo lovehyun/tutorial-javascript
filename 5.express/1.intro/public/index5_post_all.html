@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Express Body Parser 테스트</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; }
+        h2 { margin-top: 40px; }
+        button { margin-top: 10px; }
+        textarea, input[type="text"] { width: 100%; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Express Body Parser 테스트</h1>
+
+    <!-- JSON -->
+    <h2>1. JSON (application/json)</h2>
+    <textarea id="jsonInput">{ "name": "John", "age": 30 }</textarea>
+    <button onclick="sendJSON()">전송</button>
+
+    <!-- URL-Encoded -->
+    <h2>2. URL Encoded (application/x-www-form-urlencoded)</h2>
+    <input type="text" id="formName" placeholder="name=John" value="John">
+    <input type="text" id="formAge" placeholder="age=30" value="30">
+    <button onclick="sendForm()">전송</button>
+
+    <!-- Text -->
+    <h2>3. Text (text/plain)</h2>
+    <textarea id="textInput">Just a plain text message.</textarea>
+    <button onclick="sendText()">전송</button>
+
+    <!-- Raw -->
+    <h2>4. Raw (application/octet-stream)</h2>
+    <textarea id="rawInput">Raw binary content</textarea>
+    <button onclick="sendRaw()">전송</button>
+
+    <!-- Multipart -->
+    <h2>5. Multipart Form Data (multipart/form-data)</h2>
+    <input type="text" id="multipartName" placeholder="name">
+    <input type="file" id="fileInput">
+    <button onclick="sendMultipart()">전송</button>
+
+    <h2>서버 응답</h2>
+    <pre id="output">응답 결과가 여기에 표시됩니다.</pre>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function printResponse(res) {
+            output.textContent = JSON.stringify(res, null, 2);
+        }
+
+        async function sendJSON() {
+            const data = document.getElementById('jsonInput').value;
+            const res = await fetch('/submit-json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: data
+            });
+            printResponse(await res.json());
+        }
+
+        async function sendForm() {
+            const name = document.getElementById('formName').value;
+            const age = document.getElementById('formAge').value;
+            const params = new URLSearchParams();
+            params.append('name', name);
+            params.append('age', age);
+            const res = await fetch('/submit-form', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            printResponse(await res.json());
+        }
+
+        async function sendText() {
+            const text = document.getElementById('textInput').value;
+            const res = await fetch('/submit-text', {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: text
+            });
+            printResponse(await res.json());
+        }
+
+        async function sendRaw() {
+            const rawText = document.getElementById('rawInput').value;
+            const encoder = new TextEncoder();
+            const res = await fetch('/submit-raw', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/octet-stream' },
+                body: encoder.encode(rawText)
+            });
+            printResponse(await res.json());
+        }
+
+        async function sendMultipart() {
+            const name = document.getElementById('multipartName').value;
+            const file = document.getElementById('fileInput').files[0];
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('file', file);
+            const res = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            printResponse(await res.json());
+        }
+    </script>
+</body>
+</html>

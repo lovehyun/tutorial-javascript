@@ -9,7 +9,7 @@
 }
 
 .chatbot-messages .bot {
-    background-color: #f1f1f1;
+    background-color: #ffdcdc;
     /* border-radius: 12px; */
     border-radius: 12px 12px 12px 0;  /* ↙ 직각 */
     padding: 6px 10px;
