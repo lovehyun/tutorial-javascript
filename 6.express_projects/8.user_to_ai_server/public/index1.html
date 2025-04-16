@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Express → Flask 메시지 전달</title>
+</head>
+<body>
+    <h1>메시지 보내기</h1>
+    <input type="text" id="msgInput" placeholder="메시지를 입력하세요">
+    <button onclick="sendMessage()">보내기</button>
+    <p id="result"></p>
+
+    <script>
+        async function sendMessage() {
+            const msg = document.getElementById('msgInput').value;
+            const res = await fetch('/api/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await res.json();
+            document.getElementById('result').textContent = data.response || data.error;
+        }
+    </script>
+</body>
+</html>

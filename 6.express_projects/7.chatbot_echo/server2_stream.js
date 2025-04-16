@@ -24,6 +24,10 @@ app.use(cors());
 // app.use(express.json()); // 비스트리밍용 라우트에만 적용
 app.use(express.static('public')); // index.html 등 프론트엔드 파일 제공용
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index2_stream.html'));
+});
+
 // POST /api/chat: 받은 질문을 그대로 응답
 app.post('/api/chat', (req, res) => {
     const question = req.body.question;

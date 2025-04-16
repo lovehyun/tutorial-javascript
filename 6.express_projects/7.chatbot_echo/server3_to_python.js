@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
+const axios = require('axios');
 
 const app = express();
 const PORT = 3000;
@@ -30,12 +30,26 @@ app.get('/', (req, res) => {
 });
 
 // POST /api/chat: 받은 질문을 그대로 응답
-app.post('/api/chat', (req, res) => {
+app.post('/api/chat', async (req, res) => {
     const question = req.body.question;
     console.log('사용자 입력:', question);
 
-    const echoAnswer = `Echo: ${question}`;
-    res.json({ answer: echoAnswer });
+    try {
+        // Flask 서버로 요청 전송
+        const flaskRes = await axios.post('http://localhost:5000/process', {
+            message: question,
+            taskId: 'echo' // taskId가 필요하면 아무 값이나 전달 가능
+        });
+
+        const flaskResponse = flaskRes.data.response;
+        console.log('Flask 응답:', flaskResponse);
+
+        res.json({ answer: flaskResponse });
+
+    } catch (err) {
+        console.error('Flask 요청 실패:', err.message);
+        res.status(500).json({ answer: 'Flask 서버와 통신 실패' });
+    }
 });
 
 // 서버 실행
