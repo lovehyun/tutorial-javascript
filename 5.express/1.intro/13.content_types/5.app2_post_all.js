@@ -55,7 +55,14 @@ app.post('/submit', (req, res) => {
 app.post('/submit-json', (req, res) => {
     const jsonData = req.body; // req.body에 파싱된 JSON 데이터가 들어 있음
     console.log(jsonData);
-    res.json({ type: 'JSON', body: jsonData });
+    
+    // res.status(201).end(); // 헤더만 보내고 바디 없음
+    // res.status(201).send(); // 헤더와 빈 바디를 보냄 (Content-length: 0)
+    // res.status(201).send('Created'); // 헤더를 보내고 바디에 "Created" 를 글자로 담아서 보냄
+    // res.sendStatus(201); // 상동 (축약함수)
+    // res.status(201).json({ message: "Resource created successfully" }); // 헤더와 메세지
+
+    res.json({ type: 'JSON', body: jsonData }); // 200 헤더와 바디
 });
 
 // bash/cmd: curl -X POST http://localhost:3000/submit-form -H "Content-Type: application/x-www-form-urlencoded" -d "name=John&age=30"
@@ -117,6 +124,11 @@ app.post('/submit-xml', (req, res) => {
 
     res.set('Content-Type', 'application/xml; charset=utf-8');
     res.send(js2xmlparser.parse('response', responseData));
+});
+
+// 테스트용 HTML 페이지 경로
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index5_posts.html'));
 });
 
 // 서버 시작

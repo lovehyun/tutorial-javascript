@@ -28,11 +28,13 @@
                     img.alt = 'Random Dog Image';
                     img.style.maxWidth = '100%';
                     img.style.height = 'auto';
-
+                    
                     // Clear previous image and add new one to the container
                     var imageContainer = document.getElementById('image-container');
                     imageContainer.innerHTML = '';
                     imageContainer.appendChild(img);
+
+                    // imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
                 })
                 .catch(error => {
                     alert(`Request failed: ${error.message}`);

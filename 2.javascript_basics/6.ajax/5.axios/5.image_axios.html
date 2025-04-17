@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Dog Image (Axios)</title>
+    <!-- axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Random Dog Image</h1>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        document.getElementById('fetch-button').addEventListener('click', fetchRandomDogImage);
+
+        async function fetchRandomDogImage() {
+            try {
+                const response = await axios.get('https://dog.ceo/api/breeds/image/random');
+
+                const imageUrl = response.data.message;
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Random Dog Image';
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+
+                const imageContainer = document.getElementById('image-container');
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(img);
+
+                // imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
+            } catch (error) {
+                alert(`요청 실패: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

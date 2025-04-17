@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Express Body Parser 테스트 (Axios 버전)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: auto; }
+        h2 { margin-top: 40px; }
+        button { margin-top: 10px; }
+        textarea, input[type="text"] { width: 100%; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+    </style>
+    <!-- Axios 라이브러리 추가 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+</head>
+<body>
+    <h1>Express Body Parser 테스트 (Axios 버전)</h1>
+
+    <!-- JSON -->
+    <h2>1. JSON (application/json)</h2>
+    <textarea id="jsonInput">{ "name": "John", "age": 30 }</textarea>
+    <button onclick="sendJSON()">전송</button>
+
+    <!-- URL-Encoded -->
+    <!-- 브라우저 <form method="POST" enctype="application/x-www-form-urlencoded">가 기본 폼 설정 -->
+    <h2>2. URL Encoded (application/x-www-form-urlencoded)</h2>
+    <input type="text" id="formName" placeholder="name=John" value="John">
+    <input type="text" id="formAge" placeholder="age=30" value="30">
+    <button onclick="sendForm()">전송</button>
+
+    <!-- Text -->
+    <h2>3. Text (text/plain)</h2>
+    <textarea id="textInput">Just a plain text message.</textarea>
+    <button onclick="sendText()">전송</button>
+
+    <!-- Raw -->
+    <h2>4. Raw (application/octet-stream)</h2>
+    <textarea id="rawInput">Raw binary content</textarea>
+    <button onclick="sendRaw()">전송</button>
+
+    <!-- Multipart -->
+    <h2>5. Multipart Form Data (multipart/form-data)</h2>
+    <input type="text" id="multipartName" placeholder="name">
+    <input type="file" id="fileInput">
+    <button onclick="sendMultipart()">전송</button>
+
+    <h2>서버 응답</h2>
+    <pre id="output">응답 결과가 여기에 표시됩니다.</pre>
+
+    <!-- <script src="scripts_axios.js"></script> -->
+    <script src="scripts_fetch.js"></script>
+</body>
+</html>

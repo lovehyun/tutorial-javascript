@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Dog Image</title>
+</head>
+<body>
+    <h1>Random Dog Image</h1>
+    <button id="fetch-button">Fetch Image</button>
+    <div id="image-container"></div>
+
+    <script>
+        document.getElementById('fetch-button').addEventListener('click', fetchRandomDogImage);
+
+        async function fetchRandomDogImage() {
+            try {
+                const response = await fetch('https://dog.ceo/api/breeds/image/random');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const imageUrl = data.message;
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Random Dog Image';
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                
+                const imageContainer = document.getElementById('image-container');
+                imageContainer.innerHTML = '';
+                imageContainer.appendChild(img);
+                
+                // imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
+            } catch (error) {
+                alert(`Request failed: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

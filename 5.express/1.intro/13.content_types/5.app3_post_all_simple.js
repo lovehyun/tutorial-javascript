@@ -46,8 +46,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
 });
 
 // 테스트용 HTML 페이지 경로
-app.get('/test', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'test.html'));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index5_posts.html'));
 });
 
 // 서버 실행
