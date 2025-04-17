@@ -36,7 +36,13 @@ document.addEventListener("DOMContentLoaded", function() {
     function addImage(imageUrl) {
         const imageElement = document.createElement('div');
         imageElement.classList.add('bot');
-        imageElement.innerHTML = `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+        // imageElement.innerHTML = `<img src="${imageUrl}" style="max-width: 100%; border-radius: 8px; margin-top: 6px;">`;
+        imageElement.innerHTML = `
+            <img src="${imageUrl}" 
+                style="max-width: 100%; border-radius: 8px; margin-top: 6px; cursor: pointer;"
+                onclick="window.open('${imageUrl}', '_blank')">
+            </img>
+        `
         chatbotMessages.appendChild(imageElement);
         chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
     }
