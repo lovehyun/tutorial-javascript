@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyTube - 동영상 시청</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">MyTube</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="검색..." />
+            <button id="search-button">검색</button>
+        </div>
+        <div class="header-right">
+            <a href="/upload" class="upload-btn">업로드</a>
+            <div class="user-menu">
+                <button id="login-btn">로그인</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="video-page">
+        <div class="video-container">
+            <div class="player-wrapper">
+                <video id="video-player" controls>
+                    <!-- 비디오 소스는 JavaScript로 설정됩니다 -->
+                    <p>브라우저가 비디오 태그를 지원하지 않습니다.</p>
+                </video>
+            </div>
+
+            <div class="video-info">
+                <h1 id="video-title">비디오 제목</h1>
+                <div class="video-stats">
+                    <span id="video-views">0 조회수</span>
+                    <span id="video-date">업로드 날짜</span>
+                </div>
+                <div class="video-actions">
+                    <button id="like-btn">
+                        <span class="icon">👍</span>
+                        <span id="like-count">0</span>
+                    </button>
+                    <button id="dislike-btn">
+                        <span class="icon">👎</span>
+                        <span id="dislike-count">0</span>
+                    </button>
+                    <button id="share-btn">
+                        <span class="icon">📤</span>
+                        <span>공유</span>
+                    </button>
+                </div>
+                <div class="video-description">
+                    <p id="video-description-text">비디오 설명</p>
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <h3>댓글</h3>
+                <div class="comment-form">
+                    <textarea id="comment-input" placeholder="댓글 추가..."></textarea>
+                    <button id="comment-submit">댓글</button>
+                </div>
+                <div id="comments-container">
+                    <!-- 댓글 목록이 JavaScript로 여기에 추가됩니다 -->
+                    <div class="loading">댓글 로딩 중...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-videos">
+            <h3>다음 동영상</h3>
+            <div id="related-videos">
+                <!-- 관련 비디오 목록이 JavaScript로 여기에 추가됩니다 -->
+                <div class="loading">관련 동영상 로딩 중...</div>
+            </div>
+        </div>
+    </main>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>로그인</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">사용자 이름:</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호:</label>
+                    <input type="password" id="password" name="password" required />
+                </div>
+                <button type="submit">로그인</button>
+            </form>
+            <p>계정이 없으신가요? <a href="#" id="register-link">회원가입</a></p>
+        </div>
+    </div>
+
+    <script src="/js/videoPlayer.js"></script>
+</body>
+</html>

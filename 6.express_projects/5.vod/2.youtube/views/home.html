@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyTube - 홈</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">MyTube</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="검색..." />
+            <button id="search-button">검색</button>
+        </div>
+        <div class="header-right">
+            <a href="/upload" class="upload-btn">업로드</a>
+            <div class="user-menu">
+                <button id="login-btn">로그인</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="sidebar">
+            <ul class="nav-menu">
+                <li class="active"><a href="/">홈</a></li>
+                <li><a href="#">인기</a></li>
+                <li><a href="#">구독</a></li>
+                <li><a href="#">라이브러리</a></li>
+                <li><a href="#">기록</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <h2>추천 동영상</h2>
+            <div id="videos-container" class="videos-grid">
+                <!-- 비디오 목록이 JavaScript로 여기에 추가됩니다 -->
+                <div class="loading">동영상 로딩 중...</div>
+            </div>
+        </div>
+    </main>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>로그인</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">사용자 이름:</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호:</label>
+                    <input type="password" id="password" name="password" required />
+                </div>
+                <button type="submit">로그인</button>
+            </form>
+            <p>계정이 없으신가요? <a href="#" id="register-link">회원가입</a></p>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>회원가입</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-username">사용자 이름:</label>
+                    <input type="text" id="reg-username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">이메일:</label>
+                    <input type="email" id="email" name="email" required />
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">비밀번호:</label>
+                    <input type="password" id="reg-password" name="password" required />
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">비밀번호 확인:</label>
+                    <input type="password" id="confirm-password" name="confirmPassword" required />
+                </div>
+                <button type="submit">가입하기</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
