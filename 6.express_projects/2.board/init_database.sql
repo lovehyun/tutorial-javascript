@@ -7,5 +7,5 @@ CREATE TABLE board (
     message VARCHAR(200)
 );
 
-INSERT INTO board(title, message) VALUES("title1", "message1");
-INSERT INTO board(title, message) VALUES("title2", "message2");
+INSERT INTO board(title, message) VALUES('title1', 'message1');
+INSERT INTO board(title, message) VALUES('title2', 'message2');
