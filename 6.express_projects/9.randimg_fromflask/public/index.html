@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>랜덤 고양이 사진</title>
+    <style>
+        body { text-align: center; padding-top: 50px; font-family: sans-serif; }
+        img { max-width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>🐱 랜덤 고양이 사진</h1>
+    <button onclick="fetchImage()">불러오기</button>
+    <div id="image-container">
+        <p>이미지를 불러오려면 버튼을 클릭하세요.</p>
+    </div>
+
+    <script>
+        async function fetchImage() {
+            try {
+                const res = await fetch('http://localhost:5000/random-dog');
+                const data = await res.json();
+                document.getElementById('image-container').innerHTML = `
+                    <img src="${data.url}" alt="랜덤 고양이" />
+                `;
+            } catch (error) {
+                console.error('이미지 요청 실패:', error);
+            }
+        }
+    </script>
+</body>
+</html>
