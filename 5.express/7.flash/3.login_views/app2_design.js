@@ -32,8 +32,8 @@ app.use(flash());
 // Routes
 app.get('/', (req, res) => {
     // res.render('login');
-    res.render('login2', { messages: req.flash('messages') });
-    // res.render('login3', { messages: req.flash('messages') });
+    res.render('login2_design', { messages: req.flash('messages') });
+    // res.render('login3_autoclose', { messages: req.flash('messages') });
 });
 
 

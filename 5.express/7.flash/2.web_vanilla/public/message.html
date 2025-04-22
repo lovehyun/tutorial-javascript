@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Flash Message Example</title>
+</head>
+<body>
+    <h1>Flash Message Example</h1>
+    <p id="flashMessage">로딩 중...</p>
+
+    <script>
+        fetch('/flash-data')
+            .then(res => res.json())
+            .then(data => {
+                const msg = data.message || 'No flash message';
+                document.getElementById('flashMessage').innerText = msg;
+            });
+    </script>
+</body>
+</html>
