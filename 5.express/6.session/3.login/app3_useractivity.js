@@ -1,3 +1,7 @@
+// 세션 만료시간 설정
+// 로그인 상태 확인 (/check-login)
+// 사용자 활동 갱신 (/user-activity)
+
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
