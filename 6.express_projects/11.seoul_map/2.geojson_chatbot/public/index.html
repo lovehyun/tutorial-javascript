@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>행정동 지도</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="chatbot.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <h1 id="map-title">행정동 지도</h1>
+
+    <select id="region-selector">
+        <option value="seoul">서울특별시</option>
+        <option value="jeju">제주특별자치도</option>
+    </select>
+
+    <div id="map"></div>
+
+    <!-- 챗봇 아이콘 -->
+    <div id="chatbotIcon" class="chatbot-icon">
+        <i class="bi bi-chat-dots-fill"></i>
+    </div>
+
+    <!-- 챗봇 창 -->
+    <div id="chatbotWindow" class="chatbot-window">
+        <div class="chatbot-header">
+            <span>지도 도우미</span>
+            <span id="closeChatbot" style="cursor: pointer;"><i class="bi bi-x-lg"></i></span>
+        </div>
+        <div class="chatbot-body">
+            <div id="chatbotMessages" class="chatbot-messages">
+            <!-- 메시지는 JavaScript에서 동적으로 추가됩니다 -->
+            </div>
+            <div class="chatbot-input-container">
+                <input type="text" id="chatbotInput" placeholder="메시지를 입력하세요...">
+                <button id="sendMessage"><i class="bi bi-send"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>
