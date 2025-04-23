@@ -1,38 +1,53 @@
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcrypt');
 
 const app = express();
 const port = 3000;
 
-// 미들웨어 설정
+// SQLite DB 연결
+const db = new sqlite3.Database('users.db', (err) => {
+    if (err) {
+        console.error('DB 연결 실패:', err.message);
+    } else {
+        console.log('SQLite DB 연결 성공!');
+    }
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// 세션 설정
 app.use(session({
     secret: 'your-secret-key',
     resave: false,
     saveUninitialized: true,
 }));
 
-// 간단한 메모리 기반 사용자 데이터
-const users = [
-    { id: 1, username: 'user1', password: 'password1' },
-    { id: 2, username: 'user2', password: 'password2' },
-];
-
 // 로그인 라우트
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    const user = users.find((u) => u.username === username && u.password === password);
 
-    if (user) {
-        req.session.user = { id: user.id, username: user.username };
-        res.json({ message: '로그인 성공!' });
-    } else {
-        res.status(401).json({ message: '로그인 실패' });
-    }
+    const query = `SELECT * FROM users WHERE username = ?`;
+    db.get(query, [username], async (err, row) => {
+        if (err) {
+            console.error('쿼리 오류:', err.message);
+            return res.status(500).json({ message: '서버 오류' });
+        }
+
+        if (!row) {
+            return res.status(401).json({ message: '사용자 없음' });
+        }
+
+        const match = await bcrypt.compare(password, row.password);
+        if (match) {
+            req.session.user = { id: row.id, username: row.username };
+            res.json({ message: '로그인 성공!' });
+        } else {
+            res.status(401).json({ message: '비밀번호 불일치' });
+        }
+    });
 });
 
 // 프로필 확인 라우트
@@ -57,9 +72,9 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// 로그인 페이지 제공
+// 로그인 HTML 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login2.html'));
 });
 
 // 서버 실행
