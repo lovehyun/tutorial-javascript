@@ -21,21 +21,16 @@ app.use(express.json());
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    const query = `SELECT * FROM users WHERE username = ?`;
+    const query = `SELECT * FROM users WHERE username = ? AND password = ?`;
 
-    db.get(query, [username], async (err, row) => {
+    db.get(query, [username, password], (err, row) => {
         if (err) {
             console.error('DB 쿼리 오류:', err.message);
             res.status(500).json({ message: '서버 오류' });
         } else if (!row) {
-            res.status(401).json({ message: '사용자 없음' });
+            res.status(401).json({ message: '아이디 또는 비밀번호가 틀렸습니다' });
         } else {
-            const match = await bcrypt.compare(password, row.password);
-            if (match) {
-                res.json({ message: '로그인 성공', user: { id: row.id, username: row.username } });
-            } else {
-                res.status(401).json({ message: '비밀번호 불일치' });
-            }
+            res.json({ message: '로그인 성공', user: { id: row.id, username: row.username } });
         }
     });
 });

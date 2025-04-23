@@ -33,8 +33,8 @@ const products = [
 // --->
 // 메인 라우트
 app.get('/', (req, res) => {
-    const user = req.session.user;
-    res.sendFile(path.join(__dirname, 'public', 'home.html'));
+    // res.sendFile(path.join(__dirname, 'public', 'home.html'));
+    res.redirect('/home');
 });
 
 app.get('/home', (req, res) => {

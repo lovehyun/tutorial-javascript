@@ -27,10 +27,7 @@ app.use(session({
 app.use(express.static('public'));
 
 // 메인 라우트
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'home.html'));
-});
-
+app.get('/', (req, res) => res.redirect('/home'));
 app.get('/home', (req, res) => res.sendFile(path.join(__dirname, 'public', 'home.html')));
 app.get('/cart', (req, res) => res.sendFile(path.join(__dirname, 'public', 'cart.html')));
 app.get('/products', (req, res) => res.sendFile(path.join(__dirname, 'public', 'products.html')));
@@ -150,6 +147,21 @@ app.delete('/api/cart/:productId', checkLogin, (req, res) => {
 });
 
 function calculateTotalAmount(cart) {
+    // 방법1. for
+    // let total = 0;
+    // for (let i = 0; i < cart.length; i++) {
+    //     total += cart[i].price * cart[i].quantity;
+    // }
+    // return total;
+
+    // 방법2. for..of
+    // let total = 0;
+    // for (const item of cart) {
+    //     total += item.price * item.quantity;
+    // }
+    // return total;
+
+    // 방법3. reduce
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
 }
 

@@ -40,6 +40,11 @@ app.post('/login', (req, res) => {
             return res.status(401).json({ message: '사용자 없음' });
         }
 
+        // $[version]$[cost]$[22자 base64 salt][31자 base64 hash]
+        // $2b$10$A94T0hG9CK9SM2GLKMJj4.ZNxAZS2ZzROhZCz3UFZk7C9wP68VWtK
+        // $2b$: bcrypt 알고리즘 버전
+        // 10$: salt rounds (몇 번 반복했는지)
+        // A94T0hG9CK9SM2GLKMJj4.: salt
         const match = await bcrypt.compare(password, row.password);
         if (match) {
             req.session.user = { id: row.id, username: row.username };

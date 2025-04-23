@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles2.css">
+</head>
+<body>
+    <h2>장바구니</h2>
+    <table id="cartTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+            <tr id="emptyCartMessageRow" style="display: none;">
+                <td colspan="5" style="background-color: #fff; text-align: center;">장바구니가 비었습니다.</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td>Total:</td>
+                <td id="totalAmount" class="total"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script src="/js/cart2.js"></script>
+</body>
+</html>
