@@ -6,7 +6,7 @@
 
 // connect.sid
 // s%3AotyQHFqoDNCN-Lmsop4IGuMG50b7Dv-B.z82XYsNQ7xlBhnagGYLm5J8ORxEaGokBM1BquBYLsr0]
-// s:{세션 데이터}.{서명}
+// s:{세션 데이터(id)}.{서명(hmac)}
 
 const express = require('express');
 const session = require('express-session');

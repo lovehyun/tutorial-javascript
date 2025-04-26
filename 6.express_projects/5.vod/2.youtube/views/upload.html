@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyTube - 동영상 업로드</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">MyTube</div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="검색..." />
+            <button id="search-button">검색</button>
+        </div>
+        <div class="header-right">
+            <a href="/upload" class="upload-btn active">업로드</a>
+            <div class="user-menu">
+                <button id="login-btn">로그인</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="upload-page">
+        <h1>동영상 업로드</h1>
+
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="upload-area">
+                <div id="drop-zone" class="drop-zone">
+                    <div class="upload-icon">📁</div>
+                    <p>파일을 여기에 끌어다 놓거나</p>
+                    <label for="video-file" class="file-select-btn">파일 선택</label>
+                    <input type="file" id="video-file" name="videoFile" accept="video/*" style="display: none" />
+                </div>
+                <div id="file-preview" class="file-preview" style="display: none">
+                    <video id="preview-player" controls></video>
+                    <div class="file-info">
+                        <p id="file-name">파일명</p>
+                        <p id="file-size">파일 크기</p>
+                    </div>
+                    <button type="button" id="change-file-btn">다른 파일 선택</button>
+                </div>
+            </div>
+
+            <div class="video-details">
+                <div class="form-group">
+                    <label for="video-title">제목 <span class="required">*</span></label>
+                    <input type="text" id="video-title" name="title" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="video-description">설명</label>
+                    <textarea id="video-description" name="description" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>미리보기 이미지</label>
+                    <div class="thumbnail-options">
+                        <div class="thumbnail-option">
+                            <input type="radio" id="auto-thumbnail" name="thumbnailType" value="auto" checked />
+                            <label for="auto-thumbnail">자동 생성</label>
+                        </div>
+                        <div class="thumbnail-option">
+                            <input type="radio" id="custom-thumbnail" name="thumbnailType" value="custom" />
+                            <label for="custom-thumbnail">직접 업로드</label>
+                        </div>
+                    </div>
+                    <div id="custom-thumbnail-upload" style="display: none">
+                        <input type="file" id="thumbnail-file" name="thumbnailFile" accept="image/*" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>공개 설정</label>
+                    <div class="visibility-options">
+                        <div class="visibility-option">
+                            <input type="radio" id="public-visibility" name="visibility" value="public" checked />
+                            <label for="public-visibility">공개</label>
+                        </div>
+                        <div class="visibility-option">
+                            <input type="radio" id="unlisted-visibility" name="visibility" value="unlisted" />
+                            <label for="unlisted-visibility">일부 공개</label>
+                        </div>
+                        <div class="visibility-option">
+                            <input type="radio" id="private-visibility" name="visibility" value="private" />
+                            <label for="private-visibility">비공개</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="upload-actions">
+                <button type="button" id="cancel-btn">취소</button>
+                <button type="submit" id="upload-btn" disabled>업로드</button>
+            </div>
+
+            <div id="upload-progress" class="upload-progress" style="display: none">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <p id="progress-status">0%</p>
+            </div>
+        </form>
+    </main>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>로그인</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">사용자 이름:</label>
+                    <input type="text" id="username" name="username" required />
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호:</label>
+                    <input type="password" id="password" name="password" required />
+                </div>
+                <button type="submit">로그인</button>
+            </form>
+            <p>계정이 없으신가요? <a href="#" id="register-link">회원가입</a></p>
+        </div>
+    </div>
+
+    <script src="/js/upload.js"></script>
+</body>
+</html>

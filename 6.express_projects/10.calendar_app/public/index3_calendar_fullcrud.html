@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>일정관리 캘린더</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        #calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+        #calendar-header button {
+            padding: 5px 10px;
+        }
+        #calendar-month {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+        .day {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 100px;
+            position: relative;
+            cursor: pointer;
+        }
+        .day.today {
+            background: #e0f7fa;
+            border: 2px solid #00796b;
+        }
+        .day .date {
+            font-weight: bold;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+        .day .events {
+            font-size: 0.8em;
+            margin-top: 25px;
+            overflow-y: auto;
+            max-height: 65px;
+            text-align: left;
+        }
+        .day .events div {
+            background: #f1f8e9;
+            margin: 2px 0;
+            padding: 2px 4px;
+            border-left: 3px solid #689f38;
+            cursor: pointer;
+        }
+        #eventModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        #eventModal.active {
+            display: block;
+        }
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        #overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>📅 일정관리 캘린더</h1>
+
+    <div id="calendar-header">
+        <button onclick="changeMonth(-1)">&lt;</button>
+        <div id="calendar-month"></div>
+        <button onclick="changeMonth(1)">&gt;</button>
+    </div>
+
+    <div id="calendar"></div>
+
+    <div id="overlay"></div>
+    <div id="eventModal">
+        <h3>일정 추가/수정</h3>
+        <input type="hidden" id="modalDate" />
+        <input type="hidden" id="eventId" />
+        <div>
+            <label>날짜: <span id="displayDate"></span></label>
+        </div>
+        <div>
+            <label>제목: <input type="text" id="modalTitle" /></label>
+        </div>
+        <div>
+            <label>설명: <textarea id="modalDesc"></textarea></label>
+        </div>
+        <div style="margin-top: 10px">
+            <button onclick="saveEvent()">저장</button>
+            <button onclick="deleteEvent()">삭제</button>
+            <button onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        const calendarEl = document.getElementById('calendar');
+        const overlay = document.getElementById('overlay');
+        const modal = document.getElementById('eventModal');
+        const modalDate = document.getElementById('modalDate');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const displayDate = document.getElementById('displayDate');
+        const eventIdInput = document.getElementById('eventId');
+        const monthLabel = document.getElementById('calendar-month');
+
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth();
+
+        function getMonthDays(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function renderCalendar() {
+            calendarEl.innerHTML = '';
+            monthLabel.textContent = `${currentYear}년 ${currentMonth + 1}월`;
+            const daysInMonth = getMonthDays(currentYear, currentMonth);
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const totalCells = daysInMonth + firstDay;
+
+            for (let i = 0; i < totalCells; i++) {
+                const dayEl = document.createElement('div');
+                dayEl.classList.add('day');
+                if (i >= firstDay) {
+                    const dateNum = i - firstDay + 1;
+                    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(
+                        dateNum
+                    ).padStart(2, '0')}`;
+                    dayEl.innerHTML = `<div class="date">${dateNum}</div><div class="events" id="events-${dateStr}"></div>`;
+
+                    if (dateStr === today.toISOString().slice(0, 10)) {
+                        dayEl.classList.add('today');
+                    }
+
+                    dayEl.addEventListener('click', () => openModal(dateStr));
+
+                    fetch(`/events/${dateStr}`)
+                        .then((res) => res.json())
+                        .then((events) => {
+                            const eventsEl = document.getElementById(`events-${dateStr}`);
+                            events.forEach((ev) => {
+                                const div = document.createElement('div');
+                                div.textContent = ev.title;
+                                div.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    openModal(dateStr, ev);
+                                });
+                                eventsEl.appendChild(div);
+                            });
+                        });
+                }
+                calendarEl.appendChild(dayEl);
+            }
+        }
+
+        function changeMonth(offset) {
+            currentMonth += offset;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        function openModal(date, event = null) {
+            overlay.classList.add('active');
+            modal.classList.add('active');
+            modalDate.value = date;
+            displayDate.textContent = date;
+            if (event) {
+                modalTitle.value = event.title;
+                modalDesc.value = event.description;
+                eventIdInput.value = event.id;
+            } else {
+                modalTitle.value = '';
+                modalDesc.value = '';
+                eventIdInput.value = '';
+            }
+        }
+
+        function closeModal() {
+            overlay.classList.remove('active');
+            modal.classList.remove('active');
+        }
+
+        function saveEvent() {
+            const id = eventIdInput.value;
+            const date = modalDate.value;
+            const title = modalTitle.value;
+            const desc = modalDesc.value;
+            if (!title) return alert('제목은 필수입니다.');
+
+            const url = id ? `/events/${id}` : '/events';
+            const method = id ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, title, description: desc }),
+            }).then(() => {
+                closeModal();
+                renderCalendar();
+            });
+        }
+
+        function deleteEvent() {
+            const id = eventIdInput.value;
+            if (!id) return alert('삭제할 일정이 없습니다.');
+            if (!confirm('정말 삭제하시겠습니까?')) return;
+
+            fetch(`/events/${id}`, { method: 'DELETE' }).then(() => {
+                closeModal();
+                renderCalendar();
+            });
+        }
+
+        renderCalendar();
+    </script>
+</body>
+</html>

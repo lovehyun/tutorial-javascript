@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>일정관리 캘린더</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>📅 일정관리 캘린더</h1>
+    <input type="date" id="datePicker" />
+    <input type="text" id="titleInput" placeholder="일정 제목" />
+    <textarea id="descInput" placeholder="설명 (선택)"></textarea>
+    <button onclick="addEvent()">일정 추가</button>
+    <h3>해당 날짜의 일정</h3>
+    <ul id="eventList"></ul>
+
+    <script>
+        const dateInput = document.getElementById('datePicker');
+        const titleInput = document.getElementById('titleInput');
+        const descInput = document.getElementById('descInput');
+        const eventList = document.getElementById('eventList');
+
+        dateInput.addEventListener('change', fetchEvents);
+
+        function fetchEvents() {
+            const date = dateInput.value;
+            fetch(`/events/${date}`)
+                .then(res => res.json())
+                .then(events => {
+                    eventList.innerHTML = '';
+                    events.forEach(ev => {
+                        const li = document.createElement('li');
+                        li.textContent = `${ev.title} - ${ev.description || ''}`;
+                        const delBtn = document.createElement('button');
+                        delBtn.textContent = '삭제';
+                        delBtn.onclick = () => deleteEvent(ev.id);
+                        li.appendChild(delBtn);
+                        eventList.appendChild(li);
+                    });
+                });
+        }
+
+        function addEvent() {
+            const date = dateInput.value;
+            const title = titleInput.value;
+            const desc = descInput.value;
+
+            if (!date || !title) return alert('날짜와 제목은 필수입니다.');
+
+            fetch('/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date, title, description: desc })
+            })
+            .then(res => res.json())
+            .then(() => {
+                titleInput.value = '';
+                descInput.value = '';
+                fetchEvents();
+            });
+        }
+
+        function deleteEvent(id) {
+            fetch(`/events/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => fetchEvents());
+        }
+    </script>
+</body>
+</html>

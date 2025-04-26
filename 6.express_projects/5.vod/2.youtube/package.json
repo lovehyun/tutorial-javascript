@@ -1,0 +1,26 @@
+{
+    "name": "youtube-clone",
+    "version": "1.0.0",
+    "description": "간단한 YouTube 클론 프로젝트",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "nodemon src/server.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "youtube",
+        "clone",
+        "express",
+        "vanilla-js"
+    ],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.18.2",
+        "multer": "^1.4.5-lts.1"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    }
+}

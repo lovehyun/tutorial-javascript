@@ -1,0 +1,181 @@
+.chatbot-messages .bot i {
+    color: #0077cc;
+    margin-right: 5px;
+}
+
+.chatbot-messages .user i {
+    color: #5a5a5a;
+    margin-right: 5px;
+}
+
+.chatbot-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.chatbot-icon:hover {
+    background: #0069d9;
+    transform: scale(1.05);
+}
+
+.chatbot-window {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 340px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.6); /* 더 투명하게 설정 */
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px); /* Safari 지원 */
+    border-radius: 10px;
+    border: 1px solid rgba(204, 204, 204, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.chatbot-header {
+    background: rgba(0, 123, 255, 0.7); /* 헤더 더 투명하게 */
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    height: 45px;
+    min-height: 45px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.chatbot-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 45px); /* 헤더 높이를 제외한 높이 계산 */
+    overflow: hidden; /* 내부 요소가 넘치는 것을 방지 */
+}
+
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    padding-right: 20px;
+    max-height: calc(100% - 60px);
+    background-color: rgba(248, 249, 250, 0.4); /* 더 투명하게 */
+    scrollbar-width: thin;
+    scrollbar-color: #b0b0b0 transparent;
+}
+
+/* Webkit 기반 브라우저 스크롤바 스타일링 */
+.chatbot-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+    background: #f8f9fa;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background-color: #b0b0b0;
+    border-radius: 10px;
+    border: 2px solid #f8f9fa;
+}
+
+.chatbot-messages .user,
+.chatbot-messages .bot {
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    max-width: 85%;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.chatbot-messages .bot {
+    background-color: rgba(255, 255, 255, 0.6); /* 더 투명하게 */
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.chatbot-messages .user {
+    background-color: rgba(227, 242, 253, 0.6); /* 더 투명하게 */
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.chatbot-messages .user {
+    background-color: #e3f2fd;
+    margin-left: auto;
+    border-bottom-right-radius: 4px;
+}
+
+.chatbot-messages .bot {
+    background-color: #ffffff;
+    margin-right: auto;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.chatbot-input-container {
+    display: flex;
+    border-top: 1px solid rgba(238, 238, 238, 0.5);
+    padding: 12px 15px;
+    background-color: rgba(255, 255, 255, 0.6); /* 더 투명하게 */
+    margin-bottom: 0;
+    box-sizing: border-box;
+    height: 60px;
+    min-height: 60px;
+    flex-shrink: 0;
+}
+
+.chatbot-input-container input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid rgba(221, 221, 221, 0.6);
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.chatbot-input-container input:focus {
+    border-color: #007bff;
+}
+
+.chatbot-input-container button {
+    width: 40px;
+    height: 40px;
+    margin-left: 8px;
+    border: none;
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.chatbot-input-container button:hover {
+    background: #0069d9;
+}

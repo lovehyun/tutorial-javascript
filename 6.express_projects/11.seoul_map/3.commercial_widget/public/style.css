@@ -1,0 +1,111 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin: 10px 0;
+}
+
+#map {
+    height: 90vh;
+    width: 100%;
+}
+
+#region-selector {
+    display: block;
+    margin: 0 auto 10px;
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+/* 컨트롤 패널 스타일 */
+#control-panel {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 900;
+}
+
+#control-panel button {
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+#control-panel button i {
+    font-size: 16px;
+}
+
+#control-panel button:hover {
+    background-color: #f0f0f0;
+    transform: translateX(-5px);
+}
+
+#control-panel button.active {
+    background-color: #4a89dc;
+    color: white;
+    transform: translateX(-10px);
+}
+
+/* 범례 스타일 */
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+/* 레전드만 챗봇 위에 위치하도록 조정 */
+.chat-legend {
+    margin-bottom: 100px !important; /* 챗봇 위로 이동하기 위한 여백 */
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+    font-weight: bold;
+}
+
+.legend {
+    line-height: 18px;
+    color: #555;
+}
+
+.legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+/* 툴팁 스타일 */
+.leaflet-tooltip {
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
