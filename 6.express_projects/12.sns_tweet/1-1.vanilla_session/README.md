@@ -124,7 +124,21 @@ INSERT INTO like_relation (tweet_id, user_id) VALUES (2, 1);
 
 **정규화 필요 이유:**
 - 기본키 일부에만 종속된 속성을 제거하여 데이터 구조를 명확히 함.
+- 트윗 1개에 대해 좋아요 개수를 보여줘야 함. 그런데 좋아요 수는 별도로 저장이 안 돼 있음. 그래서 매번 tweet 하나를 가져올 때마다 like 테이블을 다 조회해서 count를 세야 함.
 - 트윗과 좋아요 개수 관리 책임을 분리해 성능 최적화.
+
+**likes_count가 없는 상태**
+- 한 트윗당 매번 like_relation 서브쿼리를 돌려야 합니다.
+
+```sql
+SELECT 
+    tweet.id, 
+    tweet.content, 
+    tweet.user_id, 
+    (SELECT COUNT(*) FROM like_relation WHERE tweet_id = tweet.id) AS likes_count
+FROM tweet
+ORDER BY tweet.id DESC;
+```
 
 **tweet 테이블에 likes_count 컬럼 추가 (선택사항)**
 
@@ -144,6 +158,17 @@ UPDATE tweet SET likes_count = likes_count - 1 WHERE id = 1;
 ```
 
 **정규화 후 데이터 상태 (likes_count 적용):**
+- 트윗 테이블에 아예 likes_count 컬럼이 있으니까
+
+```sql
+SELECT 
+    id, 
+    content, 
+    user_id, 
+    likes_count
+FROM tweet
+ORDER BY id DESC;
+```
 
 **tweet 테이블**
 | id | content | user_id | likes_count |
