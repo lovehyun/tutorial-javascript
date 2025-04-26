@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SweetAlert2 다양한 예제</title>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SweetAlert2 다양한 예제 테스트</h1>
+
+    <button onclick="basicAlert()">✅ 기본 알림</button>
+    <button onclick="successAlert()">🎉 성공 알림</button>
+    <button onclick="errorAlert()">❌ 에러 알림</button>
+    <button onclick="confirmAlert()">🤔 확인/취소 알림</button>
+    <button onclick="timerAlert()">⏰ 자동 닫힘 알림</button>
+    <button onclick="inputPrompt()">✏️ 입력창 알림</button>
+    <button onclick="ajaxSimulation()">🔄 AJAX 시뮬레이션</button>
+
+    <script>
+        // 1. 기본 알림
+        function basicAlert() {
+            Swal.fire('안녕하세요!', '기본 팝업입니다.', 'info');
+        }
+
+        // 2. 성공 알림
+        function successAlert() {
+            Swal.fire({
+                icon: 'success',
+                title: '성공!',
+                text: '작업이 성공적으로 완료되었습니다.',
+                confirmButtonText: '좋아요'
+            });
+        }
+
+        // 3. 에러 알림
+        function errorAlert() {
+            Swal.fire({
+                icon: 'error',
+                title: '에러 발생',
+                text: '문제가 발생했습니다. 다시 시도해 주세요.',
+                confirmButtonText: '닫기'
+            });
+        }
+
+        // 4. 확인/취소 알림
+        function confirmAlert() {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: '이 작업은 되돌릴 수 없습니다.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('삭제 완료!', '항목이 삭제되었습니다.', 'success');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    Swal.fire('취소됨', '데이터는 안전합니다.', 'info');
+                }
+            });
+        }
+
+        // 5. 자동 닫힘 알림
+        function timerAlert() {
+            Swal.fire({
+                title: '자동으로 닫힙니다',
+                text: '3초 후에 창이 자동으로 닫혀요!',
+                timer: 3000,
+                timerProgressBar: true,
+                willClose: () => {
+                    console.log('팝업이 자동으로 닫혔습니다.');
+                }
+            });
+        }
+
+        // 6. 입력창 알림
+        function inputPrompt() {
+            Swal.fire({
+                title: '이름을 입력하세요',
+                input: 'text',
+                inputPlaceholder: '여기에 입력...',
+                showCancelButton: true,
+                confirmButtonText: '제출',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire(`입력한 값: ${result.value}`);
+                }
+            });
+        }
+
+        // 7. AJAX 시뮬레이션
+        function ajaxSimulation() {
+            Swal.fire({
+                title: '서버 요청 중...',
+                text: '잠시만 기다려 주세요...',
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'success',
+                    title: '요청 완료!',
+                    text: '서버 응답을 받았습니다.'
+                });
+            }, 2000); // 2초 뒤 완료
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SweetAlert2 서버 통신 예제</title>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        button {
+            margin: 20px;
+            padding: 12px 24px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>SweetAlert2 + 서버 통신 (3개 버튼)</h1>
+
+    <button onclick="loginPopup()">🛡️ 로그인 폼 보내기</button>
+    <button onclick="inputAndSend()">📨 이름 입력 보내기</button>
+    <button onclick="timerInsidePopup()">⏰ 타이머 완료 보내기</button>
+
+    <script>
+        // 1. 로그인 폼
+        async function loginPopup() {
+            const { value: formValues } = await Swal.fire({
+                title: '로그인',
+                html:
+                    '<input id="swal-input-email" class="swal2-input" placeholder="이메일">' +
+                    '<input id="swal-input-password" class="swal2-input" placeholder="비밀번호" type="password">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '로그인',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const email = document.getElementById('swal-input-email').value;
+                    const password = document.getElementById('swal-input-password').value;
+                    if (!email || !password) {
+                        Swal.showValidationMessage('모든 필드를 입력하세요!');
+                        return false;
+                    }
+                    return { email, password };
+                }
+            });
+
+            if (formValues) {
+                Swal.fire({ title: '전송 중...', didOpen: () => Swal.showLoading() });
+
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formValues)
+                });
+                const data = await response.json();
+
+                Swal.fire('완료!', data.message, 'success');
+            }
+        }
+
+        // 2. 이름 입력 후 서버 전송
+        async function inputAndSend() {
+            const { value: name } = await Swal.fire({
+                title: '이름 입력',
+                input: 'text',
+                inputPlaceholder: '이름을 입력하세요',
+                showCancelButton: true,
+                confirmButtonText: '전송',
+                cancelButtonText: '취소',
+                preConfirm: (value) => {
+                    if (!value) {
+                        Swal.showValidationMessage('이름을 입력해야 합니다!');
+                        return false;
+                    }
+                    return value;
+                }
+            });
+
+            if (name) {
+                Swal.fire({ title: '전송 중...', didOpen: () => Swal.showLoading() });
+
+                const response = await fetch('/api/send-name', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                const data = await response.json();
+
+                Swal.fire('완료!', data.message, 'success');
+            }
+        }
+
+        // 3. 타이머 완료 후 서버 전송
+        async function timerInsidePopup() {
+            let timerInterval;
+
+            const result = await Swal.fire({
+                title: '타이머 진행 중...',
+                html: '남은 시간 <b></b>초',
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: () => {
+                    const b = Swal.getHtmlContainer().querySelector('b');
+                    timerInterval = setInterval(() => {
+                        const remaining = Math.ceil(Swal.getTimerLeft() / 1000);
+                        b.textContent = remaining;
+                    }, 100);
+                },
+                willClose: () => {
+                    clearInterval(timerInterval);
+                }
+            });
+
+            if (result.dismiss === Swal.DismissReason.timer) {
+                Swal.fire({ title: '전송 중...', didOpen: () => Swal.showLoading() });
+
+                const response = await fetch('/api/timer-done', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const data = await response.json();
+
+                Swal.fire('완료!', data.message, 'success');
+            }
+        }
+    </script>
+
+</body>
+</html>

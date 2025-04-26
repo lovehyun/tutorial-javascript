@@ -1,0 +1,29 @@
+<!-- https://sweetalert2.github.io/ -->
+<!-- https://sweetalert2.github.io/#configuration -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>SweetAlert2 테스트</title>
+
+    <!-- SweetAlert2 CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+    <h1>SweetAlert2 간단 테스트</h1>
+    <button onclick="showAlert()">팝업 열기</button>
+
+    <script>
+        function showAlert() {
+            Swal.fire({
+                title: '안녕하세요!',
+                text: '이건 SweetAlert2 기본 팝업입니다.',
+                icon: 'success',   // success, error, warning, info, question
+                confirmButtonText: '확인'
+            });
+        }
+    </script>
+
+</body>
+</html>
