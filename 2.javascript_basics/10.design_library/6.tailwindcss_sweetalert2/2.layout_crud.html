@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tailwind + SweetAlert2 + 완전한 CRUD</title>
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* 추가 시 fade-in 에니메이션 */
+        .fade-in {
+            animation: fadeIn 2.0s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 삭제 fade-out 에니메이션 */
+        .fade-out {
+            animation: fadeOut 2.0s forwards;
+        }
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 메뉴바 -->
+    <nav class="bg-white shadow p-4 flex justify-between">
+        <div class="text-2xl font-bold text-blue-600">My App</div>
+        <div class="flex space-x-4">
+            <a href="#" class="text-gray-700 hover:text-blue-500">Home</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">About</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">Contact</a>
+        </div>
+    </nav>
+
+    <!-- 본문 -->
+    <div class="max-w-5xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">사용자 목록</h1>
+
+        <!-- 사용자 추가 버튼 -->
+        <button
+            onclick="addUser()"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-6"
+        >
+            ➕ 사용자 추가
+        </button>
+
+        <!-- 테이블 -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table id="userTable" class="min-w-full text-center">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-3 px-4">ID</th>
+                        <th class="py-3 px-4">이름</th>
+                        <th class="py-3 px-4">이메일</th>
+                        <th class="py-3 px-4">액션</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- 동적 데이터 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let users = [
+            { id: 1, name: '홍길동', email: 'hong@example.com' },
+            { id: 2, name: '김철수', email: 'kim@example.com' },
+        ];
+        let nextId = 3;
+
+        function renderTable() {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            users.forEach((user) => {
+                const tr = document.createElement('tr');
+                tr.classList.add('border-b');
+                tr.id = `user-row-${user.id}`;
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4">${user.id}</td>
+                    <td class="py-3 px-4">${user.name}</td>
+                    <td class="py-3 px-4">${user.email}</td>
+                    <td class="py-3 px-4 space-x-2">
+                    <button onclick="editUser(${user.id})" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-1 px-3 rounded">수정</button>
+                    <button onclick="deleteUser(${user.id})" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">삭제</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 사용자 추가
+        async function addUser() {
+            const { value: formValues } = await Swal.fire({
+                title: '새 사용자 추가',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="이름">' +
+                    '<input id="swal-email" class="swal2-input" placeholder="이메일">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '추가',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const email = document.getElementById('swal-email').value;
+                    if (!name || !email) {
+                        Swal.showValidationMessage('모든 항목을 입력하세요!');
+                        return false;
+                    }
+                    return { name, email };
+                },
+            });
+
+            if (formValues) {
+                users.push({ id: nextId++, name: formValues.name, email: formValues.email });
+                renderTable();
+                Swal.fire('추가 완료!', `${formValues.name} (${formValues.email})`, 'success');
+            }
+
+            // fade-in 효과 추가
+            // if (formValues) {
+            //     const newUser = { id: nextId++, name: formValues.name, email: formValues.email };
+            //     users.push(newUser);
+
+            //     // 테이블 다시 그리기
+            //     renderTable();
+
+            //     // 추가된 행에 fade-in 효과 적용
+            //     const newRow = document.getElementById(`user-row-${newUser.id}`);
+            //     if (newRow) {
+            //     newRow.classList.add('fade-in');
+            //     setTimeout(() => {
+            //         newRow.classList.remove('fade-in'); // 애니메이션 끝난 후 클래스 제거
+            //     }, 500); // 0.5초 뒤에 제거
+            //     }
+
+            //     Swal.fire('추가 완료!', `${formValues.name} (${formValues.email})`, 'success');
+            // }
+        }
+
+        // 사용자 수정
+        async function editUser(id) {
+            const user = users.find((u) => u.id === id);
+
+            const { value: formValues } = await Swal.fire({
+                title: '사용자 수정',
+                html:
+                    `<input id="swal-name" class="swal2-input" placeholder="이름" value="${user.name}">` +
+                    `<input id="swal-email" class="swal2-input" placeholder="이메일" value="${user.email}">`,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '수정',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const email = document.getElementById('swal-email').value;
+                    if (!name || !email) {
+                        Swal.showValidationMessage('모든 항목을 입력하세요!');
+                        return false;
+                    }
+                    return { name, email };
+                },
+            });
+
+            if (formValues) {
+                user.name = formValues.name;
+                user.email = formValues.email;
+                renderTable();
+                Swal.fire('수정 완료!', `${formValues.name} (${formValues.email})`, 'success');
+            }
+        }
+
+        // 사용자 삭제
+        function deleteUser(id) {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: `사용자 ID: ${id}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    users = users.filter(user => user.id !== id);
+                    renderTable();
+                    Swal.fire('삭제 완료!', `ID ${id} 사용자가 삭제되었습니다.`, 'success');
+                    
+                    // fade-out 효과 추가
+                    // const row = document.getElementById(`user-row-${id}`);
+                    // if (row) {
+                    //     row.classList.add('fade-out');
+                    //     setTimeout(() => {
+                    //         users = users.filter((user) => user.id !== id);
+                    //         renderTable();
+                    //     }, 500); // fade-out 0.5초 후 삭제
+                    // }
+                    // Swal.fire('삭제 완료!', `ID ${id} 사용자가 삭제되었습니다.`, 'success');
+                }
+            });
+        }
+
+        // 최초 테이블 렌더링
+        renderTable();
+    </script>
+</body>
+</html>

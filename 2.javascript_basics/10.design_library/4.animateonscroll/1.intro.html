@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>AOS 기본 스크롤 이펙트</title>
+
+    <!-- AOS CSS 추가 -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+    <style>
+        body {
+            height: 2000px; /* 스크롤할 수 있도록 높이 확보 */
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+        .box {
+            margin: 100px 0;
+            padding: 40px;
+            background: #f0f0f0;
+            border: 2px solid #ccc;
+            text-align: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>스크롤하면서 등장하는 요소들</h1>
+
+    <div class="box" data-aos="fade-up">첫 번째 박스</div>
+    <div class="box" data-aos="fade-right">두 번째 박스</div>
+    <div class="box" data-aos="zoom-in">세 번째 박스</div>
+
+    <!-- AOS JS 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+        // AOS를 초기화
+        AOS.init();
+    </script>
+
+</body>
+</html>

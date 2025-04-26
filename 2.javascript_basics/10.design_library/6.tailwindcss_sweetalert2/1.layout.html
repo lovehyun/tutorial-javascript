@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TailwindCSS + SweetAlert2 예제</title>
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- 메뉴바 -->
+    <nav class="bg-white shadow p-4 flex justify-between">
+        <div class="text-2xl font-bold text-blue-600">My App</div>
+        <div class="flex space-x-4">
+            <a href="#" class="text-gray-700 hover:text-blue-500">Home</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">About</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">Contact</a>
+        </div>
+    </nav>
+
+    <!-- 본문 -->
+    <div class="max-w-5xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">사용자 목록</h1>
+
+        <!-- SweetAlert2 버튼 -->
+        <button onclick="addUser()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-6">
+            사용자 추가
+        </button>
+
+        <!-- 테이블 -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table class="min-w-full text-center">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-3 px-4">ID</th>
+                        <th class="py-3 px-4">이름</th>
+                        <th class="py-3 px-4">이메일</th>
+                        <th class="py-3 px-4">액션</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="py-3 px-4">1</td>
+                        <td class="py-3 px-4">홍길동</td>
+                        <td class="py-3 px-4">hong@example.com</td>
+                        <td class="py-3 px-4">
+                            <button onclick="deleteUser(1)" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-3 px-4">2</td>
+                        <td class="py-3 px-4">김철수</td>
+                        <td class="py-3 px-4">kim@example.com</td>
+                        <td class="py-3 px-4">
+                            <button onclick="deleteUser(2)" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // SweetAlert2로 사용자 추가 팝업
+        async function addUser() {
+            const { value: formValues } = await Swal.fire({
+                title: '새 사용자 추가',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="이름">' +
+                    '<input id="swal-email" class="swal2-input" placeholder="이메일">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '추가',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const email = document.getElementById('swal-email').value;
+                    if (!name || !email) {
+                        Swal.showValidationMessage('모든 항목을 입력하세요!');
+                        return false;
+                    }
+                    return { name, email };
+                }
+            });
+
+            if (formValues) {
+                Swal.fire('추가 완료!', `${formValues.name} (${formValues.email})`, 'success');
+            }
+        }
+
+        // SweetAlert2로 사용자 삭제 확인
+        function deleteUser(id) {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: `사용자 ID: ${id}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('삭제 완료!', `ID ${id} 사용자가 삭제되었습니다.`, 'success');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

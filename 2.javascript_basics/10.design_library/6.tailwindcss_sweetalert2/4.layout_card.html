@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tailwind + SweetAlert2 + Chart.js 통합 예제</title>
+
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- 메뉴바 -->
+    <nav class="bg-white shadow p-4 flex justify-between">
+        <div class="text-2xl font-bold text-blue-600">My Dashboard</div>
+        <div class="flex space-x-4">
+            <a href="#" class="text-gray-700 hover:text-blue-500">Home</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">Charts</a>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-6 space-y-8">
+        <!-- 카드 영역 추가 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="statCards">
+            <div class="bg-white shadow rounded p-4 text-center">
+                <h3 class="text-gray-600">총 사용자 수</h3>
+                <p class="text-3xl font-bold text-blue-600" id="totalUsers">0명</p>
+            </div>
+            <div class="bg-white shadow rounded p-4 text-center">
+                <h3 class="text-gray-600">평균 성적</h3>
+                <p class="text-3xl font-bold text-green-500" id="averageScore">0점</p>
+            </div>
+            <div class="bg-white shadow rounded p-4 text-center">
+                <h3 class="text-gray-600">최고 성적</h3>
+                <p class="text-3xl font-bold text-red-500" id="highestScore">0점</p>
+            </div>
+        </div>
+        
+        <!-- 사용자 테이블 -->
+        <div class="bg-white rounded shadow p-4">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-2xl font-bold text-gray-800">사용자 목록</h2>
+                <button
+                    onclick="addUser()"
+                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                >
+                    ➕ 사용자 추가
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-center">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="py-2 px-4">ID</th>
+                            <th class="py-2 px-4">이름</th>
+                            <th class="py-2 px-4">이메일</th>
+                            <th class="py-2 px-4">성적</th>
+                            <th class="py-2 px-4">액션</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <!-- 동적 내용 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 차트 영역 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">성적 막대 그래프</h2>
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">성적 비율 파이 차트</h2>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let users = [
+            { id: 1, name: '홍길동', email: 'hong@example.com', score: 80 },
+            { id: 2, name: '김철수', email: 'kim@example.com', score: 95 },
+        ];
+        let nextId = 3;
+
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+
+        let barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: '성적',
+                        data: [],
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)', // Tailwind blue-500
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true },
+                },
+            },
+        });
+
+        let pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        data: [],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(251, 191, 36, 0.7)',
+                            'rgba(239, 68, 68, 0.7)',
+                        ],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+            },
+        });
+
+        function renderTable() {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = '';
+
+            users.forEach((user) => {
+                const tr = document.createElement('tr');
+                tr.classList.add('border-b');
+                tr.innerHTML = `
+                    <td class="py-2 px-4">${user.id}</td>
+                    <td class="py-2 px-4">${user.name}</td>
+                    <td class="py-2 px-4">${user.email}</td>
+                    <td class="py-2 px-4">${user.score}</td>
+                    <td class="py-2 px-4">
+                    <button onclick="deleteUser(${user.id})" class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded">
+                        삭제
+                    </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updateCharts();
+            updateStatCards();
+        }
+
+        function updateCharts() {
+            const names = users.map((u) => u.name);
+            const scores = users.map((u) => u.score);
+
+            // Bar Chart 업데이트
+            barChart.data.labels = names;
+            barChart.data.datasets[0].data = scores;
+            barChart.update();
+
+            // Pie Chart 업데이트
+            pieChart.data.labels = names;
+            pieChart.data.datasets[0].data = scores;
+            pieChart.update();
+        }
+
+        async function addUser() {
+            const { value: formValues } = await Swal.fire({
+                title: '새 사용자 추가',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="이름">' +
+                    '<input id="swal-email" class="swal2-input" placeholder="이메일">' +
+                    '<input id="swal-score" type="number" min="0" max="100" class="swal2-input" placeholder="성적 (0~100)">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '추가',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const email = document.getElementById('swal-email').value;
+                    const score = document.getElementById('swal-score').value;
+                    if (!name || !email || !score) {
+                        Swal.showValidationMessage('모든 항목을 입력하세요!');
+                        return false;
+                    }
+                    return { name, email, score: Number(score) };
+                },
+            });
+
+            if (formValues) {
+                users.push({
+                    id: nextId++,
+                    name: formValues.name,
+                    email: formValues.email,
+                    score: formValues.score,
+                });
+                renderTable();
+                Swal.fire('추가 완료!', `${formValues.name} 추가되었습니다.`, 'success');
+            }
+        }
+
+        function deleteUser(id) {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: `사용자 ID: ${id}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    users = users.filter((user) => user.id !== id);
+                    renderTable();
+                    Swal.fire('삭제 완료!', `ID ${id} 사용자가 삭제되었습니다.`, 'success');
+                }
+            });
+        }
+
+        function updateStatCards() {
+            const total = users.length;
+            const scores = users.map(u => u.score);
+
+            const average = scores.length ? (scores.reduce((a, b) => a + b) / scores.length).toFixed(1) : 0;
+            const highest = scores.length ? Math.max(...scores) : 0;
+
+            document.getElementById('totalUsers').textContent = `${total}명`;
+            document.getElementById('averageScore').textContent = `${average}점`;
+            document.getElementById('highestScore').textContent = `${highest}점`;
+        }
+
+        // 초기 렌더링
+        renderTable();
+    </script>
+</body>
+</html>
