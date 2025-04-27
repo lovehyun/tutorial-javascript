@@ -5,7 +5,16 @@ const sqlite3 = require('sqlite3');
 const path = require('path');
 
 const app = express();
-const db = new sqlite3.Database('database.db');
+// const db = new sqlite3.Database('database.db');
+const db = new sqlite3.Database('database.db', (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('Connected to the database.');
+        // SQLite3은 연결(Connection)마다 별도로 PRAGMA foreign_keys = ON을 설정해야 하므로, 초기화 SQL 파일 말고 서버 코드 안에서도 켜야 함.
+        db.run('PRAGMA foreign_keys = ON');
+    }
+});
 
 // 미들웨어
 app.use(express.json());
