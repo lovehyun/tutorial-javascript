@@ -1,4 +1,3 @@
-
 async function fetchTweets() {
     const res = await fetch(`${BASE_URL}/api/tweets`);
     return await res.json();

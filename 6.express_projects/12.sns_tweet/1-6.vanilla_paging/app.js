@@ -5,10 +5,17 @@ const sqlite3 = require('sqlite3');
 const path = require('path');
 
 const app = express();
-const db = new sqlite3.Database('database.db');
 
-// 리버스 프록시를 신뢰하게 설정
-app.set('trust proxy', true);
+// const db = new sqlite3.Database('database.db');
+const db = new sqlite3.Database('database.db', (err) => {
+    if (err) {
+        console.error(err.message);
+    } else {
+        console.log('Connected to the database.');
+        // SQLite3은 연결(Connection)마다 별도로 PRAGMA foreign_keys = ON을 설정해야 하므로, 초기화 SQL 파일 말고 서버 코드 안에서도 켜야 함.
+        db.run('PRAGMA foreign_keys = ON');
+    }
+});
 
 // 미들웨어
 app.use(express.json());
@@ -18,7 +25,12 @@ app.use(morgan('dev'));
 app.use(session({
     secret: 'your-secret-key',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    // cookie: {
+    //     maxAge: 7 * 24 * 60 * 60 * 1000 // 7일 동안 유지
+    // }
+    // cookie.maxAge 또는 cookie.expires가 설정됨 - 브라우저를 꺼도 쿠키 파일에 저장되어 살아남음. (persistent cookie)
+    // cookie.maxAge 또는 cookie.expires가 설정 안 됨 - 브라우저 메모리 상에만 존재함. 브라우저를 닫으면 사라짐. (session cookie)
 }));
 
 // 정적 파일 제공
@@ -122,32 +134,18 @@ app.get('/api/tweets', (req, res) => {
 
 // 트윗 목록 가져오기 - 페이징 처리를 고려한 페이지 내 좋아요 정보만 조회
 app.get('/api/tweets', (req, res) => {
-    // const page = parseInt(req.query.page) || 1;  // 기본 1페이지
-    // const limit = parseInt(req.query.limit) || 10; // 기본 10개
-    // const offset = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;  // 기본 1페이지
+    const limit = parseInt(req.query.limit) || 10; // 기본 10개
+    const offset = (page - 1) * limit;
 
-    const queryPage = req.query && req.query.page;
-    const queryLimit = req.query && req.query.limit;
-
-    const page = queryPage ? parseInt(queryPage) : 1;
-    const limit = queryLimit ? parseInt(queryLimit) : null; // limit 없으면 전체 조회
-    const offset = limit ? (page - 1) * limit : 0;
-    
-    let query = `
+    const query = `
         SELECT tweet.*, user.username
         FROM tweet
         JOIN user ON tweet.user_id = user.id
         ORDER BY tweet.id DESC
+        LIMIT ? OFFSET ?
     `;
-
-    const params = [];
-
-    if (limit !== null) {
-        query += ' LIMIT ? OFFSET ?';
-        params.push(limit, offset);
-    }
-
-    db.all(query, params, (err, tweets) => {
+    db.all(query, [limit, offset], (err, tweets) => {
         if (err) {
             return res.status(500).json({ error: '트윗 조회 실패' });
         }
@@ -256,32 +254,6 @@ app.post('/api/profile/update', loginRequired, (req, res) => {
             return res.status(400).json({ error: '이미 존재하는 사용자명 또는 이메일입니다.' });
         }
         res.json({ message: '프로필 수정 완료!' });
-    });
-});
-
-// 비밀번호 변경
-app.post('/api/profile/password', loginRequired, (req, res) => {
-    const { current_password, new_password } = req.body;
-
-    if (!current_password || !new_password) {
-        return res.status(400).json({ error: '모든 필드를 입력하세요.' });
-    }
-
-    db.get('SELECT * FROM user WHERE id = ?', [req.session.user.id], (err, user) => {
-        if (err || !user) {
-            return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
-        }
-
-        if (user.password !== current_password) {
-            return res.status(400).json({ error: '기존 비밀번호가 일치하지 않습니다.' });
-        }
-
-        db.run('UPDATE user SET password = ? WHERE id = ?', [new_password, req.session.user.id], function(err) {
-            if (err) {
-                return res.status(500).json({ error: '비밀번호 변경 실패' });
-            }
-            res.json({ message: '비밀번호가 변경되었습니다.' });
-        });
     });
 });
 

@@ -124,59 +124,6 @@ app.get('/api/tweets', (req, res) => {
     });
 });
 
-// 트윗 목록 가져오기 - 페이징 처리를 고려한 페이지 내 좋아요 정보만 조회
-/*
-app.get('/api/tweets', (req, res) => {
-    const page = parseInt(req.query.page) || 1;  // 기본 1페이지
-    const limit = parseInt(req.query.limit) || 10; // 기본 10개
-    const offset = (page - 1) * limit;
-
-    const query = `
-        SELECT tweet.*, user.username
-        FROM tweet
-        JOIN user ON tweet.user_id = user.id
-        ORDER BY tweet.id DESC
-        LIMIT ? OFFSET ?
-    `;
-    db.all(query, [limit, offset], (err, tweets) => {
-        if (err) {
-            return res.status(500).json({ error: '트윗 조회 실패' });
-        }
-
-        // 트윗 글이 없으면 빈 배열 반환
-        if (tweets.length === 0) {
-            return res.json([]);
-        }
-
-        if (req.session.user) {
-            const userId = req.session.user.id;
-            const tweetIds = tweets.map(tweet => tweet.id);
-
-            // 현재 페이지 글 중에 로그인 사용자가 좋아요 한 글이 있는지 조회
-            const placeholders = tweetIds.map(() => '?').join(',');
-            const likeQuery = `
-                SELECT tweet_id FROM like 
-                WHERE user_id = ? 
-                AND tweet_id IN (${placeholders})
-            `;
-            db.all(likeQuery, [userId, ...tweetIds], (err, likes) => {
-                if (err) {
-                    return res.status(500).json({ error: '좋아요 조회 실패' });
-                }
-                const likedTweetIds = likes.map(like => like.tweet_id);
-                const result = tweets.map(tweet => ({
-                    ...tweet,
-                    liked_by_current_user: likedTweetIds.includes(tweet.id)
-                }));
-                res.json(result);
-            });
-        } else {
-            res.json(tweets.map(tweet => ({ ...tweet, liked_by_current_user: false })));
-        }
-    });
-});
-*/
-
 // 트윗 작성
 app.post('/api/tweet', loginRequired, (req, res) => {
     const { content } = req.body;
