@@ -1,3 +1,7 @@
+const BASE_PATH = '';  // 경로 prefix
+// const BASE_PATH = '/tweet2';  // 경로 prefix
+const BASE_URL = location.origin + BASE_PATH;
+
 // 로그인 여부에 따라 네비게이션 메뉴 제어
 async function setupNav() {
     const user = await fetchMe();
@@ -33,14 +37,14 @@ function showFlash(message, type='success') {
 
 // API로 현재 사용자 정보 가져오기
 async function fetchMe() {
-    const res = await fetch('/api/me');
+    const res = await fetch(`${BASE_URL}/api/me`);
     return await res.json();
 }
 
 // 로그아웃 처리
 async function logout() {
-    await fetch('/api/logout', { method: 'POST' });
-    window.location.href = '/login.html';
+    await fetch(`${BASE_URL}/api/logout`, { method: 'POST' });
+    window.location.href = `${BASE_URL}/login.html`;
 }
 
 // 페이지 로드 시 메뉴 설정

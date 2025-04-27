@@ -1,7 +1,7 @@
 async function renderProfile() {
     const user = await fetchMe();
     if (!user) {
-        window.location.href = '/login.html';
+        window.location.href = `${BASE_URL}/login.html`;
         return;
     }
 
@@ -13,7 +13,7 @@ async function updateProfile() {
     const username = document.getElementById('profile-username').value;
     const email = document.getElementById('profile-email').value;
 
-    const res = await fetch('/api/profile/update', {
+    const res = await fetch(`${BASE_URL}/api/profile/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email })

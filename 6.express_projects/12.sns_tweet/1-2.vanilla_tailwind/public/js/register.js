@@ -3,7 +3,7 @@ async function register() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    const res = await fetch('/api/register', {
+    const res = await fetch(`${BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
@@ -12,7 +12,7 @@ async function register() {
     if (res.ok) {
         showFlash('회원가입 성공! 로그인 해주세요.', 'success');
         setTimeout(() => {
-            window.location.href = '/login.html';
+            window.location.href = `${BASE_URL}/login.html`;
         }, 500);
     } else {
         const error = await res.json();

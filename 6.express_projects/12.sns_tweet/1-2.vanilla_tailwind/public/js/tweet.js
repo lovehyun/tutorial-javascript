@@ -6,7 +6,7 @@ async function submitTweet() {
         return;
     }
 
-    const res = await fetch('/api/tweet', {
+    const res = await fetch(`${BASE_URL}/api/tweet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content })
@@ -15,7 +15,7 @@ async function submitTweet() {
     if (res.ok) {
         showFlash('트윗 작성 완료!', 'success');
         setTimeout(() => {
-            window.location.href = '/index.html';
+            window.location.href = `${BASE_URL}/index.html`;
         }, 500);
     } else {
         showFlash('트윗 작성 실패', 'danger');

@@ -1,15 +1,16 @@
+
 async function fetchTweets() {
-    const res = await fetch('/api/tweets');
+    const res = await fetch(`${BASE_URL}/api/tweets`);
     return await res.json();
 }
 
 async function likeTweet(id) {
-    await fetch(`/api/like/${id}`, { method: 'POST' });
+    await fetch(`${BASE_URL}/api/like/${id}`, { method: 'POST' });
     renderTweets();
 }
 
 async function unlikeTweet(id) {
-    await fetch(`/api/unlike/${id}`, { method: 'POST' });
+    await fetch(`${BASE_URL}/api/unlike/${id}`, { method: 'POST' });
     renderTweets();
 }
 
@@ -40,7 +41,7 @@ function openConfirm(onConfirm) {
 
 async function deleteTweet(id) {
     openConfirm(async () => {
-        await fetch(`/api/tweet/${id}`, { method: 'DELETE' });
+        await fetch(`${BASE_URL}/api/tweet/${id}`, { method: 'DELETE' });
         renderTweets();
     });
 }
