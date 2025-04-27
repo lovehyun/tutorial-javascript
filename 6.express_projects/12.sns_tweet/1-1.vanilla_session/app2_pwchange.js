@@ -5,7 +5,6 @@ const sqlite3 = require('sqlite3');
 const path = require('path');
 
 const app = express();
-
 // const db = new sqlite3.Database('database.db');
 const db = new sqlite3.Database('database.db', (err) => {
     if (err) {
@@ -125,6 +124,59 @@ app.get('/api/tweets', (req, res) => {
     });
 });
 
+// 트윗 목록 가져오기 - 페이징 처리를 고려한 페이지 내 좋아요 정보만 조회
+/*
+app.get('/api/tweets', (req, res) => {
+    const page = parseInt(req.query.page) || 1;  // 기본 1페이지
+    const limit = parseInt(req.query.limit) || 10; // 기본 10개
+    const offset = (page - 1) * limit;
+
+    const query = `
+        SELECT tweet.*, user.username
+        FROM tweet
+        JOIN user ON tweet.user_id = user.id
+        ORDER BY tweet.id DESC
+        LIMIT ? OFFSET ?
+    `;
+    db.all(query, [limit, offset], (err, tweets) => {
+        if (err) {
+            return res.status(500).json({ error: '트윗 조회 실패' });
+        }
+
+        // 트윗 글이 없으면 빈 배열 반환
+        if (tweets.length === 0) {
+            return res.json([]);
+        }
+
+        if (req.session.user) {
+            const userId = req.session.user.id;
+            const tweetIds = tweets.map(tweet => tweet.id);
+
+            // 현재 페이지 글 중에 로그인 사용자가 좋아요 한 글이 있는지 조회
+            const placeholders = tweetIds.map(() => '?').join(',');
+            const likeQuery = `
+                SELECT tweet_id FROM like 
+                WHERE user_id = ? 
+                AND tweet_id IN (${placeholders})
+            `;
+            db.all(likeQuery, [userId, ...tweetIds], (err, likes) => {
+                if (err) {
+                    return res.status(500).json({ error: '좋아요 조회 실패' });
+                }
+                const likedTweetIds = likes.map(like => like.tweet_id);
+                const result = tweets.map(tweet => ({
+                    ...tweet,
+                    liked_by_current_user: likedTweetIds.includes(tweet.id)
+                }));
+                res.json(result);
+            });
+        } else {
+            res.json(tweets.map(tweet => ({ ...tweet, liked_by_current_user: false })));
+        }
+    });
+});
+*/
+
 // 트윗 작성
 app.post('/api/tweet', loginRequired, (req, res) => {
     const { content } = req.body;
@@ -196,6 +248,32 @@ app.post('/api/profile/update', loginRequired, (req, res) => {
             return res.status(400).json({ error: '이미 존재하는 사용자명 또는 이메일입니다.' });
         }
         res.json({ message: '프로필 수정 완료!' });
+    });
+});
+
+// 비밀번호 변경
+app.post('/api/profile/password', loginRequired, (req, res) => {
+    const { current_password, new_password } = req.body;
+
+    if (!current_password || !new_password) {
+        return res.status(400).json({ error: '모든 필드를 입력하세요.' });
+    }
+
+    db.get('SELECT * FROM user WHERE id = ?', [req.session.user.id], (err, user) => {
+        if (err || !user) {
+            return res.status(404).json({ error: '사용자를 찾을 수 없습니다.' });
+        }
+
+        if (user.password !== current_password) {
+            return res.status(400).json({ error: '기존 비밀번호가 일치하지 않습니다.' });
+        }
+
+        db.run('UPDATE user SET password = ? WHERE id = ?', [new_password, req.session.user.id], function(err) {
+            if (err) {
+                return res.status(500).json({ error: '비밀번호 변경 실패' });
+            }
+            res.json({ message: '비밀번호가 변경되었습니다.' });
+        });
     });
 });
 

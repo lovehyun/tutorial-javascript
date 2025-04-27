@@ -1,121 +1,110 @@
 /* 전체 페이지 기본 글꼴 설정 */
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial, sans-serif; /* 전체 글꼴을 Arial로 설정 */
 }
 
 /* 상단 네비게이션 바 스타일 */
 nav ul {
-    list-style-type: none;
-    padding: 0;
+    list-style-type: none; /* 리스트 점(bullet) 제거 */
+    padding: 0; /* 기본 패딩 제거 */
 }
-
 nav ul li {
-    display: inline;
-    margin-right: 10px;
+    display: inline; /* 리스트 항목을 가로로 나열 */
+    margin-right: 10px; /* 각 항목 오른쪽에 10px 여백 추가 */
 }
 
 /* 플래시 메시지 영역 (성공/오류 알림) */
 .flash-messages {
-    list-style-type: none;
-    padding: 0;
+    list-style-type: none; /* 플래시 메시지도 리스트 점 제거 */
+    padding: 0; /* 기본 패딩 제거 - 메세지 없을때 공간 차지 안하도록 */
 }
-
+.flash-messages li {
+    padding: 10px; /* 안쪽 여백 10px */
+    margin-bottom: 5px; /* 아래쪽에 5px 간격 */
+    border-radius: 5px; /* 테두리 둥글게 */
+}
 .flash-messages li.success {
-    background-color: #d4edda;
-    color: #155724;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
+    background-color: #d4edda; /* 성공 메시지 배경색 (연한 초록) */
+    color: #155724; /* 성공 메시지 글자색 (짙은 초록) */
 }
-
 .flash-messages li.danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
+    background-color: #f8d7da; /* 실패 메시지 배경색 (연한 빨강) */
+    color: #721c24; /* 실패 메시지 글자색 (진한 빨강) */
 }
 
 /* 본문 스타일 --> */
 /* 개별 트윗 카드 스타일 */
 .tweet {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
+    border: 1px solid #ccc; /* 트윗 하나를 연한 회색 테두리로 둘러싸기 */
+    padding: 10px; /* 안쪽 여백 10px */
+    margin-bottom: 10px; /* 트윗 간 아래쪽에 10px 간격 */
 }
-
 /* 트윗 본문과 삭제 버튼을 좌우 정렬 */
 .tweet-body-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: flex; /* 내부 요소를 가로로 나열 (플렉스 박스) */
+    justify-content: space-between; /* 양쪽 끝으로 요소를 배치 */
+    align-items: flex-start; /* 위쪽 정렬 */
 }
-
 /* 트윗 본문 (왼쪽 정렬된 내용) */
 .tweet-content {
-    margin: 0;
-    flex: 1;
+    margin: 0; /* 바깥 여백 제거 */
+    flex: 1; /* 가능한 공간 모두 차지 */
 }
-
 /* 작성자 표시 - 아래, 작고 흐리게 */
 .tweet-author {
-    font-size: 0.9em;
-    color: #666;
-    font-style: italic;
-    margin: 4px 0;
+    font-size: 0.9em; /* 글자 크기를 기본보다 약간 작게 */
+    color: #666; /* 흐린 회색 글자색 */
+    font-style: italic; /* 이탤릭체로 표시 */
+    margin: 4px 0; /* 위아래 4px 여백 */
 }
-
 /* 좋아요/취소 버튼과 좋아요 수 */
 .tweet-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; /* 버튼과 좋아요 수를 가로로 나열 */
+    justify-content: space-between; /* 버튼과 좋아요 수를 양끝으로 배치 */
+    align-items: center; /* 세로 중앙 정렬 */
 }
-
 /* 좋아요 수 스타일 */
 .likes-count {
-    color: #555;
+    color: #555; /* 짙은 회색 글자색 */
 }
-
 /* 삭제 버튼 포함한 폼 */
 .delete-form {
-    display: inline;
+    display: inline; /* 폼을 블록이 아닌 인라인으로 표시 */
 }
-
 /* 삭제 버튼 자체 스타일 */
 .delete-form button {
-    background: none;
-    border: none;
-    color: red;
-    font-weight: bold;
-    cursor: pointer;
+    background: none; /* 배경 없음 */
+    border: none; /* 테두리 없음 */
+    color: red; /* 글자색 빨간색 */
+    font-weight: bold; /* 글자 굵게 */
+    cursor: pointer; /* 마우스 오버 시 커서를 포인터로 변경 */
 }
 /* 본문 스타일 <-- */
 
+/* 글 작성 페이지 스타일 --> */
 /* 트윗 폼 전체 박스 */
 .tweet-form-box {
-    max-width: 800px;
-    margin: 20px auto;
+    max-width: 800px; /* 최대 너비 800px로 제한 */
+    margin: 20px auto; /* 위아래 20px 여백, 좌우는 가운데 정렬 */
 }
-
 /* 텍스트 영역: 넓고 간결하게 */
 .simple-textarea {
-    width: 100%;
-    font-size: 1rem;
-    padding: 8px;
-    border: 1px solid #ccc;
+    width: 100%; /* 가로 100% */
+    font-size: 1rem; /* 글자 크기 기본값 1rem */
+    padding: 8px; /* 안쪽 여백 8px */
+    border: 1px solid #ccc; /* 연한 회색 테두리 */
 }
-
 /* 제출 버튼: 기본 스타일 */
 .simple-button {
-    padding: 6px 14px;
-    font-size: 1rem;
-    border: none;
-    background-color: #007BFF;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 6px 14px; /* 안쪽 여백 위아래 6px, 좌우 14px */
+    font-size: 1rem; /* 글자 크기 기본값 1rem */
+    border: none; /* 테두리 없음 */
+    background-color: #007BFF; /* 파란색 배경 */
+    color: white; /* 글자색 흰색 */
+    border-radius: 5px; /* 버튼 모서리 둥글게 */
+    cursor: pointer; /* 마우스 오버 시 커서를 포인터로 변경 */
 }
 .simple-button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* 호버 시 더 짙은 파란색으로 변경 */
 }
+/* 글 작성 페이지 스타일 <-- */
