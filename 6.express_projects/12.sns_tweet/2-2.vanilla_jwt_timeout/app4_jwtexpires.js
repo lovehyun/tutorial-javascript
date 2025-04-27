@@ -149,18 +149,7 @@ app.get('/api/tweets', (req, res) => {
                 return res.json(result);
             }
 
-            const tweetIds = tweets.map(tweet => tweet.id);
-            if (tweetIds.length === 0) {
-                return res.json([]);
-            }
-
-            const placeholders = tweetIds.map(() => '?').join(',');
-            const likeQuery = `
-                SELECT tweet_id
-                FROM like
-                WHERE user_id = ? AND tweet_id IN (${placeholders})
-            `;
-            db.all(likeQuery, [user.id, ...tweetIds], (err, likes) => {
+            db.all(`SELECT tweet_id FROM like WHERE user_id = ?`, [user.id], (err, likes) => {
                 if (err) {
                     return res.status(500).json({ error: '좋아요 조회 실패' });
                 }

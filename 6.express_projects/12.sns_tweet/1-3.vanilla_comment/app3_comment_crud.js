@@ -97,15 +97,8 @@ app.get('/api/tweets', (req, res) => {
 
         if (req.session.user) {
             const userId = req.session.user.id;
-            const tweetIds = tweets.map(tweet => tweet.id);
 
-            if (tweetIds.length === 0) {
-                res.json(tweets.map(tweet => ({ ...tweet, liked_by_current_user: false })));
-                return;
-            }
-
-            const placeholders = tweetIds.map(() => '?').join(',');
-            db.all(`SELECT tweet_id FROM like WHERE user_id = ? AND tweet_id IN (${placeholders})`, [userId, ...tweetIds], (err, likes) => {
+            db.all(`SELECT tweet_id FROM like WHERE user_id = ?`, [userId], (err, likes) => {
                 if (err) {
                     return res.status(500).json({ error: '좋아요 조회 실패' });
                 }

@@ -82,19 +82,21 @@ app.get('/api/me', authenticateToken, (req, res) => {
 });
 
 // 트윗 목록 (좋아요 여부 미체크 하는 간단한 버전)
-// app.get('/api/tweets', (req, res) => {
-//     const query = `
-//         SELECT tweet.*, user.username
-//         FROM tweet
-//         JOIN user ON tweet.user_id = user.id
-//         ORDER BY tweet.id DESC
-//     `;
-//     db.all(query, [], (err, tweets) => {
-//         if (err) return res.status(500).json({ error: '트윗 조회 실패' });
+/*
+app.get('/api/tweets', (req, res) => {
+    const query = `
+        SELECT tweet.*, user.username
+        FROM tweet
+        JOIN user ON tweet.user_id = user.id
+        ORDER BY tweet.id DESC
+    `;
+    db.all(query, [], (err, tweets) => {
+        if (err) return res.status(500).json({ error: '트윗 조회 실패' });
 
-//         res.json(tweets.map(tweet => ({ ...tweet, liked_by_current_user: false })));
-//     });
-// });
+        res.json(tweets.map(tweet => ({ ...tweet, liked_by_current_user: false })));
+    });
+});
+*/
 
 // 트윗 목록
 app.get('/api/tweets', (req, res) => {
@@ -131,11 +133,68 @@ app.get('/api/tweets', (req, res) => {
                 return res.json(result);
             }
 
-            const tweetIds = tweets.map(tweet => tweet.id);
-            if (tweetIds.length === 0) {
-                return res.json([]);
+            db.all(`SELECT tweet_id FROM like WHERE user_id = ?`, [user.id], (err, likes) => {
+                if (err) {
+                    return res.status(500).json({ error: '좋아요 조회 실패' });
+                }
+
+                const likedTweetIds = likes.map(like => like.tweet_id);
+                const result = tweets.map(tweet => ({
+                    ...tweet,
+                    liked_by_current_user: likedTweetIds.includes(tweet.id)
+                }));
+                res.json(result);
+            });
+        });
+    });
+});
+
+// 트윗 목록 - 페이징 처리 고려한 효율적인 쿼리 구문
+/*
+app.get('/api/tweets', (req, res) => {
+    const page = parseInt(req.query.page) || 1;    // page 없으면 1
+    const limit = parseInt(req.query.limit) || 10;  // limit 없으면 10
+    const offset = (page - 1) * limit;
+
+    const query = `
+        SELECT tweet.*, user.username
+        FROM tweet
+        JOIN user ON tweet.user_id = user.id
+        ORDER BY tweet.id DESC
+        LIMIT ? OFFSET ?
+    `;
+
+    db.all(query, [limit, offset], (err, tweets) => {
+        if (err) {
+            return res.status(500).json({ error: '트윗 조회 실패' });
+        }
+
+        if (tweets.length === 0) {
+            return res.json([]);
+        }
+
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (!token) {
+            // 로그인 안한 경우: liked_by_current_user 전부 false
+            const result = tweets.map(tweet => ({
+                ...tweet,
+                liked_by_current_user: false
+            }));
+            return res.json(result);
+        }
+
+        jwt.verify(token, SECRET_KEY, (err, user) => {
+            if (err) {
+                const result = tweets.map(tweet => ({
+                    ...tweet,
+                    liked_by_current_user: false
+                }));
+                return res.json(result);
             }
 
+            const tweetIds = tweets.map(tweet => tweet.id);
             const placeholders = tweetIds.map(() => '?').join(',');
             const likeQuery = `
                 SELECT tweet_id
@@ -157,6 +216,7 @@ app.get('/api/tweets', (req, res) => {
         });
     });
 });
+*/
 
 // 트윗 작성
 app.post('/api/tweet', authenticateToken, (req, res) => {
