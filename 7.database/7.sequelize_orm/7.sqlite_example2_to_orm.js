@@ -4,7 +4,7 @@ const { Sequelize, DataTypes } = require('sequelize');
 // SQLite 데이터베이스를 사용하여 Sequelize 인스턴스 생성
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './database.sqlite', // SQLite 데이터베이스 파일
+    storage: './database2.sqlite', // SQLite 데이터베이스 파일
 });
 
 // User 모델 정의

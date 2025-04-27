@@ -31,6 +31,27 @@ const User = sequelize.define('User', {
     },
 });
 
+// Sequelize는 기본으로 createdAt, updatedAt 컬럼을 추가합니다. 안생기게 하려면 아래 추가...
+/*
+const User = sequelize.define('User', {
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+    },
+    age: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+}, {
+    timestamps: false, // createdAt, updatedAt 컬럼 생성 안 함
+});
+*/
+
 // 순차적으로 실행되는 비동기 함수
 (async () => {
     // 1. 데이터베이스 동기화 및 초기화
