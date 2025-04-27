@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        #todo-list li { margin-bottom: 5px; cursor: pointer; }
+        #todo-list li.completed { text-decoration: line-through; }
+
+        .delete-btn {
+            margin-left: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list"></ul>
+
+    <script>
+        const todoList = document.getElementById('todo-list');
+        const input = document.getElementById('new-todo');
+        const addBtn = document.getElementById('add-todo');
+
+        // To-Do 항목 렌더링
+        function renderTodos(todos) {
+            todoList.innerHTML = '';
+            todos.forEach(todo => {
+                const li = document.createElement('li');
+                li.textContent = todo.text;
+                li.classList.toggle('completed', todo.completed);
+
+                // 토글
+                li.addEventListener('click', async () => {
+                    try {
+                        await axios.put(`/api/todos/${todo.id}/toggle`);
+                        await fetchTodos();
+                    } catch (err) {
+                        console.error('토글 실패:', err);
+                    }
+                });
+
+                // 삭제 버튼
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '삭제';
+                deleteBtn.classList.add('delete-btn');
+                deleteBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    try {
+                        await axios.delete(`/api/todos/${todo.id}`);
+                        await fetchTodos();
+                    } catch (err) {
+                        console.error('삭제 실패:', err);
+                    }
+                });
+
+                li.appendChild(deleteBtn);
+                todoList.appendChild(li);
+            });
+        }
+
+        // To-Do 목록 불러오기
+        async function fetchTodos() {
+            try {
+                const res = await axios.get('/api/todos');
+                renderTodos(res.data);
+            } catch (err) {
+                console.error('목록 불러오기 실패:', err);
+            }
+        }
+
+        // To-Do 추가
+        addBtn.addEventListener('click', async () => {
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                await axios.post('/api/todos', { text });
+                input.value = '';
+                await fetchTodos();
+            } catch (err) {
+                console.error('추가 실패:', err);
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') addBtn.click();
+        });
+
+        // 초기 로딩
+        fetchTodos();
+    </script>
+</body>
+</html>
