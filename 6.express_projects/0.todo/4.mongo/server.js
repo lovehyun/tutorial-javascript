@@ -5,10 +5,13 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = 3000;
 
+require('dotenv').config();
+
 // MongoDB 연결
 async function initDB() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/your_database');
+        // await mongoose.connect('mongodb://localhost:27017/your_database');
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log('MongoDB 연결 성공');
     } catch (err) {
         console.error('MongoDB 연결 실패:', err);

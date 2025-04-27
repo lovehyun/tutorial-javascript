@@ -1,16 +1,23 @@
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql2');
+require('dotenv').config();
 
 const app = express();
 const PORT = 3000;
 
 // MySQL 데이터베이스 연결
+// const db = mysql.createConnection({
+//     host: 'localhost',         // 본인 환경에 맞게 수정
+//     user: 'your_username',     // 본인 환경에 맞게 수정
+//     password: 'your_password', // 본인 환경에 맞게 수정
+//     database: 'your_database'  // 본인 환경에 맞게 수정
+// });
 const db = mysql.createConnection({
-    host: 'localhost',         // 본인 환경에 맞게 수정
-    user: 'your_username',     // 본인 환경에 맞게 수정
-    password: 'your_password', // 본인 환경에 맞게 수정
-    database: 'your_database'  // 본인 환경에 맞게 수정
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE
 });
 
 // MySQL 연결 후 테이블 생성
