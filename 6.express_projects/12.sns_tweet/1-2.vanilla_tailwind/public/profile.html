@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8" />
     <title>Profile - Social Network</title>
+    <!-- <base href="/tweet2/"> -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <nav class="bg-white/80 backdrop-blur-md shadow-md fixed w-full z-10">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex space-x-6">
-                <a href="/index.html" class="text-lg font-bold text-blue-600">Home</a>
-                <a id="nav-login" href="/login.html" class="text-gray-600 hover:text-blue-500">Login</a>
+                <a href="index.html" class="text-lg font-bold text-blue-600">Home</a>
+                <a id="nav-login" href="login.html" class="text-gray-600 hover:text-blue-500">Login</a>
                 <a id="nav-logout" href="#" onclick="logout()" class="hidden text-gray-600 hover:text-blue-500">Logout</a>
-                <a id="nav-profile" href="/profile.html" class="hidden text-gray-600 hover:text-blue-500">Profile</a>
-                <a id="nav-tweet" href="/tweet.html" class="hidden text-gray-600 hover:text-blue-500">Tweet</a>
+                <a id="nav-profile" href="profile.html" class="hidden text-gray-600 hover:text-blue-500">Profile</a>
+                <a id="nav-tweet" href="tweet.html" class="hidden text-gray-600 hover:text-blue-500">Tweet</a>
             </div>
         </div>
     </nav>
@@ -24,29 +25,16 @@
         <div class="bg-white shadow-lg rounded-lg p-8">
             <h2 class="text-2xl font-bold mb-6 text-center">프로필 수정</h2>
             <form id="profile-form" onsubmit="event.preventDefault(); updateProfile();">
-                <input
-                    id="profile-username"
-                    type="text"
-                    placeholder="사용자명"
-                    class="w-full mb-4 px-4 py-2 border rounded-lg"
-                />
-                <input
-                    id="profile-email"
-                    type="email"
-                    placeholder="이메일"
-                    class="w-full mb-4 px-4 py-2 border rounded-lg"
-                />
-                <button
-                    type="submit"
-                    class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 rounded-lg transition"
-                >
+                <input id="profile-username" type="text" placeholder="사용자명" class="w-full mb-4 px-4 py-2 border rounded-lg" />
+                <input id="profile-email" type="email" placeholder="이메일" class="w-full mb-4 px-4 py-2 border rounded-lg" />
+                <button type="submit" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 rounded-lg transition">
                     프로필 수정
                 </button>
             </form>
         </div>
     </div>
 
-    <script src="/js/common.js"></script>
-    <script src="/js/profile.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/profile.js"></script>
 </body>
 </html>

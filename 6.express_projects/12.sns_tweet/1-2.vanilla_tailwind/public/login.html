@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <title>Login - Social Network</title>
+    <!-- <base href="/tweet2/"> -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
     <nav class="bg-white/80 backdrop-blur-md shadow-md fixed w-full z-10">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="/index.html" class="text-lg font-bold text-blue-600">Home</a>
+            <a href="index.html" class="text-lg font-bold text-blue-600">Home</a>
         </div>
     </nav>
 
@@ -18,25 +19,17 @@
         <div class="bg-white shadow-lg rounded-lg p-8">
             <h2 class="text-2xl font-bold mb-6 text-center">로그인</h2>
             <input id="email" type="email" placeholder="이메일" class="w-full mb-4 px-4 py-2 border rounded-lg" />
-            <input
-                id="password"
-                type="password"
-                placeholder="비밀번호"
-                class="w-full mb-4 px-4 py-2 border rounded-lg"
-            />
-            <button
-                onclick="login()"
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition"
-            >
+            <input id="password" type="password" placeholder="비밀번호" class="w-full mb-4 px-4 py-2 border rounded-lg" />
+            <button onclick="login()" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">
                 로그인
             </button>
             <p class="mt-4 text-center text-gray-600">
-                아직 계정이 없나요? <a href="/register.html" class="text-blue-500 hover:underline">회원가입</a>
+                아직 계정이 없나요? <a href="register.html" class="text-blue-500 hover:underline">회원가입</a>
             </p>
         </div>
     </div>
 
-    <script src="/js/common.js"></script>
-    <script src="/js/login.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>

@@ -7,6 +7,9 @@ const path = require('path');
 const app = express();
 const db = new sqlite3.Database('database.db');
 
+// 리버스 프록시를 신뢰하게 설정
+app.set('trust proxy', true);
+
 // 미들웨어
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
