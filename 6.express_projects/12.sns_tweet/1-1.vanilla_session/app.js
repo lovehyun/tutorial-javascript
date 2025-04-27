@@ -25,7 +25,12 @@ app.use(morgan('dev'));
 app.use(session({
     secret: 'your-secret-key',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    // cookie: {
+    //     maxAge: 7 * 24 * 60 * 60 * 1000 // 7일 동안 유지
+    // }
+    // cookie.maxAge 또는 cookie.expires가 설정됨 - 브라우저를 꺼도 쿠키 파일에 저장되어 살아남음. (persistent cookie)
+    // cookie.maxAge 또는 cookie.expires가 설정 안 됨 - 브라우저 메모리 상에만 존재함. 브라우저를 닫으면 사라짐. (session cookie)
 }));
 
 // 정적 파일 제공
