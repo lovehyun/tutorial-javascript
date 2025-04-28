@@ -5,11 +5,15 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
+const chatbot = require('./services/chatbot');
+
 const db = new sqlite3.Database('./calendar.db');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+
+app.use(chatbot);
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index3_calendar_fullcrud.html'));
@@ -44,6 +48,20 @@ app.delete('/events/:id', (req, res) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ deleted: this.changes });
     });
+});
+
+// 일정 수정 (업데이트)
+app.put('/events/:id', (req, res) => {
+    const { id } = req.params;
+    const { title, description } = req.body;
+    db.run(
+        'UPDATE schedule SET title = ?, description = ? WHERE id = ?',
+        [title, description, id],
+        function (err) {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ updated: this.changes });
+        }
+    );
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

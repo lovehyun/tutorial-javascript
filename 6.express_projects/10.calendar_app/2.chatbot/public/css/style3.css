@@ -1,0 +1,88 @@
+body {
+    font-family: sans-serif;
+    max-width: 800px;
+    margin: 40px auto;
+    text-align: center;
+}
+h1 {
+    margin-bottom: 10px;
+}
+#calendar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+#calendar-header button {
+    padding: 5px 10px;
+}
+#calendar-month {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 20px;
+}
+.day {
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 100px;
+    position: relative;
+    cursor: pointer;
+}
+.day.today {
+    background: #e0f7fa;
+    border: 2px solid #00796b;
+}
+.day .date {
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+.day .events {
+    font-size: 0.8em;
+    margin-top: 25px;
+    overflow-y: auto;
+    max-height: 65px;
+    text-align: left;
+}
+.day .events div {
+    background: #f1f8e9;
+    margin: 2px 0;
+    padding: 2px 4px;
+    border-left: 3px solid #689f38;
+    cursor: pointer;
+}
+#eventModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+#eventModal.active {
+    display: block;
+}
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+#overlay.active {
+    display: block;
+}
