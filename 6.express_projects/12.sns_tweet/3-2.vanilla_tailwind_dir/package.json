@@ -1,0 +1,16 @@
+{
+  "name": "express-tweet-app",
+  "version": "1.0.0",
+  "description": "트윗 프로젝트 (Express + SQLite3)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "morgan": "^1.10.0",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Home - Social Network</title>
+    <!-- <base href="/tweet2/"> -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white/80 backdrop-blur-md shadow-md fixed w-full z-10">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-lg font-bold text-blue-600">Home</a>
+                <a id="nav-login" href="login.html" class="text-gray-600 hover:text-blue-500">Login</a>
+                <a id="nav-logout" href="#" onclick="logout()" class="hidden text-gray-600 hover:text-blue-500">Logout</a>
+                <a id="nav-profile" href="profile.html" class="hidden text-gray-600 hover:text-blue-500">Profile</a>
+                <a id="nav-tweet" href="tweet.html" class="hidden text-gray-600 hover:text-blue-500">Tweet</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 max-w-2xl mx-auto">
+        <ul id="flash-message" class="mb-4"></ul>
+
+        <div id="tweets" class="space-y-6"></div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+            <p class="mb-4 text-lg font-semibold">정말 삭제하시겠습니까?</p>
+            <div class="flex justify-center space-x-4">
+                <button id="confirm-yes" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">예</button>
+                <button id="confirm-no" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded">아니오</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/common.js"></script>
+    <script src="js/index_old.js"></script>
+</body>
+</html>
