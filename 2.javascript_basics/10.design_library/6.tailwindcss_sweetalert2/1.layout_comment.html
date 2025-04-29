@@ -1,0 +1,242 @@
+<!--
+1. 설치: 핵심엔진, CSS처리기, 브라우저 호환성 자동 처리기 (Tailwind v3.x 까지. v4.x 부터는 유효하지 않음.
+npm install -D tailwindcss @tailwindcss/postcss
+
+npm install -D tailwindcss@3.3.3 postcss@8.4.27 autoprefixer@10.4.14
+npx tailwindcss init -p 
+
+2. 개발
+src/input.css 에 아래 삽입
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+3. 빌드
+npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify 
+
+4. 배포
+<link href="./dist/output.css" rel="stylesheet">
+-->
+
+<!-- 
+Tailwind 클래스	CSS 대응
+bg-gray-100	background-color: #f7fafc;
+bg-white	background-color: #ffffff;
+shadow	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+p-4	padding: 1rem;
+flex	display: flex;
+justify-between	justify-content: space-between;
+space-x-4	margin-right: 1rem; (Flex children 간격)
+text-gray-700	color: #374151;
+hover:text-blue-500	hover color: #3b82f6;
+text-2xl	font-size: 1.5rem;
+font-bold	font-weight: 700;
+text-blue-600	color: #2563eb;
+max-w-5xl	max-width: 64rem;
+mx-auto	margin-left/right: auto;
+py-3, px-4	padding-top/bottom: 0.75rem, padding-left/right: 1rem;
+rounded	border-radius: 0.25rem;
+overflow-x-auto	overflow-x: auto;
+min-w-full	min-width: 100%;
+text-center	text-align: center;
+bg-gray-200	background-color: #e5e7eb;
+border-b	border-bottom: 1px solid #e5e7eb;
+bg-blue-500, hover:bg-blue-600	파란색 배경과 호버 시 진한 파란색
+bg-red-500, hover:bg-red-600	빨간색 배경과 호버 시 진한 빨간색
+text-white	color: #ffffff;
+font-semibold	font-weight: 600; 
+-->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TailwindCSS + SweetAlert2 예제</title>
+
+    <!-- TailwindCSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100"> <!-- 배경을 밝은 회색으로 설정 (background-color: #f7fafc;) -->
+
+    <!-- 메뉴바 -->
+    <nav class="bg-white shadow p-4 flex justify-between">
+        <!-- 
+            bg-white: 배경을 흰색으로 (background-color: #ffffff;)
+            shadow: 기본 그림자 추가 (box-shadow: 0 1px 3px rgba(0,0,0,0.1))
+            p-4: 패딩 1rem (padding: 1rem;)
+            flex: Flexbox 사용 (display: flex;)
+            justify-between: 좌우 끝으로 정렬 (justify-content: space-between;)
+        -->
+        <div class="text-2xl font-bold text-blue-600">My App</div>
+        <!--
+            text-2xl: 글자 크기 1.5rem (font-size: 1.5rem;)
+            font-bold: 글자 굵기 bold (font-weight: 700;)
+            text-blue-600: 파란색 계열 글자색 (color: #2563eb;)
+        -->
+        <div class="flex space-x-4">
+            <!--
+                flex: Flexbox로 내부 항목 나열 (display: flex;)
+                space-x-4: 항목 간 수평 간격 1rem (margin-right: 1rem;)
+            -->
+            <a href="#" class="text-gray-700 hover:text-blue-500">Home</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">About</a>
+            <a href="#" class="text-gray-700 hover:text-blue-500">Contact</a>
+            <!--
+                text-gray-700: 회색 글자 (color: #374151;)
+                hover:text-blue-500: 마우스 올리면 파란색으로 변경 (color: #3b82f6;)
+            -->
+        </div>
+    </nav>
+
+    <!-- 본문 -->
+    <div class="max-w-5xl mx-auto p-6">
+        <!--
+            max-w-5xl: 최대 너비 64rem (1024px) (max-width: 64rem;)
+            mx-auto: 수평 가운데 정렬 (margin-left/right: auto;)
+            p-6: 패딩 1.5rem (padding: 1.5rem;)
+        -->
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">사용자 목록</h1>
+        <!--
+            text-3xl: 글자 크기 1.875rem (font-size: 1.875rem;)
+            font-bold: 볼드체 (font-weight: 700;)
+            mb-6: 아래쪽 마진 1.5rem (margin-bottom: 1.5rem;)
+            text-gray-800: 짙은 회색 글자색 (color: #1f2937;)
+        -->
+
+        <!-- SweetAlert2 버튼 -->
+        <button onclick="addUser()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-6">
+            <!--
+                bg-blue-500: 파란색 배경 (background-color: #3b82f6;)
+                hover:bg-blue-600: 호버 시 더 진한 파란색 (background-color: #2563eb;)
+                text-white: 흰색 글자 (color: #ffffff;)
+                font-semibold: 글자 semi-bold (font-weight: 600;)
+                py-2: 수직 패딩 0.5rem (padding-top/bottom: 0.5rem;)
+                px-4: 수평 패딩 1rem (padding-left/right: 1rem;)
+                rounded: 기본 테두리 둥글게 (border-radius: 0.25rem;)
+                mb-6: 아래쪽 마진 1.5rem
+            -->
+            사용자 추가
+        </button>
+
+        <!-- 테이블 -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <!--
+                bg-white: 흰색 배경
+                rounded: 테두리 둥글게
+                shadow: 기본 그림자
+                overflow-x-auto: 가로 스크롤 허용 (overflow-x: auto;)
+            -->
+            <table class="min-w-full text-center">
+                <!--
+                    min-w-full: 최소 너비 부모 100% (min-width: 100%;)
+                    text-center: 텍스트 중앙 정렬 (text-align: center;)
+                -->
+                <thead class="bg-gray-200">
+                    <!--
+                        bg-gray-200: 밝은 회색 배경 (background-color: #e5e7eb;)
+                    -->
+                    <tr>
+                        <th class="py-3 px-4">ID</th>
+                        <th class="py-3 px-4">이름</th>
+                        <th class="py-3 px-4">이메일</th>
+                        <th class="py-3 px-4">액션</th>
+                        <!--
+                            py-3: 수직 패딩 0.75rem (padding-top/bottom: 0.75rem;)
+                            px-4: 수평 패딩 1rem (padding-left/right: 1rem;)
+                        -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <!--
+                            border-b: 하단에 얇은 테두리 (border-bottom: 1px solid #e5e7eb;)
+                        -->
+                        <td class="py-3 px-4">1</td>
+                        <td class="py-3 px-4">홍길동</td>
+                        <td class="py-3 px-4">hong@example.com</td>
+                        <td class="py-3 px-4">
+                            <button onclick="deleteUser(1)" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">
+                                <!--
+                                    bg-red-500: 빨간색 배경 (background-color: #ef4444;)
+                                    hover:bg-red-600: 진한 빨간색으로 변경 (background-color: #dc2626;)
+                                    text-white: 흰색 글자
+                                    font-semibold: Semi-bold
+                                    py-1: 수직 패딩 0.25rem
+                                    px-3: 수평 패딩 0.75rem
+                                    rounded: 둥근 테두리
+                                -->
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-3 px-4">2</td>
+                        <td class="py-3 px-4">김철수</td>
+                        <td class="py-3 px-4">kim@example.com</td>
+                        <td class="py-3 px-4">
+                            <button onclick="deleteUser(2)" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // SweetAlert2로 사용자 추가 팝업
+        async function addUser() {
+            const { value: formValues } = await Swal.fire({
+                title: '새 사용자 추가',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="이름">' +
+                    '<input id="swal-email" class="swal2-input" placeholder="이메일">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: '추가',
+                cancelButtonText: '취소',
+                preConfirm: () => {
+                    const name = document.getElementById('swal-name').value;
+                    const email = document.getElementById('swal-email').value;
+                    if (!name || !email) {
+                        Swal.showValidationMessage('모든 항목을 입력하세요!');
+                        return false;
+                    }
+                    return { name, email };
+                }
+            });
+
+            if (formValues) {
+                Swal.fire('추가 완료!', `${formValues.name} (${formValues.email})`, 'success');
+            }
+        }
+
+        // SweetAlert2로 사용자 삭제 확인
+        function deleteUser(id) {
+            Swal.fire({
+                title: '정말 삭제하시겠습니까?',
+                text: `사용자 ID: ${id}`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire('삭제 완료!', `ID ${id} 사용자가 삭제되었습니다.`, 'success');
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>

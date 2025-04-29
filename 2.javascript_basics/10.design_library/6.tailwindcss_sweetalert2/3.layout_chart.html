@@ -30,6 +30,13 @@
     </nav>
 
     <div class="max-w-6xl mx-auto p-6 space-y-8">
+        <!--
+            max-w-6xl: 최대 너비 6xl(72rem, 1152px)로 제한 (max-width: 72rem;)
+            mx-auto: 수평 가운데 정렬 (margin-left: auto; margin-right: auto;)
+            p-6: 모든 방향에 1.5rem 패딩 (padding: 1.5rem;)
+            space-y-8: 자식 요소들 사이에 수직 간격 2rem 추가 (margin-top: 2rem;)
+        -->
+            
         <!-- 사용자 테이블 -->
         <div class="bg-white rounded shadow p-4">
             <div class="flex justify-between mb-4">
@@ -62,8 +69,26 @@
 
         <!-- 차트 영역 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!--
+                grid: display: grid;  (CSS Grid 레이아웃 활성화)
+                grid-cols-1: 기본 1열 구성 (grid-template-columns: repeat(1, minmax(0, 1fr));)
+                md:grid-cols-2: 화면 너비 768px 이상일 때 2열 구성
+                gap-8: 항목 간 간격 2rem (gap: 2rem;)
+            -->
             <div class="bg-white p-4 rounded shadow">
+                <!--
+                    bg-white: 배경색 흰색 (background-color: #ffffff;)
+                    p-4: 패딩 1rem (padding: 1rem;)
+                    rounded: 모서리 둥글게 0.25rem (border-radius: 0.25rem;)
+                    shadow: 기본 그림자 추가 (box-shadow: 0 1px 3px rgba(0,0,0,0.1);)
+                -->
                 <h2 class="text-xl font-bold text-gray-800 mb-4">성적 막대 그래프</h2>
+                <!--
+                    text-xl: 글자 크기 1.25rem (font-size: 1.25rem;)
+                    font-bold: 글자 굵게 (font-weight: 700;)
+                    text-gray-800: 글자색 짙은 회색 (#1f2937)
+                    mb-4: 아래쪽 여백 1rem (margin-bottom: 1rem;)
+                -->
                 <canvas id="barChart"></canvas>
             </div>
             <div class="bg-white p-4 rounded shadow">

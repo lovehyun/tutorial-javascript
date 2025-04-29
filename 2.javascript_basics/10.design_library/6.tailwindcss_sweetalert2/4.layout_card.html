@@ -30,9 +30,30 @@
     </nav>
 
     <div class="max-w-6xl mx-auto p-6 space-y-8">
+        <!--
+            max-w-6xl: 최대 너비 72rem (1152px)로 제한 (max-width: 72rem;)
+            mx-auto: 수평 가운데 정렬 (margin-left: auto; margin-right: auto;)
+            p-6: 모든 방향에 1.5rem 패딩 추가 (padding: 1.5rem;)
+            space-y-8: 자식 요소들 사이에 수직 간격 2rem 추가 (margin-top: 2rem;)
+        -->
+        
         <!-- 카드 영역 추가 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8" id="statCards">
+            <!--
+                grid: display: grid; (CSS Grid 레이아웃 활성화)
+                grid-cols-1: 기본적으로 1열 구성
+                md:grid-cols-3: 화면 너비 768px 이상일 때 3열로 변경
+                gap-6: 항목 간 간격 1.5rem (gap: 1.5rem;)
+                mb-8: 아래쪽 마진 2rem 추가 (margin-bottom: 2rem;)
+            -->
             <div class="bg-white shadow rounded p-4 text-center">
+                <!--
+                    bg-white: 배경 흰색 (background-color: #ffffff;)
+                    shadow: 기본 그림자 추가 (box-shadow: 0 1px 3px rgba(0,0,0,0.1);)
+                    rounded: 모서리 둥글게 0.25rem (border-radius: 0.25rem;)
+                    p-4: 패딩 1rem (padding: 1rem;)
+                    text-center: 텍스트 가운데 정렬 (text-align: center;)
+                -->
                 <h3 class="text-gray-600">총 사용자 수</h3>
                 <p class="text-3xl font-bold text-blue-600" id="totalUsers">0명</p>
             </div>
