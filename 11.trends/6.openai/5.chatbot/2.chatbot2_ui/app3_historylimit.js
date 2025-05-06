@@ -7,7 +7,7 @@
 
 const express = require('express');
 const morgan = require('morgan');
-const { OpenAI } = require('openai/index.mjs');
+const { OpenAI } = require('openai');
 
 require('dotenv').config();
 

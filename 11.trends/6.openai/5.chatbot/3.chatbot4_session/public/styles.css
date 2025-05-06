@@ -1,0 +1,144 @@
+/* 전체 화면을 수평 레이아웃으로 설정 */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    display: flex; /* 수평 레이아웃 구성 */
+    height: 100vh; /* 화면 전체 높이 차지 */
+}
+
+/* 왼쪽 사이드바 - 세션 목록 */
+#sidebar {
+    width: 240px; /* 고정 너비 */
+    background-color: #f0f0f0; /* 연한 회색 배경 */
+    border-right: 1px solid #ccc; /* 오른쪽 경계선 */
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto; /* 세션 목록이 많아질 경우 스크롤 허용 */
+}
+
+/* 오른쪽 콘텐츠 영역 - 채팅창 및 입력창 */
+#content {
+    flex: 1; /* 남은 공간 전체 차지 */
+    display: flex;
+    flex-direction: column; /* 위아래 정렬 */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* 채팅 메시지 표시 영역 */
+#chat-container {
+    flex: 1; /* 콘텐츠 영역 내에서 확장 */
+    overflow-y: auto; /* 채팅 내용이 많을 경우 스크롤 */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* 가벼운 그림자 */
+    margin-bottom: 10px;
+}
+
+/* 채팅 입력 폼 */
+#user-input-form {
+    display: flex;
+    gap: 10px; /* 입력창과 버튼 사이 간격 */
+}
+
+#user-input {
+    flex: 1; /* 입력창이 너비 대부분 차지 */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#submit-button {
+    padding: 10px 16px;
+    background-color: #5bc0de; /* 파란색 배경 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* 채팅 메시지 공통 스타일 */
+.chat-message {
+    margin: 6px 0;
+    padding: 10px 15px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word; /* 긴 단어 줄바꿈 */
+}
+
+/* 사용자 메시지 스타일 (오른쪽 정렬) */
+.user {
+    background-color: #5bc0de; /* 파란색 배경 */
+    color: white;
+    margin-left: auto; /* 오른쪽 정렬 */
+    text-align: right;
+}
+
+/* 챗봇 메시지 스타일 (왼쪽 정렬) */
+.chatbot {
+    background-color: #e0e0e0; /* 회색 배경 */
+    color: black;
+    margin-right: auto; /* 왼쪽 정렬 */
+}
+
+/* "생각 중..." 메시지 스타일 */
+#loading-indicator {
+    display: none; /* 기본은 숨김 */
+    padding: 8px 15px;
+    background-color: #eee;
+    border-radius: 10px;
+    font-size: 14px;
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
+/* 세션 목록 아이템 컨테이너 */
+.session-item {
+    margin-bottom: 10px;
+}
+
+/* 세션 목록 개별 링크 스타일 */
+.session-link {
+    display: block;
+    text-decoration: none;
+    color: black;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+/* 세션 링크 마우스 호버 효과 */
+.session-link:hover {
+    background-color: #e6f7ff; /* 밝은 파란색 */
+}
+
+/* New Chat 버튼 스타일 */
+#new-chat-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #5bc0de; /* 기본 파란색 */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* New Chat 버튼 마우스 호버 시 색상 변경 */
+#new-chat-button:hover {
+    background-color: #31b0d5;
+}
+
+/* New Chat 버튼 클릭 시 색상 변경 */
+#new-chat-button:active {
+    background-color: #269abc;
+}

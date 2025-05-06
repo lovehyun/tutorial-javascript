@@ -58,7 +58,8 @@ async function getChatGPTResponse(conversationHistory) {
     try {
         // 'system' 역할을 사용하여 사용자와 챗봇 간의 대화를 초기화합니다.
         const inputMessages = [
-            { role: 'system', content: 'You are a helpful assistant.' },
+            // { role: 'system', content: 'You are a helpful assistant.' },
+            { role: 'system', content: 'You are a helpful assistant. Please remember the ongoing conversation history in memory.' },
             ...conversationHistory,
         ];
 
