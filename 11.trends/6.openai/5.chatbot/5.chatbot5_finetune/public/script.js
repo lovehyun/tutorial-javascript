@@ -4,27 +4,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     const chatContainer = document.getElementById('chat-container');
     const userInputForm = document.getElementById('user-input-form');
     const userInputField = document.getElementById('user-input');
-    const loadingIndicator = document.getElementById('loading-indicator');
     const submitButton = document.getElementById('submit-button');
     const currentSessionId = document.getElementById('current-session-id');
     const sessionListContainer = document.getElementById('session-list-container');
+    const currentSessionDate = document.getElementById('current-session-date');
 
-    // '전송' 버튼 이벤트
-    submitButton.addEventListener('click', function () {
-        submitUserInput();
-    });
+    let loadingMessageDiv = null;
 
-    // '폼' 입력 이벤트
+    submitButton.addEventListener('click', submitUserInput);
     userInputForm.addEventListener('submit', function (event) {
         event.preventDefault();
         submitUserInput();
     });
 
     async function submitUserInput() {
-        const userInput = userInputField.value;
+        const userInput = userInputField.value.trim();
         const sessionId = currentSessionId.textContent;
 
-        if (userInput.trim() === '') return;
+        if (!userInput || !sessionId) return;
 
         appendMessage('user', userInput);
         showLoadingIndicator();
@@ -33,8 +30,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             const chatGPTResponse = await getChatGPTResponse(sessionId, userInput);
             hideLoadingIndicator();
-
-            // 서버 응답의 개행 문자를 HTML에서 인식하는 <br> 태그로 변환
             const formattedResponse = formatResponseForHTML(chatGPTResponse);
             appendMessage('chatbot', formattedResponse);
         } catch (error) {
@@ -49,39 +44,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     function appendMessage(role, content) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${role}`;
-        messageDiv.innerHTML = '<div class="message-content">' + content + '</div>';
+        const visualRole = role === 'assistant' ? 'chatbot' : role;  // assistant → chatbot
+
+        messageDiv.className = `chat-message ${visualRole}`;
+        messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
         chatContainer.appendChild(messageDiv);
     }
 
-    async function showSession(sessionId) {
-        try {
-            const response = await fetch(`/api/session/${sessionId}`);
-            const data = await response.json();
-
-            // 화면 지우기
-            chatContainer.innerHTML = '';
-
-            // 세션의 대화 내용을 화면에 출력
-            data.conversationHistory.forEach((item) => {
-                appendMessage(item.role, item.content);
-            });
-
-            // 세션 정보를 화면에 갱신
-            displaySessionInfo(data);
-            
-            scrollToBottom();
-        } catch (error) {
-            console.error('Error loading session:', error.message);
-        }
-    }
-
     function showLoadingIndicator() {
-        loadingIndicator.style.display = 'flex';
+        hideLoadingIndicator(); // 중복 방지
+        loadingMessageDiv = document.createElement('div');
+        loadingMessageDiv.className = 'chat-message chatbot';
+        loadingMessageDiv.innerHTML = '<div class="message-content"><span class="loading-dots"></span> 생각 중...</div>';
+        chatContainer.appendChild(loadingMessageDiv);
+        scrollToBottom();
     }
 
     function hideLoadingIndicator() {
-        loadingIndicator.style.display = 'none';
+        if (loadingMessageDiv && loadingMessageDiv.parentNode) {
+            loadingMessageDiv.parentNode.removeChild(loadingMessageDiv);
+            loadingMessageDiv = null;
+        }
     }
 
     async function getChatGPTResponse(sessionId, userInput) {
@@ -101,50 +84,35 @@ document.addEventListener('DOMContentLoaded', async function () {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // 개행 문자(\n)를 <br> 태그로 변환하는 함수
     function formatResponseForHTML(response) {
         return response.replace(/\n/g, '<br>');
     }
 
-    // 페이지 로딩 시 이전 대화 기록 및 세션 정보를 불러옴
     async function loadChatHistoryAndSession() {
         try {
-            // 현재 세션의 대화 내용 불러오기
             const sessionResponse = await fetch('/api/current-session');
             const sessionData = await sessionResponse.json();
-
-            // 현재 세션의 대화 기록을 화면에 출력
-            sessionData.conversationHistory.forEach((item) => {
-                appendMessage(item.role, item.content);
+            sessionData.conversationHistory.forEach(item => {
+                const formatted = formatResponseForHTML(item.content);
+                appendMessage(item.role, formatted);
             });
-
-            // 세션 정보를 화면에 출력
             displaySessionInfo(sessionData);
-
             scrollToBottom();
         } catch (error) {
             console.error('Error loading chat history and session:', error.message);
         }
     }
 
-    // 페이지 로딩 시 이전 대화 기록과 세션 정보를 불러옴
-    await loadChatHistoryAndSession();
-
-    // 세션 정보를 화면에 출력하는 함수 추가
     function displaySessionInfo(sessionData) {
-        const sessionIdElement = document.getElementById('current-session-id');
-        const sessionDateElement = document.getElementById('current-session-date');
-
-        if (sessionData && sessionData.id && sessionData.start_time) {
-            sessionIdElement.textContent = sessionData.id;
-            sessionDateElement.textContent = new Date(sessionData.start_time).toLocaleString();
+        if (sessionData?.id && sessionData?.start_time) {
+            currentSessionId.textContent = sessionData.id;
+            currentSessionDate.textContent = new Date(sessionData.start_time).toLocaleString();
         } else {
-            sessionIdElement.textContent = 'N/A';
-            sessionDateElement.textContent = 'N/A';
+            currentSessionId.textContent = 'N/A';
+            currentSessionDate.textContent = 'N/A';
         }
     }
 
-    // 세션 정보 갱신을 위한 함수
     async function updateSessionInfo() {
         try {
             const sessionResponse = await fetch('/api/current-session');
@@ -155,19 +123,13 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // 새로운 대화 세션 시작 버튼 이벤트 리스너 추가
     const newChatButton = document.getElementById('new-chat-button');
     newChatButton.addEventListener('click', async function () {
         try {
-            // 새로운 세션 시작 요청
             const response = await fetch('/api/new-session', { method: 'POST' });
             const data = await response.json();
-
             if (data.success) {
-                // 성공적으로 새로운 세션이 시작되면 세션 정보 갱신
-                updateSessionInfo();
-
-                // 대화 내용을 모두 삭제하고 화면을 다시 그리기
+                await updateSessionInfo();
                 clearChatContainer();
             } else {
                 console.error('Error starting new session:', data.error);
@@ -177,24 +139,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    // 대화 내용을 모두 삭제하고 화면을 다시 그리는 함수
     function clearChatContainer() {
-        chatContainer.innerHTML = ''; // 대화 내용 삭제
-        loadAllSessions(); // 세션 목록을 다시 불러와서 화면에 표시
+        chatContainer.innerHTML = '';
+        loadAllSessions();
     }
 
     async function loadAllSessions() {
         try {
             const response = await fetch('/api/all-sessions');
             const data = await response.json();
-
-            // 전체 세션 목록을 화면에 출력
-            sessionListContainer.innerHTML = ''; // 기존 목록 제거
-            data.allSessions.forEach((session) => {
-                appendSession(session);
-            });
-
-            // 세션 목록에 클릭 이벤트 리스너 추가
+            sessionListContainer.innerHTML = '';
+            data.allSessions.forEach(appendSession);
             addSessionClickListeners();
         } catch (error) {
             console.error('Error loading all sessions:', error.message);
@@ -211,19 +166,35 @@ document.addEventListener('DOMContentLoaded', async function () {
         sessionListContainer.appendChild(sessionDiv);
     }
 
-    // 페이지 로딩 시 전체 세션 목록을 불러오고 표시
-    await loadAllSessions();
-
-    // 이전 대화 내용을 클릭했을 때 세션을 가져오는 이벤트 리스너 추가
     function addSessionClickListeners() {
         const sessionLinks = document.querySelectorAll('.session-link');
-    
-        sessionLinks.forEach((sessionLink) => {
-            sessionLink.addEventListener('click', async (event) => {
-                const sessionId = sessionLink.dataset.sessionId;
+        sessionLinks.forEach(link => {
+            link.addEventListener('click', async event => {
+                event.preventDefault();
+                const sessionId = link.dataset.sessionId;
+                if (sessionId === currentSessionId.textContent) return;
                 await showSession(sessionId);
             });
         });
     }
 
+    async function showSession(sessionId) {
+        try {
+            const response = await fetch(`/api/session/${sessionId}`);
+            const data = await response.json();
+            chatContainer.innerHTML = '';
+            data.conversationHistory.forEach(item => {
+                const formatted = formatResponseForHTML(item.content);
+                appendMessage(item.role, formatted);
+            });
+            displaySessionInfo(data);
+            currentSessionId.textContent = data.id;
+            scrollToBottom();
+        } catch (error) {
+            console.error('Error loading session:', error.message);
+        }
+    }
+
+    await loadChatHistoryAndSession();
+    await loadAllSessions();
 });
