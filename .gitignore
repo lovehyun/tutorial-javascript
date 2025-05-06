@@ -35,6 +35,7 @@ captcha.jpg
 captcha*.jpg
 *.traineddata
 uploads/*
+*.zip
 
 # 패키지 파일 (임시 제외)
 package-lock.json
