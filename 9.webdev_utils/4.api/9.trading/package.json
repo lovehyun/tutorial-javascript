@@ -2,6 +2,8 @@
   "dependencies": {
     "axios": "^1.9.0",
     "dotenv": "^16.5.0",
+    "finnhub": "^1.2.19",
+    "luxon": "^3.6.1",
     "unzipper": "^0.12.3",
     "xml2js": "^0.6.2",
     "yahoo-finance2": "^2.13.3"
