@@ -76,15 +76,15 @@ async function control_models() {
     let fineTune = await openai.fineTuning.jobs.retrieve('ftjob-eVQEGSZ3joUUhHCABmZL1Lry');
     console.log(fineTune);
 
-    // // Cancel a job
+    // Cancel a job
     // let status = await openai.fineTuning.jobs.cancel('ftjob-abc123');
     // console.log(status);
 
-    // // List up to 10 events from a fine-tuning job
+    // List up to 10 events from a fine-tuning job
     // let events = await openai.fineTuning.jobs.listEvents(fineTune.id, { limit: 10 });
     // console.log(events);
 
-    // // Delete a fine-tuned model (must be an owner of the org the model was created in)
+    // Delete a fine-tuned model (must be an owner of the org the model was created in)
     // let model = await openai.models.delete('ft:gpt-3.5-turbo:acemeco:suffix:abc123')
     // console.log(model);
 }

@@ -1,6 +1,5 @@
-// public/script.js
-
 document.addEventListener('DOMContentLoaded', async function () {
+    // DOM 요소 참조
     const chatContainer = document.getElementById('chat-container');
     const userInputForm = document.getElementById('user-input-form');
     const userInputField = document.getElementById('user-input');
@@ -11,12 +10,14 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     let loadingMessageDiv = null;
 
+    // 이벤트 리스너 설정
     submitButton.addEventListener('click', submitUserInput);
     userInputForm.addEventListener('submit', function (event) {
         event.preventDefault();
         submitUserInput();
     });
 
+    // 사용자 입력 처리 및 챗봇 응답 요청
     async function submitUserInput() {
         const userInput = userInputField.value.trim();
         const sessionId = currentSessionId.textContent;
@@ -42,9 +43,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         scrollToBottom();
     }
 
+    // 채팅 메시지 DOM에 추가
     function appendMessage(role, content) {
         const messageDiv = document.createElement('div');
-        const visualRole = role === 'assistant' ? 'chatbot' : role;  // assistant → chatbot
+        const visualRole = role === 'assistant' ? 'chatbot' : role;
 
         messageDiv.className = `chat-message ${visualRole}`;
         messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
@@ -67,6 +69,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 챗봇 응답 요청
     async function getChatGPTResponse(sessionId, userInput) {
         const response = await fetch('/api/chat', {
             method: 'POST',
@@ -80,22 +83,27 @@ document.addEventListener('DOMContentLoaded', async function () {
         return data.chatGPTResponse;
     }
 
+    // 채팅창 하단으로 스크롤
     function scrollToBottom() {
         chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
+    // 개행 문자 HTML 변환
     function formatResponseForHTML(response) {
         return response.replace(/\n/g, '<br>');
     }
 
+    // 현재 세션 및 대화 내역 불러오기
     async function loadChatHistoryAndSession() {
         try {
-            const sessionResponse = await fetch('/api/current-session');
+            const sessionResponse = await fetch('/api/sessions/current');
             const sessionData = await sessionResponse.json();
+
             sessionData.conversationHistory.forEach(item => {
                 const formatted = formatResponseForHTML(item.content);
                 appendMessage(item.role, formatted);
             });
+
             displaySessionInfo(sessionData);
             scrollToBottom();
         } catch (error) {
@@ -103,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 세션 정보 화면에 표시
     function displaySessionInfo(sessionData) {
         if (sessionData?.id && sessionData?.start_time) {
             currentSessionId.textContent = sessionData.id;
@@ -113,9 +122,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 현재 세션 정보 갱신
     async function updateSessionInfo() {
         try {
-            const sessionResponse = await fetch('/api/current-session');
+            const sessionResponse = await fetch('/api/sessions/current');
             const sessionData = await sessionResponse.json();
             displaySessionInfo(sessionData);
         } catch (error) {
@@ -123,10 +133,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 새 세션 생성 버튼 클릭 이벤트
     const newChatButton = document.getElementById('new-chat-button');
     newChatButton.addEventListener('click', async function () {
         try {
-            const response = await fetch('/api/new-session', { method: 'POST' });
+            const response = await fetch('/api/sessions', { method: 'POST' });
             const data = await response.json();
             if (data.success) {
                 await updateSessionInfo();
@@ -139,14 +150,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
+    // 채팅창 초기화
     function clearChatContainer() {
         chatContainer.innerHTML = '';
         loadAllSessions();
     }
 
+    // 전체 세션 목록 로드
     async function loadAllSessions() {
         try {
-            const response = await fetch('/api/all-sessions');
+            const response = await fetch('/api/sessions');
             const data = await response.json();
             sessionListContainer.innerHTML = '';
             data.allSessions.forEach(appendSession);
@@ -156,6 +169,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 세션 리스트에 세션 항목 추가
     function appendSession(session) {
         const sessionDiv = document.createElement('div');
         sessionDiv.className = 'session-item';
@@ -166,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         sessionListContainer.appendChild(sessionDiv);
     }
 
+    // 세션 항목 클릭 시 해당 대화 불러오기
     function addSessionClickListeners() {
         const sessionLinks = document.querySelectorAll('.session-link');
         sessionLinks.forEach(link => {
@@ -178,9 +193,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
+    // 특정 세션 로딩
     async function showSession(sessionId) {
         try {
-            const response = await fetch(`/api/session/${sessionId}`);
+            const response = await fetch(`/api/sessions/${sessionId}`);
             const data = await response.json();
             chatContainer.innerHTML = '';
             data.conversationHistory.forEach(item => {
@@ -195,6 +211,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+    // 초기화
     await loadChatHistoryAndSession();
     await loadAllSessions();
 });
