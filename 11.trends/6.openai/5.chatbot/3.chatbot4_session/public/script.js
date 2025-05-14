@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const sessionListContainer = document.getElementById('session-list-container');
     const currentSessionDate = document.getElementById('current-session-date');
 
-    let loadingMessageDiv = null;
+    let loadingMessageDiv = null; // 로딩중 표시용 요소
 
     // 이벤트 리스너 설정
     submitButton.addEventListener('click', submitUserInput);
@@ -53,8 +53,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         chatContainer.appendChild(messageDiv);
     }
 
+    // 로딩 인디케이터 표시
     function showLoadingIndicator() {
-        hideLoadingIndicator(); // 중복 방지
+        hideLoadingIndicator();
         loadingMessageDiv = document.createElement('div');
         loadingMessageDiv.className = 'chat-message chatbot';
         loadingMessageDiv.innerHTML = '<div class="message-content"><span class="loading-dots"></span> 생각 중...</div>';
@@ -62,6 +63,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         scrollToBottom();
     }
 
+    // 로딩 인디케이터 제거
     function hideLoadingIndicator() {
         if (loadingMessageDiv && loadingMessageDiv.parentNode) {
             loadingMessageDiv.parentNode.removeChild(loadingMessageDiv);
@@ -96,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 현재 세션 및 대화 내역 불러오기
     async function loadChatHistoryAndSession() {
         try {
-            const sessionResponse = await fetch('/api/sessions/current');
+            const sessionResponse = await fetch('/api/sessions/latest');
             const sessionData = await sessionResponse.json();
 
             sessionData.conversationHistory.forEach(item => {
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 현재 세션 정보 갱신
     async function updateSessionInfo() {
         try {
-            const sessionResponse = await fetch('/api/sessions/current');
+            const sessionResponse = await fetch('/api/sessions/latest');
             const sessionData = await sessionResponse.json();
             displaySessionInfo(sessionData);
         } catch (error) {
@@ -184,7 +186,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     function addSessionClickListeners() {
         const sessionLinks = document.querySelectorAll('.session-link');
         sessionLinks.forEach(link => {
-            link.addEventListener('click', async event => {
+            link.addEventListener('click', async (event) => {
                 event.preventDefault();
                 const sessionId = link.dataset.sessionId;
                 if (sessionId === currentSessionId.textContent) return;

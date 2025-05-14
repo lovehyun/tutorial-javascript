@@ -71,8 +71,8 @@ app.post('/api/sessions', (req, res) => {
     res.json({ success: true, sessionId: result.lastInsertRowid });
 });
 
-// 현재 세션 정보 및 대화 가져오기
-app.get('/api/sessions/current', (req, res) => {
+// 최신 세션 정보 및 대화 가져오기
+app.get('/api/sessions/latest', (req, res) => {
     const session = getCurrentSession();
     const conversationHistory = getConversationBySession(session.id);
     res.json({ id: session.id, start_time: session.start_time, conversationHistory });

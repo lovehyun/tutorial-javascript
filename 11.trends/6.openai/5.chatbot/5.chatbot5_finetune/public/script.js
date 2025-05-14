@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 현재 세션 및 대화 기록 불러오기
     async function loadChatHistoryAndSession() {
         try {
-            const sessionResponse = await fetch('/api/sessions/current');
+            const sessionResponse = await fetch('/api/sessions/latest');
             const sessionData = await sessionResponse.json();
 
             sessionData.conversationHistory.forEach(item => {
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 세션 정보 새로고침
     async function updateSessionInfo() {
         try {
-            const sessionResponse = await fetch('/api/sessions/current');
+            const sessionResponse = await fetch('/api/sessions/latest');
             const sessionData = await sessionResponse.json();
             displaySessionInfo(sessionData);
         } catch (error) {

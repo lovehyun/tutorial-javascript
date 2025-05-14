@@ -56,7 +56,7 @@ app.post('/api/sessions', (req, res) => {
 });
 
 // 현재 세션 + 대화 내역 반환
-app.get('/api/sessions/current', (req, res) => {
+app.get('/api/sessions/latest', (req, res) => {
     const session = getCurrentSession();
     const conversationHistory = getConversationBySession(session.id);
     res.json({ id: session.id, start_time: session.start_time, conversationHistory });
