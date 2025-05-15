@@ -2,6 +2,9 @@
 const API_SERVER = '';
 
 document.addEventListener("DOMContentLoaded", function() {
+    // chatbot UI 렌더링
+    createChatbotUI();
+
     // DOMContentLoaded 이벤트가 발생하면 콜백 함수 실행
     const chatbotIcon = document.getElementById('chatbotIcon'); // 챗봇 아이콘 요소 선택
     const chatbotWindow = document.getElementById('chatbotWindow'); // 챗봇 창 요소 선택
@@ -60,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const botResponse = await sendMessageToServer(message);
             addMessage(botResponse, 'bot');
 
-            // 응답 받은 뒤 화면 갱신
+            // 응답 받은 뒤 화면 갱신 - 주의: 다른 모듈의 함수
             fetchTodos();
         }
     }
@@ -83,6 +86,30 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error('서버와의 연결 오류:', error);
             return '서버와 연결할 수 없습니다.';
         }
+    }
+
+    // 화면 맨 끝에 아래 코드 삽입
+    function createChatbotUI() {
+        const chatbotHTML = `
+            <div class="chatbot-icon" id="chatbotIcon">
+                <i class="bi bi-chat-dots-fill"></i>
+            </div>
+            <div class="chatbot-window" id="chatbotWindow" style="display: none;">
+                <div class="resizer" id="resizer"></div>
+                <div class="chatbot-header">
+                    <span>Chatbot</span>
+                    <button id="closeChatbot">X</button>
+                </div>
+                <div class="chatbot-body">
+                    <div class="chatbot-messages" id="chatbotMessages"></div>
+                    <div class="chatbot-input-container">
+                        <input type="text" id="chatbotInput" placeholder="Type a message...">
+                        <button id="sendMessage">Send</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', chatbotHTML);
     }
 
     // 챗봇 윈도우 리사이즈

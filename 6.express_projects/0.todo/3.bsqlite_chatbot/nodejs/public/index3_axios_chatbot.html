@@ -4,7 +4,7 @@
     <title>To-Do List</title>
     <style>
         #todo-list li { margin-bottom: 5px; cursor: pointer; }
-        #todo-list li.completed { text-decoration: line-through; }
+        #todo-list li.completed { text-decoration: line-through; text-decoration-color: red; }
 
         /* 삭제 버튼 스타일 추가 */
         .delete-btn {
@@ -19,6 +19,7 @@
     </style>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="css/chatbot3_bubble.css" />
+    <script src="js/chatbot3.js" defer></script>
     <!-- Axios CDN 추가 -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
@@ -35,26 +36,30 @@
 
         // To-Do 항목 렌더링
         function renderTodos(todos) {
+            // 리스트 클리어
             todoList.innerHTML = '';
+            
             todos.forEach(todo => {
                 const li = document.createElement('li');
                 li.textContent = todo.text;
                 li.classList.toggle('completed', todo.completed);
 
-                // 토글
-                li.addEventListener('click', () => {
-                    axios.put(`/api/todos/${todo.id}/toggle`)
-                        .then(() => fetchTodos());
+                // 완료 토글
+                li.addEventListener('click', async () => {
+                    await axios.put(`/api/todos/${todo.id}`);
+                    await fetchTodos();
                 });
 
                 // 삭제 버튼
                 const deleteBtn = document.createElement('button');
                 deleteBtn.textContent = '삭제';
                 deleteBtn.classList.add('delete-btn');
-                deleteBtn.addEventListener('click', (e) => {
+                deleteBtn.dataset.id = todo.id;  // 삭제용 ID 저장 (이벤트 리스너 하나로 처리하기 시)
+
+                deleteBtn.addEventListener('click', async (e) => {
                     e.stopPropagation();
-                    axios.delete(`/api/todos/${todo.id}`)
-                        .then(() => fetchTodos());
+                    await axios.delete(`/api/todos/${todo.id}`);
+                    await fetchTodos();
                 });
 
                 li.appendChild(deleteBtn);
@@ -62,22 +67,30 @@
             });
         }
 
+        // 이벤트 리스너 하나로 처리하기
+        // document.addEventListener('click', async (e) => {
+        //     if (e.target.matches('.delete-btn')) {
+        //         e.stopPropagation(); // 클릭 이벤트 전파 차단
+        //         const id = e.target.dataset.id;
+        //         await axios.delete(`/api/todos/${id}`);
+        //         await fetchTodos();
+        //     }
+        // });
+
         // To-Do 목록 불러오기
-        function fetchTodos() {
-            axios.get('/api/todos')
-                .then(res => renderTodos(res.data));
+        async function fetchTodos() {
+            const res = await axios.get('/api/todos');
+            renderTodos(res.data);
         }
 
         // To-Do 추가
-        addBtn.addEventListener('click', () => {
+        addBtn.addEventListener('click', async () => {
             const text = input.value.trim();
             if (!text) return;
 
-            axios.post('/api/todos', { text })
-                .then(() => {
-                    input.value = '';
-                    fetchTodos();
-                });
+            await axios.post('/api/todos', { text });
+            input.value = '';
+            await fetchTodos();
         });
 
         input.addEventListener('keydown', (e) => {
@@ -87,26 +100,5 @@
         // 초기 로딩
         fetchTodos();
     </script>
-
-    <!-- 챗봇 추가 -->
-    <div class="chatbot-icon" id="chatbotIcon">
-        <i class="bi bi-chat-dots-fill"></i>
-    </div>
-    <div class="chatbot-window" id="chatbotWindow">
-        <div class="resizer" id="resizer"></div> <!-- 왼쪽 상단에 리사이즈 핸들 추가 -->
-        <div class="chatbot-header">
-            <span>Chatbot</span>
-            <button id="closeChatbot">X</button>
-        </div>
-        <div class="chatbot-body">
-            <div class="chatbot-messages" id="chatbotMessages"></div>
-            <div class="chatbot-input-container">
-                <input type="text" id="chatbotInput" placeholder="Type a message...">
-                <button id="sendMessage">Send</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/chatbot3.js"></script>
 </body>
 </html>

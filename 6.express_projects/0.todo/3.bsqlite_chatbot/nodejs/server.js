@@ -2,9 +2,11 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 
-const todoRoutes = require('./routes/todoRoutes');
+const todoRoutes = require('./routes/todoRoute');
 // const chatbot = require('./services/chatbot_external');
-const chatbot = require('./services/chatbot_self');
+// const chatbot = require('./services/chatbot_external_text2sql');
+// const chatbot = require('./services/chatbot_self');
+const chatbot = require('./services/chatbot_self2');
 
 const app = express();
 const PORT = 3000;

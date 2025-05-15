@@ -89,6 +89,54 @@ def chat():
         print("서버 오류:", e)
         return jsonify({ "error": "서버 내부 오류입니다." }), 500
 
+@app.route("/chat/text2sql", methods=["POST"])
+def text2sql():
+    data = request.get_json()
+    question = data.get("question")
+    schema = data.get("schema")
+
+    if not question or not schema:
+        return jsonify({"error": "질문 또는 스키마가 누락되었습니다."}), 400
+
+    system_prompt = f"""
+당신은 SQLite 데이터베이스에 대한 SQL 생성기입니다.
+
+[제공된 스키마]
+{schema}
+
+아래와 같은 사용자 질문에 대해 적절한 SQL 쿼리를 생성하세요. 반드시 JSON 형식으로만 응답하세요:
+
+형식:
+{{ "sql": "SELECT ...", "explanation": "이 쿼리는 ..." }}
+
+주의사항:
+- DROP, ALTER, CREATE 등 파괴적인 명령은 절대 생성하지 마세요.
+- 항상 SELECT, INSERT, UPDATE, DELETE로 제한하세요.
+- 마크다운, 코드 블록, 주석 없이 JSON만 반환하세요.
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                { "role": "system", "content": system_prompt },
+                { "role": "user", "content": question }
+            ],
+            temperature=0
+        )
+
+        reply = response.choices[0].message.content.strip()
+        print("GPT 응답 원문:\n", reply)
+
+        reply = reply.replace("```json", "").replace("```", "").strip()
+        parsed = json.loads(reply)
+        return jsonify(parsed)
+
+    except json.JSONDecodeError:
+        return jsonify({"error": "GPT 응답을 JSON으로 파싱할 수 없습니다.", "raw": reply}), 500
+    except Exception as e:
+        return jsonify({"error": "서버 내부 오류", "message": str(e)}), 500
+
 # Flask 서버 실행
 if __name__ == '__main__':
     app.run(port=5000)

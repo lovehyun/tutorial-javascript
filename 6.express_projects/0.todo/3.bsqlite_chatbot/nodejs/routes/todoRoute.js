@@ -14,7 +14,7 @@ router.get('/api/todos', getAllTodos);
 router.post('/api/todos', addTodo);
 
 // 할 일 완료 토글
-router.put('/api/todos/:id/toggle', toggleTodo);
+router.put('/api/todos/:id', toggleTodo);
 
 // 할 일 삭제
 router.delete('/api/todos/:id', deleteTodo);

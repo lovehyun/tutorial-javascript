@@ -4,6 +4,7 @@ const router = express.Router();
 const { OpenAI } = require('openai');
 
 const db = require('../models/database');
+const todoModel = require('../models/todoModel2');
 
 require('dotenv').config({ path: '../.env' });
 
@@ -24,7 +25,7 @@ router.post('/api/chat', async (req, res) => {
     if (!question) return res.status(400).json({ answer: '질문을 입력해주세요.' });
 
     try {
-        const todos = getTodos();
+        const todos = todoModel.getAllTodos();
         const systemPrompt = buildPrompt2(todos);
         const rawResponse = await requestChatGPT(systemPrompt, question);
 
@@ -41,20 +42,24 @@ router.post('/api/chat', async (req, res) => {
 
         switch (action) {
             case 'add':
-                addTodo(text);
+                todoModel.insertTodo(text);
                 return res.json({ answer: `할 일 추가됨: ${text}` });
 
             case 'done':
-                const updated = markTodoAsDone(text, todos);
-                return res.json({
-                    answer: updated ? `할 일 완료 처리됨: ${updated}` : `완료 처리할 항목을 찾을 수 없습니다: ${text}`
-                });
+                var target = todos.find(t => t.text.includes(text));
+                if (!target) {
+                    return res.json({ answer: `완료 처리할 항목을 찾을 수 없습니다: ${text}` });
+                }
+                todoModel.updateTodoCompleted(target.id, 1);
+                return res.json({ answer: `할 일 완료 처리됨: ${target.text}` });
 
             case 'delete':
-                const deleted = deleteTodoByText(text, todos);
-                return res.json({
-                    answer: deleted ? `할 일 삭제됨: ${deleted}` : `삭제할 항목을 찾을 수 없습니다: ${text}`
-                });
+                var target = todos.find(t => t.text.includes(text));
+                if (!target) {
+                    return res.json({ answer: `삭제할 항목을 찾을 수 없습니다: ${text}` });
+                }
+                todoModel.deleteTodoById(target.id);
+                return res.json({ answer: `할 일 삭제됨: ${target.text}` });
 
             case 'list':
                 const list = todos.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? "완료" : "미완료"}]`).join('\n');
@@ -76,30 +81,6 @@ router.post('/api/chat', async (req, res) => {
         return res.status(500).json({ answer: '챗봇 처리 중 오류가 발생했습니다.' });
     }
 });
-
-// 동기 방식 DB 처리 함수들
-function getTodos() {
-    return db.prepare('SELECT * FROM todos').all();
-}
-
-function addTodo(text) {
-    db.prepare('INSERT INTO todos (text, completed) VALUES (?, 0)').run(text);
-}
-
-function markTodoAsDone(text, todos) {
-    const target = todos.find(t => t.text.includes(text));
-    if (!target) return null;
-    db.prepare('UPDATE todos SET completed = 1 WHERE id = ?').run(target.id);
-    return target.text;
-}
-
-function deleteTodoByText(text, todos) {
-    const target = todos.find(t => t.text.includes(text));
-    if (!target) return null;
-    db.prepare('DELETE FROM todos WHERE id = ?').run(target.id);
-    return target.text;
-}
-
 
 // GPT 프롬프트 생성
 function buildPrompt(todos) {
