@@ -38,8 +38,8 @@ body {
 }
 
 .resizer {
-    width: 15px;
-    height: 15px;
+    width: 10px;
+    height: 10px;
     background: #ccc;
     position: absolute;
     left: 0; /* 왼쪽 */

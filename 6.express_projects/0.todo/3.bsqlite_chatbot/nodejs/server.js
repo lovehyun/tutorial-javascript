@@ -16,7 +16,7 @@ app.use(express.json());
 // 정적 파일 및 라우터 연결
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index3_chatbot.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index3_axios_chatbot.html'));
 });
 
 // 라우터 연결
