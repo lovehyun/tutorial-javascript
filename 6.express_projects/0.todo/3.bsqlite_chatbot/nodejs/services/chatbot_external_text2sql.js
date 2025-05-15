@@ -12,6 +12,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const db = require('../models/database');
+const { getAllTodos } = require('../models/todoModel2');
 
 const GPT_SERVER = 'http://127.0.0.1:5000';
 
@@ -40,6 +41,11 @@ function executeSQL(db, sql) {
     }
 }
 
+function formatTodosForPrompt(todos) {
+    if (!Array.isArray(todos) || todos.length === 0) return '할 일이 없습니다.';
+    return todos.map((t, i) => `${i + 1}. ${t.text} [${t.completed ? '완료' : '미완료'}]`).join('\n');
+}
+
 function formatTodoResults(results) {
     if (!Array.isArray(results) || results.length === 0) {
         return '조회된 항목이 없습니다.';
@@ -53,6 +59,40 @@ function formatTodoResults(results) {
     return `총 ${results.length}개의 항목이 있습니다:\n\n${lines.join('\n')}`;
 }
 
+function formatGenericSQLResult(result) {
+    if (Array.isArray(result)) {
+        if (result.length === 0) return '조회된 항목이 없습니다.';
+
+        const firstRow = result[0];
+
+        // SELECT COUNT(*) 대응
+        if (Object.keys(firstRow).length === 1 && typeof Object.values(firstRow)[0] === 'number') {
+            const key = Object.keys(firstRow)[0];
+            return `총 ${firstRow[key]}개의 항목이 있습니다.`;
+        }
+
+        // text 및 completed 필드가 존재할 경우 포맷 출력
+        if ('text' in firstRow) {
+            return `총 ${result.length}개의 항목이 조회되었습니다:\n\n` +
+                result.map((row, i) => {
+                    const status = row.completed ? '완료' : '미완료';
+                    return `${i + 1}. ${row.text} [${status}]`;
+                }).join('\n');
+        }
+
+        // 일반 SELECT 결과
+        const lines = result.map((row, i) =>
+            `${i + 1}. ` + Object.entries(row).map(([k, v]) => `${k}: ${v}`).join(', ')
+        );
+        return `총 ${result.length}개의 항목이 조회되었습니다:\n\n${lines.join('\n')}`;
+
+    } else if (result && typeof result === 'object' && 'changes' in result) {
+        return `총 ${result.changes}개의 항목이 변경되었습니다.`;
+    }
+
+    return '결과를 해석할 수 없습니다.';
+}
+
 router.post('/api/chat', async (req, res) => {
     const { question } = req.body;
     if (!question) {
@@ -60,32 +100,32 @@ router.post('/api/chat', async (req, res) => {
     }
 
     try {
+        // 현재 목록 조회
+        const todos = getAllTodos();
+        const formattedTodos = formatTodosForPrompt(todos);
+
         // 실제 DB로부터 스키마 추출
         const schema = getTableSchema('todos');
 
         // Flask 서버에 question + schema 전송
         const flaskRes = await axios.post(`${GPT_SERVER}/chat/text2sql`, {
             question,
+            todos: formattedTodos,
             schema
         });
 
         const { sql, explanation } = flaskRes.data;
-
-        if (!sql) {
-            return res.status(400).json({ answer: 'GPT가 유효한 SQL을 생성하지 못했습니다.' });
-        }
-
         console.log('생성된 SQL 및 설명:', sql, explanation);
 
-        const result = executeSQL(db, sql);
-        
-        // 클라이언트에 반환
-        let formattedResult = '';
-        if (Array.isArray(result)) {
-            formattedResult = formatTodoResults(result);
-        } else {
-            formattedResult = `총 ${result.changes}개의 항목이 변경되었습니다.`;
+        if (!sql) {
+            // return res.status(400).json({ answer: 'GPT가 유효한 SQL을 생성하지 못했습니다.' });
+            return res.status(200).json({ answer: explanation });
         }
+
+        const result = executeSQL(db, sql);
+        const formattedResult = formatGenericSQLResult(result);
+
+        console.log('최종 응답:', formattedResult);
 
         return res.json({
             sql,

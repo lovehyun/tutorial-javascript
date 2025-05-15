@@ -95,6 +95,9 @@ def text2sql():
     question = data.get("question")
     schema = data.get("schema")
 
+    print("수신된 질문:", question)
+    print("현재 스키마 목록:", schema)
+
     if not question or not schema:
         return jsonify({"error": "질문 또는 스키마가 누락되었습니다."}), 400
 
@@ -109,9 +112,11 @@ def text2sql():
 형식:
 {{ "sql": "SELECT ...", "explanation": "이 쿼리는 ..." }}
 
-주의사항:
-- DROP, ALTER, CREATE 등 파괴적인 명령은 절대 생성하지 마세요.
-- 항상 SELECT, INSERT, UPDATE, DELETE로 제한하세요.
+제약 조건:
+- 반드시 위에 제공된 스키마의 테이블과 필드만 사용하세요.
+- 제공되지 않은 테이블이나 필드는 절대 사용하지 마세요.
+- DROP, ALTER, CREATE 같은 파괴적인 명령은 절대 생성하지 마세요.
+- SELECT, INSERT, UPDATE, DELETE만 사용하세요.
 - 마크다운, 코드 블록, 주석 없이 JSON만 반환하세요.
 """
 
@@ -130,6 +135,8 @@ def text2sql():
 
         reply = reply.replace("```json", "").replace("```", "").strip()
         parsed = json.loads(reply)
+        print("\n파싱된 응답 JSON:\n", parsed)
+        
         return jsonify(parsed)
 
     except json.JSONDecodeError:
