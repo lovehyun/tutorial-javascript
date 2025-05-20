@@ -2,76 +2,76 @@
 // 
 // 챗봇 백엔드 통신용 API서버 주소 설정
 // window.CHATBOT_CONFIG = {
-//   API_SERVER: 'https://your-api-server.com'
+//     API_SERVER: 'https://your-api-server.com',
+//     echoMode: false
 // };
 // 
 // (async () => {
-//   const script = document.createElement('script');
-//   script.src = 'https://domain/path/chatbot.js';
-//   script.defer = true;
-//   document.head.appendChild(script);
+//     window.CHATBOT_CONFIG = { echoMode: true };
+//     const script = document.createElement('script');
+//     script.src = 'https://domain/path/chatbot.js';
+//     script.onload = () => {
+//         console.log('✅ 로드 완료');
+//         initChatbot();
+//     };
+//     script.onerror = () => {
+//         console.error('❌ 스크립트 로드 실패');
+//     };
+//     document.head.appendChild(script);
 // })();
+// 전역 설정값이 없으면 기본값 사용 (현재 서버 자체)
+// window.CHATBOT_CONFIG = { API_SERVER: 'https://your-server.com' };
+// const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || 'http://localhost:3000';
+const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || '';
+const ECHO_MODE = window.CHATBOT_CONFIG?.echoMode ?? true; // 기본 에코 모드
 
-// 챗봇 UI를 생성하는 함수
-function createChatbotUI() {
-    // 챗봇 아이콘
-    const chatbotIcon = document.createElement('div');
-    chatbotIcon.id = 'chatbotIcon';
-    chatbotIcon.classList.add('chatbot-icon');
-    chatbotIcon.innerHTML = '<i class="bi bi-chat-dots-fill"></i>';
-
-    // 챗봇 창
-    const chatbotWindow = document.createElement('div');
-    chatbotWindow.id = 'chatbotWindow';
-    chatbotWindow.classList.add('chatbot-window');
-    chatbotWindow.style.display = 'none'; // 처음에는 숨김 처리
-
-    // 챗봇 헤더
-    const header = document.createElement('div');
-    header.classList.add('chatbot-header');
-    header.innerHTML = `<span>Chatbot</span><button id="closeChatbot">X</button>`;
-
-    // 챗봇 바디
-    const body = document.createElement('div');
-    body.classList.add('chatbot-body');
-
-    const messages = document.createElement('div');
-    messages.id = 'chatbotMessages';
-    messages.classList.add('chatbot-messages');
-
-    const inputContainer = document.createElement('div');
-    inputContainer.classList.add('chatbot-input-container');
-    inputContainer.innerHTML = `
-        <input type="text" id="chatbotInput" placeholder="Type a message...">
-        <button id="sendMessage">Send</button>
-    `;
-
-    body.appendChild(messages);
-    body.appendChild(inputContainer);
-
-    chatbotWindow.appendChild(header);
-    chatbotWindow.appendChild(body);
-
-    // body의 맨 마지막에 아이콘과 창 추가
-    document.body.appendChild(chatbotIcon);
-    document.body.appendChild(chatbotWindow);
-
-    return { chatbotIcon, chatbotWindow, messages };
+// 메인 초기화 함수
+function initChatbot() {
+    loadChatbotStylesheet();
+    createChatbotUI();
+    registerEventHandlers();
+    registerResizeHandler();
 }
 
-// 필요 스타일이 없으면 자동으로 추가
+// DOM이 준비되면 초기화 실행
+document.addEventListener('DOMContentLoaded', initChatbot);
+
+// 챗봇 UI 생성 (DOM)
+function createChatbotUI() {
+    const chatbotHTML = `
+        <div class="chatbot-icon" id="chatbotIcon">
+            <i class="bi bi-chat-dots-fill"></i>
+        </div>
+        <div class="chatbot-window" id="chatbotWindow" style="display: none;">
+            <div class="resizer" id="resizer"></div>
+            <div class="chatbot-header">
+                <span>Chatbot</span>
+                <button id="closeChatbot">X</button>
+            </div>
+            <div class="chatbot-body">
+                <div class="chatbot-messages" id="chatbotMessages"></div>
+                <div class="chatbot-input-container">
+                    <input type="text" id="chatbotInput" placeholder="Type a message...">
+                    <button id="sendMessage">Send</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', chatbotHTML);
+}
+
+// CSS 자동 로딩
 function loadChatbotStylesheet() {
-    const existingLink = document.querySelector('link[href*="chatbot.css"]');
-    if (!existingLink) {
+    // chatbot용 CSS가 없다면 삽입
+    if (!document.querySelector('link[href*="chatbot.css"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'css/chatbot.css';  // 실제 배포된 CSS 경로 (https://xxx)
+        link.href = 'css/chatbot.css';  // 실제 CSS 경로로 수정
         document.head.appendChild(link);
     }
 
-    // bootstrap-icons도 없으면 추가
-    const iconLink = document.querySelector('link[href*="bootstrap-icons"]');
-    if (!iconLink) {
+    // bootstrap-icons도 없으면 삽입
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
         const bi = document.createElement('link');
         bi.rel = 'stylesheet';
         bi.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css';
@@ -79,79 +79,114 @@ function loadChatbotStylesheet() {
     }
 }
 
-// 챗봇 초기화 함수
-function initChatbot() {
-    const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || 'http://localhost:3000';
-    const { chatbotIcon, chatbotWindow, messages } = createChatbotUI();
-
+// 이벤트 등록 (각 챗봇 아이콘 클릭/닫기/메세지전송 등)
+function registerEventHandlers() {
+    const chatbotIcon = document.getElementById('chatbotIcon');
+    const chatbotWindow = document.getElementById('chatbotWindow');
     const closeChatbot = document.getElementById('closeChatbot');
     const sendMessage = document.getElementById('sendMessage');
     const chatbotInput = document.getElementById('chatbotInput');
 
-    // 이벤트 리스너: 챗봇 아이콘 클릭 시 챗봇 창 보이기
+    // 챗봇 활성화
     chatbotIcon.addEventListener('click', () => {
         chatbotIcon.style.display = 'none';
         chatbotWindow.style.display = 'flex';
     });
 
-    // 이벤트 리스너: 챗봇 창 닫기 버튼 클릭 시
+    // 챗봇 비활성화
     closeChatbot.addEventListener('click', () => {
         chatbotWindow.style.display = 'none';
         chatbotIcon.style.display = 'flex';
     });
 
-    // 메시지 추가 함수
-    function addMessage(message, sender = 'user') {
-        const messageElement = document.createElement('div');
-        const formattedMessage = message.replace(/\n/g, '<br>');
-        messageElement.innerHTML = sender === 'user'
-            ? `<i class="bi bi-person"></i> ${formattedMessage}`
-            : `<i class="bi bi-robot"></i> ${formattedMessage}`;
-        messageElement.classList.add(sender);
-        messages.appendChild(messageElement);
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    // 메시지 보내기 처리 함수
-    async function handleUserMessage() {
-        const message = chatbotInput.value.trim();
-        if (!message) return;
-        addMessage(message, 'user');
-        chatbotInput.value = '';
-        const botResponse = await sendMessageToServer(message);
-        addMessage(botResponse, 'bot');
-    }
-
-    // 서버로 메시지 전송하는 함수
-    async function sendMessageToServer(question) {
-        try {
-            const response = await fetch(`${API_SERVER}/api/chat`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ question })
-            });
-            const data = await response.json();
-            return data.answer;
-        } catch (error) {
-            console.error('서버와의 연결 오류:', error);
-            return '서버와 연결할 수 없습니다.';
-        }
-    }
-
-    // 이벤트 리스너: 메시지 전송 버튼
+    // 메세지 전송
     sendMessage.addEventListener('click', handleUserMessage);
-    // 이벤트 리스너: 엔터키 입력 시
     chatbotInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleUserMessage();
-        }
+        if (e.key === 'Enter') handleUserMessage();
     });
 }
 
-// DOMContentLoaded 이벤트 후 챗봇 초기화
-document.addEventListener("DOMContentLoaded", () => {
-    loadChatbotStylesheet();
-    initChatbot();
-});
+// 메시지 전송 및 수신 처리
+async function handleUserMessage() {
+    const input = document.getElementById('chatbotInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user');
+    input.value = '';
+
+    const botResponse = await sendMessageToServer(message);
+    addMessage(botResponse, 'bot');
+
+    // 외부 연동: 예시로 To-Do 갱신
+    if (typeof fetchTodos === 'function') {
+        fetchTodos();
+    }
+}
+
+// 메시지 추가
+function addMessage(message, sender = 'user') {
+    const container = document.getElementById('chatbotMessages');
+    const formatted = message.replace(/\n/g, '<br>');
+
+    const messageElement = document.createElement('div');
+    messageElement.innerHTML = sender === 'user'
+        ? `<i class="bi bi-person"></i> ${formatted}`
+        : `<i class="bi bi-robot"></i> ${formatted}`;
+    messageElement.classList.add(sender);
+
+    container.appendChild(messageElement);
+    container.scrollTop = container.scrollHeight;
+}
+
+// 서버에 질문 전송
+async function sendMessageToServer(question) {
+    if (ECHO_MODE) {
+        return `Echo: ${question}`;
+    }
+
+    try {
+        const res = await fetch(`${API_SERVER}/api/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question })
+        });
+        const data = await res.json();
+        return data.answer || '응답이 없습니다.';
+    } catch (e) {
+        console.error('서버 오류:', e);
+        return '서버와 연결할 수 없습니다.';
+    }
+}
+
+// 리사이즈 핸들러 등록
+function registerResizeHandler() {
+    const chatbotWindow = document.getElementById('chatbotWindow');
+    const resizer = document.getElementById('resizer');
+
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+
+    resizer.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = chatbotWindow.getBoundingClientRect();
+        startWidth = rect.width;
+        startHeight = rect.height;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+
+        const dx = startX - e.clientX;  // 왼쪽 방향 드래그
+        const dy = startY - e.clientY;  // 위쪽 방향 드래그
+        chatbotWindow.style.width = Math.max(250, startWidth + dx) + 'px';
+        chatbotWindow.style.height = Math.max(300, startHeight + dy) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+    });
+}

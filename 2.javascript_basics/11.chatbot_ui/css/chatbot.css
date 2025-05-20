@@ -34,6 +34,17 @@ body {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* 챗봇 창에 그림자를 추가하여 입체감 부여 */
     display: none; /* 기본적으로 챗봇 창을 보이지 않게 설정 */
     flex-direction: column; /* 챗봇 창 내부 요소들을 세로로 배치 */
+    resize: none; /* 브라우저 기본 리사이즈는 비활성화 */
+}
+
+.resizer {
+    width: 10px;
+    height: 10px;
+    background: #ccc;
+    position: absolute;
+    left: 0; /* 왼쪽 */
+    top: 0;  /* 상단 */
+    cursor: nw-resize; /* ↖ 방향 커서 */
 }
 
 .chatbot-header {
@@ -52,6 +63,7 @@ body {
     padding: 10px; /* 챗봇 본문의 내부 여백을 10px로 설정 */
     display: flex; /* 챗봇 본문 내부 요소들을 플렉스 박스로 설정 */
     flex-direction: column; /* 챗봇 본문 내부 요소들을 세로로 배치 */
+    overflow: hidden;        /* 내부에서만 스크롤되도록 */
 }
 
 .chatbot-messages {
@@ -61,12 +73,17 @@ body {
     border: 1px solid #ddd; /* 메시지 창의 경계선을 밝은 회색으로 설정 */
     border-radius: 4px; /* 메시지 창의 모서리를 둥글게 설정 */
     padding: 5px; /* 메시지 창의 내부 여백을 5px로 설정 */
-    max-height: 280px; /* 메시지 창의 최대 높이를 280px로 설정하여 스크롤바가 나타나도록 함 */
+    /* max-height: 280px; 메시지 창의 최대 높이를 280px로 설정하여 스크롤바가 나타나도록 함 */
 }
 
 .chatbot-input-container {
     display: flex; /* 입력창과 버튼을 같은 줄에 배치 */
     align-items: center; /* 입력창과 버튼을 수직 중앙 정렬 */
+
+    /* 고정 높이 추가 */
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-top: 1px solid #ddd;
 }
 
 #chatbotInput {
