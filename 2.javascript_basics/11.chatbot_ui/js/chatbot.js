@@ -1,27 +1,27 @@
 // 팁: 개발자도구에서 한번에 로딩
-// 
 // 챗봇 백엔드 통신용 API서버 주소 설정
-// window.CHATBOT_CONFIG = {
-//     API_SERVER: 'https://your-api-server.com',
-//     echoMode: false
-// };
-// 
-// (async () => {
-//     window.CHATBOT_CONFIG = { echoMode: true };
-//     const script = document.createElement('script');
-//     script.src = 'https://domain/path/chatbot.js';
-//     script.onload = () => {
-//         console.log('✅ 로드 완료');
-//         initChatbot();
-//     };
-//     script.onerror = () => {
-//         console.error('❌ 스크립트 로드 실패');
-//     };
-//     document.head.appendChild(script);
-// })();
+/* 
+window.CHATBOT_CONFIG = {
+    API_SERVER: 'https://your-api-server.com',
+    echoMode: false
+};
+
+(async () => {
+    window.CHATBOT_CONFIG = { echoMode: true };
+    const script = document.createElement('script');
+    script.src = 'https://domain/path/chatbot.js';
+    script.onload = () => {
+        console.log('✅ 로드 완료');
+        initChatbot();
+    };
+    script.onerror = () => {
+        console.error('❌ 스크립트 로드 실패');
+    };
+    document.head.appendChild(script);
+})();
+*/
+
 // 전역 설정값이 없으면 기본값 사용 (현재 서버 자체)
-// window.CHATBOT_CONFIG = { API_SERVER: 'https://your-server.com' };
-// const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || 'http://localhost:3000';
 const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || '';
 const ECHO_MODE = window.CHATBOT_CONFIG?.echoMode ?? true; // 기본 에코 모드
 

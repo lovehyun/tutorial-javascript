@@ -1,16 +1,16 @@
 // 팁: 개발자도구에서 한번에 로딩
-// 
 // 챗봇 백엔드 통신용 API서버 주소 설정
-// window.CHATBOT_CONFIG = {
-//   API_SERVER: 'https://your-api-server.com'
-// };
-// 
-// (async () => {
-//   const script = document.createElement('script');
-//   script.src = 'https://domain/path/chatbot.js';
-//   script.defer = true;
-//   document.head.appendChild(script);
-// })();
+/*
+window.CHATBOT_CONFIG = {
+    API_SERVER: 'https://your-api-server.com'
+};
+
+(async () => {
+    const script = document.createElement('script');
+    script.src = 'https://domain/path/chatbot.js';
+    document.head.appendChild(script);
+})();
+*/
 
 // 챗봇 UI를 생성하는 함수
 function createChatbotUI() {
@@ -81,7 +81,7 @@ function loadChatbotStylesheet() {
 
 // 챗봇 초기화 함수
 function initChatbot() {
-    const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || 'http://localhost:3000';
+    const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || '';
     const { chatbotIcon, chatbotWindow, messages } = createChatbotUI();
 
     const closeChatbot = document.getElementById('closeChatbot');
