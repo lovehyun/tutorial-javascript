@@ -1,21 +1,22 @@
 // 팁: 개발자도구에서 한번에 로딩
 // 챗봇 백엔드 통신용 API서버 주소 설정
 /* 
+const protocol = window.location.protocol;
 window.CHATBOT_CONFIG = {
-    API_SERVER: 'https://your-api-server.com',
-    echoMode: false
+    API_SERVER: `${protocol}//makemyproject.net`,
+    echoMode: true
 };
 
 (async () => {
-    window.CHATBOT_CONFIG = { echoMode: true };
+    const baseURL = window.CHATBOT_CONFIG?.API_SERVER || '';
     const script = document.createElement('script');
-    script.src = 'https://domain/path/chatbot.js';
+    script.src = `${baseURL}/js/chatbot.js`;
     script.onload = () => {
-        console.log('✅ 로드 완료');
+        console.log('Chatbot script loaded successfully.');
         initChatbot();
     };
     script.onerror = () => {
-        console.error('❌ 스크립트 로드 실패');
+        console.error('Failed to load chatbot script.');
     };
     document.head.appendChild(script);
 })();
@@ -62,11 +63,13 @@ function createChatbotUI() {
 
 // CSS 자동 로딩
 function loadChatbotStylesheet() {
+    const baseURL = window.CHATBOT_CONFIG?.API_SERVER || '';
+
     // chatbot용 CSS가 없다면 삽입
     if (!document.querySelector('link[href*="chatbot.css"]')) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = 'css/chatbot.css';  // 실제 CSS 경로로 수정
+        link.href = `${baseURL}/css/chatbot.css`;  // 실제 CSS 경로로 수정
         document.head.appendChild(link);
     }
 

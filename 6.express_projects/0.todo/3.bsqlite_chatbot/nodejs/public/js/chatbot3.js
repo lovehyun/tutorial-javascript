@@ -1,6 +1,5 @@
 // 전역 설정값이 없으면 기본값 사용 (현재 서버 자체)
 // window.CHATBOT_CONFIG = { API_SERVER: 'https://your-server.com' };
-// const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || 'http://localhost:3000';
 const API_SERVER = window.CHATBOT_CONFIG?.API_SERVER || '';
 
 // 메인 초기화 함수
