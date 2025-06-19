@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <h3>네이버같은 로그인창</h3>
+    <form method="GET" action="login.html">
+        <label for="user_id">아이디</label>
+        <input type="text" name="id" id="user_id"><BR>
+        <label for="user_pw">비밀번호</label>
+        <input type="password" name="pw" id="user_pw"><BR>
+        <input type="submit" value="로그인">
+    </form>
+
+    <h3>구글같은 검색창</h3>
+    <form method="GET" action="search">
+        <label for="query">검색어</label>
+        <input type="text" name="q" id="query">
+        <input type="submit" value="검색">
+    </form>
+</body>
+</html>
+
+<!-- file:///<중략>/1.HTML/login.html?id=aaaa&pw=bbbb -->
+<!-- file:///<중략>/1.HTML/search?q=apple -->
