@@ -2,23 +2,36 @@
 <html>
     <head>
         <style>
-            #cat1 { float: left; margin: 50px; }
-            #cat2 { float: right; margin: 50px; }
+            #cat1 { 
+                float: left;
+                margin: 50px;
+                /* border: 1px dashed red; */
+            }
+            #cat2 { 
+                float: right;
+                padding: 50px;
+                /* border: 1px dashed red; */
+            }
 
             .container {
                 border: 3px dashed orange;
             }
+
             p {
-                clear: both;
+                /* clear: both; */
+                /* clear: both; 를 주면 왼쪽이나 오른쪽에 float 된 요소들 밑으로 내려가서 새 줄에서 시작합니다.
+                   즉, 이미지 양옆 공간에 끼어들지 않고, 이미지 아래로 정확히 떨어집니다. */
             }
         </style>
     </head>
     <body>
         <h1>이미지를 통한 페이지 흐름 이해하기</h1>
         <div class="container">
-            <img src="../images/cats.jpg" id="cat1">
-            <img src="../images/cats.jpg" id="cat2">
+            <img src="../images/cats.jpg" width="200" id="cat1">
+            <img src="../images/cats.jpg" width="200" id="cat2">
             <p> 긴 컨텐츠 추가하기 </p>
+            <p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Dolores cumque distinctio laborum aliquid cum ab, laboriosam odio. Mollitia quam hic modi tempore cupiditate animi accusamus eum, atque voluptatibus, ipsum sit?</p>
+            <p> Lorem ipsum dolor, sit amet consectetur adipisicing elit. Aperiam quasi animi, laboriosam et nulla sunt autem pariatur ab odio accusantium ad iusto accusamus architecto expedita sequi id excepturi quibusdam blanditiis.</p>
         </div>
     </body>
 </html>

@@ -4,68 +4,88 @@
     <meta charset="UTF-8">
     <title>페이지 제목</title>
     <style>
+        /* 전체 문서에 적용되는 기본 폰트 및 여백 설정 */
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif; /* 기본 글꼴 설정 */
+            margin: 0;                      /* 바깥 여백 제거 */
+            padding: 0;                     /* 안쪽 여백 제거 */
         }
 
+        /* 상단 헤더 영역 스타일 */
         header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
+            background-color: #333;         /* 어두운 배경색 */
+            color: #fff;                    /* 글자색 흰색 */
+            padding: 10px;                  /* 안쪽 여백 */
         }
 
+        /* 기본 메뉴 리스트 스타일 제거 */
         ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
+            list-style-type: none;          /* 점 없는 리스트 */
+            margin: 0;                      /* 바깥 여백 제거 */
+            padding: 0;                     /* 안쪽 여백 제거 */
         }
 
+        /* 상단 메뉴 항목 스타일 */
         ul li {
-            display: inline-block;
-            margin-right: 20px;
+            display: inline-block;          /* 가로로 나열 */
+            margin-right: 20px;             /* 메뉴 간 간격 */
+            position: relative;             /* 서브메뉴 위치 기준점 설정 */
         }
 
+        /* 메뉴 항목 링크 스타일 */
         ul li a {
-            color: #fff;
-            text-decoration: none;
+            color: #fff;                    /* 링크 글자색 흰색 */
+            text-decoration: none;          /* 밑줄 제거 */
         }
 
+        /* ▼▼▼ 서브메뉴 영역 ▼▼▼ */
+
+        /* .submenu: 서브 메뉴 전체 영역 숨겨진 상태 (기본) */
         .submenu {
-            display: none;
+            display: none;                  /* 처음엔 숨김 */
+            position: absolute;             /* 상위 메뉴 아래에 고정 위치 */
+            background-color: #333;         /* 배경색 동일하게 */
+            top: 100%;                      /* 부모 메뉴 아래에 위치 */
+            left: 0;                        /* 좌측 정렬 */
+            z-index: 1000;                  /* 다른 요소보다 위에 표시 */
+            white-space: nowrap;            /* 줄바꿈 없이 한 줄로 표시 */
+            min-width: 150px;               /* 최소 너비 확보 */
+            padding: 5px 0;                 /* 위아래 여백 */
         }
 
+        /* li에 마우스를 올렸을 때 서브메뉴 보이게 함 */
         ul li:hover .submenu {
-            display: block;
-            position: absolute;
-            background-color: #333;
-            margin-top: 5px;
+            display: block;                 /* 마우스 올리면 표시 */
         }
 
+        /* 서브메뉴 내부의 ul 리스트 */
         .submenu ul {
-            display: block;
-            margin: 0;
-            padding: 0;
+            display: block;                 /* 블록 형식 */
+            margin: 0;                      /* 여백 제거 */
+            padding: 0;                     /* 안쪽 여백 제거 */
         }
 
+        /* 서브메뉴 항목들 */
         .submenu ul li {
-            display: block;
+            display: block;                 /* 세로 정렬 항목 */
         }
 
+        /* 서브메뉴 항목 링크 스타일 */
         .submenu ul li a {
-            display: block;
-            padding: 5px 10px;
-            color: #fff;
-            text-decoration: none;
+            display: block;                 /* 전체 너비 클릭 가능 */
+            padding: 5px 10px;              /* 안쪽 여백 */
+            color: #fff;                    /* 글자색 흰색 */
+            text-decoration: none;          /* 밑줄 제거 */
         }
 
+        /* 서브메뉴 항목에 마우스를 올렸을 때 배경색 변경 */
         .submenu ul li a:hover {
-            background-color: #555;
+            background-color: #555;         /* 밝은 회색 배경 */
         }
 
+        /* 본문 콘텐츠 영역 */
         main {
-            padding: 20px;
+            padding: 20px;                  /* 안쪽 여백 */
         }
     </style>
 </head>
@@ -73,7 +93,10 @@
     <header>
         <nav>
             <ul>
+                <!-- 상단 메뉴: 홈 -->
                 <li><a href="#">홈</a></li>
+
+                <!-- 상단 메뉴: 메뉴 1 (서브메뉴 포함) -->
                 <li>
                     <a href="#">메뉴 1</a>
                     <div class="submenu">
@@ -84,6 +107,8 @@
                         </ul>
                     </div>
                 </li>
+
+                <!-- 상단 메뉴: 메뉴 2 (서브메뉴 포함) -->
                 <li>
                     <a href="#">메뉴 2</a>
                     <div class="submenu">
@@ -94,6 +119,8 @@
                         </ul>
                     </div>
                 </li>
+
+                <!-- 상단 메뉴: 메뉴 3 -->
                 <li><a href="#">메뉴 3</a></li>
             </ul>
         </nav>
