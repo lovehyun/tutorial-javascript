@@ -11,10 +11,14 @@
             background-color: lightblue;
             margin-top: 10px;
         }
+
+        .show {
+            display: block !important;
+        }
     </style>
 </head>
 <body>
-    <button onclick="toggleDiv2()">Toggle Div</button>
+    <button onclick="toggleDivBetter()">Toggle Div</button>
 
     <div id="myDiv">이것은 숨겨진 Div입니다.</div>
 
@@ -38,6 +42,11 @@
             } else {
                 divElement.style.display = 'none'; // div를 숨깁니다.
             }
+        }
+
+        function toggleDivBetter() {
+            var divElement = document.getElementById('myDiv');
+            divElement.classList.toggle('show'); // 해당 class가 없으면 추가, 있으면 삭제
         }
     </script>
 </body>

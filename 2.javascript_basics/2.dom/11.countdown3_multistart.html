@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Timer</title>
+</head>
+<body>
+    <h1>Countdown Timer</h1>
+    <input type="number" id="timeInput" placeholder="Enter seconds">
+    <button onclick="startTimer()">Start</button>
+    <!-- <p id="timerDisplay"></p> -->
+    <div id="timersContainer"></div> <!-- 타이머를 추가할 공간 -->
+
+    <script>
+        function startTimer() {
+            let time = parseInt(document.getElementById("timeInput").value);
+            const display = document.getElementById("timerDisplay");
+
+            // 잘못된 입력 처리
+            if (isNaN(time) || time <= 0) {
+                alert("Please enter a valid time.");
+                return;
+            }
+
+            // 타이머 DOM 요소 생성
+            const timerElement = document.createElement('p');
+            timerElement.textContent = `${time} seconds remaining`;
+
+            // 타이머를 화면에 추가
+            document.getElementById('timersContainer').appendChild(timerElement);
+
+            // 타이머 시작
+            const interval = setInterval(() => {
+                // time--;
+                if (time <= 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = "Time's up!";
+                } else {
+                    timerElement.textContent = `${time} seconds remaining`;
+                    time--; // 이 위치 버그 발견하고... 위로 올리기
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

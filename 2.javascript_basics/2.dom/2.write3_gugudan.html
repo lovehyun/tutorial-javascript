@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>구구단 출력기</title>
+</head>
+<body>
+    <h1>구구단 출력기</h1>
+
+    <!-- 입력 박스 -->
+    <input type="number" id="danInput" placeholder="단 입력 (예: 2)">
+    <button id="printButton">출력하기</button>
+
+    <!-- 결과 출력 영역 -->
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('printButton').addEventListener('click', function() {
+            let dan = parseInt(document.getElementById('danInput').value);
+            let resultBox = document.getElementById('result');
+
+            // 입력값이 비어있으면 경고
+            if (isNaN(dan)) {
+                resultBox.innerHTML = '단을 입력하세요.';
+                return;
+            }
+
+            // 구구단 출력
+            let output = `<h3>${dan}단</h3>`;
+            for (let i = 1; i <= 9; i++) {
+                output += `${dan} x ${i} = ${dan * i} <br>`;
+            }
+
+            resultBox.innerHTML = output;
+
+            // .value: 사용자 입력 가능한 요소 (input, textarea, select 등)
+            // .textContent: 입력값이 아니라, 화면에 보여주는 값을 가져올때 (div, span, p, h1 등)
+        });
+    </script>
+</body>
+</html>

@@ -3,6 +3,8 @@
 <head>
     <title>Auto Refresh Example</title>
     <script>
+        // window.onload: HTML, CSS, 이미지, JS, 영상 등 모든 리소스가 로드된 후
+        // document.addEventListener("DOMContentLoaded", ()): HTML만 완성되면 바로 실행 가능 (실무에서 더 많이 사용됨)
         window.onload = function () {
             setTimeout(function () {
                 location.reload();         // 브라우저 캐시에서 페이지를 다시 로드

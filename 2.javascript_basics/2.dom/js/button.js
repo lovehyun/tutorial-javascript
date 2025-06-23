@@ -16,6 +16,7 @@ function number_inc() {
 function number_dec() {
     console.log("-1 버튼 클릭");
 
-    result = document.getElementById("result");
-    result.innerText = parseInt(result.innerText, 10) - 1;
+    // result = document.getElementById("result");
+    // result.innerText = parseInt(result.innerText, 10) - 1;
+    document.getElementById('result').textContent -= 1;
 }

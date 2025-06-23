@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Timer</title>
+</head>
+<body>
+    <h1>Countdown Timer</h1>
+    <input type="number" id="timeInput" placeholder="Enter seconds">
+    <button onclick="startTimer()">Start</button>
+    <button onclick="clearAllTimers()">Clear All Timers</button>
+    <div id="timersContainer"></div> <!-- 타이머를 추가할 공간 -->
+
+    <script>
+        // 모든 타이머의 interval ID를 저장하는 배열
+        const intervals = [];
+
+        function startTimer() {
+            let time = parseInt(document.getElementById("timeInput").value);
+            const display = document.getElementById("timerDisplay");
+
+            // 잘못된 입력 처리
+            if (isNaN(time) || time <= 0) {
+                alert("Please enter a valid time.");
+                return;
+            }
+
+            // 타이머 DOM 요소 생성
+            const timerElement = document.createElement('p');
+            timerElement.textContent = `${time} seconds remaining`;
+
+            // 타이머를 화면에 추가
+            document.getElementById('timersContainer').appendChild(timerElement);
+
+            // 타이머 시작
+            const interval = setInterval(() => {
+                time--;
+                if (time <= 0) {
+                    clearInterval(interval);
+                    timerElement.textContent = "Time's up!";
+                } else {
+                    timerElement.textContent = `${time} seconds remaining`;
+                }
+            }, 1000);
+
+            // interval ID 저장
+            intervals.push(intervalId);
+        }
+
+        function clearAllTimers() {
+            // 모든 interval 중지
+            intervals.forEach(intervalId => clearInterval(intervalId));
+            intervals.length = 0; // interval 배열 초기화
+
+            // 모든 타이머 DOM 삭제
+            document.getElementById('timersContainer').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
