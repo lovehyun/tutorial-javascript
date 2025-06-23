@@ -4,16 +4,16 @@
     "version": "1.0",
     "description": "Auction Allkill 페이지에서 상품 정보를 수집하고 정렬 및 검색하는 툴",
     "icons": {
-        "16": "allkill_icon_16.png",
-        "48": "allkill_icon_48.png",
-        "128": "allkill_icon_128.png"
+        "16": "icons/allkill_icon_16.png",
+        "48": "icons/allkill_icon_48.png",
+        "128": "icons/allkill_icon_128.png"
     },
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "allkill_icon_16.png",
-            "48": "allkill_icon_48.png",
-            "128": "allkill_icon_128.png"
+            "16": "icons/allkill_icon_16.png",
+            "48": "icons/allkill_icon_48.png",
+            "128": "icons/allkill_icon_128.png"
         }
     },
     "permissions": [
