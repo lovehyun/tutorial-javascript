@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Table Color Example</title>
+    <style>
+        table {
+            /* border: 1px solid black; */
+            border-collapse: collapse; /* 셀 간의 경계선 설정 : separate(기본값) */
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid black;
+            /* background-color: #ffffff; */
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td>셀 1</td>
+            <td>셀 2</td>
+            <td>셀 3</td>
+        </tr>
+        <tr>
+            <td>셀 4</td>
+            <td>셀 5</td>
+            <td>셀 6</td>
+        </tr>
+        <tr>
+            <td>셀 7</td>
+            <td>셀 8</td>
+            <td>셀 9</td>
+        </tr>
+    </table>
+
+    <button onclick="changeOddCellColor1()">홀수셀 색상 변경</button>
+    <button onclick="resetCellColor()">리셋</button>
+
+    <script>
+        var cells = document.getElementsByTagName("td");
+
+/*
+| 함수 이름               | 방법       | 설명                       | 특징        |
+| ------------------- | -------- | ------------------------ | --------- |
+| changeOddCellColor1 | 기본 for문  | 가장 일반적인 반복문              | 직관적       |
+| changeOddCellColor2 | forEach  | 배열 변환 후 forEach 사용       | 가독성 최고    |
+| changeOddCellColor3 | for...of | for...of 사용, index 수동 관리 | 깔끔함       |
+| changeOddCellColor4 | 비트 연산    | (i & 1) 연산으로 홀짝 판별       | 성능 우수     |
+| changeOddCellColor5 | CSS 선택자  | `nth-child(odd)` 직접 선택   | 코드 가장 짧음  |
+| changeOddCellColor6 | while문   | 2칸씩 건너뛰며 선택              | 빠름, 다소 생소 | 
+*/
+
+        // 방법 1. 기본 for문
+        function changeOddCellColor1() {
+            // 테이블 셀의 배경색을 변경하는 함수입니다.
+            for (var i = 0; i < cells.length; i++) {
+                if (i % 2 !== 1) { // 홀수 셀인 경우
+                    cells[i].style.backgroundColor = "lightgreen"; // 변경할 색상을 여기에 입력하세요.
+                }
+            }
+        }
+
+        // 방법 2. forEach 사용 (HTMLCollection을 배열로 변환)
+        function changeOddCellColor2() {
+            Array.from(cells).forEach((cell, index) => {
+                // 인덱스 0, 2, 4... → 사람 기준 홀수 번째 셀
+                if (index % 2 === 0) {
+                    cell.style.backgroundColor = "lightgreen";
+                }
+            });
+        }
+
+        // 방법 3. for...of 사용
+        function changeOddCellColor3() {
+            let index = 0;
+            for (const cell of cells) {
+                // 인덱스 0, 2, 4... → 사람 기준 홀수 번째 셀
+                if (index % 2 === 0) {
+                    cell.style.backgroundColor = "lightgreen";
+                }
+                index++;
+            }
+        }
+
+        // 방법 4. 비트 연산자 사용
+        function changeOddCellColor4() {
+            for (var i = 0; i < cells.length; i++) {
+                // 비트 연산자 사용 → (짝수 인덱스 = 홀수 번째 셀)
+                if ((i & 1) === 0) {
+                    cells[i].style.backgroundColor = "lightgreen";
+                }
+            }
+        }
+
+        // 방법 5. CSS 선택자 사용 (nth-child) - 홀수 테이블이면 안됨!!
+        function changeOddCellColor5() {
+            // 사람 기준 홀수 번째 셀만 선택
+            var oddCells = document.querySelectorAll('td:nth-child(odd)');
+            oddCells.forEach(cell => {
+                cell.style.backgroundColor = 'lightgreen';
+            });
+        }
+
+        // 방법 6. while문 사용
+        function changeOddCellColor6() {
+            var i = 0;
+            while (i < cells.length) {
+                // 인덱스 0, 2, 4... → 사람 기준 홀수 번째 셀
+                cells[i].style.backgroundColor = "lightgreen";
+                i += 2; // 2칸씩 건너뛰기
+            }
+        }
+
+        // 리셋 함수 (모든 셀 색상 초기화)
+        function resetCellColor() {
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].style.backgroundColor = "white"; // 기본 색상으로 초기화
+            }
+        }
+    </script>
+</body>
+
+</html>

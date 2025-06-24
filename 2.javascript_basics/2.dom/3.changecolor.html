@@ -48,7 +48,19 @@
         }
 
         function randomColor2() {
-            const randomColor = '#' + Math.floor(Math.random()*16_777_216).toString(16).padStart(6, '0'); // ES2021부터 숫자에 _ 지원함
+            const r = Math.floor(Math.random() * 256);
+            const g = Math.floor(Math.random() * 256);
+            const b = Math.floor(Math.random() * 256);
+
+            const color = `rgb(${r}, ${g}, ${b})`;
+            // const color = 'rgba(${r}, ${g}, ${b}, 0.5)`;`
+
+            document.body.style.backgroundColor = color;
+        }
+
+        function randomColor3() {
+            const randomColor = '#' + Math.floor(Math.random() * 16_777_216).toString(16).padStart(6, '0'); // ES2021부터 숫자에 _ 지원함
+            // const randomColor = '#' + Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
             document.body.style.backgroundColor = randomColor;
         }
     </script>

@@ -23,7 +23,7 @@
     <div id="myDiv">이것은 숨겨진 Div입니다.</div>
 
     <script>
-        function toggleDiv() {
+        function toggleDiv() { // 처음 시작시 안되는 버그
             var divElement = document.getElementById('myDiv');
 
             if (divElement.style.display === 'none') {
@@ -33,7 +33,7 @@
             }
         }
 
-        function toggleDiv2() {
+        function toggleDiv2() { // 로직을 바꿔서 해결 (단, css에서 디자인이 바뀌면 반대 버그 발생 가능)
             var divElement = document.getElementById('myDiv');
             var displayStyle = window.getComputedStyle(divElement).display;
 

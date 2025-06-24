@@ -21,6 +21,7 @@
     <script>
         function toggleDiv() {
             var divElement = document.getElementById('myDiv');
+            // var divElement = document.querySelector('#myDiv');
 
             if (divElement.style.display === 'none') {
                 divElement.style.display = 'block'; // div를 보이게 설정합니다.
@@ -30,6 +31,17 @@
         }
 
         function toggleDiv2() {
+            var divElement = document.getElementById('myDiv');
+            // var divElement = document.querySelector('#myDiv');
+
+            if (divElem.style.display !== 'block') {
+                divElem.style.display = 'block';
+            } else {
+                divElem.style.display = 'none';
+            }
+        }
+
+        function toggleDiv3() {
             var divElement = document.getElementById('myDiv');
             var displayStyle = window.getComputedStyle(divElement).display;
 
