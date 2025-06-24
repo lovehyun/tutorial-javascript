@@ -1,20 +1,24 @@
 // content.js
 
+// 메시지 송수신의 전체 흐름
+// popup.js (팝업 창) ↔ content.js (웹페이지)
+//
+// 1. 수집 시작
+// popup.js: chrome.tabs.sendMessage(currentTab.id, { action: 'collect' })
+//     ↓
+// content.js: chrome.runtime.onMessage.addListener() 에서 수신
+//     ↓
+// content.js: startCollecting() 실행
+//
+// 2. 진행상황 업데이트
+// content.js: chrome.runtime.sendMessage({ status: 'collecting', collected: 10 })
+//     ↓
+// popup.js: chrome.runtime.onMessage.addListener() 에서 수신
+//     ↓
+// popup.js: updateStatus() 호출하여 UI 업데이트
+
 let windowItems = [];
 let isCollecting = false;
-
-// 메시지 수신 처리
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'collect') {
-        startCollecting();
-    } else if (request.action === 'sortDiscount') {
-        loadItems(sortByDiscount);
-    } else if (request.action === 'sortPrice') {
-        loadItems(sortByPrice);
-    } else if (request.action === 'search') {
-        loadItems(openSearchPage);
-    }
-});
 
 // 상품 수집 함수
 function startCollecting() {
@@ -62,16 +66,4 @@ function startCollecting() {
             }
         }
     }, 500);
-}
-
-// 데이터 불러오기 후 콜백 실행
-function loadItems(callback) {
-    chrome.storage.local.get('allkillItems', (result) => {
-        if (!result.allkillItems || !result.allkillItems.length) {
-            chrome.runtime.sendMessage({ status: 'error', message: '상품이 없습니다. 먼저 수집하세요.' });
-            return;
-        }
-        windowItems = result.allkillItems;
-        callback(windowItems);
-    });
 }
