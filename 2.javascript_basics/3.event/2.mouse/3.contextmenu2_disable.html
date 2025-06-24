@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Context Menu Event Example</title>
+</head>
+<body>
+    <p>우클릭을 시도해 보세요</p>
+    <script>
+        // 페이지 전체 우클릭 방지
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault(); // 기본 우클릭 메뉴를 차단
+            alert('우클릭이 비활성화되어 있습니다.');
+        });
+    </script>
+</body>
+</html>

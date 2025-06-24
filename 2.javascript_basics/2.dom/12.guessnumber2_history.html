@@ -5,12 +5,11 @@
 </head>
 <body>
     <h1>Guess the Number (1~100)</h1>
-    <input type="number" id="guessInput" placeholder="Enter your guess">
+    <input type="number" id="guessInput" placeholder="Enter your guess" min="1" max="100">
     <button onclick="checkGuess()">Guess</button>
     <p id="result"></p>
 
     <h2>Guess History</h2>
-    <!-- <ul id="historyList"></ul> 히스토리를 표시할 영역 -->
     <ol id="historyList"></ol> <!-- 히스토리를 표시할 영역 -->
 
     <script>
@@ -21,6 +20,11 @@
             const guess = parseInt(document.getElementById("guessInput").value);
             const result = document.getElementById("result");
             const historyList = document.getElementById("historyList");
+
+             if (guess < 1 || guess > 100 || isNaN(guess)) {
+                result.textContent = "Please enter a number between 1 and 100.";
+                return; // 잘못된 입력일 경우 함수 종료
+            }
 
             let feedback = "";
 

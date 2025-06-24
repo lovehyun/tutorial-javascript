@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Copy to Clipboard</title>
+</head>
+<body>
+    <input type="text" value="Copy this text" id="myInput">
+    <button id="copyButton">Copy</button>
+
+    <script>
+        document.getElementById('copyButton').addEventListener('click', function() {
+        const copyText = document.getElementById('myInput');
+        copyText.select();
+        document.execCommand('copy');
+        alert('Copied the text: ' + copyText.value);
+    });
+    </script>
+</body>
+</html>
+
+<!--
+특징:
+- 오래된 전통적인 방식입니다.
+- execCommand('copy')를 사용하여 선택된 내용을 클립보드로 복사합니다.
+- HTTPS 환경이 아니어도 동작합니다.
+- 브라우저 지원이 넓지만, 일부 최신 브라우저에서는 점점 지원을 중단하는 추세입니다.
+  (특히 execCommand는 앞으로 Deprecated 예정)
+
+장점:
+- 대부분의 브라우저에서 동작 (구형 브라우저 포함)
+- HTTPS가 없어도 사용 가능
+
+단점:
+- 사용자 입력 요소 (input, textarea)만 복사 가능 (div, span 등은 불편)
+- 보안, 접근성 측면에서 비추천
+- 최신 권장 방식이 아님
+-->

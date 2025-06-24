@@ -5,15 +5,12 @@
     <title>Click Event Example</title>
 </head>
 <body>
-    <button id="myButton">Click Me</button>
+    <div id="myElement" style="width:100px; height:100px; background-color:lightblue;">Right click me</div>
     <script>
-        document.getElementById('myButton').addEventListener('click', function() {
-            alert('Button clicked!'); // 클릭은 left 버튼만 가능
-        });
-
         // 나중에 over, out 하면서 다시...
         document.getElementById('myElement').addEventListener('mousedown', (event) => {
             console.log("마우스가 DOWN");
+
             switch(event.button) {
                 case 0: // 좌클릭
                     console.log('Left button clicked');
@@ -25,7 +22,7 @@
                     console.log('Right button clicked');
                     break;
                 default:
-                    console.log('Unknown button clicked');
+                    console.log('Unknown button clicked: ', event.button);
             }
         });
     </script>
