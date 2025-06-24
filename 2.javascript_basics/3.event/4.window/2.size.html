@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Window Size Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        #sizeInfo {
+            font-size: 18px;
+            line-height: 1.6;
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Window and Screen Size Info</h1>
+    <div id="sizeInfo"></div>
+
+    <script>
+        function updateSizeInfo() {
+            const sizeInfo = document.getElementById('sizeInfo');
+
+            const innerWidth = window.innerWidth;
+            const innerHeight = window.innerHeight;
+
+            const outerWidth = window.outerWidth;
+            const outerHeight = window.outerHeight;
+
+            const screenWidth = screen.width;
+            const screenHeight = screen.height;
+
+            sizeInfo.innerHTML = `
+                <strong>Viewport (window.inner)</strong><br>
+                Width: ${innerWidth}px<br>
+                Height: ${innerHeight}px<br><br>
+
+                <strong>Browser Window (window.outer)</strong><br>
+                Width: ${outerWidth}px<br>
+                Height: ${outerHeight}px<br><br>
+
+                <strong>Screen (screen)</strong><br>
+                Width: ${screenWidth}px<br>
+                Height: ${screenHeight}px
+            `;
+        }
+
+        // 페이지 로드 시 실행
+        updateSizeInfo();
+
+        // 창 크기 조절 시 실시간 업데이트
+        window.addEventListener('resize', updateSizeInfo);
+    </script>
+</body>
+</html>
+
+<!--
+참고:
+window.innerWidth / innerHeight	웹 페이지의 실제 표시 영역 (스크롤바 제외)
+window.outerWidth / outerHeight	브라우저 전체 크기 (스크롤바 포함)
+-->
