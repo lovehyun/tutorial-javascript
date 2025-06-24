@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>헬스케어 360</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- 상단 네비게이션 -->
+    <nav class="bg-blue-500 p-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-white text-xl font-semibold">헬스케어 360</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-white">환영합니다</span>
+            <i class="fas fa-user-circle text-white text-2xl"></i>
+        </div>
+    </nav>
+
+    <!-- 전체 레이아웃 -->
+    <div class="flex min-h-screen">
+        <!-- 사이드바 -->
+        <aside class="bg-gray-800 text-white w-64 p-4">
+            <nav>
+                <ul class="space-y-2">
+                    <li><a href="#" data-page="pages/home.html" class="menu-link block p-2 hover:bg-gray-700">홈</a></li>
+                    <li><a href="#" data-page="pages/reservation.html" class="menu-link block p-2 hover:bg-gray-700">예약 관리</a></li>
+                    <li><a href="#" data-page="pages/treatment.html" class="menu-link block p-2 hover:bg-gray-700">치료 관리</a></li>
+                    <li><a href="#" data-page="pages/budget.html" class="menu-link block p-2 hover:bg-gray-700">예산 관리</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <main id="content" class="flex-1 p-8">
+            <!-- 여기로 각 페이지가 동적으로 로딩됨 -->
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuLinks = document.querySelectorAll('.menu-link');
+            const content = document.getElementById('content');
+
+            // 첫 로딩 시 홈 페이지 불러오기
+            loadPage('pages/home.html');
+
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    loadPage(page);
+                });
+            });
+
+            function loadPage(page) {
+                fetch(page)
+                    .then(response => response.text())
+                    .then(html => {
+                        content.innerHTML = html;
+
+                        // 동적으로 삽입된 script 실행
+                        const scripts = content.querySelectorAll('script');
+
+                        scripts.forEach(oldScript => {
+                            const newScript = document.createElement('script');
+
+                            // 외부 스크립트 (src 있는 경우)
+                            if (oldScript.src) {
+                                // 이미 로드된 스크립트인지 확인
+                                if (!document.querySelector(`script[src="${oldScript.src}"]`)) {
+                                    newScript.src = oldScript.src;
+                                    newScript.onload = () => console.log(`${newScript.src} 로드 완료`);
+                                    document.body.appendChild(newScript);
+                                }
+                            } else {
+                                // 내부 스크립트는 항상 재실행
+                                newScript.innerHTML = oldScript.innerHTML;
+                                content.appendChild(newScript);  // content 영역에만 삽입
+                            }
+                        });
+                    });
+            }
+
+        });
+    </script>
+</body>
+</html>

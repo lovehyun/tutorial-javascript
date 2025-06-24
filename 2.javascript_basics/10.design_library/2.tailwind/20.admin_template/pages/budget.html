@@ -1,0 +1,65 @@
+<h2 class="text-3xl font-bold mb-6">예산 관리</h2>
+<div class="bg-white p-6 rounded shadow mb-8">
+    <h3 class="text-xl font-semibold mb-4">월별 예산 현황</h3>
+    <canvas id="budgetChart" width="400" height="200"></canvas>
+</div>
+
+<table class="min-w-full bg-white rounded shadow table-auto">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="px-4 py-2">월</th>
+            <th class="px-4 py-2">예산</th>
+            <th class="px-4 py-2">사용 금액</th>
+            <th class="px-4 py-2">잔액</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="border-b">
+            <td class="px-4 py-2">1월</td>
+            <td class="px-4 py-2">100만원</td>
+            <td class="px-4 py-2">50만원</td>
+            <td class="px-4 py-2">50만원</td>
+        </tr>
+        <tr class="border-b">
+            <td class="px-4 py-2">2월</td>
+            <td class="px-4 py-2">100만원</td>
+            <td class="px-4 py-2">70만원</td>
+            <td class="px-4 py-2">30만원</td>
+        </tr>
+        <tr class="border-b">
+            <td class="px-4 py-2">3월</td>
+            <td class="px-4 py-2">100만원</td>
+            <td class="px-4 py-2">90만원</td>
+            <td class="px-4 py-2">10만원</td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    (function () {
+        // 기존 차트 제거 (fetch 시 재진입 방지)
+        if (window.currentChart) {
+            window.currentChart.destroy();
+        }
+
+        var ctx = document.getElementById('budgetChart').getContext('2d');
+        window.currentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+                datasets: [{
+                    label: '예산 사용액 (만원)',
+                    data: [50, 70, 90, 40, 60, 80],
+                    backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    })();
+</script>

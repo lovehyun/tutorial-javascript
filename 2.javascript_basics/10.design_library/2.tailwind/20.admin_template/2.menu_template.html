@@ -1,0 +1,154 @@
+<!-- https://www.creative-tim.com/twcomponents/component/salud-360-1 -->
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>헬스케어 360</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-100">
+    <!-- 상단 네비게이션 -->
+    <nav class="bg-blue-500 p-4 flex items-center justify-between">
+        <div>
+            <h1 class="text-white text-xl font-semibold">헬스케어 360</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-white">환영합니다</span>
+            <i class="fas fa-user-circle text-white text-2xl"></i>
+        </div>
+    </nav>
+
+    <!-- 사이드바 네비게이션 -->
+    <aside class="bg-gray-800 text-white w-64 min-h-screen p-4">
+        <nav>
+            <ul class="space-y-2">
+                <li class="opcion-con-desplegable">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            <span>일정 관리</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                    <ul class="desplegable ml-4 hidden">
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                예약 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                보험 관리
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="opcion-con-desplegable">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                        <div class="flex items-center">
+                            <i class="fas fa-money-bill-wave mr-2"></i>
+                            <span>회계 관리</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                    <ul class="desplegable ml-4 hidden">
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                치료 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                지출 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                세금 계산서
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="opcion-con-desplegable">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            <span>통계 보고서</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                    <ul class="desplegable ml-4 hidden">
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                예산 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                진료 보고서
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="opcion-con-desplegable">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-700">
+                        <div class="flex items-center">
+                            <i class="fas fa-file-alt mr-2"></i>
+                            <span>문서 관리</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </div>
+                    <ul class="desplegable ml-4 hidden">
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                서명 대기 문서
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="block p-2 hover:bg-gray-700 flex items-center">
+                                <i class="fas fa-chevron-right mr-2 text-xs"></i>
+                                전체 문서
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">헬스케어 CRM에 오신 것을 환영합니다!</h1>
+        <p>여기에서 고객 및 진료 관리 기능을 편리하게 사용할 수 있습니다.</p>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const options = document.querySelectorAll('.opcion-con-desplegable');
+
+            options.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const submenu = option.querySelector('.desplegable');
+                    submenu.classList.toggle('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
