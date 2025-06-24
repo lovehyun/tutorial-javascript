@@ -43,15 +43,26 @@
             margin-top: 20px;
             padding: 20px;
             border-radius: 10px;
-            background-color: white;
+            /* background-color: white; */
+            background-color: rgba(255,255,255,0.5);
             z-index: 1; /* 위로 보내기 */
+
+            /* 방법1. 미리 공간 확보하기 */
+            /* min-height: 60px; */
+            /* display: flex; 내용이 생겼을때 가운데 자동 정렬 - 아래 두줄과 함께 (가로/세로) */
+            /* justify-content: center; */
+            /* align-items: center; */
         }
     </style>
 </head>
 <body>
     <div id="fullScreenDiv"></div>
     <button id="changeColorBtn">Change Background Color</button>
+
     <div id="colorCode"></div>
+
+    <!-- 방법2. 공백 미리 넣어서 자리 차지하기 -->
+    <!-- <div id="colorCode">&nbsp;</div> -->
 
     <script>
         function getRandomColor() {

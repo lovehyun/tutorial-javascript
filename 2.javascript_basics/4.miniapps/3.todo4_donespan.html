@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        /* To-Do 리스트 항목 스타일 */
+        #todo-list li {
+            margin-bottom: 5px; /* 아래쪽 마진 */
+        }
+        /* 항목 줄 전체가 클릭하던것 -> 텍스트만 클릭 가능하도록 span을 별도로 설정 */
+        #todo-list li span {
+            cursor: pointer; /* 텍스트에 손가락 커서 적용 */
+            display: inline-block; /* span은 inline이지만 명시적으로 지정 */
+        }
+        /* 완료된 항목에 취소선 적용 */
+        #todo-list li.completed span {
+            text-decoration: line-through;
+        }
+        #todo-list li button {
+            margin-left: 10px; /* 삭제 버튼 왼쪽에 여백 추가 */
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list"></ul>
+
+    <script>
+        document.getElementById('add-todo').addEventListener('click', function() {
+            const newTodo = document.getElementById('new-todo').value.trim();
+
+            if (newTodo === '') return;
+
+            // li, span, 삭제 버튼 생성
+            const li = document.createElement('li');
+            const span = document.createElement('span');
+            const deleteBtn = document.createElement('button');
+
+            span.textContent = newTodo; // 텍스트 삽입
+            deleteBtn.textContent = '삭제'; // 삭제 버튼 텍스트
+
+            // 텍스트 클릭 시 완료 토글
+            span.addEventListener('click', function() {
+                li.classList.toggle('completed');
+            });
+
+            // 삭제 버튼 클릭 시 항목 삭제
+            deleteBtn.addEventListener('click', function(e) {
+                e.stopPropagation(); // li 클릭 이벤트 방지
+                li.remove();
+            });
+
+            // li에 span과 버튼 삽입
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+
+            // 리스트에 항목 추가
+            document.getElementById('todo-list').appendChild(li);
+
+            // 입력 필드 초기화
+            document.getElementById('new-todo').value = '';
+        });
+
+        // Enter 키로도 추가 가능하게 설정
+        document.getElementById('new-todo').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('add-todo').click();
+            }
+        });
+    </script>
+</body>
+</html>

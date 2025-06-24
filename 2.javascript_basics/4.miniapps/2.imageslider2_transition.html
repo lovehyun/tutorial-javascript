@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Slider</title>
+    <style>
+        /* 슬라이더 컨테이너 */
+        .slider {
+            position: relative; /* 자식 요소를 절대 위치로 배치하기 위한 기준 */
+            width: 100%; /* 부모 너비를 100%로 채움 */
+            max-width: 400px; /* 최대 너비 제한 */
+            margin: 0 auto; /* 슬라이더를 가운데 정렬 */
+            overflow: hidden; /* 슬라이더 영역 밖으로 나간 이미지를 숨김 */
+            height: 400px; /* 고정 높이 설정 */
+        }
+
+        /* 슬라이더 안의 이미지 기본 상태 */
+        .slider img {
+            width: 100%; /* 슬라이더 너비에 맞춤 */
+            height: 100%; /* 슬라이더 높이에 맞춤 */
+            position: absolute; /* 슬라이더 안에서 절대 위치로 배치 */
+            top: 0; /* 슬라이더 상단 기준 */
+            left: 100%; /* 기본적으로 오른쪽 바깥에 배치 (안 보이도록) */
+            opacity: 0; /* 기본적으로 안 보이게 처리 */
+            transition: left 0.5s ease, opacity 0.5s ease; /* 이동과 투명도 변경에 애니메이션 적용 */
+            z-index: 1; /* 버튼보다 아래 배치 */
+        }
+
+        /* 활성화된 이미지 */
+        .slider img.active {
+            left: 0; /* 중앙으로 이동 */
+            opacity: 1; /* 완전히 보이도록 설정 */
+            z-index: 2; /* 다른 이미지 위에 보이도록 설정 */
+        }
+
+        /* 이전 이미지 (왼쪽으로 밀림) */
+        .slider img.prev {
+            left: -100%; /* 왼쪽 바깥으로 이동 */
+        }
+
+        /* 다음 이미지 (오른쪽으로 밀림) */
+        .slider img.next {
+            left: 100%; /* 오른쪽 바깥으로 이동 (기본 상태와 동일하지만, 애니메이션 효과를 위해 명시적으로 사용) */
+        }
+
+        /* 슬라이더 내 버튼 기본 스타일 */
+        .slider button {
+            position: absolute; /* 슬라이더 기준 절대 위치 배치 */
+            top: 50%; /* 수직 중앙 배치 */
+            transform: translateY(-50%); /* 버튼 정확한 수직 중앙 정렬 */
+            padding: 10px; /* 여백 */
+            font-size: 16px; /* 글씨 크기 */
+            background-color: rgba(255, 255, 255, 0.7); /* 반투명 흰색 배경 */
+            border: none; /* 테두리 제거 */
+            cursor: pointer; /* 커서를 손가락 모양으로 변경 */
+            z-index: 3; /* 버튼이 항상 이미지 위에 보이도록 설정 */
+        }
+
+        /* 왼쪽 버튼 위치 */
+        #prevBtn { left: 10px; }
+
+        /* 오른쪽 버튼 위치 */
+        #nextBtn { right: 10px; }
+
+        /* 비활성화된 버튼 스타일 */
+        button:disabled {
+            background-color: rgba(200, 200, 200, 0.7); /* 비활성화 시 색상 변경 */
+            cursor: not-allowed; /* 비활성화 시 금지 커서 */
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="slider">
+    <button id="prevBtn">Previous</button>
+    <img src="images/cat1.jpg" class="active" alt="Image 1">
+    <img src="images/cat2.jpg" alt="Image 2">
+    <img src="images/cat3.jpg" alt="Image 3">
+    <button id="nextBtn">Next</button>
+</div>
+
+<script>
+    const images = document.querySelectorAll('.slider img');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    function showImage(newIndex, direction) {
+        // 현재 이미지 클래스 제거
+        images[currentIndex].classList.remove('active', 'prev', 'next');
+
+        // 이동 방향에 따라 현재 이미지를 left/right 위치로 보내기
+        images[currentIndex].classList.add(direction === 'next' ? 'prev' : 'next');
+
+        // 새 이미지 위치 초기화
+        images[newIndex].classList.remove('prev', 'next');
+        images[newIndex].classList.add('active');
+
+        currentIndex = newIndex;
+
+        // 버튼 상태 업데이트
+        prevBtn.disabled = currentIndex === 0;
+        nextBtn.disabled = currentIndex === images.length - 1;
+    }
+
+    prevBtn.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            showImage(currentIndex - 1, 'prev');
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentIndex < images.length - 1) {
+            showImage(currentIndex + 1, 'next');
+        }
+    });
+
+    // 초기 버튼 상태 설정
+    prevBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === images.length - 1;
+</script>
+
+</body>
+</html>

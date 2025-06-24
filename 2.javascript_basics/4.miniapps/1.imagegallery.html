@@ -26,10 +26,6 @@
     <!-- 방법1. -->
     <img id="large-image" src="" alt="Large Image">
     
-    <!-- 방법2. -->
-    <div id="large-image-container">
-    </div>
-
     <script>
         // <-- 1단계 코드 -->
         // 개별 이미지 요소 선택
@@ -54,62 +50,6 @@
             const largeImage = document.getElementById('large-image');
             largeImage.src = img3.src;
             largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
-        });
-
-        // <-- 2단계 코드 -->
-        // 이미지 요소들을 배열에 저장
-        const images = [img1, img2, img3];
-
-        // 반복문을 통해 클릭 이벤트 리스너 추가
-        // for (let i = 0; i < images.length; i++) {
-        //     images[i].addEventListener('click', function() {
-        //         const largeImage = document.getElementById('large-image');
-        //         largeImage.src = images[i].src;
-        //         largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
-        //     })
-        // }
-        //
-        // for-each 로 변환
-        // images.forEach(function(img) {
-        //     img.addEventListener('click', function() {
-        //         largeImage.src = img.src;
-        //         largeImage.style.display = 'block';
-        //     });
-        // });
-
-        // <-- 3단계 코드 -->
-        // document.querySelectorAll('.gallery img').forEach(function(img) {
-        //     img.addEventListener('click', function() {
-        //         const largeImage = document.getElementById('large-image');
-        //         largeImage.src = img.src;
-        //         largeImage.style.display = 'block'; // 이미지를 클릭했을 때 표시
-        //     });
-        // });
-
-
-
-        // <-- 다른 방법, div안에 추가 -->
-        // 공통 클릭 핸들러 함수
-        function showLargeImage(src) {
-            const container = document.getElementById('large-image-container');
-            
-            // 기존 이미지가 있다면 제거
-            container.innerHTML = '';
-
-            // 새로운 이미지 태그 생성
-            const img = document.createElement('img');
-            img.src = src;
-            img.alt = 'Large Image';
-            img.style.maxWidth = '100%';
-            img.style.margin = '20px auto';
-
-            // div에 이미지 추가
-            container.appendChild(img);
-        }
-
-        // 각 썸네일에 클릭 이벤트 등록
-        document.querySelectorAll('.gallery img').forEach(img => {
-            img.addEventListener('click', () => showLargeImage(img.src));
         });
 
     </script>

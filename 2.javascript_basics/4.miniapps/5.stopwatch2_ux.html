@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch App</title>
+    <style>
+        body {
+            display: flex; /* Flexbox 사용 */
+            flex-direction: column; /* 수직 정렬 */
+            align-items: center; /* 가로 중앙 정렬 */
+            justify-content: center; /* 세로 중앙 정렬 */
+            height: 100vh; /* 전체 화면 높이 */
+            margin: 0;
+            background-color: #f0f0f0; /* 배경색 설정 */
+        }
+        #display {
+            font-size: 48px; /* 글자 크기 */
+            margin-bottom: 20px; /* 아래 여백 */
+        }
+        .button-container {
+            display: flex; /* Flexbox 사용 */
+            gap: 10px; /* 버튼 사이의 간격 */
+        }
+        .button-container button {
+            padding: 10px 20px; /* 패딩 설정 */
+            font-size: 18px; /* 글자 크기 */
+        }
+
+        /* 전체 스톱워치 박스 스타일 */
+        .stopwatch-box {
+            padding: 30px; /* 안쪽 여백 */
+            border-radius: 20px; /* 둥근 테두리 */
+            background-color: #ffffff; /* 박스 배경색 (흰색) */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+            display: flex; /* Flexbox 사용 */
+            flex-direction: column; /* 세로 정렬 */
+            align-items: center; /* 가로 중앙 정렬 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 스톱워치 전체를 감싸는 박스 -->
+    <div class="stopwatch-box">
+        <!-- 스톱워치 표시 영역 -->
+        <div id="display">00:00.00</div>
+        <!-- 버튼 컨테이너 -->
+        <div class="button-container">
+            <button id="startButton">Start</button>
+            <button id="stopButton">Stop</button>
+            <button id="resetButton">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        let startTime; // 스톱워치 시작 시간
+        let updatedTime; // 업데이트된 시간
+        let difference; // 경과 시간
+        let timerInterval; // 타이머 인터벌
+        let running = false; // 스톱워치 실행 여부
+
+        const display = document.getElementById('display'); // 스톱워치 표시 요소
+        const startButton = document.getElementById('startButton'); // 시작 버튼
+        const stopButton = document.getElementById('stopButton'); // 정지 버튼
+        const resetButton = document.getElementById('resetButton'); // 리셋 버튼
+
+        function startTimer() {
+            if (!running) { // 스톱워치가 실행 중이 아닐 때
+                // new Date()	새로운 Date 객체 생성	Date 객체 (예: Wed Apr 09 2025 17:23:10 GMT+0900)
+                // Date()	함수처럼 호출됨	현재 시간의 문자열 (예: "Wed Apr 09 2025 17:23:10 GMT+0900")
+                // startTime = Date() 로 문자열만 반환하면, getTime() 등의 추가적인 메소드 호출 불가, 객체를 생성하여 getTtime() 사용
+
+                startTime = new Date().getTime() - (difference || 0); // 시작 시간 설정
+                timerInterval = setInterval(updateTimer, 10); // 10밀리초마다 updateTimer 호출
+                running = true; // 스톱워치 실행 상태로 변경
+
+                // 버튼 상태 업데이트
+                startButton.disabled = true; // Start 비활성화
+                stopButton.disabled = false; // Stop 활성화
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval); // 타이머 인터벌 중지
+            running = false; // 스톱워치 실행 상태 해제
+
+            // 버튼 상태 업데이트
+            startButton.disabled = false; // Start 활성화
+            stopButton.disabled = true; // Stop 비활성화
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval); // 타이머 인터벌 중지
+            running = false; // 스톱워치 실행 상태 해제
+            difference = 0; // 경과 시간 초기화
+            display.textContent = '00:00.00'; // 표시 초기화
+
+            // 버튼 상태 업데이트
+            startButton.disabled = false; // Start 활성화
+            stopButton.disabled = true; // Stop 비활성화
+        }
+
+        function updateTimer() {
+            // new Date().getTime()은 현재 시각을 매번 새로 측정해서 시작시간(startTime) 과의 연산 수행
+            updatedTime = new Date().getTime(); // 현재 시간
+            difference = updatedTime - startTime; // 경과 시간 계산
+
+            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // 분 계산 (시간(1000*60*60)을 뺀 나머지에서 분(1000*60) 계산)
+            let seconds = Math.floor((difference % (1000 * 60)) / 1000); // 초 계산 (분을 뺀 나머지에서 초 계산)
+            let milliseconds = Math.floor((difference % 1000) / 10); // 밀리초 계산 (초빼고 밀리초 계산)
+
+            // 모든 하드코딩은 상수로 정의
+            // const HOUR_MS = 1000 * 60 * 60;
+            // const MINUTE_MS = 1000 * 60;
+            // let minutes = Math.floor((difference % HOUR_MS) / MINUTE_MS);
+
+            // 계산된 시간을 00:00.00 형식으로 표시
+            display.textContent = 
+                (minutes < 10 ? '0' + minutes : minutes) + ':' +
+                (seconds < 10 ? '0' + seconds : seconds) + '.' +
+                (milliseconds < 10 ? '0' + milliseconds : milliseconds);
+
+            // 또는 패딩 함수 사용
+            // display.textContent = 
+            //     String(minutes).padStart(2, '0') + ':' +
+            //     String(seconds).padStart(2, '0') + '.' +
+            //     String(milliseconds).padStart(2, '0');
+        }
+
+        // 초기 버튼 상태 설정
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        resetButton.disabled = false;
+
+        startButton.addEventListener('click', startTimer); // 시작 버튼 클릭 시 startTimer 호출
+        stopButton.addEventListener('click', stopTimer); // 정지 버튼 클릭 시 stopTimer 호출
+        resetButton.addEventListener('click', resetTimer); // 리셋 버튼 클릭 시 resetTimer 호출
+    </script>
+</body>
+</html>
