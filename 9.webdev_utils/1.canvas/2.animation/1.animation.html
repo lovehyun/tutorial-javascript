@@ -1,47 +1,63 @@
-<canvas id="animationCanvas" width="400" height="200"></canvas>
-<canvas id="animationCanvas2" width="400" height="200"></canvas>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="animationCanvas" width="400" height="200"></canvas>
+    <canvas id="animationCanvas2" width="400" height="200"></canvas>
 
-<script>
-    const canvas = document.getElementById('animationCanvas');
-    const context = canvas.getContext('2d');
-    let x = 0;
+    <script>
+        const canvas = document.getElementById('animationCanvas');
+        const context = canvas.getContext('2d');
+        let x = 0;
 
-    function draw() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = '#FF0000';
-        context.fillRect(x, 50, 50, 50);
+        function draw() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#FF0000';
+            context.fillRect(x, 50, 50, 50);
 
-        x += 5;
-        if (x > canvas.width) {
-            x = 0;
+            x += 5;
+            if (x > canvas.width) {
+                x = 0;
+            }
+
+            requestAnimationFrame(draw);
         }
 
-        requestAnimationFrame(draw);
-    }
+        draw();
+    </script>
 
-    draw();
-</script>
+    <script>
+        const canvas2 = document.getElementById('animationCanvas2');
+        const context2 = canvas2.getContext('2d');
+        let x2 = 0;
+        let d = 1;
 
-<script>
-    const canvas2 = document.getElementById('animationCanvas2');
-    const context2 = canvas2.getContext('2d');
-    let x2 = 0;
-    let d = 1;
+        function draw2() {
+            context2.clearRect(0, 0, canvas2.width, canvas2.height);
+            context2.fillStyle = '#FF0000';
+            context2.fillRect(x2, 50, 50, 50);
 
-    function draw2() {
-        context2.clearRect(0, 0, canvas2.width, canvas2.height);
-        context2.fillStyle = '#FF0000';
-        context2.fillRect(x2, 50, 50, 50);
+            x2 += 5 * d;
+            if (x2 > canvas2.width - 50) {
+                d = -1;
+            } else if (x2 < 0) {
+                d = 1;
+            }
 
-        x2 += 5 * d;
-        if (x2 > canvas2.width - 50) {
-            d = -1;
-        } else if (x2 < 0) {
-            d = 1;
+            requestAnimationFrame(draw2);
         }
 
-        requestAnimationFrame(draw2);
-    }
+        draw2();
+    </script>
 
-    draw2();
-</script>
+</body>
+</html>
