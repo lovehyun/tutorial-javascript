@@ -18,11 +18,11 @@
         #dropZone {
             width: 200px;
             height: 200px;
+            background-color: #f0f0f0;
             border: 2px dashed #cccccc;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f0f0f0;
         }
     </style>
 </head>
@@ -42,6 +42,7 @@
         // 드래그 오버 이벤트
         dropZone.addEventListener('dragover', function(event) {
             event.preventDefault(); // 기본 드래그 오버 동작 중단
+            // 기본 동작: 드래그 앤 드롭 시 브라우저가 파일 복사, 링크 이동 등의 기본적으로 정의된 동작을 실행하는 것. 
             console.log('Drag over drop zone');
         });
 
@@ -54,7 +55,3 @@
     </script>
 </body>
 </html>
-
-<!-- 
-기본 동작: 드래그 앤 드롭 시 브라우저가 파일 복사, 링크 이동 등의 기본적으로 정의된 동작을 실행하는 것. 
--->

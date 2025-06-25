@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag and Drop without dataTransfer</title>
+    <style>
+        .container {
+            width: 200px;
+            height: 200px;
+            background-color: #f0f0f0;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .placeholder {
+            position: absolute;
+            color: #999;
+        }
+
+        #dragItem {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="startZone" class="container">
+        <span class="placeholder" id="startPlaceholder">Drop here</span>
+        <div id="dragItem" draggable="true">Drag me</div>
+    </div>
+
+    <div id="dropZone" class="container">
+        <span class="placeholder" id="dropPlaceholder">Drop here</span>
+    </div>
+
+    <script>
+        const dragItem = document.getElementById('dragItem');
+        const startZone = document.getElementById('startZone');
+        const dropZone = document.getElementById('dropZone');
+        const startPlaceholder = document.getElementById('startPlaceholder');
+        const dropPlaceholder = document.getElementById('dropPlaceholder');
+
+        // 드래그 시작 이벤트
+        dragItem.addEventListener('dragstart', function () {
+            console.log('Drag started');
+        });
+
+        // 드래그 오버: 두 박스 모두 허용
+        [startZone, dropZone].forEach(zone => {
+            zone.addEventListener('dragover', function (event) {
+                event.preventDefault();
+                console.log('Drag over', zone.id);
+            });
+        });
+
+        // 드롭 처리: 두 박스 모두 가능
+        [startZone, dropZone].forEach(zone => {
+            zone.addEventListener('drop', function (event) {
+                event.preventDefault();
+                zone.appendChild(dragItem);
+                console.log(`Dropped in ${zone.id}`);
+            });
+        });
+
+    </script>
+</body>
+</html>

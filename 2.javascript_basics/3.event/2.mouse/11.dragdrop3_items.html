@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Drag and Drop without dataTransfer</title>
+    <style>
+        #dragItems {
+            display: block;
+        }
+        .dragItem {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            /* flex-shrink: 0; */ /* 줄어들지 않게 */
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        #dragItem1 { background-color: #ffcc00; }
+        #dragItem2 { background-color: #00ffdd; }
+        #dragItem3 { background-color: #dd88ff; }
+
+        #dropZone {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <div id="dragItems">
+        <div id="dragItem1" class="dragItem" draggable="true">Drag me</div>
+        <div id="dragItem2" class="dragItem" draggable="true">Drag me</div>
+        <div id="dragItem3" class="dragItem" draggable="true">Drag me</div>
+        <div id="dropZone">Drop here</div>
+    </div>
+
+    <script>
+        const dragItems = document.querySelectorAll('.dragItem');
+        const dropZone = document.getElementById('dropZone');
+
+        let currentDragging = null; // 전역 변수 (지금 드래그 중인 요소)
+
+        // 드래그 시작
+        dragItems.forEach(item => {
+            item.addEventListener('dragstart', function() {
+                currentDragging = this; // 현재 드래그 중인 요소 저장
+                console.log('Drag started:', this.id);
+            });
+        });
+
+        // 드래그 오버
+        dropZone.addEventListener('dragover', function(event) {
+            event.preventDefault();
+            console.log('Drag over drop zone');
+        });
+
+        // 드롭
+        dropZone.addEventListener('drop', function(event) {
+            event.preventDefault();
+            if (currentDragging) {
+                dropZone.appendChild(currentDragging);
+                console.log('Dropped:', currentDragging.id);
+                currentDragging = null; // 드래그 완료 후 초기화
+            }
+        });
+    </script>
+</body>
+</html>

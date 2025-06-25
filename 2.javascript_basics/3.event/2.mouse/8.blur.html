@@ -6,9 +6,15 @@
 </head>
 <body>
     <input type="text" id="myInput" placeholder="Blur me">
+    <p id="lengthDisplay"></p> <!-- 글자 길이 출력 영역 추가 -->
+
     <script>
         document.getElementById('myInput').addEventListener('blur', function() {
             console.log('Input lost focus!');
+
+            const inputText = this.value; // 입력된 글자
+            const length = inputText.length; // 글자 길이
+            document.getElementById('lengthDisplay').textContent = `글자 수: ${length}`; // 아래에 출력
         });
     </script>
 </body>

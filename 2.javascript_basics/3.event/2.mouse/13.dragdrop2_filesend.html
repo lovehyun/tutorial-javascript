@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Drag and Drop Upload Example</title>
+    <style>
+        #dropZone {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            /* margin: 20px auto; */
+        }
+
+        #fileList {
+            margin-top: 20px;
+            /* text-align: center; */
+        }
+
+        #sendButton {
+            display: block;
+            padding: 10px 20px;
+            /* margin: 20px auto; */
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dropZone">📂 여기에 파일을 드래그 하세요</div>
+    <div id="fileList">
+        <h3>드롭된 파일 목록:</h3>
+        <ul id="fileNames"></ul>
+    </div>
+    <button id="sendButton">전송</button>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileNames = document.getElementById('fileNames');
+        const sendButton = document.getElementById('sendButton');
+
+        // 드래그된 파일들을 저장할 배열
+        let fileArray = [];
+
+        dropZone.addEventListener('dragover', function (event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#e0e0e0';
+        });
+
+        dropZone.addEventListener('dragleave', function () {
+            dropZone.style.backgroundColor = '#f9f9f9';
+        });
+
+        dropZone.addEventListener('drop', function (event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#f9f9f9';
+
+            const files = event.dataTransfer.files;
+
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    fileArray.push(files[i]); // 파일 배열에 저장
+
+                    const li = document.createElement('li');
+                    li.textContent = files[i].name;
+                    fileNames.appendChild(li);
+                }
+            }
+        });
+
+        // 파일 전송
+        sendButton.addEventListener('click', function () {
+            if (fileArray.length === 0) {
+                alert('업로드할 파일이 없습니다.');
+                return;
+            }
+
+            const formData = new FormData();
+            fileArray.forEach((file, index) => {
+                formData.append('files[]', file);
+            });
+
+            // fetch로 서버에 전송
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert('업로드 성공: ' + result);
+                // 성공 시 리스트 초기화
+                fileArray = [];
+                fileNames.innerHTML = '';
+            })
+            .catch(error => {
+                alert('업로드 실패: ' + error);
+            });
+        });
+    </script>
+</body>
+</html>

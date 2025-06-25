@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>File Drag and Drop Append Example</title>
+    <style>
+        #dropZone {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #cccccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            /* margin: 50px auto; */
+        }
+
+        #fileList {
+            margin-top: 20px;
+            /* text-align: center; */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dropZone">📂 여기에 파일을 드래그 하세요</div>
+    <div id="fileList">
+        <h3>드롭된 파일 목록:</h3>
+        <ul id="fileNames"></ul>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileNames = document.getElementById('fileNames');
+
+        // 드래그 오버
+        dropZone.addEventListener('dragover', function (event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#e0e0e0';
+        });
+
+        // 드래그 떠날 때
+        dropZone.addEventListener('dragleave', function () {
+            dropZone.style.backgroundColor = '#f9f9f9';
+        });
+
+        // 드롭
+        dropZone.addEventListener('drop', function (event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#f9f9f9';
+
+            const files = event.dataTransfer.files;
+
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    const li = document.createElement('li');
+                    li.textContent = files[i].name;
+                    fileNames.appendChild(li); // 기존 목록에 계속 추가
+                }
+            }
+        });
+    </script>
+</body>
+</html>
