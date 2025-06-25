@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Drag and Drop without dataTransfer</title>
     <style>
+        .grid {
+            display: grid;
+            grid-template-columns: 200px 200px;
+            grid-template-rows: 200px 200px;
+            gap: 20px;
+        }
+
         .container {
             width: 200px;
             height: 200px;
@@ -13,7 +20,6 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            margin-bottom: 20px;
         }
 
         .placeholder {
@@ -34,42 +40,47 @@
     </style>
 </head>
 <body>
-    <div id="startZone" class="container">
-        <span class="placeholder" id="startPlaceholder">Drop here</span>
-        <div id="dragItem" draggable="true">Drag me</div>
-    </div>
-
-    <div id="dropZone" class="container">
-        <span class="placeholder" id="dropPlaceholder">Drop here</span>
+    <div class="grid">
+        <div id="zone1" class="container">
+            <span class="placeholder">Drop here</span>
+            <div id="dragItem" draggable="true">Drag me</div>
+        </div>
+        <div id="zone2" class="container">
+            <span class="placeholder">Drop here</span>
+        </div>
+        <div id="zone3" class="container">
+            <span class="placeholder">Drop here</span>
+        </div>
+        <div id="zone4" class="container">
+            <span class="placeholder">Drop here</span>
+        </div>
     </div>
 
     <script>
         const dragItem = document.getElementById('dragItem');
-        const startZone = document.getElementById('startZone');
-        const dropZone = document.getElementById('dropZone');
+        const zones = document.querySelectorAll('.container');
 
         // 드래그 시작 이벤트
         dragItem.addEventListener('dragstart', function () {
             console.log('Drag started');
         });
 
-        // 드래그 오버: 두 박스 모두 허용
-        [startZone, dropZone].forEach(zone => {
+        // 드래그 오버: 모든 Drop Zone 허용
+        zones.forEach(zone => {
             zone.addEventListener('dragover', function (event) {
                 event.preventDefault();
                 console.log('Drag over', zone.id);
             });
         });
 
-        // 드롭 처리: 두 박스 모두 가능
-        [startZone, dropZone].forEach(zone => {
+        // 드롭 처리
+        zones.forEach(zone => {
             zone.addEventListener('drop', function (event) {
                 event.preventDefault();
                 zone.appendChild(dragItem);
                 console.log(`Dropped in ${zone.id}`);
             });
         });
-
     </script>
 </body>
 </html>
