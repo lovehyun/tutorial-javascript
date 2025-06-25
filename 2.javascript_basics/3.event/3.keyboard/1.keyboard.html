@@ -7,9 +7,15 @@
 <body>
     <input type="text" id="myInput" placeholder="Press any key">
     <script>
-        document.addEventListener('keydown', function(event) {
+        document.getElementById('myInput').addEventListener('keydown', function(event) {
             console.log(`Key pressed: ${event.key}`);
+            // 한글 입력 시 IME 입력기에서 해당 부분을 처리중이라 Process 라고 나옴 (영문은 문제X)
         });
+
+        // 윈도우 전체 이벤트
+        // document.addEventListener('keydown', function(event) {
+        //     console.log(`Key pressed: ${event.key}`);
+        // });
     </script>
 </body>
 </html>

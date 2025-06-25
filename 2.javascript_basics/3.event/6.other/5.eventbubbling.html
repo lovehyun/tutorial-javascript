@@ -2,6 +2,20 @@
 <html>
 <head>
     <title>Event Bubbling Example</title>
+    <style>
+        #grandparent {
+            padding: 50px;
+            background-color: lightgrey;
+        }
+        #parent {
+            padding: 50px;
+            background-color: lightblue;
+        }
+        #child {
+            padding: 50px;
+            background-color: lightgreen;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const child = document.getElementById('child');
@@ -32,11 +46,11 @@
     이벤트 버블링은 특정 요소에서 이벤트가 발생했을 때, 그 이벤트가 그 요소의 부모 요소로 전파되는 과정을 말합니다. 
     이는 DOM 트리 상에서 최하위 요소에서 상위 요소로 이벤트가 전파되는 방향을 의미합니다. -->
 
-    <div id="grandparent" style="padding: 50px; background-color: lightgrey;">
+    <div id="grandparent">
         Grandparent
-        <div id="parent" style="padding: 50px; background-color: lightblue;">
+        <div id="parent">
             Parent
-            <div id="child" style="padding: 50px; background-color: lightgreen;">
+            <div id="child">
                 Child
             </div>
         </div>

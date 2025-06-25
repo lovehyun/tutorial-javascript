@@ -57,6 +57,20 @@
                     li.textContent = files[i].name;
                     fileNames.appendChild(li); // 기존 목록에 계속 추가
                 }
+
+                // forEach 버전으로 구현
+                // Array.from(files).forEach(file => {
+                //     const li = document.createElement('li');
+                //     li.textContent = file.name;
+                //     fileNames.appendChild(li);
+                // });
+
+                // 스프레드 문법(...) 으로 구현
+                // [...files].forEach(file => {
+                //     const li = document.createElement('li');
+                //     li.textContent = file.name;
+                //     fileNames.appendChild(li);
+                // });
             }
         });
     </script>

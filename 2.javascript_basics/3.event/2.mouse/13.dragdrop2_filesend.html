@@ -81,6 +81,12 @@
             const formData = new FormData();
             fileArray.forEach((file, index) => {
                 formData.append('files[]', file);
+                // formData.append('file', file); // 단일파일
+                // 실제 규약은 아니고, 개발시 관행임
+
+                // 전송 예시:
+                // Content-Disposition: form-data; name="files[]"; filename="file1.txt"
+                // Content-Disposition: form-data; name="files[]"; filename="file2.txt"
             });
 
             // fetch로 서버에 전송
