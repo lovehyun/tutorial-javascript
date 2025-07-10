@@ -36,6 +36,10 @@
                         option.text = breed;
                         mainBreedSelector.appendChild(option);
                     }
+
+                    // 버그찾기미션. 
+                    // 최초 로드 시 기본 선택된 메인 브리드에 대해 서브 브리드도 자동으로 로딩
+                    // populateSubBreedList();
                 })
                 .catch(error => {
                     alert(`Request failed: ${error.message}`);
@@ -69,22 +73,11 @@
             var subBreed = document.getElementById('sub-breed-selector').value;
             var breed = subBreed ? `${mainBreed}/${subBreed}` : mainBreed;
             fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     var imageUrl = data.message;
-                    var img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.alt = `Random ${breed} Image`;
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
                     var imageContainer = document.getElementById('image-container');
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
+                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
                 })
                 .catch(error => {
                     alert(`Request failed: ${error.message}`);

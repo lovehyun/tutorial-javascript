@@ -25,6 +25,30 @@
                 .then(data => {
                     var breeds = data.message;
                     var dogSelector = document.getElementById('dog-selector');
+
+                    // 메인 품종 이름만 추출하여 <option> 생성
+                    for (var breed in breeds) {
+                        var option = document.createElement('option');
+                        option.value = breed;       // 예: "bulldog"
+                        option.text = breed;        // 사용자에게 보이는 텍스트도 "bulldog"
+                        dogSelector.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    alert(`Request failed: ${error.message}`);
+                });
+            
+            /* 서브 품종을 기반으로 "서브 메인" 품종명으로 변환. 예) boston bulldog, english bulldog 등
+            fetch('https://dog.ceo/api/breeds/list/all')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    var breeds = data.message;
+                    var dogSelector = document.getElementById('dog-selector');
                     
                     for (var breed in breeds) {
                         if (breeds[breed].length > 0) {
@@ -45,28 +69,18 @@
                 .catch(error => {
                     alert(`Request failed: ${error.message}`);
                 });
+            */
         }
 
         // Function to fetch and display image of selected breed
         function fetchBreedImage() {
             var breed = document.getElementById('dog-selector').value;
             fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     var imageUrl = data.message;
-                    var img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.alt = `Random ${breed} Image`;
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
                     var imageContainer = document.getElementById('image-container');
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
+                    imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
                 })
                 .catch(error => {
                     alert(`Request failed: ${error.message}`);

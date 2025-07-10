@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AJAX Example with Local Server</title>
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <h1>AJAX Example with Local Server</h1>
@@ -26,6 +31,8 @@
                 })
                 .catch(error => {
                     console.error('There was a problem with the fetch operation:', error);
+                    document.getElementById('result').classList.add("error");
+                    document.getElementById('result').innerHTML = "통신중 장애가 발생했습니다."
                 });
         });
     </script>
