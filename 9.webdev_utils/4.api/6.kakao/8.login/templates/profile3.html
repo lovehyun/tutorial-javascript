@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>내 프로필</title>
+</head>
+<body>
+    <h1>👤 내 프로필</h1>
+    <p><strong>닉네임:</strong> {{ user.properties.nickname }}</p>
+    <p><strong>이메일:</strong> {{ user.kakao_account.email or '없음' }}</p>
+    {% if user.kakao_account.profile.profile_image_url %}
+    <img src="{{ user.kakao_account.profile.profile_image_url }}" alt="프로필 사진" width="100" />
+    {% endif %}
+    <p><a href="/message">📨 나에게 메시지 보내기</a></p>
+    <p><a href="/logout">로그아웃</a></p>
+</body>
+</html>
