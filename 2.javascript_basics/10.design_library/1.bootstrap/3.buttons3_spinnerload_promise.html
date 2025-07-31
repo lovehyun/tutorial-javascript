@@ -39,7 +39,10 @@
             const spinner = loadButton.querySelector('.spinner-border');
             spinner.classList.remove('d-none');
 
-            // 1초 대기
+            // 1초 대기 - promise 체이닝을 아래 두가지 방법으로 구현 가능
+
+            /*
+            // 방법1.
             new Promise(resolve => setTimeout(resolve, 1000))
                 .then(() => {
                     const randomId = Math.floor(Math.random() * 10) + 1;
@@ -66,6 +69,35 @@
                     clearButton.disabled = false;
                     spinner.classList.add('d-none');
                 });
+            */
+
+            // 방법2.
+            new Promise(resolve => setTimeout(resolve, 1000))
+                .then(() => {
+                    const randomId = Math.floor(Math.random() * 10) + 1;
+                    fetch(`https://jsonplaceholder.typicode.com/posts/${randomId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            result.innerHTML = `
+                                <div class="alert alert-success">
+                                    <h5>${data.title}</h5>
+                                    <p>${data.body}</p>
+                                </div>
+                            `;
+                        })
+                        .catch(error => {
+                            result.innerHTML = `
+                                <div class="alert alert-danger">
+                                    데이터 가져오기에 실패했습니다.
+                                </div>
+                            `;
+                        })
+                        .finally(() => {
+                            loadButton.disabled = false;
+                            clearButton.disabled = false;
+                            spinner.classList.add('d-none');
+                        });
+                })
         });
 
         // 결과 클리어

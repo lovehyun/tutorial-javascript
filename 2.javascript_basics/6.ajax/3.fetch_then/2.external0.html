@@ -25,12 +25,8 @@
                 .then((data) => {
                     // 성공적으로 데이터를 받아왔을 때
                     document.getElementById('contentContainer').innerHTML =
-                        '<p><strong>Title:</strong> ' +
-                        data.title +
-                        '</p>' +
-                        '<p><strong>Body:</strong> ' +
-                        data.body +
-                        '</p>';
+                        '<p><strong>Title:</strong> ' + data.title + '</p>' +
+                        '<p><strong>Body:</strong> ' + data.body + '</p>';
                 })
                 .catch((error) => {
                     // 오류 처리
