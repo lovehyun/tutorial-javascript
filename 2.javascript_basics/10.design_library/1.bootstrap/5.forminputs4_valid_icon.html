@@ -64,21 +64,28 @@
             <!-- 관심 분야 -->
             <div class="mb-3">
                 <label class="form-label">관심 분야 (최소 1개, 최대 3개 선택)</label>
-                <div>
+                <div class="form-label" id="interest-group">
                     <!-- 체크박스 목록 -->
-                    <div class="form-check">
+                    <div class="form-check form-check-inline">
+                    <!-- <div class="form-check"> -->
                         <input class="form-check-input interest-checkbox" type="checkbox" id="interest1">
                         <label class="form-check-label" for="interest1">관심 분야 1</label>
                     </div>
-                    <div class="form-check">
+                    
+                    <div class="form-check form-check-inline">
+                    <!-- <div class="form-check"> -->
                         <input class="form-check-input interest-checkbox" type="checkbox" id="interest2">
                         <label class="form-check-label" for="interest2">관심 분야 2</label>
                     </div>
-                    <div class="form-check">
+
+                    <div class="form-check form-check-inline">
+                    <!-- <div class="form-check"> -->
                         <input class="form-check-input interest-checkbox" type="checkbox" id="interest3">
                         <label class="form-check-label" for="interest3">관심 분야 3</label>
                     </div>
-                    <div class="form-check">
+
+                    <div class="form-check form-check-inline">
+                    <!-- <div class="form-check"> -->
                         <input class="form-check-input interest-checkbox" type="checkbox" id="interest4">
                         <label class="form-check-label" for="interest4">관심 분야 4</label>
                     </div>
@@ -118,16 +125,51 @@
             }
         }
 
-        // 비밀번호 검증
+        // 비밀번호 검증 - 정규표현식
         function validatePassword() {
             const password = document.getElementById('password');
             const passwordValue = password.value;
-            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d|.*[!@#$%^&*]).{8,}$/;
+
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d|.*[!@#$%^&*]).{8,}$/; // 일부 버그 있음 소문자/대문자 필수인...
             if (!passwordRegex.test(passwordValue)) {
                 password.classList.add('is-invalid');
             } else {
                 password.classList.remove('is-invalid');
                 password.classList.add('is-valid');
+            }
+        }
+
+        // 비밀번호 검증 - 정규표현식 없이
+        function validatePassword2() {
+            const password = document.getElementById('password');
+            const pw = password.value;
+
+            let hasUpper = false;
+            let hasLower = false;
+            let hasNumber = false;
+            let hasSpecial = false;
+
+            for (let ch of pw) {
+                if (ch >= 'A' && ch <= 'Z') {
+                    hasUpper = true;
+                } else if (ch >= 'a' && ch <= 'z') {
+                    hasLower = true;
+                } else if (!isNaN(ch)) {
+                    hasNumber = true;
+                } else if ("!@#$%^&*".includes(ch)) {
+                    hasSpecial = true;
+                }
+            }
+
+            const lengthValid = pw.length >= 8;
+            const typesCount = [hasUpper, hasLower, hasNumber || hasSpecial].filter(Boolean).length;
+
+            if (lengthValid && typesCount >= 3) {
+                password.classList.remove('is-invalid');
+                password.classList.add('is-valid');
+            } else {
+                password.classList.remove('is-valid');
+                password.classList.add('is-invalid');
             }
         }
 
@@ -155,12 +197,17 @@
 
         // 관심 분야 검증
         function validateInterests() {
+            const interestGroup = document.getElementById('interest-group');
+            
             const interests = document.querySelectorAll('.interest-checkbox');
             const selectedInterests = Array.from(interests).filter(checkbox => checkbox.checked);
+            
             if (selectedInterests.length < 1 || selectedInterests.length > 3) {
                 interests.forEach(checkbox => checkbox.classList.add('is-invalid'));
+                interestGroup.classList.add('is-invalid');
             } else {
                 interests.forEach(checkbox => checkbox.classList.remove('is-invalid'));
+                interestGroup.classList.remove('is-invalid');
             }
         }
 
