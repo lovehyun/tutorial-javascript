@@ -1,11 +1,13 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const morgan = require('morgan');
 const app = express();
 
 // 메모리에 메시지 저장
 const messages = [];
 
+app.use(morgan('dev'));
 app.use(cors()); // CORS 설정 허용
 app.use(express.json()); // JSON 형식의 요청 본문 처리
 app.use(express.static(path.join(__dirname, 'public'))); // 정적 파일 제공

@@ -63,7 +63,7 @@ function createChatbotUI() {
 
 // CSS 자동 로딩
 function loadChatbotStylesheet() {
-    const baseURL = window.CHATBOT_CONFIG?.API_SERVER || '';
+    const baseURL = window.CHATBOT_CONFIG?.API_SERVER || '.';
 
     // chatbot용 CSS가 없다면 삽입
     if (!document.querySelector('link[href*="chatbot.css"]')) {
