@@ -14,17 +14,25 @@ const path = require('path');
 // 내부 서버 관리 코드
 // ========================================================
 
-let webSocketAddress = process.env.WEBSOCKET_ADDRESS;
+// WebSocket 주소 설정을 함수로 변경
+function getWebSocketAddress(req) {
+    // 호스트:포트 정보 (프로토콜 없이)
+    const webSocketHost = process.env.WEBSOCKET_ADDRESS || 
+                         req.get('host') || 
+                         `localhost:${port}`;
+    
+    // HTTPS 여부에 따라 프로토콜 결정
+    const isHTTPS = req.secure || req.headers['x-forwarded-proto'] === 'https';
+    const protocol = isHTTPS ? 'wss' : 'ws';
+    
+    return `${protocol}://${webSocketHost}`;
+}
 
-if (!webSocketAddress) {
-    logger.error('WEBSOCKET_ADDRESS 환경 변수가 설정되지 않았습니다.');
-    if (process.env.NODE_ENV === 'PRODUCTION') {
-        process.exit(1); // 프로세스 종료
-    } else {
-        const defaultWebSocketAddress = `ws://127.0.0.1:${port}`;
-        logger.info(`WEBSOCKET_ADDRESS를 기본값으로 사용합니다. ${defaultWebSocketAddress}`);
-        webSocketAddress = defaultWebSocketAddress; // 기본값을 webSocketAddress에 할당
-    }
+// 환경변수 체크 및 로깅
+if (!process.env.WEBSOCKET_ADDRESS) {
+    logger.info('WEBSOCKET_ADDRESS 환경 변수가 설정되지 않았습니다. 동적으로 프로토콜을 판단합니다.');
+} else {
+    logger.info(`고정 WebSocket 주소 사용: ${process.env.WEBSOCKET_ADDRESS}`);
 }
 
 // ========================================================
@@ -41,6 +49,7 @@ app.get('/', (req, res) => {
 
 // 클라이언트에게 WebSocket 주소를 전달
 app.get('/config', (req, res) => {
+    const webSocketAddress = getWebSocketAddress(req);
     res.json({ webSocketAddress });
     logger.info(`Successfully configured the websocket address to client ${webSocketAddress}`)
 });
