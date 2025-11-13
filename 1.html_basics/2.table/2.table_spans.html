@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>6x5 테이블 예제</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 600px;
+            text-align: center;
+        }
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 6px;
+        }
+        thead th {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <caption>
+            table / tr / td / th / colspan / rowspan 예제 (6행 × 5열)
+        </caption>
+        <thead>
+            <tr>
+                <!-- 1행 1열: 빈 헤더 (왼쪽 위) -->
+                <th></th>
+                <!-- 1행 2~3열: Group A 로 2칸 합치기 -->
+                <th colspan="2">Group A</th>
+                <!-- 1행 4~5열: Group B 로 2칸 합치기 -->
+                <th colspan="2">Group B</th>
+            </tr>
+            <tr>
+                <!-- 2행: 실제 열 제목 5개 -->
+                <th>#</th>
+                <th>A1</th>
+                <th>A2</th>
+                <th>B1</th>
+                <th>B2</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <!-- 3행 -->
+            <tr>
+                <!-- 첫 번째 열은 행 제목으로 th 사용 -->
+                <th scope="row">Row 1</th>
+
+                <!-- A1: Row 1~2 두 줄 합치기 (rowspan=2) -->
+                <td rowspan="2">R1-2 / A1</td>
+
+                <!-- A2: Row 1 전용 -->
+                <td>R1 / A2</td>
+
+                <!-- B1: Row 1 전용 -->
+                <td>R1 / B1</td>
+
+                <!-- B2: Row 1~3 세 줄 합치기 (rowspan=3) -->
+                <td rowspan="3">R1-3 / B2</td>
+            </tr>
+
+            <!-- 4행 -->
+            <tr>
+                <th scope="row">Row 2</th>
+                <!-- A1 은 위 행에서 rowspan 으로 이미 차지 -->
+                <td>R2 / A2</td>
+                <td>R2 / B1</td>
+                <!-- B2 도 위에서 rowspan=3 -->
+            </tr>
+
+            <!-- 5행 -->
+            <tr>
+                <th scope="row">Row 3</th>
+                <td>R3 / A1</td>
+
+                <!-- A2 + B1 을 가로로 2칸 합치기 -->
+                <td colspan="2">R3 / (A2 + B1)</td>
+
+                <!-- B2 는 여전히 rowspan=3 의 마지막 줄 -->
+            </tr>
+
+            <!-- 6행 -->
+            <tr>
+                <th scope="row">Row 4</th>
+
+                <!-- A1 + A2 를 가로로 2칸 합치기 -->
+                <td colspan="2">R4 / (A1 + A2)</td>
+
+                <td>R4 / B1</td>
+                <td>R4 / B2</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

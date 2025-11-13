@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        /* 테이블 전체를 반응형 가로 100%로 */
+        .img-table {
+            width: 100%;
+            border-collapse: collapse; /* 테두리 겹침 제거 (선택사항) */
+            table-layout: fixed; /* 각 칼럼 너비를 균등 분배 */
+        }
+
+        .img-table td {
+            width: 33.33%; /* 3열이므로 100/3 */
+            height: 200px; /* 원하는 고정 높이 */
+            padding: 4px; /* 이미지 간 여백 (선택사항) */
+            box-sizing: border-box;
+        }
+
+        .img-table img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* or contain */
+            display: block; /* 이미지 하단 여백 제거 */
+        }
+
+        /* (선택) 테두리 보이게 하고 싶으면 */
+        .img-table,
+        .img-table td {
+            border: 1px solid #ccc;
+        }
+    </style>
+
+    <table class="img-table">
+        <tr>
+            <td><img src="../images/cats.jpg" alt="" /></td>
+            <td><img src="../images/movie1.jpg" alt="" /></td>
+            <td><img src="../images/movie2.jpg" alt="" /></td>
+        </tr>
+        <tr>
+            <td><img src="img4.jpg" alt="" /></td>
+            <td><img src="img5.jpg" alt="" /></td>
+            <td><img src="img6.jpg" alt="" /></td>
+        </tr>
+    </table>
+</body>
+</html>

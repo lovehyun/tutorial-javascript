@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>기본 테이블 예제</title>
+
+    <style>
+        table {
+            border-collapse: collapse; /* 선 겹침 제거 */
+            width: 400px;
+            text-align: center;
+        }
+        th,
+        td {
+            border: 1px solid #333;
+            padding: 8px;
+        }
+        thead th {
+            background: #eee; /* 헤더 강조 */
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <caption>
+            4행 × 3열 기본 테이블 구조
+        </caption>
+
+        <!-- 테이블 헤더 -->
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>이름</th>
+                <th>직업</th>
+            </tr>
+        </thead>
+
+        <!-- 테이블 본문 -->
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>홍길동</td>
+                <td>개발자</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>김철수</td>
+                <td>디자이너</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>이영희</td>
+                <td>기획자</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
