@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>새싹 좌석 배치 랜덤 셔플</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 20px;
+        }
+        .left-panel {
+            width: 320px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        h1 {
+            font-size: 20px;
+            margin: 0 0 8px;
+        }
+        .subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .names-list {
+            max-height: 360px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 8px;
+            background: #fafbff;
+        }
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .name-row span {
+            font-size: 12px;
+            width: 40px;
+            text-align: right;
+            color: #555;
+        }
+        .name-row input {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+        }
+        .buttons {
+            display: flex;
+            gap: 8px;
+        }
+        button {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button.primary {
+            background: #4f46e5;
+            color: white;
+        }
+        button.secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .hint {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.4;
+        }
+        canvas {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .canvas-title {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="panel left-panel">
+        <div>
+            <h1>좌석 배치 랜덤 셔플</h1>
+            <div class="subtitle">새싹(Seoul SW Academy) 웹서비스 개발자 과정</div>
+        </div>
+
+        <div>
+            <label for="roomSelect">교육장 선택</label>
+            <select id="roomSelect">
+                <option value="room10">A 교육장 (10석)</option>
+                <option value="room13">B 교육장 (13석)</option>
+            </select>
+        </div>
+
+        <div>
+            <label>수강생 이름 입력</label>
+            <div id="namesContainer" class="names-list">
+                <!-- 이름 입력칸 자동 생성 -->
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="saveNamesBtn" class="secondary">이름 저장</button>
+            <button id="shuffleBtn" class="primary">랜덤 섞기</button>
+        </div>
+
+        <div class="hint">
+            · 한 번 입력한 이름은 이 브라우저에 <b>자동 저장</b>됩니다 (localStorage 사용).<br>
+            · 랜덤 섞기 후 0.5초마다 한 자리씩 새 배치가 표시됩니다.<br>
+            · 좌표를 조금만 수정하면 실제 교육장 물리 좌석과 1:1로 맞출 수 있습니다.
+        </div>
+    </div>
+
+    <div class="panel right-panel">
+        <div class="canvas-title" id="canvasTitle">A 교육장 (10석) 도면</div>
+        <canvas id="roomCanvas" width="900" height="460"></canvas>
+    </div>
+</div>
+
+<script>
+    // =========================
+    // 1. 기본 데이터 (레이아웃)
+    // =========================
+
+    // 좌석/강사/스크린/출입문 도면 좌표 정의
+    // 실제 교육장 구조에 맞게 x, y 값만 조금씩 조정해서 쓰시면 됩니다.
+    const roomLayouts = {
+        room10: {
+            label: "A 교육장 (10석)",
+            seatCount: 10,
+            // 학생 좌석: 2행 x 5열 예시
+            seats: [
+                { id: 1, x: 120, y: 120, w: 80, h: 50 },
+                { id: 2, x: 220, y: 120, w: 80, h: 50 },
+                { id: 3, x: 320, y: 120, w: 80, h: 50 },
+                { id: 4, x: 420, y: 120, w: 80, h: 50 },
+                { id: 5, x: 520, y: 120, w: 80, h: 50 },
+
+                { id: 6, x: 120, y: 200, w: 80, h: 50 },
+                { id: 7, x: 220, y: 200, w: 80, h: 50 },
+                { id: 8, x: 320, y: 200, w: 80, h: 50 },
+                { id: 9, x: 420, y: 200, w: 80, h: 50 },
+                { id: 10,x: 520, y: 200, w: 80, h: 50 }
+            ],
+            instructor: { x: 360, y: 40, w: 90, h: 40 },
+            screen:    { x: 220, y: 10, w: 260, h: 20 },
+            door:      { x: 820, y: 260, w: 40, h: 90 }
+        },
+        room13: {
+            label: "B 교육장 (13석)",
+            seatCount: 13,
+            // 학생 좌석: 3행 (5 + 5 + 3) 예시
+            seats: [
+                { id: 1, x: 80,  y: 120, w: 80, h: 50 },
+                { id: 2, x: 180, y: 120, w: 80, h: 50 },
+                { id: 3, x: 280, y: 120, w: 80, h: 50 },
+                { id: 4, x: 380, y: 120, w: 80, h: 50 },
+                { id: 5, x: 480, y: 120, w: 80, h: 50 },
+
+                { id: 6, x: 80,  y: 200, w: 80, h: 50 },
+                { id: 7, x: 180, y: 200, w: 80, h: 50 },
+                { id: 8, x: 280, y: 200, w: 80, h: 50 },
+                { id: 9, x: 380, y: 200, w: 80, h: 50 },
+                { id: 10,x: 480, y: 200, w: 80, h: 50 },
+
+                { id: 11,x: 130, y: 280, w: 80, h: 50 },
+                { id: 12,x: 280, y: 280, w: 80, h: 50 },
+                { id: 13,x: 430, y: 280, w: 80, h: 50 }
+            ],
+            instructor: { x: 360, y: 40, w: 90, h: 40 },
+            screen:    { x: 220, y: 10, w: 260, h: 20 },
+            door:      { x: 820, y: 260, w: 40, h: 90 }
+        }
+    };
+
+    // =========================
+    // 2. 상태 관리
+    // =========================
+
+    const roomSelect    = document.getElementById('roomSelect');
+    const namesContainer= document.getElementById('namesContainer');
+    const saveNamesBtn  = document.getElementById('saveNamesBtn');
+    const shuffleBtn    = document.getElementById('shuffleBtn');
+    const canvas        = document.getElementById('roomCanvas');
+    const ctx           = canvas.getContext('2d');
+    const canvasTitle   = document.getElementById('canvasTitle');
+
+    let currentRoomKey = 'room10';
+    let currentAssignments = {};   // { seatId: name }
+
+    // 애니메이션 관련 상태
+    let isAnimating      = false;
+    let spinnerAngle     = 0;
+    let spinnerStartTime = 0;
+    let spinnerDuration  = 1500;   // 룰렛 도는 시간 (ms)
+    let spinnerReqId     = null;
+    let revealTimerId    = null;
+    let pendingAssignments = [];   // [{ id, name }, ...]
+
+    // =========================
+    // 3. localStorage 유틸
+    // =========================
+
+    function getNamesStorageKey(roomKey) {
+        return 'seatApp_names_' + roomKey;
+    }
+    function getLayoutStorageKey(roomKey) {
+        return 'seatApp_layout_' + roomKey;
+    }
+
+    function loadNames(roomKey) {
+        const raw = localStorage.getItem(getNamesStorageKey(roomKey));
+        if (!raw) return [];
+        try {
+            const arr = JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveNames(roomKey, names) {
+        localStorage.setItem(getNamesStorageKey(roomKey), JSON.stringify(names));
+    }
+
+    function loadLayout(roomKey) {
+        const raw = localStorage.getItem(getLayoutStorageKey(roomKey));
+        if (!raw) return {};
+        try {
+            const obj = JSON.parse(raw);
+            return obj && typeof obj === 'object' ? obj : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveLayout(roomKey, layoutObj) {
+        localStorage.setItem(getLayoutStorageKey(roomKey), JSON.stringify(layoutObj));
+    }
+
+    // =========================
+    // 4. 이름 입력 UI 생성
+    // =========================
+
+    function renderNameInputs() {
+        const layout = roomLayouts[currentRoomKey];
+        const seatCount = layout.seatCount;
+        const savedNames = loadNames(currentRoomKey);
+
+        namesContainer.innerHTML = '';
+
+        for (let i = 0; i < seatCount; i++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'name-row';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = (i + 1) + '번';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = '수강생 이름';
+            input.value = savedNames[i] || '';
+
+            rowDiv.appendChild(labelSpan);
+            rowDiv.appendChild(input);
+            namesContainer.appendChild(rowDiv);
+        }
+    }
+
+    function collectNamesFromInputs() {
+        const inputs = namesContainer.querySelectorAll('input');
+        const names = [];
+        inputs.forEach(input => {
+            names.push(input.value.trim());
+        });
+        return names;
+    }
+
+    // =========================
+    // 5. 캔버스 그리기
+    // =========================
+
+    function drawRoom() {
+        const layout = roomLayouts[currentRoomKey];
+        const seats  = layout.seats;
+
+        // 전체 배경
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 교실 외곽
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 40, canvas.width - 100, canvas.height - 100);
+
+        // 스크린
+        const scr = layout.screen;
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(scr.x, scr.y, scr.w, scr.h);
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('스크린', scr.x + scr.w / 2, scr.y + scr.h / 2);
+
+        // 강사석
+        const inst = layout.instructor;
+        ctx.fillStyle = '#e0f2fe';
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 2;
+        ctx.fillRect(inst.x, inst.y, inst.w, inst.h);
+        ctx.strokeRect(inst.x, inst.y, inst.w, inst.h);
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('강사', inst.x + inst.w / 2, inst.y + inst.h / 2);
+
+        // 출입문
+        const door = layout.door;
+        ctx.fillStyle = '#f97316';
+        ctx.fillRect(door.x, door.y, door.w, door.h);
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px sans-serif';
+        ctx.save();
+        ctx.translate(door.x + door.w / 2, door.y + door.h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('출입문', 0, 0);
+        ctx.restore();
+
+        // 학생 좌석
+        seats.forEach(seat => {
+            const name = currentAssignments[seat.id] || '';
+
+            // 좌석 박스
+            ctx.fillStyle = name ? '#e5fce7' : '#ffffff';
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(seat.x, seat.y, seat.w, seat.h);
+            ctx.strokeRect(seat.x, seat.y, seat.w, seat.h);
+
+            // 좌석 번호
+            ctx.fillStyle = '#4b5563';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(seat.id + '번', seat.x + 4, seat.y + 3);
+
+            // 이름
+            if (name) {
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#111827';
+                ctx.fillText(
+                    name,
+                    seat.x + seat.w / 2,
+                    seat.y + seat.h / 2 + 6
+                );
+            }
+        });
+    }
+
+    // =========================
+    // 6. 랜덤 셔플 + 애니메이션
+    // =========================
+
+    function fisherYatesShuffle(arr) {
+        // in-place shuffle
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function startShuffle() {
+        if (isAnimating) return; // 중복 실행 방지
+
+        const names = collectNamesFromInputs();
+        const layout = roomLayouts[currentRoomKey];
+
+        // 빈 이름 체크
+        const filledNames = names.filter(n => n.length > 0);
+        if (filledNames.length !== layout.seatCount) {
+            alert(`이 교육장은 ${layout.seatCount}명이 필요합니다.\n` +
+                  `입력된 이름 수: ${filledNames.length}명\n` +
+                  `빈 칸 없이 모두 채워주세요.`);
+            return;
+        }
+
+        // 이름 저장
+        saveNames(currentRoomKey, names);
+
+        // 좌석에 할당할 배열 생성 (seatCount만큼, 순서 상관 없음)
+        const shuffled = fisherYatesShuffle([...filledNames]);
+
+        // 기존 할당 초기화
+        currentAssignments = {};
+        drawRoom();
+
+        // 애니메이션 상태 초기화
+        isAnimating = true;
+        spinnerAngle = 0;
+        spinnerStartTime = 0;
+        pendingAssignments = [];
+
+        // 좌석 id 순서대로 이름 매핑
+        const seats = roomLayouts[currentRoomKey].seats;
+        seats.forEach((seat, idx) => {
+            pendingAssignments.push({
+                id: seat.id,
+                name: shuffled[idx]
+            });
+        });
+
+        // 버튼 비활성화
+        shuffleBtn.disabled = true;
+        saveNamesBtn.disabled = true;
+        roomSelect.disabled = true;
+
+        // 룰렛 애니메이션 시작
+        spinnerReqId = requestAnimationFrame(spinnerStep);
+    }
+
+    function spinnerStep(timestamp) {
+        if (!spinnerStartTime) spinnerStartTime = timestamp;
+        const elapsed = timestamp - spinnerStartTime;
+
+        // 기본 도면 다시 그림
+        drawRoom();
+
+        // 룰렛(원형) 그리기
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        const radius = 45;
+
+        spinnerAngle += 0.25; // 회전 속도
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spinnerAngle);
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#4f46e5';
+        ctx.lineWidth = 8;
+        ctx.arc(0, 0, radius, 0, Math.PI * 1.5);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillStyle = '#6366f1';
+        ctx.moveTo(0, -radius - 8);
+        ctx.lineTo(-6, -radius - 20);
+        ctx.lineTo(6, -radius - 20);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = '#374151';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('랜덤 섞는 중...', cx, cy + radius + 15);
+
+        if (elapsed < spinnerDuration) {
+            spinnerReqId = requestAnimationFrame(spinnerStep);
+        } else {
+            // 룰렛 종료 후 순차 좌석 배치 시작
+            spinnerStartTime = 0;
+            requestAnimationFrame(() => {
+                startRevealAnimation();
+            });
+        }
+    }
+
+    function startRevealAnimation() {
+        drawRoom(); // 룰렛 제거
+
+        let index = 0;
+        const total = pendingAssignments.length;
+
+        revealTimerId = setInterval(() => {
+            if (index >= total) {
+                clearInterval(revealTimerId);
+                revealTimerId = null;
+                isAnimating = false;
+
+                // 최종 배치 저장
+                saveLayout(currentRoomKey, currentAssignments);
+
+                // 버튼 다시 활성화
+                shuffleBtn.disabled = false;
+                saveNamesBtn.disabled = false;
+                roomSelect.disabled = false;
+                return;
+            }
+
+            const seatAssign = pendingAssignments[index];
+            currentAssignments[seatAssign.id] = seatAssign.name;
+            drawRoom();
+            index++;
+        }, 500); // 0.5초에 한 명씩
+    }
+
+    // =========================
+    // 7. 이벤트 핸들러
+    // =========================
+
+    roomSelect.addEventListener('change', () => {
+        currentRoomKey = roomSelect.value;
+        const layout = roomLayouts[currentRoomKey];
+        canvasTitle.textContent = layout.label + ' 도면';
+
+        // 이름 입력칸 재생성 + 저장된 이름 로드
+        renderNameInputs();
+
+        // 마지막 저장된 좌석 배치 로드
+        currentAssignments = loadLayout(currentRoomKey) || {};
+        drawRoom();
+    });
+
+    saveNamesBtn.addEventListener('click', () => {
+        const layout = roomLayouts[currentRoomKey];
+        const names = collectNamesFromInputs();
+        const filledNames = names.filter(n => n.length > 0);
+
+        if (filledNames.length !== layout.seatCount) {
+            if (!confirm(
+                `현재 ${layout.seatCount}석 중 ${filledNames.length}명만 입력되어 있습니다.\n` +
+                `그래도 저장하시겠습니까?`
+            )) {
+                return;
+            }
+        }
+        saveNames(currentRoomKey, names);
+        alert('이름이 이 브라우저에 저장되었습니다.');
+    });
+
+    shuffleBtn.addEventListener('click', startShuffle);
+
+    // =========================
+    // 8. 초기 로드
+    // =========================
+
+    function init() {
+        // 초기 이름 입력 UI
+        renderNameInputs();
+        // 초기 좌석 배치(이전 저장값이 있으면 로드)
+        currentAssignments = loadLayout(currentRoomKey) || {};
+        drawRoom();
+    }
+
+    init();
+</script>
+</body>
+</html>
