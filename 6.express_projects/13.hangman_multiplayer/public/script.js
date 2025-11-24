@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", init);
 (async () => {
     try {
         // 1) "해커1" 이름으로 참가 (항상 새 playerId 발급)
-        const joinRes = await fetch("/api/join", {
+        const joinRes = await fetch("api/join", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: "해커1" })
@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", init);
         console.log("join 완료, playerId:", playerId, "이름:", joinData.name);
 
         // 2) 현재 라운드 상태 조회
-        const stateRes = await fetch("/api/state");
+        const stateRes = await fetch("api/state");
         const state = await stateRes.json();
 
         const fakeTime = state.roundStart;  // 라운드 시작 시각 = 0초만에 푼 것처럼
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", init);
         console.log("실제 경과 시간:", Math.floor((state.now - state.roundStart) / 1000), "초");
 
         // 3) 조작된 시간과 정답으로 finish 전송
-        const finishRes = await fetch("/api/finish", {
+        const finishRes = await fetch("api/finish", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
