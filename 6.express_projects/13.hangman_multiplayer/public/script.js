@@ -6,6 +6,12 @@ let lastState = null;
 let lastRoundId = null;
 let pollTimer = null;
 
+// 현재 문서가 위치한 디렉터리 경로를 base로 사용 (예: /hangman, /game 등)
+// 예) https://example.com/hangman/index.html -> /hangman
+//     https://example.com/hangman/          -> /hangman
+//     https://example.com/                  -> "" (루트)
+const BASE = new URL('.', window.location.href).pathname.replace(/\/$/, '');
+
 // Hangman 상태
 let answer = "";        // 정답 단어 (서버에서 받음)
 let display = [];       // ['_', 'p', '_', ...]
@@ -36,7 +42,7 @@ function formatTimeDiff(ms) {
 // 이름 등록
 async function joinGame() {
     const name = prompt("이름을 입력해주세요:", "") || "익명";
-    const res = await fetch("/api/join", {
+    const res = await fetch(`${BASE}/api/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name })
@@ -49,7 +55,7 @@ async function joinGame() {
 
 // 서버 상태 조회
 async function fetchState() {
-    const res = await fetch("/api/state");
+    const res = await fetch(`${BASE}/api/state`);
     const state = await res.json();
     lastState = state;
     // 새 라운드가 시작됐으면 클라이언트 행맨 상태 초기화
@@ -173,7 +179,7 @@ async function finishGame() {
     const clientFinishedAt = Date.now(); // weak 서버에서만 취약하게 사용됨
 
     try {
-        const res = await fetch("/api/finish", {
+        const res = await fetch(`${BASE}/api/finish`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
