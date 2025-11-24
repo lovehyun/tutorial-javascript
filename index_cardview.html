@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>JavaScript 튜토리얼 실습 모음</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        .section {
+            margin-bottom: 2rem;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .section-desc {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 0.75rem;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+            border: 1px solid #eee;
+        }
+        .card a {
+            text-decoration: none;
+            color: #1a73e8;
+            font-weight: 600;
+        }
+        .card-title {
+            margin-bottom: 0.25rem;
+        }
+        .card small {
+            display: block;
+            margin-top: 0.25rem;
+            color: #777;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.1rem 0.45rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            background: #e3f2fd;
+            color: #1a73e8;
+            margin-right: 0.25rem;
+        }
+        #status {
+            margin: 0.5rem 0 1.5rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>tutorial-javascript 실습 대시보드</h1>
+    <p id="status">GitHub에서 HTML 파일 목록을 불러오는 중입니다…</p>
+
+    <div id="root"></div>
+
+    <script>
+        // === 설정값 (여기만 저장소에 맞게 고정) ===
+        const OWNER = 'lovehyun'; // GitHub ID
+        const REPO = 'tutorial-javascript'; // 저장소 이름
+        const BRANCH = 'main'; // 보통 main
+
+        const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+        const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
+
+        // 상위 섹션으로 묶을 패턴: 숫자로 시작하는 폴더 → 1장, 2장 …
+        const SECTION_REGEX = /^\d+\./;
+
+        async function fetchJSON(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status} - ${url}`);
+            return res.json();
+        }
+
+        // 저장소 전체 트리에서 .html 파일만 모으기
+        async function loadHtmlFiles() {
+            const url = `${API_BASE}/git/trees/${BRANCH}?recursive=1`;
+            const data = await fetchJSON(url);
+
+            // data.tree: [{ path, type, sha, url }, ...]
+            const files = data.tree.filter(
+                (item) => item.type === 'blob' && item.path.endsWith('.html') && item.path !== 'index.html' // 루트 index.html(대시보드 자신)은 제외
+            );
+
+            return files;
+        }
+
+        // 섹션 묶기: 상위 디렉터리 이름을 기준으로, 숫자-prefix 있으면 "n장"
+        function groupBySection(htmlFiles) {
+            const sections = {};
+
+            for (const file of htmlFiles) {
+                const segments = file.path.split('/');
+
+                // topDir: 1단계 디렉터리 (없으면 '(루트)')
+                const topDir = segments.length > 1 ? segments[0] : '(루트)';
+                const sectionKey = SECTION_REGEX.test(topDir)
+                    ? topDir.split('.')[0] // "1.html_basics" → "1"
+                    : '기타';
+
+                if (!sections[sectionKey]) {
+                    sections[sectionKey] = [];
+                }
+                sections[sectionKey].push(file);
+            }
+
+            return sections;
+        }
+
+        function createSectionElement(sectionKey, files) {
+            const section = document.createElement('section');
+            section.className = 'section';
+
+            const title = document.createElement('div');
+            title.className = 'section-title';
+
+            if (sectionKey === '기타') {
+                title.textContent = '기타 예제 / 도구';
+            } else if (sectionKey === '(루트)') {
+                title.textContent = '루트에 있는 예제';
+            } else {
+                title.textContent = `${sectionKey}장 실습 / 예제`;
+            }
+
+            section.appendChild(title);
+
+            const desc = document.createElement('div');
+            desc.className = 'section-desc';
+            desc.textContent = 'HTML 파일을 기준으로 자동으로 수집된 실습/서비스 목록입니다.';
+            section.appendChild(desc);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid';
+
+            // 섹션 안에서는 경로 이름으로 정렬
+            files.sort((a, b) => a.path.localeCompare(b.path, 'ko'));
+
+            for (const file of files) {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const segments = file.path.split('/');
+                const fileName = segments[segments.length - 1]; // sesac_v3.html
+                const topDir = segments.length > 1 ? segments[0] : '(루트)';
+                const shortName = fileName.replace(/\.html$/i, ''); // sesac_v3
+
+                const link = document.createElement('a');
+                link.href = `${PAGES_BASE}/${file.path}`;
+                link.target = '_blank';
+                link.rel = 'noopener';
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'card-title';
+                titleSpan.textContent = shortName;
+                link.appendChild(titleSpan);
+
+                const tag = document.createElement('span');
+                tag.className = 'tag';
+                tag.textContent = topDir;
+
+                const pathText = document.createElement('small');
+                pathText.textContent = `/${file.path}`;
+
+                card.appendChild(tag);
+                card.appendChild(link);
+                card.appendChild(pathText);
+
+                grid.appendChild(card);
+            }
+
+            section.appendChild(grid);
+            return section;
+        }
+
+        async function init() {
+            const statusEl = document.getElementById('status');
+            const rootEl = document.getElementById('root');
+
+            try {
+                statusEl.textContent = '저장소 전체 트리에서 HTML 파일을 찾고 있습니다 (GitHub API)…';
+                const htmlFiles = await loadHtmlFiles();
+
+                if (!htmlFiles.length) {
+                    statusEl.textContent =
+                        'HTML 파일을 찾지 못했습니다. 저장소에 *.html 파일이 있는지 확인해 주세요.';
+                    return;
+                }
+
+                const sections = groupBySection(htmlFiles);
+
+                rootEl.innerHTML = '';
+
+                // 섹션 키 정렬: 숫자 섹션 → 기타 순서
+                const keys = Object.keys(sections).sort((a, b) => {
+                    if (a === '기타') return 1;
+                    if (b === '기타') return -1;
+                    if (a === '(루트)') return -1;
+                    if (b === '(루트)') return 1;
+                    return Number(a) - Number(b);
+                });
+
+                for (const key of keys) {
+                    const sectionEl = createSectionElement(key, sections[key]);
+                    rootEl.appendChild(sectionEl);
+                }
+
+                statusEl.textContent = `완료! HTML 파일 ${htmlFiles.length}개를 찾았습니다.`;
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'GitHub API에서 목록을 불러오지 못했습니다. (잠시 후 새로고침 해보세요.)';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

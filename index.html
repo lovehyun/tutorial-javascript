@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>tutorial-javascript 트리 뷰</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 1.5rem;
+            background: #f5f5f5;
+        }
+        h1 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+        #status {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eee;
+        }
+        .controls button {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .controls button:hover {
+            background: #eee;
+        }
+        .topdirs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        .topdirs label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-container {
+            margin-top: 1rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eee;
+            padding: 0.75rem 1rem;
+        }
+
+        .tree {
+            font-size: 0.9rem;
+        }
+        .tree ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 1rem;
+            border-left: 1px dashed #ddd;
+        }
+        .tree li {
+            margin: 2px 0;
+        }
+        .label-row {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            cursor: default;
+        }
+        .caret {
+            display: inline-block;
+            width: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #666;
+        }
+        .caret-spacer {
+            display: inline-block;
+            width: 1rem;
+        }
+        .node-name,
+        .file-link {
+            cursor: pointer;
+        }
+        .file-link {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+
+        .dir > .label-row {
+            font-weight: 600;
+            color: #333;
+        }
+        .file > .label-row {
+            font-weight: 400;
+        }
+
+        .dir.collapsed > ul {
+            display: none;
+        }
+
+        /* 루트에 직접 있는 HTML 파일은 약간 강조 */
+        .top-root-file .file-link::before {
+            content: '★ ';
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <h1>tutorial-javascript 트리 뷰</h1>
+    <p id="status">GitHub에서 HTML 파일 구조를 불러오는 중입니다…</p>
+
+    <div class="controls">
+        <div style="display: flex; gap: 0.5rem; align-items: center; margin-right: 1rem">
+            <button id="expandAll">전체 펼치기</button>
+            <button id="collapseAll">전체 접기</button>
+        </div>
+        <div class="topdirs" id="topDirFilter">
+            <!-- 최상위 폴더 체크박스가 여기 들어갑니다 -->
+        </div>
+    </div>
+
+    <div class="tree-container">
+        <div id="tree" class="tree"></div>
+    </div>
+
+    <script>
+        // ==== 1. 저장소 설정 ====
+        const OWNER = 'lovehyun'; // GitHub ID
+        const REPO = 'tutorial-javascript'; // 저장소 이름
+        const BRANCH = 'main'; // 브랜치
+
+        const API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+        const PAGES_BASE = `https://${OWNER}.github.io/${REPO}`;
+
+        // 숫자로 시작하는 최상위 디렉토리(1.xxx, 2.xxx 등)를 챕터처럼 구분하기 위한 패턴
+        const SECTION_REGEX = /^\d+\./;
+
+        // ==== 2. GitHub API에서 트리 정보 가져오기 ====
+        async function fetchJSON(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP ${res.status} - ${url}`);
+            return res.json();
+        }
+
+        async function loadHtmlPaths() {
+            const url = `${API_BASE}/git/trees/${BRANCH}?recursive=1`;
+            const data = await fetchJSON(url);
+
+            // 트리 전체에서 *.html 파일만 추출 (자기 자신 index.html은 제외)
+            const files = data.tree.filter(
+                (item) => item.type === 'blob' && item.path.endsWith('.html') && item.path !== 'index.html'
+            );
+
+            return files.map((f) => f.path); // 문자열 경로만 추출
+        }
+
+        // ==== 3. 경로 리스트 → 트리 구조(객체) 변환 ====
+        function buildTree(paths) {
+            const root = {
+                name: '(root)',
+                isDir: true,
+                children: {}, // key: name, value: node
+            };
+
+            for (const fullPath of paths) {
+                const parts = fullPath.split('/');
+                let node = root;
+
+                parts.forEach((part, idx) => {
+                    const isLast = idx === parts.length - 1;
+                    if (!node.children[part]) {
+                        node.children[part] = {
+                            name: part,
+                            isDir: !isLast,
+                            children: !isLast ? {} : null,
+                            fullPath: isLast ? fullPath : null,
+                        };
+                    }
+                    node = node.children[part];
+                });
+            }
+
+            return root;
+        }
+
+        // ==== 4. 트리 렌더링 ====
+        function renderTree(rootNode, container) {
+            container.innerHTML = '';
+
+            const ul = document.createElement('ul');
+
+            const childNames = Object.keys(rootNode.children).sort((a, b) => a.localeCompare(b, 'ko'));
+            for (const name of childNames) {
+                const child = rootNode.children[name];
+                renderNode(child, ul, name, 1); // depth = 1 (최상위)
+            }
+
+            container.appendChild(ul);
+        }
+
+        function renderNode(node, parentUl, currentPath, depth) {
+            const li = document.createElement('li');
+            li.classList.add('node');
+            if (node.isDir) li.classList.add('dir');
+            else li.classList.add('file');
+
+            // 최상위 디렉터리는 data-top-dir로 표시 → 체크박스 필터에 사용
+            if (depth === 1 && node.isDir) {
+                li.dataset.topDir = node.name;
+            }
+
+            // 루트에 직접 있는 HTML 파일은 구분용 클래스
+            if (!node.isDir && depth === 1) {
+                li.classList.add('top-root-file');
+            }
+
+            const row = document.createElement('div');
+            row.className = 'label-row';
+
+            if (node.isDir) {
+                // 디렉터리: 펼치기/접기 화살표 + 이름
+                li.classList.add('collapsed'); // 기본은 접힌 상태
+                const caret = document.createElement('span');
+                caret.className = 'caret';
+                caret.textContent = '▶';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'node-name';
+                nameSpan.textContent = node.name;
+
+                function toggle() {
+                    const collapsed = li.classList.toggle('collapsed');
+                    caret.textContent = collapsed ? '▶' : '▼';
+                }
+
+                caret.addEventListener('click', toggle);
+                nameSpan.addEventListener('click', toggle);
+
+                row.appendChild(caret);
+                row.appendChild(nameSpan);
+                li.appendChild(row);
+
+                const ul = document.createElement('ul');
+                const childNames = Object.keys(node.children).sort((a, b) => a.localeCompare(b, 'ko'));
+
+                for (const childName of childNames) {
+                    const childNode = node.children[childName];
+                    const childPath = currentPath + '/' + childName;
+                    renderNode(childNode, ul, childPath, depth + 1);
+                }
+
+                li.appendChild(ul);
+            } else {
+                // 파일: 화살표 대신 공간만 확보
+                const spacer = document.createElement('span');
+                spacer.className = 'caret-spacer';
+                spacer.textContent = ' ';
+
+                const link = document.createElement('a');
+                link.className = 'file-link';
+                link.href = `${PAGES_BASE}/${node.fullPath}`;
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.textContent = node.name.replace(/\.html$/i, '');
+
+                row.appendChild(spacer);
+                row.appendChild(link);
+                li.appendChild(row);
+            }
+
+            parentUl.appendChild(li);
+        }
+
+        // ==== 5. 최상위 디렉터리 체크박스 영역 생성 ====
+        function setupTopDirFilter(treeRoot) {
+            const filterBox = document.getElementById('topDirFilter');
+            filterBox.innerHTML = '';
+
+            const topDirNames = Object.keys(treeRoot.children)
+                .filter((name) => name !== '(root)') // 루트 파일은 제외
+                .sort((a, b) => a.localeCompare(b, 'ko'));
+
+            if (!topDirNames.length) {
+                const span = document.createElement('span');
+                span.textContent = '최상위 디렉터리 없음';
+                filterBox.appendChild(span);
+                return;
+            }
+
+            // "모두 선택/해제" 토글용 체크박스 하나 더 만들어도 됨 (원하면 추가)
+            topDirNames.forEach((name) => {
+                const label = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.value = name;
+                cb.checked = true;
+
+                cb.addEventListener('change', updateTopDirVisibility);
+
+                label.appendChild(cb);
+                label.append(' ' + name);
+                filterBox.appendChild(label);
+            });
+
+            // 초기 표시
+            updateTopDirVisibility();
+        }
+
+        function updateTopDirVisibility() {
+            // 체크된 최상위 디렉터리 목록
+            const checked = new Set();
+            document.querySelectorAll("#topDirFilter input[type='checkbox']").forEach((cb) => {
+                if (cb.checked) checked.add(cb.value);
+            });
+
+            const topLis = document.querySelectorAll('.tree li.dir[data-top-dir]');
+            topLis.forEach((li) => {
+                const name = li.dataset.topDir;
+                // 아무 것도 체크 안 되어 있으면 "모두 숨김"보다는 "모두 보이기"가 직관적일 수 있음
+                if (checked.size === 0 || checked.has(name)) {
+                    li.style.display = '';
+                } else {
+                    li.style.display = 'none';
+                }
+            });
+        }
+
+        // ==== 6. 전체 펼치기 / 접기 ====
+        function setupExpandCollapseButtons() {
+            const expandBtn = document.getElementById('expandAll');
+            const collapseBtn = document.getElementById('collapseAll');
+
+            expandBtn.addEventListener('click', () => {
+                document.querySelectorAll('.tree li.dir').forEach((li) => {
+                    li.classList.remove('collapsed');
+                    const caret = li.querySelector('.caret');
+                    if (caret) caret.textContent = '▼';
+                });
+            });
+
+            collapseBtn.addEventListener('click', () => {
+                document.querySelectorAll('.tree li.dir').forEach((li) => {
+                    li.classList.add('collapsed');
+                    const caret = li.querySelector('.caret');
+                    if (caret) caret.textContent = '▶';
+                });
+            });
+        }
+
+        // ==== 7. 초기화 ====
+        async function init() {
+            const statusEl = document.getElementById('status');
+            const treeEl = document.getElementById('tree');
+
+            setupExpandCollapseButtons();
+
+            try {
+                statusEl.textContent = '저장소에서 HTML 파일 경로를 불러오는 중입니다 (GitHub API)…';
+                const paths = await loadHtmlPaths();
+
+                if (!paths.length) {
+                    statusEl.textContent = '*.html 파일을 찾지 못했습니다.';
+                    return;
+                }
+
+                const treeRoot = buildTree(paths);
+                renderTree(treeRoot, treeEl);
+                setupTopDirFilter(treeRoot);
+
+                statusEl.textContent = `완료! HTML 파일 ${paths.length}개를 트리로 구성했습니다.`;
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = 'GitHub API에서 목록을 불러오지 못했습니다. (잠시 후 새로고침 해보세요.)';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
