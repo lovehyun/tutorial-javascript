@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>새싹 좌석 배치 랜덤 셔플 + 편집 모드</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f7fb;
+            color: #222;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            padding: 20px;
+        }
+        .left-panel {
+            width: 340px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        h1 {
+            font-size: 20px;
+            margin: 0 0 6px;
+        }
+        .subtitle {
+            font-size: 12px;
+            color: #666;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+        select {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .names-list {
+            max-height: 260px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            padding: 8px;
+            background: #fafbff;
+        }
+        .name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        .name-row span {
+            font-size: 12px;
+            width: 40px;
+            text-align: right;
+            color: #555;
+        }
+        .name-row input {
+            flex: 1;
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+        }
+        .buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        button {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button.primary {
+            background: #4f46e5;
+            color: white;
+        }
+        button.secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+        button.ghost {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        button.ghost.on {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+        button.danger {
+            background: #ef4444;
+            color: white;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .hint {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.4;
+        }
+        canvas {
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            cursor: default;
+        }
+        canvas.edit-mode {
+            cursor: grab;
+        }
+        canvas.dragging {
+            cursor: grabbing;
+        }
+        .canvas-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .canvas-title {
+            font-size: 14px;
+            color: #555;
+        }
+        .edit-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+        }
+        .edit-badge.on {
+            border-color: #16a34a;
+            background: #dcfce7;
+            color: #166534;
+        }
+        .button-row {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="panel left-panel">
+        <div>
+            <h1>좌석 배치 랜덤 셔플</h1>
+            <div class="subtitle">새싹(Seoul SW Academy) 웹서비스 개발자 과정</div>
+        </div>
+
+        <div>
+            <label for="roomSelect">교육장 선택</label>
+            <select id="roomSelect">
+                <option value="room10">A 교육장 (10석)</option>
+                <option value="room13">B 교육장 (13석)</option>
+            </select>
+        </div>
+
+        <div>
+            <label>수강생 이름 입력</label>
+            <div id="namesContainer" class="names-list">
+                <!-- 이름 입력칸 자동 생성 -->
+            </div>
+        </div>
+
+        <div class="buttons">
+            <button id="saveNamesBtn" class="secondary">이름 저장</button>
+            <button id="shuffleBtn" class="primary">랜덤 섞기</button>
+        </div>
+
+        <div class="button-row">
+            <button id="editModeBtn" class="ghost">편집 모드: OFF</button>
+            <button id="rotateRoomBtn" class="ghost">방 회전</button>
+        </div>
+
+        <div>
+            <button id="textRotateBtn" class="ghost">텍스트: 박스와 함께 회전</button>
+        </div>
+
+        <div>
+            <button id="resetBtn" class="danger">레이아웃 초기화</button>
+        </div>
+
+        <div class="hint">
+            · 이름은 브라우저에 <b>localStorage</b>로 저장됩니다.<br>
+            · <b>이름 저장</b>을 누르면 입력된 순서대로 좌석에 배정됩니다. (빈 칸은 건너뜀)<br>
+            · <b>랜덤 섞기</b>를 누르면 입력된 이름들이 랜덤하게 재배치됩니다.<br>
+            · <b>편집 모드 ON</b>에서 좌석/강사/스크린/출입문을 드래그하여 이동하고, 우측 상단 회전 아이콘을 클릭하여 90도씩 회전할 수 있습니다.<br>
+            · <b>방 회전</b> 버튼으로 교육장 전체를 90도씩 회전시킬 수 있습니다.<br>
+            · <b>레이아웃 초기화</b>를 누르면 모든 설정이 초기 상태로 돌아갑니다.
+        </div>
+    </div>
+
+    <div class="panel right-panel">
+        <div class="canvas-header">
+            <div class="canvas-title" id="canvasTitle">A 교육장 (10석) 도면</div>
+            <div class="edit-badge" id="editBadge">편집 모드: OFF</div>
+        </div>
+        <canvas id="roomCanvas" width="900" height="900"></canvas>
+    </div>
+</div>
+
+<script>
+    // =========================
+    // 1. 기본 레이아웃 정의 (기본 좌표)
+    // =========================
+
+    const roomLayoutsBase = {
+        room10: {
+            label: "A 교육장 (10석)",
+            seatCount: 10,
+            seats: [
+                { id: 1, x: 120, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 2, x: 220, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 3, x: 320, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 4, x: 420, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 5, x: 520, y: 120, w: 80, h: 50, rotation: 0 },
+
+                { id: 6, x: 120, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 7, x: 220, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 8, x: 320, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 9, x: 420, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 10,x: 520, y: 200, w: 80, h: 50, rotation: 0 }
+            ],
+            instructor: { x: 360, y: 40, w: 90, h: 40, rotation: 0 },
+            screen:    { x: 220, y: 10, w: 260, h: 20, rotation: 0 },
+            door:      { x: 820, y: 260, w: 40, h: 90, rotation: 0 }
+        },
+        room13: {
+            label: "B 교육장 (13석)",
+            seatCount: 13,
+            seats: [
+                { id: 1, x: 80,  y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 2, x: 180, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 3, x: 280, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 4, x: 380, y: 120, w: 80, h: 50, rotation: 0 },
+                { id: 5, x: 480, y: 120, w: 80, h: 50, rotation: 0 },
+
+                { id: 6, x: 80,  y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 7, x: 180, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 8, x: 280, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 9, x: 380, y: 200, w: 80, h: 50, rotation: 0 },
+                { id: 10,x: 480, y: 200, w: 80, h: 50, rotation: 0 },
+
+                { id: 11,x: 130, y: 280, w: 80, h: 50, rotation: 0 },
+                { id: 12,x: 280, y: 280, w: 80, h: 50, rotation: 0 },
+                { id: 13,x: 430, y: 280, w: 80, h: 50, rotation: 0 }
+            ],
+            instructor: { x: 360, y: 40, w: 90, h: 40, rotation: 0 },
+            screen:    { x: 220, y: 10, w: 260, h: 20, rotation: 0 },
+            door:      { x: 820, y: 260, w: 40, h: 90, rotation: 0 }
+        }
+    };
+
+    // =========================
+    // 2. 상태 변수 정의
+    // =========================
+
+    const roomSelect     = document.getElementById('roomSelect');
+    const namesContainer = document.getElementById('namesContainer');
+    const saveNamesBtn   = document.getElementById('saveNamesBtn');
+    const shuffleBtn     = document.getElementById('shuffleBtn');
+    const editModeBtn    = document.getElementById('editModeBtn');
+    const rotateRoomBtn  = document.getElementById('rotateRoomBtn');
+    const textRotateBtn  = document.getElementById('textRotateBtn');
+    const resetBtn       = document.getElementById('resetBtn');
+    const canvas         = document.getElementById('roomCanvas');
+    const ctx            = canvas.getContext('2d');
+    const canvasTitle    = document.getElementById('canvasTitle');
+    const editBadge      = document.getElementById('editBadge');
+
+    const CANVAS_SIZE = 900;
+    const CANVAS_CENTER = CANVAS_SIZE / 2;
+    const LAYOUT_OFFSET_Y = 220;
+
+    let currentRoomKey     = 'room10';
+    let currentLayout      = null;
+    let currentAssignments = {};
+    let editMode           = false;
+    let selectedObject     = null;
+    let textFollowRotation = true;
+    let roomRotation       = 0;
+
+    let isAnimating      = false;
+    let spinnerAngle     = 0;
+    let spinnerStartTime = 0;
+    let spinnerDuration  = 1500;
+    let spinnerReqId     = null;
+    let revealTimerId    = null;
+    let pendingAssignments = [];
+
+    let dragTarget = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    let isMouseDown = false;
+
+    // =========================
+    // 3. localStorage 유틸리티
+    // =========================
+
+    function getNamesStorageKey(roomKey) {
+        return 'seatApp_names_' + roomKey;
+    }
+    function getLayoutStorageKey(roomKey) {
+        return 'seatApp_layout_' + roomKey;
+    }
+    function getAssignStorageKey(roomKey) {
+        return 'seatApp_assign_' + roomKey;
+    }
+    function getRoomRotationKey(roomKey) {
+        return 'seatApp_roomRotation_' + roomKey;
+    }
+    function getTextRotationKey() {
+        return 'seatApp_textFollowRotation';
+    }
+
+    function loadNames(roomKey) {
+        const raw = localStorage.getItem(getNamesStorageKey(roomKey));
+        if (!raw) return [];
+        try {
+            const arr = JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveNames(roomKey, names) {
+        localStorage.setItem(getNamesStorageKey(roomKey), JSON.stringify(names));
+    }
+
+    function loadLayout(roomKey) {
+        const raw = localStorage.getItem(getLayoutStorageKey(roomKey));
+        if (!raw) return null;
+        try {
+            const obj = JSON.parse(raw);
+            return obj && typeof obj === 'object' ? obj : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function saveLayout(roomKey, layout) {
+        const data = {
+            seats: layout.seats.map(s => ({
+                id: s.id, x: s.x, y: s.y, w: s.w, h: s.h, rotation: s.rotation || 0
+            })),
+            instructor: {
+                x: layout.instructor.x,
+                y: layout.instructor.y,
+                w: layout.instructor.w,
+                h: layout.instructor.h,
+                rotation: layout.instructor.rotation || 0
+            },
+            screen: {
+                x: layout.screen.x,
+                y: layout.screen.y,
+                w: layout.screen.w,
+                h: layout.screen.h,
+                rotation: layout.screen.rotation || 0
+            },
+            door: {
+                x: layout.door.x,
+                y: layout.door.y,
+                w: layout.door.w,
+                h: layout.door.h,
+                rotation: layout.door.rotation || 0
+            }
+        };
+        localStorage.setItem(getLayoutStorageKey(roomKey), JSON.stringify(data));
+    }
+
+    function loadAssignments(roomKey) {
+        const raw = localStorage.getItem(getAssignStorageKey(roomKey));
+        if (!raw) return {};
+        try {
+            const obj = JSON.parse(raw);
+            return obj && typeof obj === 'object' ? obj : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveAssignments(roomKey, assignments) {
+        localStorage.setItem(getAssignStorageKey(roomKey), JSON.stringify(assignments));
+    }
+
+    function loadRoomRotation(roomKey) {
+        const raw = localStorage.getItem(getRoomRotationKey(roomKey));
+        if (!raw) return 0;
+        try {
+            return parseInt(raw) || 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function saveRoomRotation(roomKey, rotation) {
+        localStorage.setItem(getRoomRotationKey(roomKey), rotation.toString());
+    }
+
+    function loadTextRotation() {
+        const raw = localStorage.getItem(getTextRotationKey());
+        if (raw === null) return true;
+        return raw === 'true';
+    }
+
+    function saveTextRotation(follow) {
+        localStorage.setItem(getTextRotationKey(), follow.toString());
+    }
+
+    function clearAllStorage(roomKey) {
+        localStorage.removeItem(getNamesStorageKey(roomKey));
+        localStorage.removeItem(getLayoutStorageKey(roomKey));
+        localStorage.removeItem(getAssignStorageKey(roomKey));
+        localStorage.removeItem(getRoomRotationKey(roomKey));
+        localStorage.removeItem(getTextRotationKey());
+    }
+
+    // =========================
+    // 4. 레이아웃 로딩
+    // =========================
+
+    function loadLayoutOrDefault(roomKey) {
+        const base = roomLayoutsBase[roomKey];
+        const layout = {
+            label: base.label,
+            seatCount: base.seatCount,
+            seats: base.seats.map(s => ({ ...s })),
+            instructor: { ...base.instructor },
+            screen: { ...base.screen },
+            door: { ...base.door }
+        };
+
+        const saved = loadLayout(roomKey);
+        if (!saved) return layout;
+
+        if (Array.isArray(saved.seats)) {
+            layout.seats.forEach(seat => {
+                const found = saved.seats.find(s => s.id === seat.id);
+                if (found) {
+                    seat.x = found.x;
+                    seat.y = found.y;
+                    seat.w = found.w ?? seat.w;
+                    seat.h = found.h ?? seat.h;
+                    seat.rotation = found.rotation ?? 0;
+                }
+            });
+        }
+        if (saved.instructor) {
+            layout.instructor.x = saved.instructor.x ?? layout.instructor.x;
+            layout.instructor.y = saved.instructor.y ?? layout.instructor.y;
+            layout.instructor.w = saved.instructor.w ?? layout.instructor.w;
+            layout.instructor.h = saved.instructor.h ?? layout.instructor.h;
+            layout.instructor.rotation = saved.instructor.rotation ?? 0;
+        }
+        if (saved.screen) {
+            layout.screen.x = saved.screen.x ?? layout.screen.x;
+            layout.screen.y = saved.screen.y ?? layout.screen.y;
+            layout.screen.w = saved.screen.w ?? layout.screen.w;
+            layout.screen.h = saved.screen.h ?? layout.screen.h;
+            layout.screen.rotation = saved.screen.rotation ?? 0;
+        }
+        if (saved.door) {
+            layout.door.x = saved.door.x ?? layout.door.x;
+            layout.door.y = saved.door.y ?? layout.door.y;
+            layout.door.w = saved.door.w ?? layout.door.w;
+            layout.door.h = saved.door.h ?? layout.door.h;
+            layout.door.rotation = saved.door.rotation ?? 0;
+        }
+        return layout;
+    }
+
+    // =========================
+    // 5. 이름 입력 UI 생성
+    // =========================
+
+    function renderNameInputs() {
+        const layout = roomLayoutsBase[currentRoomKey];
+        const seatCount = layout.seatCount;
+        const savedNames = loadNames(currentRoomKey);
+
+        namesContainer.innerHTML = '';
+
+        for (let i = 0; i < seatCount; i++) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'name-row';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = (i + 1) + '번';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = '수강생 이름';
+            input.value = savedNames[i] || '';
+
+            rowDiv.appendChild(labelSpan);
+            rowDiv.appendChild(input);
+            namesContainer.appendChild(rowDiv);
+        }
+    }
+
+    function collectNamesFromInputs() {
+        const inputs = namesContainer.querySelectorAll('input');
+        const names = [];
+        inputs.forEach(input => names.push(input.value.trim()));
+        return names;
+    }
+
+    // =========================
+    // 6. 회전 아이콘 그리기
+    // =========================
+
+    function drawRotateIcon(obj) {
+        const iconSize = 20;
+        const iconX = obj.x + obj.w - iconSize / 2;
+        const iconY = obj.y - iconSize / 2;
+
+        ctx.fillStyle = '#4f46e5';
+        ctx.beginPath();
+        ctx.arc(iconX, iconY, iconSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = '#fff';
+        ctx.lineWidth = 2;
+        
+        ctx.save();
+        ctx.translate(iconX, iconY);
+        
+        ctx.beginPath();
+        ctx.arc(0, 0, 5, -Math.PI * 0.7, Math.PI * 0.7);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(3, 4);
+        ctx.lineTo(6, 2);
+        ctx.lineTo(4, 0);
+        ctx.fill();
+        
+        ctx.restore();
+
+        return { x: iconX, y: iconY, radius: iconSize / 2 };
+    }
+
+    // =========================
+    // 7. 캔버스 그리기
+    // =========================
+
+    function drawRotatedRect(obj, fillColor, strokeColor, text) {
+        const cx = obj.x + obj.w / 2;
+        const cy = obj.y + obj.h / 2;
+        const angle = (obj.rotation || 0) * Math.PI / 180;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+
+        ctx.fillStyle = fillColor;
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 1.5;
+        ctx.fillRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
+        ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
+
+        if (text) {
+            if (fillColor === '#111827' || fillColor === '#f97316') {
+                ctx.fillStyle = '#ffffff';
+            } else {
+                ctx.fillStyle = '#111827';
+            }
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            if (!textFollowRotation) {
+                ctx.rotate(-angle);
+            }
+            
+            ctx.fillText(text, 0, 0);
+        }
+
+        ctx.restore();
+    }
+
+    function drawRoom() {
+        if (!currentLayout) return;
+        const layout = currentLayout;
+        const seats  = layout.seats;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f3f4f6';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(CANVAS_CENTER, CANVAS_CENTER);
+        ctx.rotate(roomRotation * Math.PI / 180);
+        ctx.translate(-CANVAS_CENTER, -CANVAS_CENTER);
+        
+        ctx.translate(0, LAYOUT_OFFSET_Y);
+
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 40, 820, 380);
+
+        const scr = layout.screen;
+        drawRotatedRect(scr, '#111827', '#111827', '스크린');
+
+        const inst = layout.instructor;
+        drawRotatedRect(inst, '#e0f2fe', '#0284c7', '강사');
+
+        const door = layout.door;
+        drawRotatedRect(door, '#f97316', '#f97316', '출입문');
+
+        seats.forEach(seat => {
+            const name = currentAssignments[seat.id] || '';
+            const cx = seat.x + seat.w / 2;
+            const cy = seat.y + seat.h / 2;
+            const angle = (seat.rotation || 0) * Math.PI / 180;
+
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            ctx.fillStyle = name ? '#e5fce7' : '#ffffff';
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(-seat.w / 2, -seat.h / 2, seat.w, seat.h);
+            ctx.strokeRect(-seat.w / 2, -seat.h / 2, seat.w, seat.h);
+
+            ctx.fillStyle = '#4b5563';
+            ctx.font = '11px sans-serif';
+            
+            // 회전 각도에 따라 정렬 방식 변경
+            const rotation = seat.rotation || 0;
+            if (rotation === 90 || rotation === 270) {
+                // 세로 방향일 때는 중앙 정렬
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+            } else {
+                // 가로 방향일 때는 왼쪽 상단 정렬
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'top';
+            }
+            
+            if (!textFollowRotation) {
+                ctx.save();
+                ctx.rotate(-angle);
+                if (rotation === 90 || rotation === 270) {
+                    ctx.fillText(seat.id + '번', 0, -seat.h / 2 + 15);
+                } else {
+                    ctx.fillText(seat.id + '번', -seat.w / 2 + 4, -seat.h / 2 + 3);
+                }
+                ctx.restore();
+            } else {
+                if (rotation === 90 || rotation === 270) {
+                    ctx.fillText(seat.id + '번', 0, -seat.h / 2 + 15);
+                } else {
+                    ctx.fillText(seat.id + '번', -seat.w / 2 + 4, -seat.h / 2 + 3);
+                }
+            }
+
+            if (name) {
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#111827';
+                
+                const rotation = seat.rotation || 0;
+                
+                if (!textFollowRotation) {
+                    ctx.save();
+                    ctx.rotate(-angle);
+                    if (rotation === 90 || rotation === 270) {
+                        ctx.fillText(name, 0, 0);
+                    } else {
+                        ctx.fillText(name, 0, 6);
+                    }
+                    ctx.restore();
+                } else {
+                    if (rotation === 90 || rotation === 270) {
+                        ctx.fillText(name, 0, 0);
+                    } else {
+                        ctx.fillText(name, 0, 6);
+                    }
+                }
+            }
+
+            ctx.restore();
+        });
+
+        if (editMode && selectedObject && !isAnimating) {
+            const obj = selectedObject.obj;
+            
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(obj.x - 2, obj.y - 2, obj.w + 4, obj.h + 4);
+            ctx.setLineDash([]);
+
+            drawRotateIcon(obj);
+        }
+
+        ctx.restore();
+
+        if (editMode && !isAnimating) {
+            ctx.fillStyle = 'rgba(55,65,81,0.7)';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('편집 모드: 드래그로 이동, 우측 상단 아이콘 클릭으로 회전', canvas.width - 10, canvas.height - 10);
+        }
+    }
+
+    // =========================
+    // 8. 랜덤 셔플 + 룰렛 애니메이션
+    // =========================
+
+    function fisherYatesShuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    function startShuffle() {
+        if (isAnimating) return;
+
+        const base = roomLayoutsBase[currentRoomKey];
+        const seatCount = base.seatCount;
+        const names = collectNamesFromInputs();
+        
+        const filledNames = names.filter(n => n.length > 0);
+        
+        if (filledNames.length === 0) {
+            alert('이름을 최소 1명 이상 입력해주세요.');
+            return;
+        }
+
+        saveNames(currentRoomKey, names);
+
+        // 전체 좌석 수만큼 배열 만들기 (빈 자리는 빈 문자열)
+        const fullArray = [];
+        for (let i = 0; i < seatCount; i++) {
+            fullArray.push(names[i] || '');
+        }
+        
+        // 전체를 섞기
+        const shuffled = fisherYatesShuffle([...fullArray]);
+
+        currentAssignments = {};
+        selectedObject = null;
+        drawRoom();
+
+        isAnimating = true;
+        spinnerAngle = 0;
+        pendingAssignments = [];
+
+        const seats = currentLayout.seats;
+        // 모든 좌석에 대해 배정 (빈 자리 포함)
+        seats.forEach((seat, idx) => {
+            pendingAssignments.push({
+                id: seat.id,
+                name: shuffled[idx] || ''  // 빈 문자열도 포함
+            });
+        });
+
+        shuffleBtn.disabled = true;
+        saveNamesBtn.disabled = true;
+        roomSelect.disabled = true;
+        editModeBtn.disabled = true;
+        rotateRoomBtn.disabled = true;
+        textRotateBtn.disabled = true;
+        resetBtn.disabled = true;
+
+        // 룰렛 애니메이션과 이름 배치를 동시에 시작
+        spinnerReqId = requestAnimationFrame(spinnerLoop);
+        startRevealAnimation();
+    }
+
+    function spinnerLoop(timestamp) {
+        if (!isAnimating) return;
+
+        drawRoom();
+
+        const cx = CANVAS_CENTER;
+        const cy = CANVAS_CENTER;
+        const radius = 45;
+
+        spinnerAngle += 0.25;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spinnerAngle);
+
+        ctx.beginPath();
+        ctx.strokeStyle = '#4f46e5';
+        ctx.lineWidth = 8;
+        ctx.arc(0, 0, radius, 0, Math.PI * 1.5);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.fillStyle = '#6366f1';
+        ctx.moveTo(0, -radius - 8);
+        ctx.lineTo(-6, -radius - 20);
+        ctx.lineTo(6, -radius - 20);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        ctx.fillStyle = '#374151';
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('랜덤 배치 중...', cx, cy + radius + 15);
+
+        spinnerReqId = requestAnimationFrame(spinnerLoop);
+    }
+
+    function startRevealAnimation() {
+        let index = 0;
+        const total = pendingAssignments.length;
+
+        revealTimerId = setInterval(() => {
+            if (index >= total) {
+                clearInterval(revealTimerId);
+                revealTimerId = null;
+                
+                // 룰렛 애니메이션 중단
+                if (spinnerReqId) {
+                    cancelAnimationFrame(spinnerReqId);
+                    spinnerReqId = null;
+                }
+                
+                isAnimating = false;
+
+                saveAssignments(currentRoomKey, currentAssignments);
+                
+                // 최종 화면 그리기 (룰렛 없이)
+                drawRoom();
+
+                shuffleBtn.disabled = false;
+                saveNamesBtn.disabled = false;
+                roomSelect.disabled = false;
+                editModeBtn.disabled = false;
+                rotateRoomBtn.disabled = false;
+                textRotateBtn.disabled = false;
+                resetBtn.disabled = false;
+                return;
+            }
+
+            const seatAssign = pendingAssignments[index];
+            currentAssignments[seatAssign.id] = seatAssign.name;
+            index++;
+        }, 500);
+    }
+
+    // =========================
+    // 9. 방 전체 회전 로직
+    // =========================
+
+    function rotateRoomLayout() {
+        roomRotation = (roomRotation + 90) % 360;
+        saveRoomRotation(currentRoomKey, roomRotation);
+    }
+
+    // =========================
+    // 10. 드래그 & 회전 로직
+    // =========================
+
+    function getMousePos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        let x = (evt.clientX - rect.left) * scaleX;
+        let y = (evt.clientY - rect.top) * scaleY;
+
+        const angle = -roomRotation * Math.PI / 180;
+        const dx = x - CANVAS_CENTER;
+        const dy = y - CANVAS_CENTER;
+        const rotatedX = dx * Math.cos(angle) - dy * Math.sin(angle) + CANVAS_CENTER;
+        const rotatedY = dx * Math.sin(angle) + dy * Math.cos(angle) + CANVAS_CENTER;
+
+        return { x: rotatedX, y: rotatedY - LAYOUT_OFFSET_Y };
+    }
+
+    function isPointInRect(x, y, rect) {
+        return x >= rect.x &&
+               x <= rect.x + rect.w &&
+               y >= rect.y &&
+               y <= rect.y + rect.h;
+    }
+
+    function isPointInCircle(x, y, cx, cy, radius) {
+        const dx = x - cx;
+        const dy = y - cy;
+        return dx * dx + dy * dy <= radius * radius;
+    }
+
+    function hitTest(x, y) {
+        if (!currentLayout) return null;
+        const layout = currentLayout;
+
+        for (let i = layout.seats.length - 1; i >= 0; i--) {
+            const seat = layout.seats[i];
+            if (isPointInRect(x, y, seat)) {
+                return { type: 'seat', obj: seat };
+            }
+        }
+        if (isPointInRect(x, y, layout.instructor)) {
+            return { type: 'instructor', obj: layout.instructor };
+        }
+        if (isPointInRect(x, y, layout.screen)) {
+            return { type: 'screen', obj: layout.screen };
+        }
+        if (isPointInRect(x, y, layout.door)) {
+            return { type: 'door', obj: layout.door };
+        }
+        return null;
+    }
+
+    function hitTestRotateIcon(x, y) {
+        if (!selectedObject) return false;
+        const obj = selectedObject.obj;
+        const iconSize = 20;
+        const iconX = obj.x + obj.w - iconSize / 2;
+        const iconY = obj.y - iconSize / 2;
+        return isPointInCircle(x, y, iconX, iconY, iconSize / 2);
+    }
+
+    function clampObjectToCanvas(obj) {
+        obj.x = Math.max(40, Math.min(860 - obj.w, obj.x));
+        obj.y = Math.max(40, Math.min(420 - obj.h, obj.y));
+    }
+
+    function rotateObject(obj) {
+        obj.rotation = ((obj.rotation || 0) + 90) % 360;
+    }
+
+    function onMouseDown(evt) {
+        if (!editMode || isAnimating) return;
+
+        isMouseDown = true;
+        const pos = getMousePos(evt);
+
+        if (hitTestRotateIcon(pos.x, pos.y)) {
+            rotateObject(selectedObject.obj);
+            saveLayout(currentRoomKey, currentLayout);
+            drawRoom();
+            return;
+        }
+
+        const hit = hitTest(pos.x, pos.y);
+        if (hit) {
+            selectedObject = hit;
+            dragTarget = hit;
+            dragOffsetX = pos.x - hit.obj.x;
+            dragOffsetY = pos.y - hit.obj.y;
+            canvas.classList.add('dragging');
+        } else {
+            selectedObject = null;
+        }
+        drawRoom();
+    }
+
+    function onMouseMove(evt) {
+        if (!editMode || isAnimating) return;
+        
+        const pos = getMousePos(evt);
+        if (selectedObject && hitTestRotateIcon(pos.x, pos.y)) {
+            canvas.style.cursor = 'pointer';
+        } else if (hitTest(pos.x, pos.y)) {
+            canvas.style.cursor = 'grab';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+
+        if (!dragTarget || !isMouseDown) return;
+
+        const obj = dragTarget.obj;
+        obj.x = pos.x - dragOffsetX;
+        obj.y = pos.y - dragOffsetY;
+        clampObjectToCanvas(obj);
+
+        drawRoom();
+    }
+
+    function onMouseUp() {
+        if (!editMode || isAnimating) {
+            dragTarget = null;
+            isMouseDown = false;
+            canvas.classList.remove('dragging');
+            return;
+        }
+        if (dragTarget) {
+            saveLayout(currentRoomKey, currentLayout);
+        }
+        dragTarget = null;
+        isMouseDown = false;
+        canvas.classList.remove('dragging');
+    }
+
+    function onMouseLeave() {
+        if (dragTarget) {
+            saveLayout(currentRoomKey, currentLayout);
+        }
+        dragTarget = null;
+        isMouseDown = false;
+        canvas.classList.remove('dragging');
+        canvas.style.cursor = 'default';
+    }
+
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseup', onMouseUp);
+    canvas.addEventListener('mouseleave', onMouseLeave);
+
+    // =========================
+    // 11. 이벤트 핸들러 (UI)
+    // =========================
+
+    roomSelect.addEventListener('change', () => {
+        currentRoomKey = roomSelect.value;
+        const base = roomLayoutsBase[currentRoomKey];
+        canvasTitle.textContent = base.label + ' 도면';
+
+        currentLayout = loadLayoutOrDefault(currentRoomKey);
+        renderNameInputs();
+        currentAssignments = loadAssignments(currentRoomKey) || {};
+        roomRotation = loadRoomRotation(currentRoomKey);
+        selectedObject = null;
+        drawRoom();
+    });
+
+    saveNamesBtn.addEventListener('click', () => {
+        const names = collectNamesFromInputs();
+        
+        saveNames(currentRoomKey, names);
+        
+        currentAssignments = {};
+        currentLayout.seats.forEach((seat, idx) => {
+            if (names[idx]) {
+                currentAssignments[seat.id] = names[idx];
+            }
+        });
+        saveAssignments(currentRoomKey, currentAssignments);
+        
+        drawRoom();
+        
+        const filledCount = names.filter(n => n.length > 0).length;
+        alert(`${filledCount}명의 이름이 저장되고 좌석에 배정되었습니다.`);
+    });
+
+    shuffleBtn.addEventListener('click', startShuffle);
+
+    editModeBtn.addEventListener('click', () => {
+        if (isAnimating) return;
+        editMode = !editMode;
+        if (!editMode) {
+            selectedObject = null;
+        }
+        updateEditModeUI();
+        drawRoom();
+    });
+
+    rotateRoomBtn.addEventListener('click', () => {
+        if (isAnimating) return;
+        
+        rotateRoomLayout();
+        selectedObject = null;
+        drawRoom();
+    });
+
+    textRotateBtn.addEventListener('click', () => {
+        if (isAnimating) return;
+        textFollowRotation = !textFollowRotation;
+        saveTextRotation(textFollowRotation);
+        updateTextRotateUI();
+        drawRoom();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (isAnimating) return;
+        
+        if (!confirm('모든 설정(이름, 레이아웃, 좌석 배정)을 초기화하시겠습니까?')) {
+            return;
+        }
+        
+        clearAllStorage(currentRoomKey);
+        
+        currentLayout = loadLayoutOrDefault(currentRoomKey);
+        currentAssignments = {};
+        roomRotation = 0;
+        textFollowRotation = true;
+        selectedObject = null;
+        editMode = false;
+        
+        renderNameInputs();
+        updateEditModeUI();
+        updateTextRotateUI();
+        drawRoom();
+        
+        alert('레이아웃이 초기화되었습니다.');
+    });
+
+    function updateEditModeUI() {
+        if (editMode) {
+            editModeBtn.textContent = '편집 모드: ON';
+            editModeBtn.classList.add('on');
+            editBadge.textContent = '편집 모드: ON';
+            editBadge.classList.add('on');
+            canvas.classList.add('edit-mode');
+        } else {
+            editModeBtn.textContent = '편집 모드: OFF';
+            editModeBtn.classList.remove('on');
+            editBadge.textContent = '편집 모드: OFF';
+            editBadge.classList.remove('on');
+            canvas.classList.remove('edit-mode');
+            canvas.style.cursor = 'default';
+        }
+    }
+
+    function updateTextRotateUI() {
+        if (textFollowRotation) {
+            textRotateBtn.textContent = '텍스트: 박스와 함께 회전';
+            textRotateBtn.classList.remove('on');
+        } else {
+            textRotateBtn.textContent = '텍스트: 항상 가로 표시';
+            textRotateBtn.classList.add('on');
+        }
+    }
+
+    // =========================
+    // 12. 초기 로드
+    // =========================
+
+    function init() {
+        currentLayout = loadLayoutOrDefault(currentRoomKey);
+        renderNameInputs();
+        currentAssignments = loadAssignments(currentRoomKey) || {};
+        roomRotation = loadRoomRotation(currentRoomKey);
+        textFollowRotation = loadTextRotation();
+        updateEditModeUI();
+        updateTextRotateUI();
+        drawRoom();
+    }
+
+    init();
+</script>
+</body>
+</html>
