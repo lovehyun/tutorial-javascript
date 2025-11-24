@@ -1,0 +1,95 @@
+/* public/style.css */
+
+/* 전체 레이아웃 */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 40px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 제목 */
+h1 {
+    margin-bottom: 10px;
+}
+
+/* 플레이어 이름 */
+#playerName {
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+/* 상태(플레이/결과) */
+#status {
+    margin: 4px 0;
+    font-weight: bold;
+}
+
+/* 타이머 */
+#timer {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+/* 단어 표시 */
+#word {
+    font-size: 2rem;
+    letter-spacing: 10px;
+    margin-bottom: 12px;
+}
+
+/* 시도 횟수 / 사용한 글자 */
+#tries,
+#usedLetters {
+    font-weight: bold;
+}
+
+/* 입력 영역 */
+#inputArea {
+    margin-top: 16px;
+}
+
+/* 입력창 */
+#letterInput {
+    width: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+/* 버튼 */
+button {
+    margin: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+/* 메시지 */
+#message {
+    margin-top: 12px;
+    min-height: 24px;
+}
+
+/* 랭킹 테이블 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 4px 6px;
+    font-size: 0.9rem;
+}
+
+th {
+    background: #f0f0f0;
+}
+
+/* 내 레코드 강조 */
+.me {
+    background-color: #e3f2fd;
+}

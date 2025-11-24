@@ -1,0 +1,46 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>5-Letter Hangman (Timing Demo)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>5-Letter Hangman</h1>
+
+    <div id="playerName"></div>
+    <div id="status"></div>
+    <div id="timer"></div>
+
+    <!-- 행맨 단어 표시 -->
+    <div id="word">_ _ _ _ _</div>
+
+    <!-- 시도 횟수 / 사용한 글자 -->
+    <div>시도한 횟수: <span id="tries"></span></div>
+    <div>사용한 글자: <span id="usedLetters"></span></div>
+
+    <!-- 글자 입력 -->
+    <div id="inputArea">
+        <input type="text" id="letterInput" maxlength="1" autocomplete="off">
+        <button id="guessBtn">글자 맞추기</button>
+    </div>
+
+    <div id="message"></div>
+
+    <h2>랭킹</h2>
+    <table id="rankingTable">
+        <thead>
+        <tr>
+            <th>순위</th>
+            <th>이름</th>
+            <th>시도 횟수</th>
+            <th>완료 시각</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script src="script.js"></script>
+</body>
+</html>
