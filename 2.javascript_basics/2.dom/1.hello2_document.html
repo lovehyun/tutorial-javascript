@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <h1>헬로우 월드</h1>
+        <button onclick="sayHello()">Hello</button>
+
+        <!-- 버튼 아래 출력용 div -->
+        <div id="output"></div>
+    </body>
+
+    <script>
+        function sayHello() {
+            console.log('hello');
+            
+            const output = document.getElementById('output');
+            output.textContent = 'hello';
+
+            // 또는 그냥 한줄로...
+            // document.getElementById('output').textContent = 'hello';
+        }
+    </script>
+</html>

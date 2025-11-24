@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단일 함수 구구단</title>
+</head>
+<body>
+    <h1>구구단 출력</h1>
+
+    <input id="dan" type="number" placeholder="단을 입력하세요">
+    <button onclick="gugudan()">출력</button>
+
+    <div id="result"></div>
+
+    <script>
+        function gugudan() {
+            const dan = document.getElementById("dan").value;
+            const resultDiv = document.getElementById("result");
+
+            // 기존 내용 지우고 시작
+            resultDiv.innerHTML = "";  
+
+            for (let i = 1; i <= 9; i++) {
+                resultDiv.innerHTML += `${dan} x ${i} = ${dan * i}<br>`;
+            }
+        }
+
+        function gugudan2() {
+            const dan = Number(document.getElementById("dan").value);
+            const resultDiv = document.getElementById("result");
+
+            if (!dan) {
+                resultDiv.innerHTML = "단을 입력해주세요!";
+                return;
+            }
+
+            let html = "";
+            for (let i = 1; i <= 9; i++) {
+                html += `${dan} x ${i} = ${dan * i}<br>`;
+            }
+
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

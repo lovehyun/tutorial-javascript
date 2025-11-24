@@ -26,10 +26,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // 진행률 업데이트 함수
-    function updateProgress(timePassed) {
-        const progress = (timePassed / duration) * 100;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${Math.floor(progress)}%`;
+    function updateProgress(elapsed) {
+        const ratio = (elapsed / duration) * 100;
+        progressBar.style.width = `${ratio}%`;
+        progressText.textContent = `${Math.floor(ratio)}%`;
     }
 
     // 타이머 진행 함수

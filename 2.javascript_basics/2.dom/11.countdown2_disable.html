@@ -6,13 +6,14 @@
 <body>
     <h1>Countdown Timer</h1>
     <input type="number" id="timeInput" placeholder="Enter seconds">
-    <button onclick="startTimer()">Start</button>
+    <button id="startButton" onclick="startTimer()">Start</button>
     <p id="timerDisplay"></p>
 
     <script>
         function startTimer() {
             let time = parseInt(document.getElementById("timeInput").value);
             const display = document.getElementById("timerDisplay");
+            const startButton = document.getElementById("startButton");
 
             // 잘못된 입력 처리
             if (isNaN(time) || time <= 0) {

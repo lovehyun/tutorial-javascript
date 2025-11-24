@@ -7,9 +7,11 @@
     <button onclick="changeColor2()">Change Background Color</button>
 
     <script>
+        // 미션1. 색상 변경
         const colors = ["red", "blue", "green"];  // 순환할 색상 목록
         let currentIndex = 0;  // 현재 색상 인덱스
 
+        // 미션1-1. 색상 토글
         function changeColor() {
             if (document.body.style.backgroundColor == 'red') {
                 document.body.style.backgroundColor = 'white';
@@ -18,6 +20,7 @@
             }
         }
 
+        // 미션1-2. 색상 순환
         function changeColor2() {
             document.body.style.backgroundColor = colors[currentIndex];
             currentIndex += 1;
@@ -27,11 +30,13 @@
             }
         }
 
+        // 깔끔하고 간결한 코드
         function changeColor3() {
             document.body.style.backgroundColor = colors[currentIndex];
             currentIndex = (currentIndex + 1) % colors.length;  // 다음 인덱스로 이동 (순환)
         }
 
+        // 미션2. 랜덤 색상
         function randomColor() {
             const r = Math.floor(Math.random() * 256); // random 은 0이상 1미만까지, 즉 x256 = 0~255
             const g = Math.floor(Math.random() * 256);

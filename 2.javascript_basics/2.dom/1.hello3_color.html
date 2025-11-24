@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <h1 id="title">헬로우 월드</h1>
+        <button onclick="sayHello()">Hello</button>
+    </body>
+
+    <script>
+        function sayHello() {
+            // console.log('hello');
+
+            // H1 요소 선택 후 색상 변경
+            const h1 = document.getElementById('title');
+            h1.style.color = 'red';   // 원하는 색상 
+            h1.style.backgroundColor = 'yellow';   // 원하는 배경 색상
+            h1.style.width = '200px'; // 원하는 크기
+        }
+    </script>
+</html>

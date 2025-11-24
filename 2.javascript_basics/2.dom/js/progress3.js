@@ -1,91 +1,86 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const timeInput = document.getElementById("timeInput");
-    const startButton = document.getElementById("startButton");
-    const resetButton = document.getElementById("resetButton");
-    const progressBar = document.getElementById("progress");
-    const progressText = document.getElementById('progressText');
+document.addEventListener("DOMContentLoaded", () => {
+    const timeInput    = document.getElementById("timeInput");
+    const startButton  = document.getElementById("startButton");
+    const resetButton  = document.getElementById("resetButton");
+    const progressBar  = document.getElementById("progress");
+    const progressText = document.getElementById("progressText");
 
-    let interval;
-    let duration;
-    let timePassed = 0; // 현재까지 진행된 시간
-    let isRunning = false; // 타이머 실행 여부
+    let intervalId = null; // 타이머 ID (null이면 멈춤 상태)
+    let duration   = 0;    // 전체 시간(초)
+    let elapsed    = 0;    // 경과 시간(초)
 
-    // 진행률 초기화 함수
-    function resetProgressBar() {
-        if (interval) clearInterval(interval);
-        progressBar.style.width = "0%";
-        progressText.textContent = "0%";
-        timePassed = 0;
-        isRunning = false;
-        startButton.textContent = "Start";
-        timeInput.disabled = false;
+    // 진행률 UI 업데이트
+    function renderProgress() {
+        const percent = duration > 0 ? (elapsed / duration) * 100 : 0;
+        const ratio = Math.min(percent, 100);
+        progressBar.style.width = `${ratio}%`;
+        progressText.textContent = `${Math.floor(ratio).toFixed(2)}%`;
     }
 
-    // 유효성 검사 함수
-    function validateTimeInput() {
-        duration = parseInt(timeInput.value);
-        if (isNaN(duration) || duration <= 0) {
-            alert("Please enter a valid number of seconds.");
-            return false;
+    // 타이머 정지 (일시정지/완료 공통)
+    function stopTimer() {
+        if (intervalId !== null) {
+            clearInterval(intervalId);
+            intervalId = null;
         }
-        return true;
+        startButton.textContent = "Start";
     }
 
-    // 진행률 업데이트 함수
-    function updateProgress() {
-        const progress = (timePassed / duration) * 100;
-        progressBar.style.width = `${progress}%`;
-        progressText.textContent = `${Math.floor(progress)}%`;
+    // 타이머 완전 리셋
+    function resetAll() {
+        stopTimer();
+        duration = 0;
+        elapsed = 0;
+        timeInput.disabled = false;
+        timeInput.value = "";
+        renderProgress();
     }
 
-    // 타이머 시작 함수
-    function startProgress() {
-        if (!validateTimeInput()) return;
+    // 타이머 시작 or 재시작
+    function startTimer() {
+        // 이미 돌고 있으면 무시
+        if (intervalId !== null) return;
 
-        isRunning = true;
-        startButton.textContent = "Stop";
+        // duration 이 없거나, 끝난 상태라면 새로 세팅
+        if (!duration || elapsed === 0 || elapsed >= duration) {
+            const value = Number(timeInput.value);
+            if (!value || value <= 0) {
+                alert("Please enter a valid number of seconds.");
+                return;
+            }
+            duration = value;
+            elapsed = 0;
+            renderProgress();
+        }
+
         timeInput.disabled = true;
+        startButton.textContent = "Stop";
 
-        interval = setInterval(() => {
-            timePassed++;
-            updateProgress();
+        intervalId = setInterval(() => {
+            elapsed += 1;
+            renderProgress();
 
-            if (timePassed >= duration) {
-                clearInterval(interval);
-                isRunning = false;
-                startButton.textContent = "Start";
-                timeInput.disabled = false;
+            if (elapsed >= duration) {
+                stopTimer();
+                timeInput.disabled = false; // 끝나면 다시 입력 가능
             }
         }, 1000);
     }
 
-    // 타이머 일시정지 함수
-    function stopProgress() {
-        clearInterval(interval);
-        isRunning = false;
-        startButton.textContent = "Start";
-    }
-
-    // 토글 함수
-    function toggleProgress() {
-        if (!isRunning) {
-            startProgress();
+    // Start 버튼 클릭 시: 시작/정지 토글
+    startButton.addEventListener("click", () => {
+        if (intervalId === null) {
+            // 멈춤 상태 → 시작/재시작
+            startTimer();
         } else {
-            stopProgress();
+            // 실행 중 → 일시정지
+            stopTimer();
         }
-    }
+    });
 
-    // 이벤트 핸들러 함수
-    function attachEventListeners() {
-        startButton.addEventListener("click", toggleProgress);
-        resetButton.addEventListener("click", resetProgressBar);
-    }
+    // Reset 버튼 클릭 시: 완전 초기화
+    resetButton.addEventListener("click", resetAll);
 
-    // 초기화 함수
-    function init() {
-        resetProgressBar();
-        attachEventListeners();
-    }
-
-    init(); // 초기화 함수 실행
+    // 처음 로딩 시 UI 초기화
+    resetAll();
 });

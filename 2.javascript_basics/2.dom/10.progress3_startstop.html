@@ -13,7 +13,17 @@
         #progress {
             width: 0%;
             height: 30px;
-            background-color: #4caf50;
+            /* background-color: #4caf50; */
+            /* background: linear-gradient(to right, #4caf50, #8bc34a); */
+            /* 밝은 라임 → 중간 네온 → 진한 초록 */
+            background: linear-gradient(
+                to right,
+                #ccff90 0%,   /* 아주 밝은 라임 */
+                #76ff03 40%,  /* 네온 초록 */
+                #00c853 70%,  /* 진한 초록 */
+                #1b5e20 100%  /* 거의 검은 초록 */
+            );
+            transition: width 0.5s linear;
             position: relative;
         }
         #progressText {

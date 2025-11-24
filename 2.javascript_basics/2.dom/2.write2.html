@@ -26,3 +26,25 @@
         </script>
     </body>
 </html>
+
+<!--
+입력값: value
+안전하고 빠른 텍스트만 출력: textContent
+HTML 태그까지 포함해 출력: innerHTML
+보이는 텍스트만 가져오기: innerText
+요소 전체를 통째로 가져오기: outerHTML
+data- 속성 사용*: dataset
+
+box.textContent = "hello";
+box.innerHTML = "<b>hello</b>";
+box.outerHTML = "<section>변경됨</section>";
+
+| 속성              | 대상                 | 태그 해석?  | 숨김 텍스트 포함? | 용도              |
+| --------------- | --------------------- | ----------- | ---------------- | --------------- |
+| **value**       | input/textarea/select | ❌         | N/A              | 입력값 읽기/쓰기       |
+| **textContent** | 모든 요소              | ❌         | ✔               | 태그를 문자 그대로 취급   |
+| **innerText**   | 모든 요소              | ❌         | ❌              | 화면에 보이는 텍스트만    |
+| **innerHTML**   | 모든 요소              | ✔          | ✔               | HTML 구조를 넣거나 읽음 |
+| **outerHTML**   | 모든 요소              | ✔          | ✔               | 요소 전체를 문자열로     |
+| **dataset**     | data-* 속성            | 문자 그대로 | ✔               | 커스텀 데이터 저장      |
+-->

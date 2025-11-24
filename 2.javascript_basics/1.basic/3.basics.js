@@ -86,6 +86,11 @@ console.log("Fruits after pop:", fruits);
 
 
 // 배열 반복
+for (let i = 0; i < fruits.length; i++) {
+  console.log(fruits[i]);
+}
+
+// 고차 함수(Higher-Order Function): "함수를 인자로 받거나 함수를 반환하는 함수"
 let numbers = [1, 2, 3, 4, 5];
 numbers.forEach(function(number) {
     console.log(number);

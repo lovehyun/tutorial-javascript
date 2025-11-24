@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () { // DOM이 완전히 
     const progressText = document.getElementById('progressText');
 
     let interval; // 타이머 인터벌을 저장할 변수
-    let duration; // 진행 시간(초)을 저장할 변수
 
     function startProgress() {
         if (interval) clearInterval(interval); // 기존의 인터벌이 있으면 제거
@@ -17,16 +16,17 @@ document.addEventListener("DOMContentLoaded", function () { // DOM이 완전히 
             return; // 함수 종료
         }
 
-        let timePassed = 0; // 경과된 시간을 초기화
+        let elapsed = 0; // 경과된 시간을 초기화
         progressBar.style.width = "0%"; // 진행률 바 초기화
 
         interval = setInterval(() => { // 1초마다 실행되는 인터벌 설정
-            timePassed++; // 경과된 시간 증가
-            let progress = (timePassed / duration) * 100; // 진행률 계산
-            progressBar.style.width = `${progress}%`; // 진행률 바 업데이트
-            progressText.textContent = Math.floor(progress) + '%'; // 퍼센트 업데이트
+            elapsed++; // 경과된 시간 증가
+            
+            let ratio = (elapsed / duration) * 100; // 진행률 계산
+            progressBar.style.width = `${ratio}%`; // 진행률 바 업데이트
+            progressText.textContent = Math.floor(ratio) + '%'; // 퍼센트 업데이트
 
-            if (timePassed >= duration) { // 지정된 시간이 경과되면
+            if (elapsed >= duration) { // 지정된 시간이 경과되면
                 clearInterval(interval); // 인터벌 제거
             }
         }, 1000); // 1초 간격으로 실행
