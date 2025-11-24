@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>5-Letter Hangman Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #word {
+            font-size: 2rem;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+        /* 남은 기회 대신 시도 횟수에 스타일 적용 */
+        #tries, #usedLetters {
+            font-weight: bold;
+        }
+        #message {
+            margin-top: 15px;
+            height: 24px;
+        }
+        input[type="text"] {
+            width: 40px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        button {
+            margin: 5px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>5 Words Hangman</h1>
+
+    <!-- 맞춰야 할 단어 표시 영역 -->
+    <div id="word">_ _ _ _ _</div>
+
+    <!-- ✅ 남은 기회 대신 "시도한 횟수" 표시 -->
+    <div>시도한 횟수: <span id="tries"></span></div>
+    <div>사용한 글자: <span id="usedLetters"></span></div>
+
+    <!-- 글자 입력 영역 -->
+    <div style="margin-top: 20px;">
+        <input type="text" id="letterInput" maxlength="1" autocomplete="off">
+        <button id="guessBtn">글자 맞추기</button>
+        <button id="newGameBtn">새 게임</button>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        // 5글자 단어 목록
+        const WORDS = ["apple", "watch", "train", "light", "mouse"];
+
+        let answer = "";        // 정답 단어
+        let display = [];       // 화면에 보이는 상태 (['_', 'p', '_', ...])
+        let tries = 0;          // 지금까지 시도한 횟수
+        let usedLetters = [];   // 이미 시도한 글자들
+        let isGameOver = false; // 단어를 모두 맞췄는지 여부
+
+        const wordEl = document.getElementById("word");
+        const triesEl = document.getElementById("tries");
+        const usedLettersEl = document.getElementById("usedLetters");
+        const messageEl = document.getElementById("message");
+        const letterInput = document.getElementById("letterInput");
+        const guessBtn = document.getElementById("guessBtn");
+        const newGameBtn = document.getElementById("newGameBtn");
+
+        // 새 게임 시작
+        function startGame() {
+            answer = WORDS[Math.floor(Math.random() * WORDS.length)];
+            display = Array(answer.length).fill("_");
+            tries = 0;              // 시도 횟수 초기화
+            usedLetters = [];
+            isGameOver = false;
+
+            updateScreen();
+            messageEl.textContent = "알파벳 한 글자씩 맞춰보세요!";
+            letterInput.value = "";
+            letterInput.focus();
+        }
+
+        // 화면 갱신
+        function updateScreen() {
+            wordEl.textContent = display.join(" ");
+            triesEl.textContent = tries;
+            usedLettersEl.textContent = usedLetters.join(", ");
+        }
+
+        // 글자 추측
+        function guessLetter() {
+            if (isGameOver) return;
+
+            let letter = letterInput.value.toLowerCase();
+            letterInput.value = "";
+            letterInput.focus();
+
+            // 유효성 검사
+            if (!letter || letter < "a" || letter > "z") {
+                messageEl.textContent = "a~z 알파벳 한 글자를 입력해주세요.";
+                return;
+            }
+
+            // 이미 사용한 글자인지 확인
+            if (usedLetters.includes(letter)) {
+                messageEl.textContent = `"${letter}" 는 이미 사용한 글자입니다.`;
+                return;
+            }
+
+            // ✅ 여기서부터는 "새로운 시도" 이므로 시도 횟수 +1
+            tries++;
+            usedLetters.push(letter);
+
+            // 정답에 포함되는지 확인
+            if (answer.includes(letter)) {
+                for (let i = 0; i < answer.length; i++) {
+                    if (answer[i] === letter) {
+                        display[i] = letter;
+                    }
+                }
+                messageEl.textContent = `"${letter}" 맞췄어요!`;
+
+                // 모든 글자를 맞췄는지 확인
+                if (!display.includes("_")) {
+                    messageEl.textContent = `축하합니다! 단어는 "${answer}" 였습니다. 총 ${tries}번 시도했어요. 🎉`;
+                    isGameOver = true;
+                }
+            } else {
+                // 오답이지만 게임은 계속 진행 (목숨 없음)
+                messageEl.textContent = `"${letter}" 는 단어에 없습니다. 계속 시도해보세요.`;
+            }
+
+            updateScreen();
+        }
+
+        // 이벤트 연결
+        guessBtn.addEventListener("click", guessLetter);
+        letterInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                guessLetter();
+            }
+        });
+        newGameBtn.addEventListener("click", startGame);
+
+        // 처음 로드 시 게임 시작
+        startGame();
+    </script>
+</body>
+</html>
+
+
+<!--
+// 무작위 대입 #1. 공격 코드 개발 (프로토타입)
+const letters = "abcdefghijklmnopqrstuvwxyz"; // a~z 문자열
+let index = 0;                                // 현재 인덱스
+
+const timerId = setInterval(() => {
+    // 모든 글자를 다 찍었으면 타이머 정지
+    if (index >= letters.length) {
+        clearInterval(timerId);
+        return;
+    }
+
+    const ch = letters[index]; // 현재 글자
+    console.log(ch);           // 콘솔에 출력
+    index++;                   // 다음 글자로 이동
+}, 100); // 100ms 간격
+-->
+
+<!--
+// 무작위 대입 #2. 실제 공격 코드
+(function () {
+    const input  = document.querySelector("input[type='text'], input:not([type])");
+    const button = document.querySelector("button, input[type='submit']");
+    if (!input || !button) {
+        console.log("input이나 button을 찾지 못했습니다.");
+        return;
+    }
+
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    let index = 0;
+
+    input.focus();
+
+    const timer = setInterval(() => {
+        if (index >= letters.length) {
+            clearInterval(timer);
+            console.log("완료");
+            return;
+        }
+
+        const ch = letters[index];
+        input.value = ch;
+
+        // 값이 바뀌었다는 정도만 알리기 (필요 시)
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+
+        // 버튼 클릭
+        button.click();
+
+        console.log("try:", ch);
+        index++;
+    }, 100);
+})();
+
+-->
