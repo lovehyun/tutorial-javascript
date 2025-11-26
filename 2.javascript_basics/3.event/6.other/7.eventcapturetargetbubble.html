@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Flow Demo (Capture & Bubble)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .box {
+            padding: 40px;
+            border: 2px solid #333;
+            margin: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        #outer {
+            background-color: #f8d7da;
+        }
+        #middle {
+            background-color: #d1ecf1;
+        }
+        #inner {
+            background-color: #d4edda;
+            cursor: pointer;
+        }
+        #log {
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #aaa;
+            height: 200px;
+            overflow-y: auto;
+            font-family: "Consolas", monospace;
+            background: #f7f7f7;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <h1>이벤트 흐름 데모 (capture / target / bubble)</h1>
+    <p>1. 브라우저 개발자도구(F12)를 열고 <strong>Console</strong> 탭을 보세요.</p>
+    <p>2. 아래 초록색 <strong>INNER</strong> 박스를 클릭해 보세요.</p>
+
+    <div id="outer" class="box">
+        OUTER
+        <div id="middle" class="box">
+            MIDDLE
+            <div id="inner" class="box">
+                INNER (여기를 클릭하세요)
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h2>로그 (화면 출력)</h2>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        const outer = document.getElementById('outer');
+        const middle = document.getElementById('middle');
+        const inner = document.getElementById('inner');
+        const logBox = document.getElementById('log');
+
+        // 로그 출력 함수 (콘솔 + 화면)
+        function log(message) {
+            console.log(message);
+            const div = document.createElement('div');
+            div.textContent = message;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // 이벤트 핸들러 공통 함수
+        function handler(phaseName, elementName, event) {
+            // eventPhase: 1 = CAPTURING_PHASE, 2 = AT_TARGET, 3 = BUBBLING_PHASE
+            const phaseMap = {
+                1: 'CAPTURE',
+                2: 'TARGET',
+                3: 'BUBBLE'
+            };
+
+            log(
+                `[${phaseName}] element=${elementName}, ` +
+                `eventPhase=${phaseMap[event.eventPhase]}, ` +
+                `target=${event.target.id}, currentTarget=${event.currentTarget.id}`
+            );
+        }
+
+        // 각 요소에 캡처/버블 단계로 리스너 등록
+        [outer, middle, inner].forEach((elem) => {
+            const name = elem.id.toUpperCase();
+
+            // 캡처 단계 리스너 (세 번째 인자 true 또는 {capture: true})
+            elem.addEventListener('click', handler.bind(null, 'CAPTURE', name), true);
+
+            // 버블 단계 리스너 (기본값 false)
+            elem.addEventListener('click', handler.bind(null, 'BUBBLE', name), false);
+        });
+    </script>
+</body>
+</html>
+
+<!--
+이벤트 기본 개념
+캡처 → 타깃 → 버블링 3단계로 흐른다.
+대부분의 이벤트는 버블링 한다.
+-->

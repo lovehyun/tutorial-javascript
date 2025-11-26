@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <title>Drag and Drop without dataTransfer</title>
     <style>
-        .grid {
-            display: grid;
-            grid-template-columns: 200px 200px;
-            grid-template-rows: 200px 200px;
-            gap: 20px;
+        #dragItem {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
         }
 
-        .container {
+        .dropContainer {
             width: 200px;
             height: 200px;
             background-color: #f0f0f0;
@@ -27,38 +31,34 @@
             color: #999;
         }
 
-        #dragItem {
-            width: 100px;
-            height: 100px;
-            background-color: #ffcc00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1;
+        .grid {
+            display: grid;
+            grid-template-columns: 200px 200px;
+            grid-template-rows: 200px 200px;
+            gap: 20px;
         }
     </style>
 </head>
 <body>
     <div class="grid">
-        <div id="zone1" class="container">
+        <div id="zone1" class="dropContainer">
             <span class="placeholder">Drop here</span>
             <div id="dragItem" draggable="true">Drag me</div>
         </div>
-        <div id="zone2" class="container">
+        <div id="zone2" class="dropContainer">
             <span class="placeholder">Drop here</span>
         </div>
-        <div id="zone3" class="container">
+        <div id="zone3" class="dropContainer">
             <span class="placeholder">Drop here</span>
         </div>
-        <div id="zone4" class="container">
+        <div id="zone4" class="dropContainer">
             <span class="placeholder">Drop here</span>
         </div>
     </div>
 
     <script>
         const dragItem = document.getElementById('dragItem');
-        const zones = document.querySelectorAll('.container');
+        const zones = document.querySelectorAll('.dropContainer');
 
         // 드래그 시작 이벤트
         dragItem.addEventListener('dragstart', function () {

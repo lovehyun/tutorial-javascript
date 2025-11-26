@@ -7,7 +7,7 @@
 <body>
     <p>우클릭을 시도해 보세요</p>
     <script>
-        // 페이지 전체 우클릭 방지
+        // 페이지 전체 우클릭 방지 (특정 DOM이 아닌 document 전체에)
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault(); // 기본 우클릭 메뉴를 차단
             alert('우클릭이 비활성화되어 있습니다.');
@@ -15,3 +15,14 @@
     </script>
 </body>
 </html>
+
+<!--
+// 1) document에 달린 이벤트 리스너 목록 보기
+getEventListeners(document).contextmenu
+
+// 2) 첫 번째 contextmenu 리스너를 변수로 저장
+const l = getEventListeners(document).contextmenu[0].listener;
+
+// 3) removeEventListener로 제거
+document.removeEventListener('contextmenu', l);
+-->

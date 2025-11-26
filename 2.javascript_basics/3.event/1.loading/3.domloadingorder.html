@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DOMContentLoaded Demo</title>
+    <script>
+        // 1) 스크립트가 실행되는 시점에 H1은 아직 DOM에 없음
+        const h1Before = document.getElementById('title');
+        console.log('DOM 그리기 전에 H1 가져오기:', h1Before); // null 나옴
+
+        // 2) windows.onload 등록
+        window.onload = function() {
+            console.log('All resources finished loading!'); // 가장 늦게 나옴
+        }
+
+        // 3) DOMContentLoaded 후에 다시 시도
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded and parsed');
+            const h1After = document.getElementById('title');
+            console.log('DOMContentLoaded 후에 H1 가져오기:', h1After); // <h1> 엘리먼트 나옴
+        });
+    </script>
+</head>
+<body>
+    <script>
+        console.log("Body > Script 시작 : 나는 언제 출력될까?");
+    </script>
+
+    <!-- 이 시점의 H1은 위의 스크립트가 실행될 때는 아직 존재하지 않았던 상태 -->
+    <h1 id="title">헬로우 DOM</h1>
+    
+    <script>
+        console.log("Body > Script 끝 : 나는 언제 출력될까?");
+    </script>
+</body>
+</html>

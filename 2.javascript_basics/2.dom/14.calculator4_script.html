@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <style>
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+            max-width: 300px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .calculator input {
+            grid-column: span 4;
+            padding: 10px;
+            font-size: 18px;
+        }
+        .calculator button {
+            padding: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="result" readonly>
+
+        <!-- onclick 전부 제거 -->
+        <button>+</button>
+        <button>-</button>
+        <button>*</button>
+        <button>/</button>
+
+        <button>7</button>
+        <button>8</button>
+        <button>9</button>
+        <button>=</button>
+
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button>C</button>
+
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button>0</button>
+    </div>
+    
+    <script>
+        const resultInput = document.getElementById("result");
+        const buttons = document.querySelectorAll(".calculator button");
+
+        // 공통 버튼 클릭 이벤트 등록
+        buttons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                const value = btn.innerText;
+
+                if (["+", "-", "*", "/"].includes(value)) {
+                    appendSymbol(value);
+                } else if (value === "=") {
+                    calculate();
+                } else if (value === "C") {
+                    clearResult();
+                } else {
+                    // 숫자
+                    appendNumber(value);
+                }
+            });
+        });
+
+        // 연산자 추가 함수
+        function appendSymbol(symbol) {
+            const lastInput = resultInput.value.slice(-1);
+
+            // 이미 입력된 마지막 글자와 동일한 연산자면 추가 X
+            if (lastInput !== symbol) {
+                resultInput.value += symbol;
+            }
+        }
+
+        // 숫자 추가 함수
+        function appendNumber(number) {
+            resultInput.value += number;
+        }
+
+        // 계산 실행 함수
+        function calculate() {
+            try {
+                const result = eval(resultInput.value);
+                resultInput.value = result;
+            } catch (error) {
+                resultInput.value = "ERROR";
+            }
+        }
+
+        // 결과 초기화 함수
+        function clearResult() {
+            resultInput.value = "";
+        }
+    </script>
+</body>
+</html>

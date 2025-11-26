@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Context Menu Event Example</title>
+    <style>
+        #myElement {
+            width:100px; 
+            height:100px; 
+            background-color:lightblue;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div id="myElement" style="width:100px; height:100px; background-color:lightblue;">Right click me</div>
+    <div id="myElement">Right click me</div>
     <script>
         document.getElementById('myElement').addEventListener('contextmenu', function(event) {
             event.preventDefault(); // 기본 메뉴 표시 중단

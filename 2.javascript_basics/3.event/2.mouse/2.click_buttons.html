@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Click Event Example</title>
+    <style>
+        #myElement {
+            width:100px; 
+            height:100px; 
+            background-color:lightblue;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div id="myElement" style="width:100px; height:100px; background-color:lightblue;">Right click me</div>
+    <div id="myElement">Left/Right click me</div>
     <script>
         // 나중에 over, out 하면서 다시...
         document.getElementById('myElement').addEventListener('mousedown', (event) => {

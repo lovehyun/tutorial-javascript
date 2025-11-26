@@ -39,10 +39,14 @@
             console.log('Drag started');
         });
 
+        dragItem.addEventListener('dragend', function() {
+            console.log('Drag ended');
+        });
+
         // 드래그 오버 이벤트
         dropZone.addEventListener('dragover', function(event) {
             event.preventDefault(); // 기본 드래그 오버 동작 중단
-            // 기본 동작: 드래그 앤 드롭 시 브라우저가 파일 복사, 링크 이동 등의 기본적으로 정의된 동작을 실행하는 것. 
+            // 기본 동작: 드래그 앤 드롭 시 브라우저가 해당 파일 열기 기능을 수행함. (html/jpg 등)
             console.log('Drag over drop zone');
         });
 

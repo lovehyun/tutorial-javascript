@@ -9,8 +9,11 @@
         <div style="height:800px; background: linear-gradient(to bottom, #ffcc00 0%, #ff6600 100%);"></div>
     </div>
     <script>
+        const box = document.getElementById("myElement");
+        
         document.addEventListener('wheel', function(event) {
             console.log(`Mouse wheel moved: ${event.deltaY}`);
+            console.log(`상단으로부터의 거리(scrollTop): ${box.scrollTop}`);
         });
     </script>
 </body>

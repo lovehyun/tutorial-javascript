@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <title>Drag and Drop without dataTransfer</title>
     <style>
-        .container {
+        #dragItem {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .dropContainer {
             width: 200px;
             height: 200px;
             background-color: #f0f0f0;
@@ -20,33 +31,22 @@
             position: absolute;
             color: #999;
         }
-
-        #dragItem {
-            width: 100px;
-            height: 100px;
-            background-color: #ffcc00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1;
-        }
     </style>
 </head>
 <body>
-    <div id="startZone" class="container">
+    <div id="startZone" class="dropContainer">
         <span class="placeholder" id="startPlaceholder">Drop here</span>
         <div id="dragItem" draggable="true">Drag me</div>
     </div>
 
-    <div id="dropZone" class="container">
+    <div id="dropZone" class="dropContainer">
         <span class="placeholder" id="dropPlaceholder">Drop here</span>
     </div>
 
     <script>
         const dragItem = document.getElementById('dragItem');
-        const startZone = document.getElementById('startZone');
         const dropZone = document.getElementById('dropZone');
+        const startZone = document.getElementById('startZone');
 
         // 드래그 시작 이벤트
         dragItem.addEventListener('dragstart', function () {
