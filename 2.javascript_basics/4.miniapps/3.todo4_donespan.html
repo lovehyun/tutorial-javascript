@@ -28,13 +28,20 @@
     <ul id="todo-list"></ul>
 
     <script>
-        document.getElementById('add-todo').addEventListener('click', function() {
-            const newTodo = document.getElementById('new-todo').value.trim();
+        // 'Add' 버튼에 클릭 이벤트 리스너 추가
+        // 1. 버튼 가져온다
+        const addBtn = document.getElementById('add-todo');
 
-            if (newTodo === '') return;
+        // 2. 클릭 이벤트 등록한다.
+        addBtn.addEventListener('click', function() {
+            // 3. 입력 필드의 값을 가져옴
+            const newTodo = document.getElementById('new-todo').value;
+            
+            // 기능개선2: 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
+            if (newTodo.trim() === '') return;
 
             // li, span, 삭제 버튼 생성
-            const li = document.createElement('li');
+            const new_li = document.createElement('li');
             const span = document.createElement('span');
             const deleteBtn = document.createElement('button');
 
@@ -43,23 +50,24 @@
 
             // 텍스트 클릭 시 완료 토글
             span.addEventListener('click', function() {
-                li.classList.toggle('completed');
+                new_li.classList.toggle('completed');
             });
 
             // 삭제 버튼 클릭 시 항목 삭제
             deleteBtn.addEventListener('click', function(e) {
                 e.stopPropagation(); // li 클릭 이벤트 방지
-                li.remove();
+                new_li.remove();
             });
 
             // li에 span과 버튼 삽입
-            li.appendChild(span);
-            li.appendChild(deleteBtn);
+            new_li.appendChild(span);
+            new_li.appendChild(deleteBtn);
 
-            // 리스트에 항목 추가
-            document.getElementById('todo-list').appendChild(li);
-
-            // 입력 필드 초기화
+            // 5. 새로운 항목을 To-Do 리스트에 추가
+            const todoList = document.getElementById('todo-list');
+            todoList.appendChild(new_li);
+            
+            // 기능개선1: 입력 필드를 비워서 초기화
             document.getElementById('new-todo').value = '';
         });
 

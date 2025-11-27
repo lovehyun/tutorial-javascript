@@ -23,25 +23,45 @@
 
     <script>
         // 'Add' 버튼에 클릭 이벤트 리스너 추가
-        document.getElementById('add-todo').addEventListener('click', function() {
-            // 입력 필드의 값을 가져옴
+        // 1. 버튼 가져온다
+        const addBtn = document.getElementById('add-todo');
+
+        // 2. 클릭 이벤트 등록한다.
+        addBtn.addEventListener('click', function() {
+            // 3. 입력 필드의 값을 가져옴
             const newTodo = document.getElementById('new-todo').value;
             
-            // 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
+            // 기능개선2: 입력 값이 빈 문자열이거나 공백만 있는 경우 함수를 종료
             if (newTodo.trim() === '') return;
 
-            // 새로운 리스트 항목(li) 요소 생성
+            // 4. 새로운 리스트 항목(li) 요소 생성
             const new_li = document.createElement('li');
             new_li.textContent = newTodo; // 리스트 항목에 입력된 텍스트 설정
 
             // 리스트 항목에 클릭 이벤트 리스너 추가
+            // 방법1. if, add / remove
+            /*
+            new_li.addEventListener('click', function() {
+                // 만약 'completed' 클래스를 이미 가지고 있으면 제거
+                if (new_li.classList.contains('completed')) {
+                    new_li.classList.remove('completed');
+                } 
+                // 가지고 있지 않으면 추가
+                else {
+                    new_li.classList.add('completed');
+                }
+            });
+            */
+
+            // 방법2. toggle
             new_li.addEventListener('click', function() {
                 // 항목을 클릭하면 'completed' 클래스를 토글 (추가/제거)
                 new_li.classList.toggle('completed');
             });
 
-            // 새로운 항목을 To-Do 리스트에 추가
-            document.getElementById('todo-list').appendChild(new_li);
+            // 5. 새로운 항목을 To-Do 리스트에 추가
+            const todoList = document.getElementById('todo-list');
+            todoList.appendChild(new_li);
             
             // 기능개선1: 입력 필드를 비워서 초기화
             document.getElementById('new-todo').value = '';
@@ -50,7 +70,7 @@
         // 기능개선2: Enter 키로도 추가 가능하게 처리
         document.getElementById('new-todo').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                document.getElementById('add-todo').click(); // 버튼 클릭과 동일한 동작 실행
+                addBtn.click(); // 버튼 클릭과 동일한 동작 실행
             }
         });
     </script>
