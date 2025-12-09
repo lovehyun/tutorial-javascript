@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>POST로 ID/PW 전송</title>
+</head>
+<body>
+    <h1>POST /login으로 ID/PW 전송</h1>
+
+    <form action="http://127.0.0.1:3001/login" method="POST">
+        <label>
+            아이디: <input type="text" name="userid" required>
+        </label>
+        <br><br>
+
+        <label>
+            비밀번호: <input type="password" name="password" required>
+        </label>
+        <br><br>
+
+        <button type="submit">POST로 전송</button>
+    </form>
+</body>
+</html>

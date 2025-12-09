@@ -15,5 +15,11 @@ class Dog extends Animal {
     }
 }
 
+class Cat extends Animal {
+    makeSound() {
+        return 'Meow!';
+    }
+}
+
 const myDog = new Dog('Buddy');
 console.log(myDog.makeSound()); // 출력: "Woof!"

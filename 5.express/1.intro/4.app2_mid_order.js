@@ -26,9 +26,14 @@ app.get('/', (req, res) => {
     res.send('Hello, World!');
 });
 
-// 에러 처리 미들웨어
+app.use((req, res, next) => {
+    console.log('5. 오류1');
+    res.status(404).send('404 Not Found');
+});
+
+// 에러 처리 미들웨어 (5xx 에러, 서버 크래시 등)
 app.use((err, req, res, next) => {
-    console.error('5. 에러 처리 미들웨어 실행:', err);
+    console.error('6. 에러 처리 미들웨어 실행:', err);
     res.status(500).send('서버 오류');
 });
 

@@ -18,6 +18,27 @@ class Order {
         }
     }
 
+    getOrderSummaryOLDJS() {
+        const items = [];
+
+        // this.products는 { product, quantity } 형태라고 가정
+        for (let i = 0; i < this.products.length; i++) {
+            const { product, quantity } = this.products[i];
+
+            items.push({
+                name: product.name,
+                quantity: quantity,
+                price: product.price
+            });
+        }
+
+        return {
+            user: this.user.name,
+            totalAmount: this.totalAmount,
+            items: items
+        };
+    }
+
     getOrderSummary() {
         return {
             user: this.user.name,

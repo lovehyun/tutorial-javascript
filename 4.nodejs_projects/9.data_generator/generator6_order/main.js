@@ -5,7 +5,6 @@ const OrderGenerator = require('./generators/order/OrderGenerator');
 const OrderItemGenerator = require('./generators/order/OrderItemGenerator');
 const { saveToCsv, printToConsole, printToStdout } = require('./output/output');
 
-
 function quickTest() {
     // User generation
     const userGen = new UserGenerator();

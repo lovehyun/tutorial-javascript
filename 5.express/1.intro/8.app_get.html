@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>GET으로 이름/나이 전송</title>
+</head>
+<body>
+    <h1>GET /submit으로 이름/나이 전송</h1>
+
+    <form action="http://127.0.0.1:3000/submit" method="GET">
+        <label>
+            이름: <input type="text" name="name" required>
+        </label>
+        <br><br>
+
+        <label>
+            나이: <input type="number" name="age" required>
+        </label>
+        <br><br>
+
+        <button type="submit">GET으로 전송</button>
+    </form>
+</body>
+</html>

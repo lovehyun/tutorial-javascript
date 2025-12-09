@@ -9,6 +9,7 @@ const port = 3000;
 // JSON 데이터 파싱 미들웨어 추가
 // app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // URL 인코딩 파싱 (express.urlencoded() / bodyParser.urlencoded()):
 // 1. express.json(): JSON 형식의 요청 본문을 파싱하고, req.body에 객체 형태로 담아줍니다.
@@ -31,11 +32,17 @@ app.post('/submit', (req, res) => {
     // 데이터 수신이 완료되었을 때 호출되는 이벤트 핸들러
     req.on('end', () => {
         try {
+            // 1) JSON 형식일 때 (curl 예제처럼)
             const jsonData = JSON.parse(data);
             res.json({ receivedData: jsonData });
             // res.status(201).end();
         } catch (error) {
-            res.status(400).json({ error: '잘못된 JSON 형식' });
+            // res.status(400).json({ error: '잘못된 JSON 형식' });
+            
+            // 2) JSON 파싱 실패 시 → URL-encoded 형식일 수 있으니 직접 파싱
+            const params = new URLSearchParams(data);
+            const obj = Object.fromEntries(params.entries());
+            return res.json({ receivedData: obj, type: 'urlencoded', raw: data });
         }
     });
 });
