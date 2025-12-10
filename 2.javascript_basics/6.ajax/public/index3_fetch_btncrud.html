@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Localhost CRUD Test (No Forms)</title>
+</head>
+<body>
+    <h1>CRUD Test (No Forms)</h1>
+
+    <!-- 1. 전체 조회 -->
+    <section>
+        <h2>1. Get All (전체 조회)</h2>
+        <button id="btn-get-all">Get All</button>
+    </section>
+
+    <!-- 2. 단건 조회 -->
+    <section>
+        <h2>2. Get One (단건 조회)</h2>
+        <label>
+            ID:
+            <input type="number" id="get-id" placeholder="예: 1" />
+        </label>
+        <button id="btn-get-one">Get One</button>
+    </section>
+
+    <!-- 3. 생성 (입력 박스 + 버튼) -->
+    <section>
+        <h2>3. Create (생성)</h2>
+        <div>
+            <label>
+                Title:
+                <input type="text" id="create-title" placeholder="제목 입력" />
+            </label>
+        </div>
+        <div>
+            <label>
+                Body:
+                <input type="text" id="create-body" placeholder="내용 입력" />
+            </label>
+        </div>
+        <button id="btn-create">Create</button>
+    </section>
+
+    <!-- 4. 수정 (입력 박스 + 버튼) -->
+    <section>
+        <h2>4. Update (수정 - PUT)</h2>
+        <div>
+            <label>
+                ID:
+                <input type="number" id="update-id" placeholder="수정할 ID (예: 1)" />
+            </label>
+        </div>
+        <div>
+            <label>
+                Title:
+                <input type="text" id="update-title" placeholder="새 제목 (옵션)" />
+            </label>
+        </div>
+        <div>
+            <label>
+                Body:
+                <input type="text" id="update-body" placeholder="새 내용 (옵션)" />
+            </label>
+        </div>
+        <button id="btn-update">Update</button>
+    </section>
+
+    <!-- 5. 삭제 (입력 박스 + 버튼) -->
+    <section>
+        <h2>5. Delete (삭제)</h2>
+        <label>
+            ID:
+            <input type="number" id="delete-id" placeholder="삭제할 ID (예: 1)" />
+        </label>
+        <button id="btn-delete">Delete</button>
+    </section>
+
+    <hr />
+
+    <!-- 결과 출력 -->
+    <h2>Response / Output</h2>
+    <pre id="output"></pre>
+
+    <script>
+        // -----------------------------
+        // 공통 설정/함수
+        // -----------------------------
+        const BASE_URL = 'http://localhost:3000/posts';
+
+        // 결과 출력
+        function printOutput(label, data) {
+            const output = document.getElementById('output');
+            output.innerText = label + '\n' + JSON.stringify(data, null, 2);
+        }
+
+        // 에러 출력
+        function printError(err) {
+            const output = document.getElementById('output');
+            output.innerText = '❌ Error:\n' + err;
+            console.error(err);
+        }
+
+        // -----------------------------
+        // CRUD 함수들
+        // -----------------------------
+
+        // 1. 전체 조회 (GET /posts)
+        async function getAll() {
+            try {
+                const res = await fetch(BASE_URL);
+                if (!res.ok) {
+                    throw new Error('GET ALL 실패: ' + res.status);
+                }
+                const data = await res.json();
+                printOutput('✅ GET ALL 성공', data);
+            } catch (err) {
+                printError(err);
+            }
+        }
+
+        // 2. 단건 조회 (GET /posts/:id)
+        async function getOne() {
+            const id = document.getElementById('get-id').value;
+            if (!id) {
+                alert('조회할 ID를 입력하세요.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/${id}`);
+                if (!res.ok) {
+                    throw new Error('GET ONE 실패: ' + res.status);
+                }
+                const data = await res.json();
+                printOutput(`✅ GET ONE 성공 (id=${id})`, data);
+            } catch (err) {
+                printError(err);
+            }
+        }
+
+        // 3. 생성 (POST /posts)
+        async function createPost() {
+            const title = document.getElementById('create-title').value;
+            const body = document.getElementById('create-body').value;
+
+            if (!title || !body) {
+                alert('title과 body를 모두 입력하세요.');
+                return;
+            }
+
+            try {
+                const res = await fetch(BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, body }),
+                });
+
+                if (!res.ok) {
+                    throw new Error('CREATE 실패: ' + res.status);
+                }
+
+                const data = await res.json();
+                printOutput('✅ CREATE 성공', data);
+
+                // 입력값 초기화
+                document.getElementById('create-title').value = '';
+                document.getElementById('create-body').value = '';
+            } catch (err) {
+                printError(err);
+            }
+        }
+
+        // 4. 수정 (PUT /posts/:id)
+        async function updatePost() {
+            const id = document.getElementById('update-id').value;
+            const title = document.getElementById('update-title').value;
+            const body = document.getElementById('update-body').value;
+
+            if (!id) {
+                alert('수정할 ID를 입력하세요.');
+                return;
+            }
+
+            if (!title && !body) {
+                alert('수정할 title 또는 body 중 최소 하나는 입력하세요.');
+                return;
+            }
+
+            const payload = {};
+            if (title) payload.title = title;
+            if (body) payload.body = body;
+
+            try {
+                const res = await fetch(`${BASE_URL}/${id}`, {
+                    method: 'PUT', // json-server 기준 전체 교체, 여기서는 보낸 필드만 넣은 구조
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!res.ok) {
+                    throw new Error('UPDATE 실패: ' + res.status);
+                }
+
+                const data = await res.json();
+                printOutput(`✅ UPDATE 성공 (id=${id})`, data);
+            } catch (err) {
+                printError(err);
+            }
+        }
+
+        // 5. 삭제 (DELETE /posts/:id)
+        async function deletePost() {
+            const id = document.getElementById('delete-id').value;
+            if (!id) {
+                alert('삭제할 ID를 입력하세요.');
+                return;
+            }
+
+            if (!confirm(`정말로 id=${id} 데이터를 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`${BASE_URL}/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!res.ok) {
+                    throw new Error('DELETE 실패: ' + res.status);
+                }
+
+                printOutput(`✅ DELETE 성공 (id=${id})`, { deletedId: id });
+                document.getElementById('delete-id').value = '';
+            } catch (err) {
+                printError(err);
+            }
+        }
+
+        // -----------------------------
+        // DOM 이벤트 바인딩
+        // -----------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            // 버튼 → 함수 연결
+            document.getElementById('btn-get-all').addEventListener('click', getAll);
+            document.getElementById('btn-get-one').addEventListener('click', getOne);
+            document.getElementById('btn-create').addEventListener('click', createPost);
+            document.getElementById('btn-update').addEventListener('click', updatePost);
+            document.getElementById('btn-delete').addEventListener('click', deletePost);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!-- public/ajax_localhost.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localhost CRUD Test</title>
+</head>
+<body>
+    <h1>CRUD Test</h1>
+    <button onclick="getAll()">Get All</button>
+    <pre id="output"></pre>
+
+    <script>
+        async function getAll() {
+            const res = await fetch('http://localhost:3000/posts');
+            const data = await res.json();
+            document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function getAll_display() {
+            // 1) 콘솔에서 확인
+            data.forEach((item, index) => {
+                console.log(index, item);
+            });
+
+            // for..of
+            for (const item of data) {
+                console.log(item);
+            }
+
+            // 전통적인 for
+            for (let i = 0; i < data.length; i++) {
+                console.log(i, data[i]);
+            }
+
+
+            // 2) 화면에 예쁘게 출력 (id - title만)
+            let text = '';
+            data.forEach((item, index) => {
+                // item 안에 들어 있는 속성에 맞춰서 출력
+                // 예: { id: 1, title: '첫 글', body: '내용' }
+                text += `${index}번째 - id: ${item.id}, title: ${item.title}\n`;
+            });
+
+            output.innerText = text;
+            
+            // 3) 고차함수 사용
+            // const lines = data.map(item => `${item.id}: ${item.title}`);
+            // document.getElementById('output').innerText = lines.join('\n');
+        }
+    </script>
+</body>
+</html>

@@ -11,36 +11,57 @@
     <div id="image-container"></div>
 
     <script>
-        document.getElementById('fetch-button').addEventListener('click', function() {
-            fetch('https://dog.ceo/api/breeds/image/random')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    var imageUrl = data.message;
+        function originalStyle() {
+            document.getElementById('fetch-button').addEventListener('click', function() {
+                fetch('https://dog.ceo/api/breeds/image/random')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        var imageUrl = data.message;
 
-                    // Create an image element
-                    var img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.alt = 'Random Dog Image';
-                    img.style.maxWidth = '100%';
-                    img.style.height = 'auto';
-                    
-                    // Clear previous image and add new one to the container
-                    var imageContainer = document.getElementById('image-container');
-                    imageContainer.innerHTML = '';
-                    imageContainer.appendChild(img);
+                        // Create an image element
+                        var img = document.createElement('img');
+                        img.src = imageUrl;
+                        img.alt = 'Random Dog Image';
+                        img.style.maxWidth = '100%';
+                        // img.style.width = '200px';
+                        img.style.height = 'auto';
+                        
+                        // Clear previous image and add new one to the container
+                        var imageContainer = document.getElementById('image-container');
+                        imageContainer.innerHTML = '';
+                        imageContainer.appendChild(img);
 
-                    // 한줄로 innerHTML 로 하려면...
-                    // imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
-                })
-                .catch(error => {
-                    alert(`Request failed: ${error.message}`);
-                });
-        });
+                        // 한줄로 innerHTML 로 하려면...
+                        // imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
+                    })
+                    .catch(error => {
+                        alert(`Request failed: ${error.message}`);
+                    });
+            });
+        }
+
+        function simpleStyle() {
+            document.getElementById('fetch-button').addEventListener('click', function() {
+                fetch('https://dog.ceo/api/breeds/image/random')
+                    .then(response => response.json())
+                    .then(data => {
+                        var imageContainer = document.getElementById('image-container');
+                        // 한줄로 innerHTML 로 하려면...
+                        imageContainer.innerHTML = `<img src="${imageUrl}" alt="Random Dog Image" style="max-width: 100%; height: auto;">`;
+                    })
+                    .catch(error => {
+                        alert(`Request failed: ${error.message}`);
+                    });
+            });
+        }
+
+        originalStyle();
+        // simpleStyle();
     </script>
 </body>
 </html>

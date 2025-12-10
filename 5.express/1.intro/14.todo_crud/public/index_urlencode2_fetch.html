@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <style>
+        #todo-list li {
+            margin-bottom: 5px;
+        }
+        #todo-list li span {
+            cursor: pointer;
+            display: inline-block;
+        }
+        #todo-list li.completed span {
+            text-decoration: line-through;
+        }
+        #todo-list li button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List (Express 연동)</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list"></ul>
+
+    <script>
+        const addBtn = document.getElementById('add-todo');
+        const input = document.getElementById('new-todo');
+        const todoList = document.getElementById('todo-list');
+
+        function createTodoElement(todo) {
+            const li = document.createElement('li');
+            li.dataset.id = todo.id;
+
+            const span = document.createElement('span');
+            const deleteBtn = document.createElement('button');
+
+            span.textContent = todo.text;
+            deleteBtn.textContent = '삭제';
+
+            if (todo.completed) {
+                li.classList.add('completed');
+            }
+
+            span.addEventListener('click', function () {
+                li.classList.toggle('completed');
+            });
+
+            deleteBtn.addEventListener('click', async function (e) {
+                e.stopPropagation();
+                const id = li.dataset.id;
+
+                try {
+                    await fetch(`/api/todos/${id}`, {
+                        method: 'DELETE',
+                    });
+                    li.remove();
+                } catch (err) {
+                    alert('삭제 중 오류가 발생했습니다.');
+                    console.error(err);
+                }
+            });
+
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+            return li;
+        }
+
+        async function loadTodos() {
+            try {
+                const res = await fetch('/api/todos');
+                const todos = await res.json();
+                todoList.innerHTML = '';
+                todos.forEach((todo) => {
+                    const li = createTodoElement(todo);
+                    todoList.appendChild(li);
+                });
+            } catch (err) {
+                console.error('목록 로딩 오류:', err);
+            }
+        }
+
+        addBtn.addEventListener('click', async function () {
+            const newTodo = input.value;
+            if (newTodo.trim() === '') return;
+
+            try {
+                // 🔹 urlencoded로 전송
+                const params = new URLSearchParams();
+                params.append('text', newTodo);
+
+                const res = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString(),
+                });
+
+                const savedTodo = await res.json();
+                const li = createTodoElement(savedTodo);
+                todoList.appendChild(li);
+                input.value = '';
+            } catch (err) {
+                console.error('추가 중 오류:', err);
+            }
+        });
+
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                addBtn.click();
+            }
+        });
+
+        loadTodos();
+    </script>
+
+</body>
+</html>

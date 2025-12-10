@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <style>
+        #todo-list li {
+            margin-bottom: 5px;
+        }
+        #todo-list li span {
+            cursor: pointer;
+            display: inline-block;
+        }
+        #todo-list li.completed span {
+            text-decoration: line-through;
+        }
+        #todo-list li button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List (Express 연동)</h1>
+    <input type="text" id="new-todo" placeholder="New to-do">
+    <button id="add-todo">Add</button>
+    <ul id="todo-list"></ul>
+
+    <script>
+        const addBtn = document.getElementById('add-todo');
+        const input = document.getElementById('new-todo');
+        const todoList = document.getElementById('todo-list');
+
+        // 공통: li 하나 만들어주는 함수 (DOM만 담당)
+        function createTodoElement(todo) {
+            const li = document.createElement('li');
+            li.dataset.id = todo.id; // 서버 id 저장
+
+            const span = document.createElement('span');
+            const deleteBtn = document.createElement('button');
+
+            span.textContent = todo.text;
+
+            deleteBtn.textContent = '삭제';
+
+            // 받아온 정보를 기반으로 완료 표시
+            if (todo.completed) {
+                li.classList.add('completed');
+            }
+
+            // 텍스트 클릭 시 완료 토글 (프런트만)
+            span.addEventListener('click', function () {
+                li.classList.toggle('completed');
+            });
+
+            // 삭제 버튼 클릭 시: 서버 + 화면 둘 다 제거
+            deleteBtn.addEventListener('click', async function (e) {
+                e.stopPropagation();
+                const id = li.dataset.id;
+
+                try {
+                    await fetch(`/api/todos/${id}`, {
+                        method: 'DELETE',
+                    });
+                    li.remove();
+                } catch (err) {
+                    alert('삭제 중 오류가 발생했습니다.');
+                    console.error(err);
+                }
+            });
+
+            li.appendChild(span);
+            li.appendChild(deleteBtn);
+            return li;
+        }
+
+        // 초기 로딩: 서버에서 목록 가져오기
+        async function loadTodos() {
+            try {
+                const res = await fetch('/api/todos');
+                const todos = await res.json();
+                todoList.innerHTML = '';
+                todos.forEach((todo) => {
+                    const li = createTodoElement(todo);
+                    todoList.appendChild(li);
+                });
+            } catch (err) {
+                console.error('목록 로딩 오류:', err);
+            }
+        }
+
+        // 새 To-Do 추가
+        addBtn.addEventListener('click', async function () {
+            const newTodo = input.value;
+
+            if (newTodo.trim() === '') return;
+
+            try {
+                const res = await fetch('/api/todos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: newTodo }),
+                });
+
+                const savedTodo = await res.json();
+                const li = createTodoElement(savedTodo);
+                todoList.appendChild(li);
+                input.value = '';
+            } catch (err) {
+                console.error('추가 중 오류:', err);
+            }
+        });
+
+        // Enter 키로도 추가
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                addBtn.click();
+            }
+        });
+
+        // 페이지 로드시 서버 데이터 로딩
+        loadTodos();
+    </script>
+</body>
+</html>

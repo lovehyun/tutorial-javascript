@@ -13,9 +13,11 @@
     <div id="image-container"></div>
 
     <script>
+        const baseUrl = 'https://dog.ceo/api'
         // Function to fetch breed list and populate the select element
         function fetchBreedList() {
-            fetch('https://dog.ceo/api/breeds/list/all')
+            // fetch('https://dog.ceo/api/breeds/list/all')
+            fetch(`${baseUrl}/breeds/list/all`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -75,7 +77,8 @@
         // Function to fetch and display image of selected breed
         function fetchBreedImage() {
             var breed = document.getElementById('dog-selector').value;
-            fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+            // fetch(`https://dog.ceo/api/breed/${breed}/images/random`)
+            fetch(`${baseUrl}/breed/${breed}/images/random`)
                 .then(response => response.json())
                 .then(data => {
                     var imageUrl = data.message;
