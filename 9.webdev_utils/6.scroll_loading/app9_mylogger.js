@@ -27,7 +27,34 @@ function getItems(start, end) {
 //     return items;
 // }
 
-app.use(morgan('dev'));
+
+// app.use(morgan('dev'));
+
+// legacy mylogger
+/*
+function mylogger(req, res, next) {
+    const now = new Date().toISOString();   // 현재 시간 (ISO 형식)
+        const method = req.method;              // GET, POST, ...
+        const path = req.originalUrl;           // 요청 URL 경로
+        console.log(`[${now}] ${method} ${path}`);
+        next(); // 다음 미들웨어/라우터로 넘기기
+}
+app.use(mylogger);
+*/
+
+// function mylogger() {
+function mylogger(option) {
+    // 여기서 필요한 설정 처리 가능 (예: 로그 레벨 등)
+    // 이 입력받은 인자와 아래 함수가 합쳐서 클로저(Closure)가 됨.
+    return function (req, res, next) {
+        const now = new Date().toISOString();
+        console.log(`[${now}] ${option} [${req.method}] [${req.originalUrl}]`);
+        next(); // 여기서 직접 호출
+    };
+}
+app.use(mylogger('dev'));
+
+
 app.use(express.static('public'));
 
 app.get('/get-items', (req, res) => {

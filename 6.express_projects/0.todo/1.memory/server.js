@@ -1,4 +1,8 @@
 // server.js
+// curl -X POST http://localhost:3000/api/todos \
+//   -H "Content-Type: application/json" \
+//   -d "{\"text\": \"공부하기\"}"
+
 const express = require('express');
 const path = require('path');
 
@@ -34,7 +38,7 @@ app.post('/api/todos', (req, res) => {
     res.json(newTodo);
 });
 
-// To-Do 완료 토글
+// To-Do 완료 토글 (:id 대신 :id/toggle 통해서 명시적으로... (메모 내용을 바꾸는게 아님))
 app.put('/api/todos/:id/toggle', (req, res) => {
     const id = parseInt(req.params.id);
     console.log(`PUT /api/todos/${id}/toggle 호출됨`);
