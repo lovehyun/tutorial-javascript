@@ -311,7 +311,7 @@
     const CANVAS_CENTER = CANVAS_SIZE / 2;
     const LAYOUT_OFFSET_Y = 220;
 
-    let currentRoomKey     = 'room10';
+    let currentRoomKey     = loadCurrentRoom();
     let currentLayout      = null;
     let currentAssignments = {};
     let editMode           = false;
@@ -351,7 +351,19 @@
     function getTextRotationKey() {
         return 'seatApp_textFollowRotation';
     }
+    function getCurrentRoomKey() {
+        return 'seatApp_currentRoom';
+    }
 
+    function loadCurrentRoom() {
+        const saved = localStorage.getItem(getCurrentRoomKey());
+        return saved || 'room10';
+    }
+
+    function saveCurrentRoom(roomKey) {
+        localStorage.setItem(getCurrentRoomKey(), roomKey);
+    }
+    
     function loadNames(roomKey) {
         const raw = localStorage.getItem(getNamesStorageKey(roomKey));
         if (!raw) return [];
@@ -585,6 +597,41 @@
     // 7. 캔버스 그리기
     // =========================
 
+    // 회전된 텍스트 그리기 공통 함수
+    function drawRotatedText(text, angle, options = {}) {
+        const {
+            font = '12px sans-serif',
+            fillStyle = '#111827',
+            textAlign = 'center',
+            textBaseline = 'middle',
+            x = 0,
+            y = 0
+        } = options;
+        
+        // 방 회전 + 개별 객체 회전을 모두 고려
+        const roomRotationRad = roomRotation * Math.PI / 180;
+        const totalRotation = roomRotationRad + angle;
+        const shouldRotate = !textFollowRotation && totalRotation !== 0;
+        
+        ctx.font = font;
+        ctx.fillStyle = fillStyle;
+
+        if (shouldRotate) {
+            // 가로 고정일 때는 항상 중앙 정렬
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.save();
+            ctx.rotate(-totalRotation);
+            ctx.fillText(text, x, y);
+            ctx.restore();
+        } else {
+            // 회전과 함께 움직일 때는 원래 정렬 사용
+            ctx.textAlign = textAlign;
+            ctx.textBaseline = textBaseline;
+            ctx.fillText(text, x, y);
+        }
+    }
+
     function drawRotatedRect(obj, fillColor, strokeColor, text) {
         const cx = obj.x + obj.w / 2;
         const cy = obj.y + obj.h / 2;
@@ -601,20 +648,8 @@
         ctx.strokeRect(-obj.w / 2, -obj.h / 2, obj.w, obj.h);
 
         if (text) {
-            if (fillColor === '#111827' || fillColor === '#f97316') {
-                ctx.fillStyle = '#ffffff';
-            } else {
-                ctx.fillStyle = '#111827';
-            }
-            ctx.font = '12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            if (!textFollowRotation) {
-                ctx.rotate(-angle);
-            }
-            
-            ctx.fillText(text, 0, 0);
+            const textColor = (fillColor === '#111827' || fillColor === '#f97316') ? '#ffffff' : '#111827';
+            drawRotatedText(text, angle, { fillStyle: textColor });
         }
 
         ctx.restore();
@@ -665,62 +700,23 @@
             ctx.fillRect(-seat.w / 2, -seat.h / 2, seat.w, seat.h);
             ctx.strokeRect(-seat.w / 2, -seat.h / 2, seat.w, seat.h);
 
-            ctx.fillStyle = '#4b5563';
-            ctx.font = '11px sans-serif';
-            
-            // 회전 각도에 따라 정렬 방식 변경
-            const rotation = seat.rotation || 0;
-            if (rotation === 90 || rotation === 270) {
-                // 세로 방향일 때는 중앙 정렬
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-            } else {
-                // 가로 방향일 때는 왼쪽 상단 정렬
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'top';
-            }
-            
-            if (!textFollowRotation) {
-                ctx.save();
-                ctx.rotate(-angle);
-                if (rotation === 90 || rotation === 270) {
-                    ctx.fillText(seat.id + '번', 0, -seat.h / 2 + 15);
-                } else {
-                    ctx.fillText(seat.id + '번', -seat.w / 2 + 4, -seat.h / 2 + 3);
-                }
-                ctx.restore();
-            } else {
-                if (rotation === 90 || rotation === 270) {
-                    ctx.fillText(seat.id + '번', 0, -seat.h / 2 + 15);
-                } else {
-                    ctx.fillText(seat.id + '번', -seat.w / 2 + 4, -seat.h / 2 + 3);
-                }
-            }
+            // 좌석 번호
+            drawRotatedText(seat.id + '번', angle, {
+                font: '11px sans-serif',
+                fillStyle: '#4b5563',
+                textAlign: 'left',
+                textBaseline: 'top',
+                x: -seat.w / 2 + 4,
+                y: -seat.h / 2 + 3
+            });
 
+            // 이름
             if (name) {
-                ctx.font = '12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillStyle = '#111827';
-                
-                const rotation = seat.rotation || 0;
-                
-                if (!textFollowRotation) {
-                    ctx.save();
-                    ctx.rotate(-angle);
-                    if (rotation === 90 || rotation === 270) {
-                        ctx.fillText(name, 0, 0);
-                    } else {
-                        ctx.fillText(name, 0, 6);
-                    }
-                    ctx.restore();
-                } else {
-                    if (rotation === 90 || rotation === 270) {
-                        ctx.fillText(name, 0, 0);
-                    } else {
-                        ctx.fillText(name, 0, 6);
-                    }
-                }
+                drawRotatedText(name, angle, {
+                    font: '12px sans-serif',
+                    fillStyle: '#111827',
+                    y: 6
+                });
             }
 
             ctx.restore();
@@ -777,13 +773,11 @@
 
         saveNames(currentRoomKey, names);
 
-        // 전체 좌석 수만큼 배열 만들기 (빈 자리는 빈 문자열)
         const fullArray = [];
         for (let i = 0; i < seatCount; i++) {
             fullArray.push(names[i] || '');
         }
         
-        // 전체를 섞기
         const shuffled = fisherYatesShuffle([...fullArray]);
 
         currentAssignments = {};
@@ -795,11 +789,10 @@
         pendingAssignments = [];
 
         const seats = currentLayout.seats;
-        // 모든 좌석에 대해 배정 (빈 자리 포함)
         seats.forEach((seat, idx) => {
             pendingAssignments.push({
                 id: seat.id,
-                name: shuffled[idx] || ''  // 빈 문자열도 포함
+                name: shuffled[idx] || ''
             });
         });
 
@@ -811,7 +804,6 @@
         textRotateBtn.disabled = true;
         resetBtn.disabled = true;
 
-        // 룰렛 애니메이션과 이름 배치를 동시에 시작
         spinnerReqId = requestAnimationFrame(spinnerLoop);
         startRevealAnimation();
     }
@@ -864,7 +856,6 @@
                 clearInterval(revealTimerId);
                 revealTimerId = null;
                 
-                // 룰렛 애니메이션 중단
                 if (spinnerReqId) {
                     cancelAnimationFrame(spinnerReqId);
                     spinnerReqId = null;
@@ -874,7 +865,6 @@
 
                 saveAssignments(currentRoomKey, currentAssignments);
                 
-                // 최종 화면 그리기 (룰렛 없이)
                 drawRoom();
 
                 shuffleBtn.disabled = false;
@@ -1060,6 +1050,8 @@
 
     roomSelect.addEventListener('change', () => {
         currentRoomKey = roomSelect.value;
+        saveCurrentRoom(currentRoomKey);
+
         const base = roomLayoutsBase[currentRoomKey];
         canvasTitle.textContent = base.label + ' 도면';
 
@@ -1174,6 +1166,7 @@
     // =========================
 
     function init() {
+        roomSelect.value = currentRoomKey;
         currentLayout = loadLayoutOrDefault(currentRoomKey);
         renderNameInputs();
         currentAssignments = loadAssignments(currentRoomKey) || {};
