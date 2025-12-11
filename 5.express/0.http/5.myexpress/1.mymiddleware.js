@@ -36,7 +36,7 @@ myapp.register(middleware1);
 myapp.register(middleware2);
 myapp.register(middleware3);
 
-// 실행할 때 사용할 context 객체
+// 실행할 때 사용할 context 객체 - 실행 시 각종 정보를 담을 빈 공간
 const context = {};
 
 // 미들웨어 순차적으로 실행

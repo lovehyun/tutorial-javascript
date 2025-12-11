@@ -3,71 +3,68 @@ const http = require('http');
 const myapp = {
     routes: {},
 
-    // 라우트 등록 메서드
-    register(route, ...middlewares) {
-        this.routes[route] = this.routes[route] || [];
-        this.routes[route].push(...middlewares);
+    // 라우트 등록 (라우트 handler 등록)
+    register(route, handler) {
+        this.routes[route] = handler;
     },
 
-    // 요청 처리 메서드
+    // 요청 처리 - http 모듈로부터 req, res 를 전달받아 경로를 처리
     handleRequest(req, res) {
         const route = req.url;
-        const middlewares = this.routes[route] || [];
-        
-        // context 객체를 사용하여 미들웨어 간 데이터를 공유
-        const context = { req, res, route };
+        const handler = this.routes[route]; // 라우터 검색
 
-        let index = 0;
-
-        // 미들웨어 실행을 위한 함수
-        const next = () => {
-            if (index < middlewares.length) {
-                const middleware = middlewares[index++];
-                middleware(context, next); // 다음 미들웨어로 전달
-            } else {
-                // 모든 미들웨어가 끝난 후 응답
-                if (!res.writableEnded) {
-                    res.end(`Response for ${route}`);
-                }
-            }
-        };
-
-        next(); // 첫 번째 미들웨어부터 실행 시작
+        if (handler) {
+            handler(req, res);   // 바로 핸들러 호출
+        } else {
+            res.statusCode = 404;
+            res.end('Not Found');
+        }
     }
 };
 
-// 미들웨어 함수 정의
-function loggerMiddleware(context, next) {
-    console.log(`Logger: ${context.req.method} ${context.route}`);
-    next();
+// 각 라우트용 핸들러들
+function rootHandler(req, res) {
+    res.end('Response for /');
 }
 
-function authMiddleware(context, next) {
-    // 간단한 인증 예시
-    if (context.route === '/admin') {
-        context.res.write('Admin authentication required\n');
-    }
-    next();
+function userHandler(req, res) {
+    res.write('User-specific processing\n');
+    res.end('Response for /user');
 }
 
-function userMiddleware(context, next) {
-    if (context.route === '/user') {
-        context.res.write('User-specific processing\n');
-    }
-    next();
+function adminHandler(req, res) {
+    res.write('Admin authentication required\n');
+    res.end('Response for /admin');
 }
 
-// 라우트 및 미들웨어 등록
-myapp.register('/', loggerMiddleware);
-myapp.register('/user', loggerMiddleware, userMiddleware);
-myapp.register('/admin', loggerMiddleware, authMiddleware);
+// 라우트 등록
+myapp.register('/', rootHandler);
+myapp.register('/user', userHandler);
+myapp.register('/admin', adminHandler);
 
-// 서버 생성 및 요청 리스너 설정
+// 여기서 등록된 라우트들 출력
+console.log('Registered routes:');
+for (const route of Object.keys(myapp.routes)) {
+    console.log(` - ${route}`);
+}
+
+console.log('Registered routes and handler names:');
+for (const [route, handler] of Object.entries(myapp.routes)) {
+    console.log(` - ${route} -> ${handler.name || '(anonymous handler)'}`);
+}
+
+// 등록후 기대 라우팅 테이블
+// {
+//   "/": rootHandler,
+//   "/user": userHandler,
+//   "/admin": adminHandler
+// }
+
+// 서버 생성
 const server = http.createServer((req, res) => {
     myapp.handleRequest(req, res);
 });
 
-// 서버 시작
 const port = 3000;
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
