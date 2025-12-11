@@ -53,11 +53,12 @@ app.get('/users', (req, res) => {
     //  - Buffer         : application/octet-stream
     //  - 숫자 (상태코드로 인식됨) : text/plain
 
-    // 변경 시 res.type('text/plain');
+    // 변경 시 res.type('text/plain'); 으로 수동 설정
+
     // res.json 시의 기본값은 'application/json'
     
     res.json(users);
-    // res.send(JSON.stringify(users));
+    // res.send(JSON.stringify(users)); // res.json(users) 와 같음
 });
 
 // 사용자 개별 정보 조회
