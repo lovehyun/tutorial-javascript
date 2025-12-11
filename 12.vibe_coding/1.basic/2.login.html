@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>회원가입 폼 예제</title>
+    <style>
+        /* 전체 레이아웃 */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 24px 28px 32px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+
+        p.desc {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* 라벨 + 인풋 공통 영역 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="date"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+            transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+            background-color: #f9fbff;
+        }
+
+        /* 에러 상태 */
+        .invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.18) !important;
+            background-color: #fff7f7;
+        }
+
+        .error {
+            font-size: 0.8rem;
+            color: #dc2626;
+            margin-top: 4px;
+            min-height: 1em;
+        }
+
+        /* 관심분야 체크박스 */
+        .interests-box {
+            padding: 10px 10px 4px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background: #fafafa;
+        }
+
+        .interests-box.invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.18);
+            background-color: #fff7f7;
+        }
+
+        .checkbox-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+        }
+
+        .checkbox-row label {
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            margin-right: 4px;
+        }
+
+        /* 버튼 */
+        .btn-area {
+            margin-top: 22px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 0;
+            border-radius: 999px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            transition: transform 0.07s ease, box-shadow 0.07s ease, filter 0.07s ease;
+            box-shadow: 0 8px 18px rgba(37,99,235,0.35);
+        }
+
+        button:hover {
+            filter: brightness(1.05);
+            box-shadow: 0 10px 24px rgba(37,99,235,0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.3);
+        }
+
+        .success-message {
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #16a34a;
+            text-align: center;
+            min-height: 1.2em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>회원가입</h1>
+    <p class="desc">아래 정보를 입력하신 후, 가입 버튼을 눌러주세요.</p>
+
+    <form id="registerForm" novalidate>
+        <!-- 사용자명 -->
+        <div class="form-group">
+            <label for="username">사용자명 (아이디)</label>
+            <div class="hint">영문/숫자 4~12자</div>
+            <input type="text" id="username" name="username" autocomplete="off" />
+            <div id="usernameError" class="error"></div>
+        </div>
+
+        <!-- 비밀번호 -->
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <div class="hint">영문, 숫자, 특수문자를 포함하여 8~20자</div>
+            <input type="password" id="password" name="password" />
+            <div id="passwordError" class="error"></div>
+        </div>
+
+        <!-- 이름 -->
+        <div class="form-group">
+            <label for="fullname">이름</label>
+            <div class="hint">실명을 입력해주세요.</div>
+            <input type="text" id="fullname" name="fullname" autocomplete="off" />
+            <div id="fullnameError" class="error"></div>
+        </div>
+
+        <!-- 생년월일 -->
+        <div class="form-group">
+            <label for="birthdate">생년월일</label>
+            <div class="hint">미래 날짜는 입력할 수 없습니다.</div>
+            <input type="date" id="birthdate" name="birthdate" />
+            <div id="birthdateError" class="error"></div>
+        </div>
+
+        <!-- 관심분야 -->
+        <div class="form-group">
+            <label>관심분야 (1개 이상 선택)</label>
+            <div class="hint">관심 있는 분야를 골라주세요.</div>
+            <div id="interestsBox" class="interests-box">
+                <div class="checkbox-row">
+                    <label><input type="checkbox" name="interest" value="security" /> 정보보안</label>
+                    <label><input type="checkbox" name="interest" value="cloud" /> 클라우드</label>
+                    <label><input type="checkbox" name="interest" value="ai" /> 인공지능</label>
+                    <label><input type="checkbox" name="interest" value="devops" /> DevOps</label>
+                </div>
+            </div>
+            <div id="interestsError" class="error"></div>
+        </div>
+
+        <div class="btn-area">
+            <button type="submit">가입하기</button>
+        </div>
+
+        <div id="successMessage" class="success-message"></div>
+    </form>
+</div>
+
+<script>
+    // ====== DOM 요소 가져오기 (가능한 const 사용) ======
+    const form = document.getElementById("registerForm");
+
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const fullnameInput = document.getElementById("fullname");
+    const birthdateInput = document.getElementById("birthdate");
+    const interestsBox = document.getElementById("interestsBox");
+    const interestsInputs = document.querySelectorAll("input[name='interest']");
+
+    const usernameError = document.getElementById("usernameError");
+    const passwordError = document.getElementById("passwordError");
+    const fullnameError = document.getElementById("fullnameError");
+    const birthdateError = document.getElementById("birthdateError");
+    const interestsError = document.getElementById("interestsError");
+    const successMessage = document.getElementById("successMessage");
+
+    // ====== 공통 에러 처리 함수 ======
+    function setError(inputEl, errorEl, message) {
+        if (inputEl) {
+            inputEl.classList.add("invalid");
+        }
+        errorEl.textContent = message;
+    }
+
+    function clearError(inputEl, errorEl) {
+        if (inputEl) {
+            inputEl.classList.remove("invalid");
+        }
+        errorEl.textContent = "";
+    }
+
+    // ====== 각 필드별 검증 함수 ======
+
+    // 1) 사용자명 검증: 영문/숫자 4~12자
+    function validateUsername() {
+        const value = usernameInput.value.trim();
+        const pattern = /^[A-Za-z0-9]{4,12}$/;
+
+        if (!value) {
+            setError(usernameInput, usernameError, "사용자명을 입력해주세요.");
+            return false;
+        }
+        if (!pattern.test(value)) {
+            setError(usernameInput, usernameError, "영문과 숫자로 4~12자 이내로 입력해주세요.");
+            return false;
+        }
+        clearError(usernameInput, usernameError);
+        return true;
+    }
+
+    // 2) 비밀번호 검증: 8~20자, 영문+숫자+특수문자 포함
+    function validatePassword() {
+        const value = passwordInput.value;
+        if (!value) {
+            setError(passwordInput, passwordError, "비밀번호를 입력해주세요.");
+            return false;
+        }
+        if (value.length < 8 || value.length > 20) {
+            setError(passwordInput, passwordError, "비밀번호는 8~20자 이내여야 합니다.");
+            return false;
+        }
+        // 영문, 숫자, 특수문자 하나 이상 포함
+        const hasLetter = /[A-Za-z]/.test(value);
+        const hasNumber = /[0-9]/.test(value);
+        const hasSpecial = /[^A-Za-z0-9]/.test(value);
+
+        if (!hasLetter || !hasNumber || !hasSpecial) {
+            setError(passwordInput, passwordError, "영문, 숫자, 특수문자를 모두 포함해야 합니다.");
+            return false;
+        }
+
+        clearError(passwordInput, passwordError);
+        return true;
+    }
+
+    // 3) 이름 검증: 공백 아닌 문자열, 2~30자
+    function validateFullname() {
+        const value = fullnameInput.value.trim();
+        if (!value) {
+            setError(fullnameInput, fullnameError, "이름을 입력해주세요.");
+            return false;
+        }
+        if (value.length < 2 || value.length > 30) {
+            setError(fullnameInput, fullnameError, "이름은 2자 이상 30자 이하로 입력해주세요.");
+            return false;
+        }
+        clearError(fullnameInput, fullnameError);
+        return true;
+    }
+
+    // 4) 생년월일 검증: 값 존재 + 미래 날짜 불가
+    function validateBirthdate() {
+        const value = birthdateInput.value;
+        if (!value) {
+            setError(birthdateInput, birthdateError, "생년월일을 입력해주세요.");
+            return false;
+        }
+
+        const selectedDate = new Date(value);
+        const today = new Date();
+        // 시/분/초를 제거하여 날짜만 비교
+        selectedDate.setHours(0,0,0,0);
+        today.setHours(0,0,0,0);
+
+        if (selectedDate > today) {
+            setError(birthdateInput, birthdateError, "미래 날짜는 선택할 수 없습니다.");
+            return false;
+        }
+
+        clearError(birthdateInput, birthdateError);
+        return true;
+    }
+
+    // 5) 관심분야 검증: 1개 이상 체크
+    function validateInterests() {
+        let checkedCount = 0;
+        interestsInputs.forEach((checkbox) => {
+            if (checkbox.checked) checkedCount++;
+        });
+
+        if (checkedCount === 0) {
+            interestsBox.classList.add("invalid");
+            interestsError.textContent = "관심분야를 최소 1개 이상 선택해주세요.";
+            return false;
+        }
+
+        interestsBox.classList.remove("invalid");
+        interestsError.textContent = "";
+        return true;
+    }
+
+    // ====== 폼 제출 처리 ======
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // 실제 전송 막기 (검증용)
+
+        successMessage.textContent = "";
+
+        const okUsername = validateUsername();
+        const okPassword = validatePassword();
+        const okFullname = validateFullname();
+        const okBirthdate = validateBirthdate();
+        const okInterests = validateInterests();
+
+        const allValid = okUsername && okPassword && okFullname && okBirthdate && okInterests;
+
+        if (allValid) {
+            successMessage.textContent = "회원가입 검증이 성공적으로 완료되었습니다!";
+            // 실제 서버 전송이 필요하다면 아래 주석을 참고하세요.
+            // form.submit();
+        }
+    });
+
+    // ====== 입력 중 실시간(또는 포커스 아웃) 검증 ======
+    usernameInput.addEventListener("blur", validateUsername);
+    passwordInput.addEventListener("blur", validatePassword);
+    fullnameInput.addEventListener("blur", validateFullname);
+    birthdateInput.addEventListener("change", validateBirthdate);
+    interestsInputs.forEach((checkbox) => {
+        checkbox.addEventListener("change", validateInterests);
+    });
+</script>
+</body>
+</html>

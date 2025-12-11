@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Neon To-Do</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --primary: #7b5cff;
+            --primary-light: #a97bff;
+            --accent: #ff6fd8;
+            --bg-dark: #050816;
+            --glass-bg: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            --text-main: #f7f7ff;
+            --text-muted: #b0b3c0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+            background: radial-gradient(circle at 0% 0%, #2b1055, #050816);
+            position: relative;
+        }
+
+        /* 움직이는 그라데이션 배경 레이어 */
+        .bg-gradient {
+            position: absolute;
+            inset: -30%;
+            background: conic-gradient(
+                from 180deg at 50% 50%,
+                #ff6fd8,
+                #3813c2,
+                #00f5a0,
+                #ff6fd8
+            );
+            filter: blur(80px);
+            opacity: 0.55;
+            animation: spin 18s linear infinite;
+            z-index: -2;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1.1); }
+        }
+
+        /* 둥둥 떠다니는 원들 */
+        .floating-orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, transparent);
+            opacity: 0.18;
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-orb:nth-child(1) {
+            width: 260px; height: 260px;
+            top: 5%; left: 8%;
+            animation: float1 16s ease-in-out infinite;
+        }
+        .floating-orb:nth-child(2) {
+            width: 200px; height: 200px;
+            bottom: 3%; right: 10%;
+            animation: float2 20s ease-in-out infinite;
+        }
+        .floating-orb:nth-child(3) {
+            width: 180px; height: 180px;
+            top: 40%; right: 60%;
+            animation: float3 22s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(35px); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-30px) translateX(-10px); }
+        }
+        @keyframes float3 {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(20px) translateX(20px); }
+        }
+
+        /* 메인 카드 */
+        .app-card {
+            width: 100%;
+            max-width: 480px;
+            background: var(--glass-bg);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(22px) saturate(160%);
+            padding: 24px 22px 26px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 60%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .6s ease;
+        }
+        .app-card:hover::before {
+            opacity: 1;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .title-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .title-group h1 {
+            font-size: 1.5rem;
+            letter-spacing: 0.04em;
+        }
+
+        .title-group span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .chip {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,.25);
+            background: radial-gradient(circle at 0 0, rgba(255,255,255,.4), transparent);
+            box-shadow: 0 0 15px rgba(124, 77, 255,0.8);
+        }
+
+        /* 입력 영역 */
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(3, 9, 28, 0.6);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+
+        .input-row input::placeholder {
+            color: rgba(255,255,255,0.35);
+        }
+
+        .input-row input:focus {
+            border-color: var(--primary-light);
+            background: rgba(7, 20, 60, 0.85);
+            box-shadow: 0 0 0 1px rgba(135, 111, 255, 0.5), 0 0 12px rgba(135, 111, 255, 0.7);
+        }
+
+        .input-row button {
+            padding: 10px 16px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+            transform: translateY(0);
+            transition: transform .15s ease, box-shadow .15s ease, filter .2s ease;
+        }
+
+        .input-row button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.55);
+            filter: brightness(1.05);
+        }
+
+        .input-row button:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.6);
+            filter: brightness(0.96);
+        }
+
+        /* 카운터/힌트 */
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .meta-row strong {
+            color: #fefefe;
+        }
+
+        /* 리스트 */
+        .todo-list {
+            list-style: none;
+            max-height: 260px;
+            padding-right: 4px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.3) transparent;
+        }
+
+        .todo-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .todo-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.35);
+            border-radius: 999px;
+        }
+        .todo-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .todo-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            margin-bottom: 8px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.14);
+            cursor: pointer;
+            overflow: hidden;
+            transition: background 0.28s ease, transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        .todo-item::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.18), transparent 50%);
+            opacity: 0;
+            transform: translateX(-40%);
+            transition: opacity .3s ease, transform .3s ease;
+            pointer-events: none;
+        }
+
+        .todo-item:hover::before {
+            opacity: 0.8;
+            transform: translateX(0%);
+        }
+
+        .todo-item:hover {
+            background: rgba(10, 16, 39, 0.85);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+        }
+
+        .todo-item:active {
+            transform: scale(0.985);
+        }
+
+        .check-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.45);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+            transition: border-color .22s ease, background .22s ease, box-shadow .22s ease, transform .15s ease;
+        }
+
+        .todo-text {
+            flex: 1;
+            font-size: 0.9rem;
+            user-select: none;
+            word-break: break-word;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+            opacity: 0.65;
+            transition: opacity 0.2s ease, transform 0.1s ease;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* 완료 상태 */
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: rgba(200, 205, 230, 0.7);
+        }
+
+        .todo-item.completed .check-circle {
+            background: radial-gradient(circle at 30% 30%, #fff, #00f5a0);
+            border-color: transparent;
+            box-shadow: 0 0 14px rgba(0, 245, 160, 0.8);
+            transform: scale(1.08);
+        }
+
+        .todo-item.completed .check-circle::before {
+            content: "✔";
+            animation: pop .18s ease-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 푸터 */
+        .app-footer {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            text-align: right;
+            color: rgba(255,255,255,0.5);
+        }
+
+        .app-footer span {
+            color: var(--primary-light);
+        }
+
+        @media (max-width: 480px) {
+            .app-card {
+                padding: 20px 18px 22px;
+            }
+
+            .title-group h1 {
+                font-size: 1.3rem;
+            }
+
+            .input-row button {
+                padding-inline: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 배경 효과 -->
+    <div class="bg-gradient"></div>
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+
+    <!-- 메인 카드 -->
+    <div class="app-card">
+        <header class="app-header">
+            <div class="title-group">
+                <h1>Neon To-Do</h1>
+                <span>오늘 해야 할 일을 반짝이게 정리해 보세요 ✨</span>
+            </div>
+            <div class="chip">Frontend Only</div>
+        </header>
+
+        <div class="input-row">
+            <input
+                type="text"
+                id="todoInput"
+                placeholder="예) JavaScript 강의 자료 정리하기"
+                autocomplete="off"
+            >
+            <button id="addBtn">추가</button>
+        </div>
+
+        <div class="meta-row">
+            <div>할 일: <strong id="countAll">0</strong>개 중 <strong id="countLeft">0</strong>개 남음</div>
+            <div>Tip: 항목 클릭 → 완료 / ❌ → 삭제</div>
+        </div>
+
+        <ul class="todo-list" id="todoList">
+            <!-- JS로 항목 추가 -->
+        </ul>
+
+        <div class="app-footer">
+            Made with <span>HTML</span> · <span>CSS</span> · <span>JS</span>
+        </div>
+    </div>
+
+    <script>
+        // 주요 DOM 요소 가져오기
+        const todoInput = document.getElementById('todoInput');
+        const addBtn    = document.getElementById('addBtn');
+        const todoList  = document.getElementById('todoList');
+        const countAll  = document.getElementById('countAll');
+        const countLeft = document.getElementById('countLeft');
+
+        // 할 일 항목 추가 함수
+        function addTodo(text) {
+            // 공백만 있는 경우는 무시
+            const trimmed = text.trim();
+            if (!trimmed) return;
+
+            // li 요소 생성
+            const li = document.createElement('li');
+            li.className = 'todo-item';
+
+            // 체크 원
+            const circle = document.createElement('div');
+            circle.className = 'check-circle';
+
+            // 텍스트
+            const span = document.createElement('span');
+            span.className = 'todo-text';
+            span.textContent = trimmed;
+
+            // 삭제 버튼
+            const delBtn = document.createElement('button');
+            delBtn.className = 'delete-btn';
+            delBtn.innerHTML = '✕';
+            delBtn.title = '삭제';
+
+            // li에 자식 추가
+            li.appendChild(circle);
+            li.appendChild(span);
+            li.appendChild(delBtn);
+
+            // 리스트에 추가
+            todoList.prepend(li); // 위에 쌓이게
+
+            // 인풋 비우고 포커스
+            todoInput.value = '';
+            todoInput.focus();
+
+            updateCounts();
+        }
+
+        // 카운트 갱신 함수
+        function updateCounts() {
+            const items = todoList.querySelectorAll('.todo-item');
+            const completed = todoList.querySelectorAll('.todo-item.completed');
+            countAll.textContent  = items.length;
+            countLeft.textContent = items.length - completed.length;
+        }
+
+        // 추가 버튼 클릭 이벤트
+        addBtn.addEventListener('click', () => {
+            addTodo(todoInput.value);
+        });
+
+        // 엔터 키로도 추가
+        todoInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                addTodo(todoInput.value);
+            }
+        });
+
+        // 리스트에 이벤트 위임
+        todoList.addEventListener('click', (event) => {
+            const target = event.target;
+
+            // 삭제 버튼 클릭
+            if (target.classList.contains('delete-btn')) {
+                const li = target.closest('.todo-item');
+                if (li) {
+                    li.remove();
+                    updateCounts();
+                }
+                return;
+            }
+
+            // li 또는 그 안의 요소 클릭 → 완료 토글
+            const li = target.closest('.todo-item');
+            if (li) {
+                li.classList.toggle('completed');
+                updateCounts();
+            }
+        });
+
+        // 시작할 때 포커스
+        todoInput.focus();
+
+        // 테스트용 기본 데이터 몇 개 넣고 시작하고 싶으면 아래 주석 해제
+        // ['JavaScript 복습하기', 'CSS 애니메이션 연습하기', 'To-Do 앱 리팩토링'].forEach(addTodo);
+    </script>
+
+</body>
+</html>

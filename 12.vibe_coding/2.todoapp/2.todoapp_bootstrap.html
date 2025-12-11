@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>나만의 데일리 대시보드</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    >
+
+    <style>
+        /* 전체 배경은 그대로 다크 + 그라데이션 유지 */
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #2f80ed 0, #1c1f2b 40%, #0b0c10 100%);
+            color: #111827; /* 기본 글자는 진한 색 */
+        }
+
+        .dashboard-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        /* 유리 느낌 카드 → 밝은 카드 + 진한 글자 */
+        .glass-card {
+            background: rgba(248, 250, 252, 0.96);  /* 거의 흰색 */
+            border-radius: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            backdrop-filter: blur(8px);
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(148, 163, 184, 0.4);
+            color: #0f172a; /* 카드 안 글자 색 */
+        }
+
+        .badge-gradient {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            color: #000;
+        }
+
+        .todo-item.completed .todo-title {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .todo-item {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+            cursor: pointer;
+        }
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+            background-color: rgba(249, 250, 251, 0.9);
+        }
+
+        .todo-title {
+            color: #111827; /* 투두 텍스트 진하게 */
+        }
+
+        /* 메모 영역을 밝게 */
+        #focusNote {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.8);
+            color: #111827;
+        }
+
+        /* 설명 텍스트 */
+        .tiny-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        #noteStatus {
+            color: #6b7280;
+        }
+
+        /* 입력창/셀렉트도 밝게 */
+        .form-control.bg-dark,
+        .form-select.bg-dark {
+            background-color: #ffffff !important;
+            color: #111827 !important;
+        }
+
+        /* 모바일에서 여백 조금 줄이기 */
+        @media (max-width: 576px) {
+            .dashboard-wrapper {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="glass-card p-4 p-md-5">
+                    <!-- 헤더 영역 -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="fw-bold mb-1">
+                                <i class="bi bi-stars me-2 text-warning"></i>
+                                데일리 포커스 대시보드
+                            </h2>
+                            <div class="tiny-label">
+                                오늘 할 일과 집중할 내용을 한 곳에서 정리해 보세요 ✍️
+                            </div>
+                        </div>
+                        <div class="text-end mt-3 mt-md-0">
+                            <span class="badge badge-gradient rounded-pill px-3 py-2">
+                                <i class="bi bi-lightning-charge-fill me-1"></i>
+                                <span id="todayText"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- 왼쪽: 투두 리스트 -->
+                        <div class="col-md-7">
+                            <div class="mb-3 d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-check2-square me-2 text-info"></i>
+                                    오늘의 할 일
+                                </h5>
+                                <button class="btn btn-sm btn-outline-danger" id="clearAll">
+                                    <i class="bi bi-trash3 me-1"></i>전체 삭제
+                                </button>
+                            </div>
+
+                            <!-- 할 일 추가 폼 -->
+                            <form id="todoForm" class="row g-2 mb-3">
+                                <div class="col-12 col-sm-7">
+                                    <input
+                                        type="text"
+                                        id="todoInput"
+                                        class="form-control form-control-sm bg-dark text-light border-secondary"
+                                        placeholder="할 일을 입력하세요..."
+                                        required
+                                    >
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <select
+                                        id="prioritySelect"
+                                        class="form-select form-select-sm bg-dark text-light border-secondary"
+                                    >
+                                        <option value="normal">보통</option>
+                                        <option value="high">높음</option>
+                                        <option value="low">낮음</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-sm-2 d-grid">
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-plus-lg me-1"></i>추가
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- 진행률 바 -->
+                            <div class="mb-2 tiny-label">
+                                완료 진행률 <span id="progressText">0%</span>
+                            </div>
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div
+                                    id="progressBar"
+                                    class="progress-bar bg-success"
+                                    role="progressbar"
+                                    style="width: 0%;"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                ></div>
+                            </div>
+
+                            <!-- 투두 리스트 -->
+                            <ul id="todoList" class="list-group list-group-flush">
+                                <!-- JS에서 동적으로 추가 -->
+                            </ul>
+
+                            <div class="tiny-label mt-2">
+                                팁: 항목을 클릭하면 완료/취소가 토글됩니다. 🖱️
+                            </div>
+                        </div>
+
+                        <!-- 오른쪽: 오늘의 포커스 메모 -->
+                        <div class="col-md-5">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-journal-text me-2 text-warning"></i>
+                                    오늘의 포커스
+                                </h5>
+                                <button class="btn btn-sm btn-outline-primary" id="saveNote">
+                                    <i class="bi bi-save me-1"></i>메모 저장
+                                </button>
+                            </div>
+                            <p class="tiny-label mb-2">
+                                오늘 꼭 집중하고 싶은 내용, 아이디어, 회의 메모 등을 자유롭게 적어두세요.
+                            </p>
+                            <textarea
+                                id="focusNote"
+                                class="form-control"
+                                rows="8"
+                                placeholder="예) 오전에는 강의자료 정리, 오후에는 프로젝트 코드 리팩토링..."
+                            ></textarea>
+                            <div class="tiny-label mt-2" id="noteStatus">
+                                아직 저장되지 않았습니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-4">
+
+                    <!-- 푸터 -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center small text-secondary">
+                        <div>
+                            <i class="bi bi-magic me-1"></i>
+                            HTML/CSS/JS + Bootstrap 만으로 동작하는 프론트엔드 전용 웹앱입니다.
+                        </div>
+                        <div class="mt-2 mt-md-0">
+                            <i class="bi bi-cloud-download me-1"></i>
+                            브라우저 <span class="text-info">localStorage</span>에 자동 저장됩니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let todos = [];
+    const STORAGE_KEY_TODOS = "fancyDashboardTodos";
+    const STORAGE_KEY_NOTE  = "fancyDashboardNote";
+
+    const todayText     = document.getElementById("todayText");
+    const todoForm      = document.getElementById("todoForm");
+    const todoInput     = document.getElementById("todoInput");
+    const prioritySelect = document.getElementById("prioritySelect");
+    const todoList      = document.getElementById("todoList");
+    const progressBar   = document.getElementById("progressBar");
+    const progressText  = document.getElementById("progressText");
+    const clearAllBtn   = document.getElementById("clearAll");
+
+    const focusNote     = document.getElementById("focusNote");
+    const saveNoteBtn   = document.getElementById("saveNote");
+    const noteStatus    = document.getElementById("noteStatus");
+
+    function setTodayText() {
+        const now = new Date();
+        const options = { year: "numeric", month: "short", day: "numeric", weekday: "short" };
+        todayText.textContent = now.toLocaleDateString("ko-KR", options);
+    }
+
+    function loadState() {
+        try {
+            const savedTodos = localStorage.getItem(STORAGE_KEY_TODOS);
+            const savedNote  = localStorage.getItem(STORAGE_KEY_NOTE);
+
+            if (savedTodos) {
+                todos = JSON.parse(savedTodos);
+            }
+            if (savedNote !== null) {
+                focusNote.value = savedNote;
+                noteStatus.textContent = "마지막 저장됨 (브라우저 localStorage)";
+            }
+        } catch (e) {
+            console.error("저장된 데이터를 불러오지 못했습니다:", e);
+        }
+    }
+
+    function saveTodos() {
+        localStorage.setItem(STORAGE_KEY_TODOS, JSON.stringify(todos));
+    }
+
+    function saveNote() {
+        localStorage.setItem(STORAGE_KEY_NOTE, focusNote.value);
+        noteStatus.textContent = "저장 완료! (브라우저 localStorage)";
+    }
+
+    function renderTodos() {
+        todoList.innerHTML = "";
+
+        if (todos.length === 0) {
+            const emptyItem = document.createElement("li");
+            emptyItem.className = "list-group-item bg-transparent border-0 text-secondary small";
+            emptyItem.textContent = "아직 등록된 할 일이 없습니다. 위에서 새로운 할 일을 추가해 보세요.";
+            todoList.appendChild(emptyItem);
+            updateProgress();
+            return;
+        }
+
+        todos.forEach((todo) => {
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex align-items-center justify-content-between bg-transparent border-secondary todo-item";
+            if (todo.completed) {
+                li.classList.add("completed");
+            }
+            li.dataset.id = todo.id;
+
+            const left = document.createElement("div");
+            left.className = "d-flex align-items-center";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.className = "form-check-input me-2";
+            checkbox.checked = todo.completed;
+
+            const title = document.createElement("span");
+            title.className = "todo-title";
+            title.textContent = todo.text;
+
+            const priorityBadge = document.createElement("span");
+            priorityBadge.className = "badge ms-2";
+            if (todo.priority === "high") {
+                priorityBadge.classList.add("bg-danger");
+                priorityBadge.textContent = "높음";
+            } else if (todo.priority === "low") {
+                priorityBadge.classList.add("bg-secondary");
+                priorityBadge.textContent = "낮음";
+            } else {
+                priorityBadge.classList.add("bg-info");
+                priorityBadge.textContent = "보통";
+            }
+
+            left.appendChild(checkbox);
+            left.appendChild(title);
+            left.appendChild(priorityBadge);
+
+            const right = document.createElement("button");
+            right.className = "btn btn-sm btn-outline-danger";
+            right.innerHTML = '<i class="bi bi-x-lg"></i>';
+
+            li.addEventListener("click", function (e) {
+                if (e.target === right || right.contains(e.target)) return;
+                toggleTodo(todo.id);
+            });
+
+            checkbox.addEventListener("click", function (e) {
+                e.stopPropagation();
+                toggleTodo(todo.id);
+            });
+
+            right.addEventListener("click", function (e) {
+                e.stopPropagation();
+                deleteTodo(todo.id);
+            });
+
+            li.appendChild(left);
+            li.appendChild(right);
+            todoList.appendChild(li);
+        });
+
+        updateProgress();
+    }
+
+    function addTodo(text, priority) {
+        const newTodo = {
+            id: Date.now(),
+            text: text.trim(),
+            priority: priority,
+            completed: false
+        };
+        todos.unshift(newTodo);
+        saveTodos();
+        renderTodos();
+    }
+
+    function toggleTodo(id) {
+        todos = todos.map((todo) =>
+            todo.id === id
+                ? { ...todo, completed: !todo.completed }
+                : todo
+        );
+        saveTodos();
+        renderTodos();
+    }
+
+    function deleteTodo(id) {
+        todos = todos.filter((todo) => todo.id !== id);
+        saveTodos();
+        renderTodos();
+    }
+
+    function clearAllTodos() {
+        if (!confirm("정말로 모든 할 일을 삭제하시겠습니까?")) return;
+        todos = [];
+        saveTodos();
+        renderTodos();
+    }
+
+    function updateProgress() {
+        const total = todos.length;
+        const completed = todos.filter((t) => t.completed).length;
+        const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+        progressBar.style.width = percent + "%";
+        progressText.textContent = percent + "%";
+        progressBar.setAttribute("aria-valuenow", percent);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setTodayText();
+        loadState();
+        renderTodos();
+
+        todoForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const text = todoInput.value.trim();
+            if (!text) {
+                todoInput.focus();
+                return;
+            }
+            const priority = prioritySelect.value;
+            addTodo(text, priority);
+            todoInput.value = "";
+            todoInput.focus();
+        });
+
+        clearAllBtn.addEventListener("click", clearAllTodos);
+
+        saveNoteBtn.addEventListener("click", function () {
+            saveNote();
+        });
+
+        focusNote.addEventListener("input", function () {
+            noteStatus.textContent = "변경됨 (저장 버튼을 눌러 저장하세요)";
+        });
+    });
+</script>
+</body>
+</html>

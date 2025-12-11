@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tailwind To-Do Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef9ff',
+                            100: '#d8f0ff',
+                            200: '#b3e0ff',
+                            300: '#7ec8ff',
+                            400: '#42a7ff',
+                            500: '#1f8aff',
+                            600: '#0f6ce6',
+                            700: '#0a52b4',
+                            800: '#093f89',
+                            900: '#082f66',
+                        },
+                    },
+                    boxShadow: {
+                        'glow': '0 0 40px rgba(59,130,246,0.45)',
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.7);
+            border-radius: 999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex items-center justify-center p-4">
+<div class="absolute inset-0 -z-10 overflow-hidden">
+    <!-- 라이트/다크에서 모두 꽤 티 나는 배경 -->
+    <div class="absolute -top-40 -left-40 w-80 h-80 bg-primary-300/40 dark:bg-primary-500/40 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-300/40 dark:bg-purple-600/40 rounded-full blur-3xl"></div>
+</div>
+
+<main class="w-full max-w-5xl">
+    <!-- 상단 영역 -->
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 px-4 sm:px-0">
+        <div class="flex items-center gap-3">
+            <div
+                class="h-10 w-10 rounded-2xl bg-gradient-to-tr from-primary-400 via-sky-400 to-emerald-400 flex items-center justify-center shadow-glow">
+                <span class="text-xl">✨</span>
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                    Tailwind To-Do Studio
+                </h1>
+                <p class="text-sm text-slate-500 dark:text-slate-300">
+                    오늘 할 일을 정리하고, 라이트/다크 테마로 분위기를 바꿔 보세요.
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 justify-between sm:justify-end">
+            <button
+                id="themeToggle"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-slate-300/80 bg-white/80 hover:bg-slate-100 text-xs sm:text-sm shadow-md transition dark:bg-slate-900 dark:border-white/10 dark:hover:bg-slate-800">
+                <span>라이트 / 다크 전환</span>
+                <span id="themeIcon">🌙</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 메인 카드 -->
+    <section
+        class="relative bg-white/90 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 rounded-3xl shadow-2xl shadow-primary-900/40 px-4 sm:px-8 py-6 sm:py-8 overflow-hidden">
+        <!-- 장식용 그리드 라인 -->
+        <div class="pointer-events-none absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_top,_#93c5fd_0,_transparent_55%),radial-gradient(circle_at_bottom,_#f97316_0,_transparent_55%)] dark:opacity-[0.04] dark:bg-[radial-gradient(circle_at_top,_#ffffff_0,_transparent_55%),radial-gradient(circle_at_bottom,_#60a5fa_0,_transparent_55%)]"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
+            <!-- 왼쪽: To-Do 리스트 -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between gap-2">
+                    <h2 class="text-lg sm:text-xl font-semibold flex items-center gap-2">
+                        📋 오늘의 할 일
+                    </h2>
+                    <span
+                        id="todoCount"
+                        class="text-xs sm:text-sm px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300/80 dark:bg-primary-500/20 dark:text-primary-100 dark:border-primary-400/40">
+                        0개의 할 일이 있습니다
+                    </span>
+                </div>
+
+                <!-- 입력 영역 -->
+                <div
+                    class="flex flex-col sm:flex-row gap-3 bg-slate-100/80 border border-slate-200 rounded-2xl p-3 sm:p-4 shadow-lg dark:bg-slate-900/60 dark:border-white/10">
+                    <div class="flex-1 relative">
+                        <input
+                            id="todoInput"
+                            type="text"
+                            placeholder="예: JavaScript 공부 30분, 강의자료 정리하기..."
+                            class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent placeholder:text-slate-400 dark:bg-slate-900/70 dark:border-slate-700/70 dark:placeholder:text-slate-500" />
+                        <span
+                            class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hidden sm:inline">
+                            Enter로 추가
+                        </span>
+                    </div>
+                    <button
+                        id="addTodoBtn"
+                        class="whitespace-nowrap inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium bg-gradient-to-r from-primary-400 via-sky-400 to-emerald-400 text-slate-900 shadow-lg hover:shadow-glow hover:-translate-y-[1px] transition">
+                        ➕ 할 일 추가
+                    </button>
+                </div>
+
+                <!-- 리스트 -->
+                <div class="max-h-[320px] md:max-h-[360px] overflow-y-auto pr-1 space-y-2" id="todoListWrapper">
+                    <ul id="todoList" class="space-y-2 text-sm sm:text-base">
+                        <!-- 동적으로 항목이 추가됩니다 -->
+                    </ul>
+                </div>
+
+                <!-- 작은 안내 -->
+                <p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <span class="text-lg">💡</span>
+                    항목을 클릭하면 완료 / 미완료가 토글되고,
+                    <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-200 border border-slate-300 text-slate-700 dark:bg-slate-800/80 dark:border-slate-600/60 dark:text-slate-200">
+                        🗑 삭제
+                    </span>
+                    버튼으로 제거할 수 있습니다.
+                </p>
+            </div>
+
+            <!-- 오른쪽: 미니 위젯들 -->
+            <div class="space-y-4">
+                <!-- 오늘의 한마디 -->
+                <div
+                    class="rounded-2xl bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-slate-200 p-4 shadow-xl dark:from-slate-900/70 dark:via-slate-900/40 dark:to-slate-800/60 dark:border-white/10">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-semibold flex items-center gap-2">
+                            🌈 오늘의 한마디
+                        </h3>
+                        <button
+                            id="quoteRefresh"
+                            class="text-[11px] px-2 py-1 rounded-full border border-slate-300 bg-white hover:bg-slate-100 transition dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
+                            새로고침
+                        </button>
+                    </div>
+                    <p id="quoteText" class="text-sm text-slate-700 leading-relaxed dark:text-slate-200">
+                        작은 한 걸음이라도, 오늘의 나를 어제보다 앞으로 보냅니다.
+                    </p>
+                </div>
+
+                <!-- 간단 포커스 타이머 -->
+                <div
+                    class="rounded-2xl bg-slate-100 border border-slate-200 p-4 shadow-xl space-y-3 dark:bg-slate-900/70 dark:border-white/10">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold flex items-center gap-2">
+                            ⏱ 포커스 타이머
+                        </h3>
+                        <span
+                            class="text-[11px] px-2 py-1 rounded-full bg-slate-200 border border-slate-300 text-slate-600 dark:bg-slate-800/80 dark:border-slate-600/80 dark:text-slate-300">
+                            미니 집중 모드
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input
+                            id="focusMinutes"
+                            type="number"
+                            min="1"
+                            max="120"
+                            value="25"
+                            class="w-20 bg-white border border-slate-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent text-right dark:bg-slate-900/60 dark:border-slate-700/70" />
+                        <span class="text-xs text-slate-500 dark:text-slate-400">분 집중</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button
+                            id="focusStart"
+                            class="flex-1 text-xs sm:text-sm px-3 py-2 rounded-lg bg-primary-500 hover:bg-primary-400 text-slate-900 font-medium shadow-md transition">
+                            ▶ 시작
+                        </button>
+                        <button
+                            id="focusReset"
+                            class="flex-1 text-xs sm:text-sm px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium border border-slate-300 transition dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100 dark:border-slate-600/70">
+                            ■ 리셋
+                        </button>
+                    </div>
+
+                    <div
+                        class="mt-1 rounded-xl bg-slate-50 border border-slate-200 p-3 flex flex-col gap-2 dark:bg-slate-950/60 dark:border-slate-800/80">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 dark:text-slate-400">남은 시간</span>
+                            <span id="focusDisplay" class="font-mono text-sm">
+                                25:00
+                            </span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden dark:bg-slate-800">
+                            <div
+                                id="focusBar"
+                                class="h-full w-0 bg-gradient-to-r from-primary-400 via-sky-400 to-emerald-400 transition-[width] duration-500 ease-out"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 작은 통계 -->
+                <div
+                    class="rounded-2xl bg-slate-100 border border-slate-200 p-3 shadow-xl text-xs space-y-1 dark:bg-slate-900/60 dark:border-white/10">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">총 할 일</span>
+                        <span id="statsTotal" class="font-semibold text-slate-900 dark:text-slate-100">0개</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">완료한 일</span>
+                        <span id="statsDone" class="font-semibold text-emerald-600 dark:text-emerald-300">0개</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">진행률</span>
+                        <span id="statsRate" class="font-semibold text-primary-600 dark:text-primary-300">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    const $ = (selector) => document.querySelector(selector);
+
+    const todoInput   = $("#todoInput");
+    const addTodoBtn  = $("#addTodoBtn");
+    const todoList    = $("#todoList");
+    const todoCount   = $("#todoCount");
+    const statsTotal  = $("#statsTotal");
+    const statsDone   = $("#statsDone");
+    const statsRate   = $("#statsRate");
+    const quoteText   = $("#quoteText");
+    const quoteRefresh = $("#quoteRefresh");
+    const themeToggle = $("#themeToggle");
+    const themeIcon   = $("#themeIcon");
+
+    const focusMinutesInput = $("#focusMinutes");
+    const focusStartBtn     = $("#focusStart");
+    const focusResetBtn     = $("#focusReset");
+    const focusDisplay      = $("#focusDisplay");
+    const focusBar          = $("#focusBar");
+
+    let focusTimer = null;
+    let focusTotalSeconds = 0;
+    let focusRemainingSeconds = 0;
+
+    const quotes = [
+        "작은 습관 하나가, 인생의 방향을 바꿉니다.",
+        "완벽함보다 중요한 것은, 어제보다 오늘 한 걸음입니다.",
+        "하고 싶은 일보다, 해야 할 일을 먼저 끝내 보세요.",
+        "코드는 거짓말하지 않습니다. 결과로 말해줍니다.",
+        "지금 쓰는 한 줄의 코드가, 내일의 나를 돕습니다.",
+        "잠깐의 집중이, 긴 시간의 발목을 잡는 일을 막아줍니다.",
+    ];
+
+    function updateQuote() {
+        const index = Math.floor(Math.random() * quotes.length);
+        quoteText.textContent = quotes[index];
+    }
+
+    quoteRefresh.addEventListener("click", updateQuote);
+
+    function applyThemeIcon() {
+        const isDark = document.documentElement.classList.contains("dark");
+        themeIcon.textContent = isDark ? "🌞" : "🌙";
+    }
+
+    function toggleTheme() {
+        document.documentElement.classList.toggle("dark");
+        applyThemeIcon();
+    }
+
+    themeToggle.addEventListener("click", toggleTheme);
+
+    function updateStats() {
+        const items = todoList.querySelectorAll("li");
+        const total = items.length;
+        let done = 0;
+        items.forEach((li) => {
+            if (li.dataset.completed === "true") {
+                done++;
+            }
+        });
+
+        const rate = total === 0 ? 0 : Math.round((done / total) * 100);
+
+        todoCount.textContent =
+            total === 0
+                ? "할 일이 없습니다. 새로 추가해 보세요!"
+                : `${total}개의 할 일이 있습니다`;
+        statsTotal.textContent = `${total}개`;
+        statsDone.textContent  = `${done}개`;
+        statsRate.textContent  = `${rate}%`;
+    }
+
+    function createTodoItem(text) {
+        const li = document.createElement("li");
+        li.className =
+            "group flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 hover:border-primary-400 hover:bg-slate-50 transition cursor-pointer dark:bg-slate-900/70 dark:border-slate-700/80 dark:hover:border-primary-400/60 dark:hover:bg-slate-900";
+        li.dataset.completed = "false";
+
+        const span = document.createElement("span");
+        span.className = "flex-1 text-slate-900 dark:text-slate-100 text-sm sm:text-base break-words";
+        span.textContent = text;
+
+        const actions = document.createElement("div");
+        actions.className = "flex items-center gap-2 shrink-0";
+
+        const badge = document.createElement("span");
+        badge.className =
+            "text-[10px] px-2 py-1 rounded-full bg-slate-200 border border-slate-300 text-slate-700 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition dark:bg-slate-800/80 dark:border-slate-600/70 dark:text-slate-300 dark:group-hover:bg-emerald-500/20 dark:group-hover:text-emerald-200";
+        badge.textContent = "진행중";
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.dataset.action = "delete";
+        delBtn.className =
+            "text-[11px] px-2 py-1 rounded-full bg-slate-200 text-slate-800 border border-slate-300 hover:bg-red-500 hover:border-red-400 hover:text-white transition dark:bg-slate-800/90 dark:text-slate-200 dark:border-slate-600/80";
+        delBtn.textContent = "🗑 삭제";
+
+        actions.appendChild(badge);
+        actions.appendChild(delBtn);
+
+        li.appendChild(span);
+        li.appendChild(actions);
+
+        li.addEventListener("click", (event) => {
+            if (event.target.dataset.action === "delete") {
+                li.remove();
+                updateStats();
+                event.stopPropagation();
+                return;
+            }
+            const current = li.dataset.completed === "true";
+            li.dataset.completed = (!current).toString();
+
+            if (!current) {
+                li.classList.add("opacity-60");
+                span.classList.add("line-through");
+                badge.textContent = "완료";
+            } else {
+                li.classList.remove("opacity-60");
+                span.classList.remove("line-through");
+                badge.textContent = "진행중";
+            }
+
+            updateStats();
+        });
+
+        return li;
+    }
+
+    function addTodo() {
+        const value = todoInput.value.trim();
+        if (!value) {
+            todoInput.classList.add("border-red-500", "ring-2", "ring-red-500/70");
+            setTimeout(() => {
+                todoInput.classList.remove("border-red-500", "ring-2", "ring-red-500/70");
+            }, 600);
+            return;
+        }
+
+        const item = createTodoItem(value);
+        todoList.prepend(item);
+        todoInput.value = "";
+        todoInput.focus();
+        updateStats();
+    }
+
+    addTodoBtn.addEventListener("click", addTodo);
+
+    todoInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            addTodo();
+        }
+    });
+
+    function formatTime(sec) {
+        const m = Math.floor(sec / 60).toString().padStart(2, "0");
+        const s = (sec % 60).toString().padStart(2, "0");
+        return `${m}:${s}`;
+    }
+
+    function resetFocusTimer() {
+        if (focusTimer) {
+            clearInterval(focusTimer);
+            focusTimer = null;
+        }
+        const minutes = parseInt(focusMinutesInput.value, 10) || 25;
+        focusTotalSeconds = minutes * 60;
+        focusRemainingSeconds = focusTotalSeconds;
+        focusDisplay.textContent = formatTime(focusRemainingSeconds);
+        focusBar.style.width = "0%";
+        focusStartBtn.textContent = "▶ 시작";
+    }
+
+    function startFocusTimer() {
+        const minutes = parseInt(focusMinutesInput.value, 10);
+        if (isNaN(minutes) || minutes <= 0) {
+            focusMinutesInput.classList.add("border-red-500", "ring-2", "ring-red-500/70");
+            setTimeout(() => {
+                focusMinutesInput.classList.remove(
+                    "border-red-500",
+                    "ring-2",
+                    "ring-red-500/70"
+                );
+            }, 600);
+            return;
+        }
+
+        if (!focusTimer) {
+            focusTotalSeconds = minutes * 60;
+            focusRemainingSeconds = focusRemainingSeconds || focusTotalSeconds;
+
+            focusTimer = setInterval(() => {
+                focusRemainingSeconds--;
+                if (focusRemainingSeconds <= 0) {
+                    focusRemainingSeconds = 0;
+                    clearInterval(focusTimer);
+                    focusTimer = null;
+                    focusStartBtn.textContent = "완료!";
+                    setTimeout(() => {
+                        focusStartBtn.textContent = "▶ 다시 시작";
+                    }, 1500);
+                }
+                focusDisplay.textContent = formatTime(focusRemainingSeconds);
+                const progress =
+                    focusTotalSeconds === 0
+                        ? 0
+                        : ((focusTotalSeconds - focusRemainingSeconds) /
+                              focusTotalSeconds) *
+                          100;
+                focusBar.style.width = `${progress}%`;
+            }, 1000);
+
+            focusStartBtn.textContent = "⏸ 일시정지";
+        } else {
+            clearInterval(focusTimer);
+            focusTimer = null;
+            focusStartBtn.textContent = "▶ 다시 시작";
+        }
+    }
+
+    focusStartBtn.addEventListener("click", startFocusTimer);
+    focusResetBtn.addEventListener("click", () => {
+        focusRemainingSeconds = 0;
+        resetFocusTimer();
+    });
+
+    resetFocusTimer();
+    updateStats();
+    updateQuote();
+    applyThemeIcon();
+</script>
+</body>
+</html>

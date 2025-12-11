@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>포토 캘린더</title>
+    <style>
+        /* 전체 페이지 기본 설정 */
+        body {
+            margin: 0;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        /* 캘린더 전체를 감싸는 컨테이너 */
+        .calendar-wrapper {
+            max-width: 800px;          /* 화면이 너무 넓을 때 가운데 좁게 보이도록 */
+            margin: 20px auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;          /* 모서리 둥근 부분 밖으로 나가는 요소 숨기기 */
+        }
+
+        /* 상단 타이틀 영역 */
+        .calendar-header {
+            text-align: center;
+            padding: 20px 10px 10px;
+        }
+
+        .calendar-header h1 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: 2px;
+        }
+
+        .calendar-header .year-month {
+            margin-top: 6px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* 사진 영역: 가로를 꽉 채우는 풍경 사진 */
+        .photo-area img {
+            display: block;
+            width: 100%;      /* 가로 전체 채우기 */
+            height: auto;     /* 비율 유지 */
+        }
+
+        /* 달력 영역 */
+        .month-calendar {
+            padding: 20px;
+        }
+
+        /* 기본 표 스타일 초기화 */
+        table {
+            width: 100%;
+            border-collapse: collapse;  /* 셀 사이 여백 제거 */
+            table-layout: fixed;        /* 각 칸을 균일한 너비로 */
+        }
+
+        th, td {
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #fafafa;
+            font-weight: 600;
+        }
+
+        /* 일요일: 첫 번째 컬럼 - 빨간색 */
+        th:nth-child(1),
+        td:nth-child(1) {
+            color: #e53935;
+        }
+
+        /* 토요일: 일곱 번째 컬럼 - 파란색 */
+        th:nth-child(7),
+        td:nth-child(7) {
+            color: #1e88e5;
+        }
+
+        /* 비어 있는 날짜(이 달에 속하지 않는 칸) */
+        .empty {
+            background-color: #fdfdfd;
+        }
+
+        /* 오늘 표시 예시 (원하실 때 사용) */
+        .today {
+            background-color: #fff3cd;
+            font-weight: 700;
+            border-color: #ffecb5;
+        }
+
+        /* 반응형: 작은 화면에서는 글자 크기 조금 줄이기 */
+        @media (max-width: 480px) {
+            .calendar-header h1 {
+                font-size: 22px;
+            }
+            .calendar-header .year-month {
+                font-size: 16px;
+            }
+            th, td {
+                padding: 6px 0;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-wrapper">
+        <!-- 상단 타이틀 / 연·월 -->
+        <div class="calendar-header">
+            <h1>PHOTO CALENDAR</h1> <!-- 필요하면 "포토 캘린더" 로 변경 -->
+            <div class="year-month">2025년 11월</div>
+        </div>
+
+        <!-- 가로를 꽉 채우는 풍경 사진 영역 -->
+        <div class="photo-area">
+            <!-- src에 원하는 풍경 사진 경로를 넣으시면 됩니다 -->
+            <img src="https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg"
+                 alt="가을 풍경 사진">
+        </div>
+
+        <!-- 한 달 달력 영역 -->
+        <div class="month-calendar">
+            <table>
+                <thead>
+                    <tr>
+                        <th>일</th>
+                        <th>월</th>
+                        <th>화</th>
+                        <th>수</th>
+                        <th>목</th>
+                        <th>금</th>
+                        <th>토</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 예시: 2025년 11월(1일이 토요일이라고 가정한 샘플) -->
+                    <tr>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>10</td>
+                        <td>11</td>
+                        <td>12</td>
+                        <td>13</td>
+                        <td>14</td>
+                        <td>15</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>17</td>
+                        <td>18</td>
+                        <td>19</td>
+                        <td>20</td>
+                        <td>21</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>24</td>
+                        <td>25</td>
+                        <td>26</td>
+                        <td>27</td>
+                        <td>28</td>
+                        <td>29</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                        <td class="empty"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
