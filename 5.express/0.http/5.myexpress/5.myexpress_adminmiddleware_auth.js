@@ -62,8 +62,21 @@ const myapp = {
 
 // 모든 요청에 대해 공통 로깅
 function loggerMiddleware(context, next) {
-    console.log(`[LOG] ${context.req.method} ${context.route}`);
+    const { req, res, route } = context;
+    // 1. 로그 찍고 끝
+    // console.log(`[LOG] ${req.method} ${route}`);
+    context.startTime = Date.now();  // 시작 시간 새로 등록 (또는 이전 timeMiddleware 에서 추가)
+
     next();
+
+    // 2. 먼저 다음 연산자부터 호출하고, 그 이후에 처리...
+    // 그 다음, 처리 끝난 후에 경과 시간 계산
+    if (context.startTime) {  // 이전 timeMiddleware 에서 하는 방식이었다면...
+        const duration = Date.now() - context.startTime;
+        console.log(`[LOG] ${req.method} ${route} -> ${res.statusCode} ${duration}ms`);
+    } else {
+        console.log(`[LOG] ${req.method} ${route} -> ${res.statusCode} (no startTime)`);
+    }
 }
 
 // 모든 요청에 대해 간단한 헤더 설정
