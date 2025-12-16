@@ -1,0 +1,2 @@
+-- DROP TABLE: 구조+데이터 삭제
+-- DELETE FROM: 데이터만 삭제(구조 유지)

@@ -1,0 +1,2 @@
+-- sqlite3 점 명령 참고
+-- .tables / .schema / .read
