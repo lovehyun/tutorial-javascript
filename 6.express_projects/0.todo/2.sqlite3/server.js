@@ -11,6 +11,8 @@ const db = new sqlite3.Database('todos.db', (err) => {
         console.error('DB 연결 실패:', err);
     } else {
         console.log('DB 연결 성공');
+
+        // 테이블 초기화
         const query = `
             CREATE TABLE IF NOT EXISTS todos (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
