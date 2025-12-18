@@ -18,13 +18,14 @@ const sqlite3 = require('sqlite3').verbose();
         const insertResult = await new Promise((resolve, reject) => {
             db.run('INSERT INTO messages (text) VALUES (?)', ['Hello, SQLite!'], function (err) {
                 if (err) reject(err);
-                else resolve(this); // `this`는 삽입된 데이터의 ID 정보를 담고 있음
+                else resolve(this);
             });
         });
         console.log('데이터가 성공적으로 삽입되었습니다. ID:', insertResult.lastID);
 
         // 데이터 조회
         const rows = await new Promise((resolve, reject) => {
+            // do.each 또는 do.all
             db.all('SELECT * FROM messages', [], (err, rows) => {
                 if (err) reject(err);
                 else resolve(rows);

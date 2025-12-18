@@ -29,6 +29,8 @@ const db = new sqlite3.Database('mydatabase.db');
         // 데이터 조회
         const rows = await new Promise((resolve, reject) => {
             const results = [];
+            
+            // db.each(sql, params, rowCallback, completeCallback) 형태라서 **콜백이 2개가 "정상"**
             db.each('SELECT * FROM greetings', [], (err, row) => {
                 if (err) reject(err);
                 else results.push(row);
@@ -36,6 +38,13 @@ const db = new sqlite3.Database('mydatabase.db');
                 if (err) reject(err);
                 else resolve(results); // 모든 행의 결과 반환
             });
+
+            // 그래서 do.each 대신 do.all 쓰면 됨
+            // db.all('SELECT * FROM greetings', [], (err, rows) => {
+            //     if (err) reject(err);
+            //     else resolve(rows);
+            // });
+            
         });
         rows.forEach(row => console.log('조회된 메시지:', row.message));
 

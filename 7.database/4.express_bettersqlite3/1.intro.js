@@ -15,12 +15,16 @@ function initializeDatabase() {
     const sql = fs.readFileSync('init_database.sql', 'utf8');
 
     // 파일 내의 SQL 쿼리 실행
-    const statements = sql.split(';').filter(Boolean); // 각 행의 ; 로 잘라서 undefined, null 등의 행은 제외
+    const statements = sql.split(';').filter(Boolean); // 각 행의 ; 로 잘라서 falsy (undefined, null 등) 행은 제외. 사실상 .filter(x => Boolean(x)) 와 같음.
+
+    // const statements = sql.split(';').map(s => s.trim()).filter(s => s.length > 0);  // 이게 더 많은 빈 문장을 제거함
+
     db.transaction(() => {
         for (const statement of statements) {
+            console.log(statement);
             db.exec(statement);
         }
-    })(); // db.transaction 은 함수를 반환함. 그리고 성공하면 자동 커밋, 실패하면 자동 롤백
+    })(); // db.transaction 은 함수를 반환함. 함수를 반환하는 팩토리라서 () 을 통해서 호출. 그리고 성공하면 자동 커밋, 실패하면 자동 롤백
 
     // 에러체크를 하려면?
     /*

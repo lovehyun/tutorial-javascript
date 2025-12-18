@@ -12,12 +12,12 @@ function connectDB() {
 function runQuery(query, params = []) {
     return new Promise((resolve, reject) => {
         const db = connectDB();
-        db.run(query, params, function (err) {
+        db.run(query, params, function (err) { // 화살표 함수 쓰면 this를 못함.
             if (err) {
                 db.close();
                 return reject(err);
             }
-            resolve(this); // `this`는 삽입된 데이터의 ID 등의 정보를 담고 있음
+            resolve(this); // `this`는 삽입된 데이터의 ID 등의 정보를 담고 있음 (db.run() 이 호출될때 넣어주는 Statement 라는 객체)
             db.close();
         });
     });
