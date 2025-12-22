@@ -10,10 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 function makeCard(id, title, message) {
     const card = document.createElement('div');
-    // card.className = 'col-12 col-md-6 col-lg-4 mb-3';
-    card.className = 'col-12 col-md-4 col-lg-4 mb-3';
+    card.className = 'col-md-4';
     card.innerHTML = `
-        <div class="card" id="card_${id}">
+        <div class="card mb-4" id="card_${id}">
             <div class="card-body">
                 <p class="card-id">${id}</p>
                 <p class="card-title">${title}</p>

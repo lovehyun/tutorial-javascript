@@ -2,6 +2,7 @@
 const express = require('express');
 // const bodyParser = require('body-parser');
 const Database = require('./database_bettersqlite3');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -11,13 +12,14 @@ const port = 3000;
 // app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 데이터베이스 모듈로부터 DB연결 객체를 생성
 const db = new Database();
 
 // 홈 페이지 렌더링
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index_fetch_columns.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index_fetch.html'));
     // res.sendFile(path.join(__dirname, 'public', 'index_jquery.html'));
 });
 

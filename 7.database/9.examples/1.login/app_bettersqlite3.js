@@ -36,6 +36,9 @@ app.post('/login', (req, res) => {
     // 데이터베이스에서 사용자 확인
     const row = db.prepare('SELECT * FROM users WHERE username = ? AND password = ?').get(username, password);
 
+    // const stmt = db.prepare('SELECT * FROM users WHERE username = ? AND password = ?');
+    // const row = stmt.get(username, password);
+
     if (row) {
         res.send('로그인 성공!');
     } else {

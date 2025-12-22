@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const dbPath = process.env.DB_PATH;
-const db = new sqlite3.Database(path.resolve(__dirname, dbPath));
+const db = new sqlite3.Database(dbPath);
 
 // Configure Nunjucks for templating
 nunjucks.configure('views', {
