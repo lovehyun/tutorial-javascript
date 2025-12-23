@@ -48,13 +48,13 @@
 
     <div class="container">
         <div class="row">
-            <!-- 4칸 열 -->
+            <!-- 4칸 열 : bg-info -->
             <div class="col-4" style="background-color: lightblue">4칸 열</div>
 
-            <!-- 6칸 열 -->
+            <!-- 6칸 열 : bg-success -->
             <div class="col-6" style="background-color: lightgreen">6칸 열</div>
 
-            <!-- 8칸 열 -->
+            <!-- 8칸 열 : bg-danger -->
             <div class="col-8" style="background-color: lightcoral">8칸 열</div>
         </div>
     </div>
@@ -106,18 +106,10 @@
     <div class="container">
         <h2 class="text-center my-4">Bootstrap Breakpoints Example</h2>
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-primary text-white p-3">
-                Box 1
-            </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-success text-white p-3">
-                Box 2
-            </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-danger text-white p-3">
-                Box 3
-            </div>
-            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-warning text-white p-3">
-                Box 4
-            </div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-primary text-white p-3">Box 1</div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-success text-white p-3">Box 2</div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-danger  text-white p-3">Box 3</div>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 bg-warning text-white p-3">Box 4</div>
         </div>
     </div>
 
@@ -125,24 +117,13 @@
         <h2 class="text-center my-4">Bootstrap Display Utilities Example</h2>
 
         <!-- Visible only on small screens -->
-        <div class="d-block d-md-none bg-success text-white p-3 text-center">
-            작은 화면에서만 보입니다 (576px 미만).
-        </div>
-
+        <div class="d-block d-sm-none            bg-success text-white p-3 text-center">아주 작은 화면에서만 보입니다 (576px 미만)</div>
+        <div class="d-none  d-sm-block d-md-none bg-success text-white p-3 text-center">작은 화면에서만 보입니다 (576px 이만, 768px 미만).</div>
         <!-- Visible only on medium screens -->
-        <div class="d-none d-md-block d-lg-none bg-primary text-white p-3 text-center">
-            중간 크기의 화면에서만 보입니다 (768px 이상, 992px 미만).
-        </div>
-
+        <div class="d-none  d-md-block d-lg-none bg-primary text-white p-3 text-center">중간 크기의 화면에서만 보입니다 (768px 이상, 992px 미만).</div>
         <!-- Visible only on large screens -->
-        <div class="d-none d-lg-block d-xl-none bg-warning text-white p-3 text-center">
-            큰 화면에서만 보입니다 (992px 이상, 1200px 미만).
-        </div>
-
-        <!-- Visible only on extra-large screens -->
-        <div class="d-none d-xl-block bg-danger text-white p-3 text-center">
-            매우 큰 화면에서만 보입니다 (1200px 이상).
-        </div>
+        <div class="d-none  d-lg-block d-xl-none bg-warning text-white p-3 text-center">큰 화면에서만 보입니다 (992px 이상, 1200px 미만).</div>
+        <div class="d-none  d-xl-block           bg-danger  text-white p-3 text-center">매우 큰 화면에서만 보입니다 (1200px 이상).</div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
