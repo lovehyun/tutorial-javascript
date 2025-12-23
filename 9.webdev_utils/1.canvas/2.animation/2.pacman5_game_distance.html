@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid white;
+        }
+        #scoreBoard {
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="scoreBoard">Score: 0</div>
+    <canvas id="myCanvas" width="600" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const context = canvas.getContext('2d');
+
+        const angles = {
+            right: { baseStart: 0.2 * Math.PI, baseEnd: 1.8 * Math.PI, minStart: 0.05 * Math.PI, maxStart: 0.25 * Math.PI },
+            left: { baseStart: 1.2 * Math.PI, baseEnd: 0.8 * Math.PI, minStart: 1.05 * Math.PI, maxStart: 1.25 * Math.PI },
+            up: { baseStart: 1.7 * Math.PI, baseEnd: 1.3 * Math.PI, minStart: 1.55 * Math.PI, maxStart: 1.75 * Math.PI },
+            down: { baseStart: 0.7 * Math.PI, baseEnd: 0.3 * Math.PI, minStart: 0.55 * Math.PI, maxStart: 0.75 * Math.PI }
+        };
+
+        let pacman = {
+            x: 100,
+            y: 100,
+            radius: 20,
+            startAngle: angles.right.baseStart,
+            endAngle: angles.right.baseEnd,
+            angleIncrement: 0.02 * Math.PI,
+            directionX: 1,
+            directionY: 0,
+            speed: 3,
+            mouthOpen: true,
+            minStart: angles.right.minStart,
+            maxStart: angles.right.maxStart
+        };
+
+        let snacks = [];
+        let score = 0;
+
+        function generateSnacks() {
+            snacks = [];
+            for (let i = 0; i < 3; i++) {
+                const snack = {
+                    x: Math.random() * (canvas.width - 40) + 20,
+                    y: Math.random() * (canvas.height - 40) + 20,
+                    radius: 5,
+                    eaten: false
+                };
+                snacks.push(snack);
+            }
+        }
+
+        function drawPacman() {
+            context.beginPath();
+            context.moveTo(pacman.x, pacman.y);
+            context.arc(pacman.x, pacman.y, pacman.radius, pacman.startAngle, pacman.endAngle);
+            context.lineTo(pacman.x, pacman.y);
+            context.fillStyle = 'yellow';
+            context.fill();
+            context.closePath();
+        }
+
+        function drawSnacks() {
+            snacks.forEach(snack => {
+                if (!snack.eaten) {
+                    context.beginPath();
+                    context.arc(snack.x, snack.y, snack.radius, 0, 2 * Math.PI);
+                    context.fillStyle = 'white';
+                    context.fill();
+                    context.closePath();
+                }
+            });
+        }
+
+        // 추가 1) (팩맨-스낵) 점선 + 거리 표시
+        function drawDashedDistanceLine(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            // 점선 라인
+            context.save();
+            context.beginPath();
+            context.setLineDash([6, 6]);          // 점선 패턴
+            context.globalAlpha = 0.35;           // 흐리게
+            context.strokeStyle = 'white';
+            context.lineWidth = 1;
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
+            context.stroke();
+            context.restore();
+
+            // 거리 텍스트 (선 중간)
+            const mx = (x1 + x2) / 2;
+            const my = (y1 + y2) / 2;
+            const label = `${distance.toFixed(1)}px`;
+
+            context.save();
+            context.globalAlpha = 0.9;
+            context.font = '14px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+
+            // 가독성용 배경(반투명 박스)
+            const paddingX = 6;
+            const paddingY = 4;
+            const textWidth = context.measureText(label).width;
+
+            context.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            context.fillRect(
+                mx - textWidth / 2 - paddingX,
+                my - 14 / 2 - paddingY,
+                textWidth + paddingX * 2,
+                14 + paddingY * 2
+            );
+
+            context.fillStyle = 'white';
+            context.fillText(label, mx, my);
+            context.restore();
+        }
+
+        // 추가 2) 모든 (먹지 않은) 스낵에 대해 연결/표시
+        function drawDistancesToSnacks() {
+            snacks.forEach(snack => {
+                if (!snack.eaten) {
+                    drawDashedDistanceLine(pacman.x, pacman.y, snack.x, snack.y);
+                }
+            });
+        }
+
+        // 추가 3) 가장 가까운 선 하나만 연결/표시
+        function drawDistancesToSnacks2() {
+            // 먹지 않은 snack만 대상으로 "가장 가까운 1개" 찾기
+            let closest = null;
+            let closestDist = Infinity;
+
+            for (const snack of snacks) {
+                if (snack.eaten) continue;
+
+                const dx = snack.x - pacman.x;
+                const dy = snack.y - pacman.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = snack;
+                }
+            }
+
+            // 가장 가까운 1개만 선/거리 표시
+            if (closest) {
+                drawDashedDistanceLine(pacman.x, pacman.y, closest.x, closest.y);
+            }
+        }
+
+
+        function updatePacmanPosition() {
+            pacman.x += pacman.directionX * pacman.speed;
+            pacman.y += pacman.directionY * pacman.speed;
+
+            if (pacman.x < pacman.radius) pacman.x = pacman.radius;
+            if (pacman.x > canvas.width - pacman.radius) pacman.x = canvas.width - pacman.radius;
+            if (pacman.y < pacman.radius) pacman.y = pacman.radius;
+            if (pacman.y > canvas.height - pacman.radius) pacman.y = canvas.height - pacman.radius;
+
+            if (pacman.mouthOpen) {
+                pacman.startAngle += pacman.angleIncrement;
+                pacman.endAngle -= pacman.angleIncrement;
+                if (pacman.startAngle >= pacman.maxStart) pacman.mouthOpen = false;
+            } else {
+                pacman.startAngle -= pacman.angleIncrement;
+                pacman.endAngle += pacman.angleIncrement;
+                if (pacman.startAngle <= pacman.minStart) pacman.mouthOpen = true;
+            }
+        }
+
+        function checkCollisions() {
+            snacks.forEach(snack => {
+                const dx = pacman.x - snack.x; 
+                const dy = pacman.y - snack.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < pacman.radius + snack.radius && !snack.eaten) {
+                    snack.eaten = true;
+                    score++;
+                    document.getElementById('scoreBoard').innerText = `Score: ${score}`;
+                }
+            });
+
+            if (snacks.every(snack => snack.eaten)) {
+                generateSnacks();
+            }
+        }
+
+        function handleKeyDown(event) {
+            switch (event.key) {
+                case 'ArrowUp':
+                    pacman.directionX = 0;
+                    pacman.directionY = -1;
+                    pacman.startAngle = angles.up.baseStart;
+                    pacman.endAngle = angles.up.baseEnd;
+                    pacman.minStart = angles.up.minStart;
+                    pacman.maxStart = angles.up.maxStart;
+                    break;
+                case 'ArrowDown':
+                    pacman.directionX = 0;
+                    pacman.directionY = 1;
+                    pacman.startAngle = angles.down.baseStart;
+                    pacman.endAngle = angles.down.baseEnd;
+                    pacman.minStart = angles.down.minStart;
+                    pacman.maxStart = angles.down.maxStart;
+                    break;
+                case 'ArrowLeft':
+                    pacman.directionX = -1;
+                    pacman.directionY = 0;
+                    pacman.startAngle = angles.left.baseStart;
+                    pacman.endAngle = angles.left.baseEnd;
+                    pacman.minStart = angles.left.minStart;
+                    pacman.maxStart = angles.left.maxStart;
+                    break;
+                case 'ArrowRight':
+                    pacman.directionX = 1;
+                    pacman.directionY = 0;
+                    pacman.startAngle = angles.right.baseStart;
+                    pacman.endAngle = angles.right.baseEnd;
+                    pacman.minStart = angles.right.minStart;
+                    pacman.maxStart = angles.right.maxStart;
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        function animate() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 순서 중요: 점선/텍스트를 "아래" 깔고 싶으면 먼저, 위에 올리고 싶으면 나중에
+            drawDistancesToSnacks();
+
+            drawPacman();
+            drawSnacks();
+            updatePacmanPosition();
+            checkCollisions();
+            requestAnimationFrame(animate);
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+        generateSnacks();
+        animate();
+    </script>
+</body>
+</html>

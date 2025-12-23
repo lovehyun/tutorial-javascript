@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>2025 포토 캘린더 (Tailwind)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <header class="text-center mb-6">
+      <h1 class="text-3xl font-bold mb-2">2025 포토 캘린더</h1>
+      <p class="text-sm text-slate-500">
+        12개월이 한 화면에 보이는 반응형 포토 캘린더 (TailwindCSS)
+      </p>
+    </header>
+
+    <!-- 캘린더 그리드 -->
+    <div
+      id="calendarGrid"
+      class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6"
+    >
+      <!-- JavaScript에서 12개월 카드가 채워집니다 -->
+    </div>
+  </div>
+
+  <script>
+    const year = 2025;
+    const months = [
+      "1월", "2월", "3월", "4월", "5월", "6월",
+      "7월", "8월", "9월", "10월", "11월", "12월"
+    ];
+    const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
+
+    const calendarGrid = document.getElementById("calendarGrid");
+
+    function createMonthCard(year, monthIndex) {
+      const firstDay = new Date(year, monthIndex, 1).getDay(); // 0=일요일
+      const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+      // 요일 헤더 생성
+      let theadCells = "";
+      weekDays.forEach((d) => {
+        theadCells += `
+          <th class="px-1 py-1 text-[11px] text-center font-medium text-slate-600 border border-slate-200">
+            ${d}
+          </th>`;
+      });
+
+      // 날짜 바디 생성
+      let day = 1;
+      let tbodyRows = "";
+
+      for (let week = 0; week < 6; week++) {
+        let rowCells = "";
+
+        for (let dow = 0; dow < 7; dow++) {
+          if (week === 0 && dow < firstDay) {
+            // 첫 주의 시작 요일 이전은 공백
+            rowCells += `
+              <td class="px-1 py-1 text-[11px] text-center text-slate-300 border border-slate-200">
+                &nbsp;
+              </td>`;
+          } else if (day > daysInMonth) {
+            // 해당 월의 날짜가 끝난 이후는 공백
+            rowCells += `
+              <td class="px-1 py-1 text-[11px] text-center text-slate-300 border border-slate-200">
+                &nbsp;
+              </td>`;
+          } else {
+            rowCells += `
+              <td class="px-1 py-1 text-[11px] text-center text-slate-800 border border-slate-200">
+                ${day}
+              </td>`;
+            day++;
+          }
+        }
+
+        tbodyRows += `<tr>${rowCells}</tr>`;
+
+        if (day > daysInMonth) {
+          break; // 더 이상 날짜가 없으면 중단
+        }
+      }
+
+      const monthName = months[monthIndex];
+
+      // 사진: 추후에 본인 이미지로 교체 가능 (지금은 placeholder)
+      const imgUrl = `https://picsum.photos/seed/${year}-${monthIndex + 1}/600/300`;
+
+      const cardHtml = `
+        <article class="bg-white rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img
+              src="${imgUrl}"
+              alt="${monthName} 사진"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div class="p-3 flex flex-col flex-1">
+            <h2 class="text-center text-sm font-semibold text-slate-800 mb-2">
+              ${year}년 ${monthName}
+            </h2>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-[11px]">
+                <thead class="bg-slate-50">
+                  <tr>
+                    ${theadCells}
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tbodyRows}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+      `;
+
+      return cardHtml;
+    }
+
+    function renderCalendar() {
+      let html = "";
+      for (let m = 0; m < 12; m++) {
+        html += createMonthCard(year, m);
+      }
+      calendarGrid.innerHTML = html;
+    }
+
+    renderCalendar();
+  </script>
+</body>
+</html>

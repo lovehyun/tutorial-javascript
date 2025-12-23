@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Neon Pacman (Readable)</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            background: #06060c;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+        #hud {
+            position: fixed;
+            left: 12px;
+            top: 10px;
+            color: #e8e8ff;
+            font: 14px/1.2 ui-monospace, Menlo, Consolas, monospace;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div id="hud">Score: <b id="score">0</b> · WASD/Arrow</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        /**********************
+         * 0) Canvas / Utils
+         **********************/
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+
+        const DPR = Math.max(1, window.devicePixelRatio || 1);
+
+        function clamp(v, min, max) {
+            return Math.max(min, Math.min(max, v));
+        }
+
+        function rand(min, max) {
+            return min + Math.random() * (max - min);
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth * DPR;
+            canvas.height = window.innerHeight * DPR;
+
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+
+            // 이후 모든 좌표는 CSS 픽셀 기준으로 그리기
+            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        /**********************
+         * 1) Input
+         **********************/
+        const pressedKeys = new Set();
+
+        window.addEventListener('keydown', (e) => pressedKeys.add(e.key));
+        window.addEventListener('keyup', (e) => pressedKeys.delete(e.key));
+
+        function getMoveVector() {
+            let dx = 0;
+            let dy = 0;
+
+            if (pressedKeys.has('ArrowLeft') || pressedKeys.has('a') || pressedKeys.has('A')) dx -= 1;
+            if (pressedKeys.has('ArrowRight') || pressedKeys.has('d') || pressedKeys.has('D')) dx += 1;
+            if (pressedKeys.has('ArrowUp') || pressedKeys.has('w') || pressedKeys.has('W')) dy -= 1;
+            if (pressedKeys.has('ArrowDown') || pressedKeys.has('s') || pressedKeys.has('S')) dy += 1;
+
+            // 대각 이동 시 속도 보정(정규화)
+            if (dx !== 0 || dy !== 0) {
+                const len = Math.hypot(dx, dy) || 1;
+                dx /= len;
+                dy /= len;
+            }
+
+            return { dx, dy };
+        }
+
+        /**********************
+         * 2) Game State
+         **********************/
+        const game = {
+            score: 0,
+            pellets: [],
+            sparks: [],
+            pacman: {
+                x: window.innerWidth * 0.35,
+                y: window.innerHeight * 0.55,
+                radius: 18,
+                vx: 3.2,
+                vy: 0,
+                dirRad: 0, // 현재 바라보는 방향(라디안)
+                mouthTime: 0, // 입 애니메이션용 시간
+                speed: 3.2,
+            },
+        };
+
+        /**********************
+         * 3) Pellet / Spark
+         **********************/
+        function spawnPellet() {
+            const pellet = {
+                x: rand(40, window.innerWidth - 40),
+                y: rand(40, window.innerHeight - 40),
+                radius: rand(4, 8),
+                hue: rand(180, 320), // 네온 느낌(파랑~보라 계열)
+            };
+            game.pellets.push(pellet);
+        }
+
+        function initPellets(count = 24) {
+            game.pellets.length = 0;
+            for (let i = 0; i < count; i++) spawnPellet();
+        }
+
+        function spawnSparks(x, y, hue) {
+            // 먹었을 때 파티클 확 튀는 연출
+            for (let i = 0; i < 16; i++) {
+                const a = rand(0, Math.PI * 2);
+                const sp = rand(1.2, 4.4);
+                game.sparks.push({
+                    x,
+                    y,
+                    vx: Math.cos(a) * sp,
+                    vy: Math.sin(a) * sp,
+                    life: rand(18, 40),
+                    hue,
+                });
+            }
+        }
+
+        initPellets();
+
+        /**********************
+         * 4) Update
+         **********************/
+        function updatePacman() {
+            const { dx, dy } = getMoveVector();
+            const p = game.pacman;
+
+            // 입력이 있으면 속도/방향 갱신
+            if (dx !== 0 || dy !== 0) {
+                p.vx = dx * p.speed;
+                p.vy = dy * p.speed;
+                p.dirRad = Math.atan2(p.vy, p.vx);
+            }
+
+            // 이동 + 화면 경계 처리
+            p.x = clamp(p.x + p.vx, p.radius, window.innerWidth - p.radius);
+            p.y = clamp(p.y + p.vy, p.radius, window.innerHeight - p.radius);
+
+            // 입 애니메이션 시간 증가
+            p.mouthTime += 0.12;
+        }
+
+        function updateSparks() {
+            for (let i = game.sparks.length - 1; i >= 0; i--) {
+                const sp = game.sparks[i];
+
+                sp.x += sp.vx;
+                sp.y += sp.vy;
+
+                sp.vx *= 0.96;
+                sp.vy *= 0.96;
+
+                sp.life -= 1;
+                if (sp.life <= 0) game.sparks.splice(i, 1);
+            }
+        }
+
+        function checkPelletCollision() {
+            const p = game.pacman;
+
+            for (let i = game.pellets.length - 1; i >= 0; i--) {
+                const q = game.pellets[i];
+                const dist = Math.hypot(q.x - p.x, q.y - p.y);
+
+                if (dist < p.radius + q.radius * 0.25) {
+                    // 제거
+                    game.pellets.splice(i, 1);
+
+                    // 점수
+                    game.score += 10;
+                    scoreEl.textContent = game.score;
+
+                    // 이펙트
+                    spawnSparks(q.x, q.y, q.hue);
+
+                    // 항상 갯수 유지
+                    spawnPellet();
+                }
+            }
+        }
+
+        function update() {
+            updatePacman();
+            updateSparks();
+            checkPelletCollision();
+        }
+
+        /**********************
+         * 5) Render Helpers
+         **********************/
+        function drawBackground() {
+            // 바탕 그라데이션
+            const bg = ctx.createRadialGradient(
+                window.innerWidth * 0.5,
+                window.innerHeight * 0.45,
+                50,
+                window.innerWidth * 0.5,
+                window.innerHeight * 0.5,
+                Math.max(window.innerWidth, window.innerHeight)
+            );
+            bg.addColorStop(0, '#0b0b22');
+            bg.addColorStop(1, '#05050a');
+
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+            // 트레일: 살짝만 덮어서 잔상 남기기
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+        }
+
+        function drawPellets() {
+            for (const q of game.pellets) {
+                ctx.save();
+
+                // 네온 글로우
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = `hsla(${q.hue},100%,65%,0.9)`;
+
+                // 바깥 글로우(그라데이션 원)
+                const glow = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.radius * 3.2);
+                glow.addColorStop(0, `hsla(${q.hue},100%,70%,0.95)`);
+                glow.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(q.x, q.y, q.radius * 3.2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // 중심 코어
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = `hsla(${q.hue},100%,75%,0.95)`;
+                ctx.beginPath();
+                ctx.arc(q.x, q.y, q.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        function drawSparks() {
+            // 밝게 “더하기” 합성
+            ctx.globalCompositeOperation = 'lighter';
+
+            for (const sp of game.sparks) {
+                ctx.save();
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = `hsla(${sp.hue},100%,70%,0.9)`;
+
+                const alpha = Math.min(1, sp.life / 40);
+                ctx.fillStyle = `hsla(${sp.hue},100%,70%,${alpha})`;
+
+                ctx.beginPath();
+                ctx.arc(sp.x, sp.y, rand(1.1, 2.6), 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        function drawPacman() {
+            const p = game.pacman;
+
+            // 입 벌림 정도(0.04~0.4 정도)
+            const bite = 0.22 + 0.18 * Math.sin(p.mouthTime);
+            const startAngle = bite * Math.PI;
+            const endAngle = (2 - bite) * Math.PI;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.dirRad);
+
+            // 글로우
+            ctx.shadowBlur = 28;
+            ctx.shadowColor = 'rgba(255,240,90,0.9)';
+
+            // 몸통 그라데이션
+            const bodyGrad = ctx.createRadialGradient(-p.radius * 0.25, -p.radius * 0.25, 2, 0, 0, p.radius * 1.35);
+            bodyGrad.addColorStop(0, '#fff6a3');
+            bodyGrad.addColorStop(0.55, '#ffe24f');
+            bodyGrad.addColorStop(1, '#ffb800');
+
+            ctx.fillStyle = bodyGrad;
+
+            // 팩맨(부채꼴)
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, p.radius, startAngle, endAngle, false);
+            ctx.closePath();
+            ctx.fill();
+
+            // 하이라이트
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = 'rgba(255,255,255,0.25)';
+            ctx.beginPath();
+            ctx.arc(-p.radius * 0.25, -p.radius * 0.32, p.radius * 0.38, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+
+            // 합성 모드는 원복
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function render() {
+            drawBackground();
+            drawPellets();
+            drawSparks();
+            drawPacman();
+        }
+
+        /**********************
+         * 6) Main Loop
+         **********************/
+        function loop() {
+            update();
+            render();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
