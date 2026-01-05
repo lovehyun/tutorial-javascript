@@ -40,7 +40,7 @@ function renderTable(data) {
     tableBody.innerHTML = '';
 
     if (data.length > 0) {
-        // 테이블 헤더 생성
+        // 테이블 헤더 생성 - 첫번째 객체의 key
         const fields = Object.keys(data[0]);
         
         const headerRow = document.createElement('tr');
@@ -53,11 +53,11 @@ function renderTable(data) {
         });
         tableHeader.appendChild(headerRow);
 
-        // 테이블 데이터 생성
+        // 테이블 데이터 생성 - [] 의 value들
         data.forEach(row => {
             const rowElement = document.createElement('tr');
             
-            rowElement.addEventListener('click', () => {
+            rowElement.addEventListener('click', () => {  // row 에 클릭으로 이동 추가
                 window.location = `/user/${row.Id}`;
             });
             

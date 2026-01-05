@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap 기본 컴포넌트 데모</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Bootstrap Demo</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarDemo" aria-controls="navbarDemo" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarDemo">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#hero">홈</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#components">컴포넌트</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#forms">폼</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#etc">기타</a>
+        </li>
+      </ul>
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="검색" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">검색</button>
+      </form>
+    </div>
+  </div>
+</nav>
+
+<!-- 히어로 섹션 / Jumbotron 느낌 -->
+<section id="hero" class="py-5 bg-light">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-7">
+        <h1 class="display-4 fw-bold">Bootstrap 기본 컴포넌트 데모</h1>
+        <p class="lead">
+          이 페이지는 Bootstrap 5의 기본 컴포넌트들을 한 번에 확인할 수 있는 단일 파일 예제입니다.
+        </p>
+        <p>
+          버튼, 카드, 알림, 탭, 아코디언, 모달, 토스트 등 다양한 컴포넌트를 간단한 예제로 모아두었습니다.
+        </p>
+        <a href="#components" class="btn btn-primary btn-lg me-2">컴포넌트 보기</a>
+        <a href="#forms" class="btn btn-outline-secondary btn-lg">폼 예제 보기</a>
+      </div>
+      <div class="col-md-5">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title">이 페이지의 특징</h5>
+            <ul class="mb-0">
+              <li>단일 HTML 파일</li>
+              <li>Bootstrap CDN만 사용</li>
+              <li>기본 컴포넌트 모음</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 컴포넌트 모음 -->
+<section id="components" class="py-5">
+  <div class="container">
+    <h2 class="mb-4">기본 컴포넌트 예제</h2>
+
+    <!-- Grid & Cards -->
+    <h4 class="mt-4">그리드 & 카드</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">카드 1 <span class="badge bg-primary">NEW</span></h5>
+            <p class="card-text">간단한 설명 텍스트입니다. 카드 컴포넌트는 이미지, 텍스트, 버튼 등을 담을 수 있습니다.</p>
+            <a href="#" class="btn btn-sm btn-primary">자세히</a>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">카드 2</h5>
+            <p class="card-text">row-cols 클래스를 사용해 반응형 카드 그리드를 쉽게 만들 수 있습니다.</p>
+            <a href="#" class="btn btn-sm btn-outline-secondary">더보기</a>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">카드 3</h5>
+            <p class="card-text">h-100 클래스로 카드 높이를 맞추어 균일한 레이아웃을 만들 수 있습니다.</p>
+            <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">모달 열기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons & Button group -->
+    <h4 class="mt-4">버튼 & 버튼 그룹</h4>
+    <div class="mb-3">
+      <button class="btn btn-primary me-1">Primary</button>
+      <button class="btn btn-secondary me-1">Secondary</button>
+      <button class="btn btn-success me-1">Success</button>
+      <button class="btn btn-danger me-1">Danger</button>
+      <button class="btn btn-warning me-1">Warning</button>
+      <button class="btn btn-info me-1">Info</button>
+      <button class="btn btn-light me-1">Light</button>
+      <button class="btn btn-dark">Dark</button>
+    </div>
+    <div class="btn-group mb-4" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-outline-primary">좌</button>
+      <button type="button" class="btn btn-outline-primary">중앙</button>
+      <button type="button" class="btn btn-outline-primary">우</button>
+    </div>
+
+    <!-- Alerts & Badges -->
+    <h4 class="mt-4">알림(Alerts) & 배지(Badges)</h4>
+    <div class="alert alert-primary" role="alert">
+      기본적인 정보 메시지입니다. <a href="#" class="alert-link">자세히 보기</a>를 눌러보세요.
+    </div>
+    <div class="alert alert-success" role="alert">
+      작업이 성공적으로 완료되었습니다!
+    </div>
+    <div class="alert alert-warning" role="alert">
+      주의가 필요한 상황입니다.
+    </div>
+    <p class="mb-4">
+      배지 예시: 
+      <span class="badge bg-primary">Primary</span>
+      <span class="badge bg-success">Success</span>
+      <span class="badge bg-danger">99+</span>
+    </p>
+
+    <!-- List group & Table -->
+    <div class="row">
+      <div class="col-md-6">
+        <h4 class="mt-4">리스트 그룹</h4>
+        <ul class="list-group mb-4">
+          <li class="list-group-item active" aria-current="true">활성 항목</li>
+          <li class="list-group-item">두 번째 항목</li>
+          <li class="list-group-item">세 번째 항목</li>
+          <li class="list-group-item">네 번째 항목</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h4 class="mt-4">테이블</h4>
+        <table class="table table-striped table-hover mb-4">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>이름</th>
+              <th>역할</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>홍길동</td>
+              <td>관리자</td>
+              <td><span class="badge bg-success">활성</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>김영희</td>
+              <td>에디터</td>
+              <td><span class="badge bg-warning text-dark">보류</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>이철수</td>
+              <td>뷰어</td>
+              <td><span class="badge bg-secondary">비활성</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <h4 class="mt-4">탭(Nav Tabs)</h4>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">홈</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">프로필</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">연락처</button>
+      </li>
+    </ul>
+    <div class="tab-content border border-top-0 p-3 mb-4" id="myTabContent">
+      <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        홈 탭 내용입니다. 간단한 소개 텍스트를 넣을 수 있습니다.
+      </div>
+      <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+        프로필 탭 내용입니다. 사용자 정보 등을 보여줄 수 있습니다.
+      </div>
+      <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+        연락처 탭 내용입니다. 이메일, 전화번호 등 연락처 정보를 넣을 수 있습니다.
+      </div>
+    </div>
+
+    <!-- Accordion -->
+    <h4 class="mt-4">아코디언(Accordion)</h4>
+    <div class="accordion mb-4" id="demoAccordion">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            아코디언 항목 1
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#demoAccordion">
+          <div class="accordion-body">
+            첫 번째 아코디언 내용입니다. FAQ, 설명 등 다양한 정보를 접었다 펼 수 있습니다.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingTwo">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            아코디언 항목 2
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#demoAccordion">
+          <div class="accordion-body">
+            두 번째 아코디언 내용입니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 폼 & 입력 컴포넌트 -->
+<section id="forms" class="py-5 bg-light">
+  <div class="container">
+    <h2 class="mb-4">폼(Form) 예제</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <h4 class="mt-2">기본 폼</h4>
+        <form class="mb-4">
+          <div class="mb-3">
+            <label for="inputEmail" class="form-label">이메일 주소</label>
+            <input type="email" class="form-control" id="inputEmail" placeholder="name@example.com">
+          </div>
+          <div class="mb-3">
+            <label for="inputPassword" class="form-label">비밀번호</label>
+            <input type="password" class="form-control" id="inputPassword" placeholder="비밀번호">
+          </div>
+          <div class="mb-3">
+            <label for="selectRole" class="form-label">역할 선택</label>
+            <select class="form-select" id="selectRole">
+              <option selected>선택하세요...</option>
+              <option value="admin">관리자</option>
+              <option value="editor">에디터</option>
+              <option value="viewer">뷰어</option>
+            </select>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="checkRemember">
+            <label class="form-check-label" for="checkRemember">기억하기</label>
+          </div>
+          <button type="submit" class="btn btn-primary">제출</button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <h4 class="mt-2">입력 상태 & 인풋 그룹</h4>
+        <div class="mb-3">
+          <label class="form-label">읽기 전용</label>
+          <input type="text" class="form-control" value="수정 불가 텍스트" readonly>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">비활성화</label>
+          <input type="text" class="form-control" placeholder="입력 비활성화" disabled>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Input Group</label>
+          <div class="input-group">
+            <span class="input-group-text">@</span>
+            <input type="text" class="form-control" placeholder="사용자 이름">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">범위 입력 (Range)</label>
+          <input type="range" class="form-range" min="0" max="100">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 기타 컴포넌트: Progress, Pagination, Breadcrumb, Toast, Modal -->
+<section id="etc" class="py-5">
+  <div class="container">
+    <h2 class="mb-4">기타 컴포넌트</h2>
+    <div class="row">
+      <div class="col-md-6">
+        <h4 class="mt-2">Progress & Pagination</h4>
+        <p class="mb-1">진행률 표시</p>
+        <div class="progress mb-3">
+          <div class="progress-bar" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
+        </div>
+
+        <p class="mb-1">페이지네이션</p>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item disabled">
+              <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a class="page-link" href="#">다음</a>
+            </li>
+          </ul>
+        </nav>
+
+        <p class="mb-1">브레드크럼</p>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">홈</a></li>
+            <li class="breadcrumb-item"><a href="#">라이브러리</a></li>
+            <li class="breadcrumb-item active" aria-current="page">데이터</li>
+          </ol>
+        </nav>
+      </div>
+
+      <div class="col-md-6">
+        <h4 class="mt-2">Toast & Modal</h4>
+        <button type="button" class="btn btn-outline-primary mb-3" id="liveToastBtn">
+          토스트(Toast) 보여주기
+        </button>
+        <button type="button" class="btn btn-outline-success mb-3 ms-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          모달 열기
+        </button>
+
+        <!-- Toast -->
+        <div class="position-relative">
+          <div class="toast-container position-absolute top-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+              <div class="toast-header">
+                <strong class="me-auto">알림</strong>
+                <small>방금 전</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body">
+                Bootstrap Toast 예제입니다.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">모달 제목</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bootstrap 모달 예제입니다. 중요 알림, 폼, 확인 대화상자 등에 사용할 수 있습니다.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+        <button type="button" class="btn btn-primary">확인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="py-4 bg-dark text-light mt-5">
+  <div class="container text-center">
+    <small>Bootstrap 기본 컴포넌트 데모 페이지 &copy; 2025</small>
+  </div>
+</footer>
+
+<!-- Bootstrap JS Bundle (Popper 포함) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Toast 예제 스크립트
+  const toastTrigger = document.getElementById('liveToastBtn');
+  const toastLiveExample = document.getElementById('liveToast');
+  if (toastTrigger) {
+    toastTrigger.addEventListener('click', () => {
+      const toast = new bootstrap.Toast(toastLiveExample);
+      toast.show();
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tailwind CSS 기본 컴포넌트 데모</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+
+    // 다크 모드 토글
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // 초기 다크 모드 상태
+    document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    });
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+  <!-- 상단 네비게이션 -->
+  <header class="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur dark:bg-slate-900/80">
+    <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-primary-500 to-indigo-500 text-white font-bold shadow-md">T</span>
+        <span class="text-lg font-semibold tracking-tight">Tailwind Demo</span>
+      </div>
+      <button class="md:hidden inline-flex items-center justify-center rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800" id="menuToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <div class="hidden items-center gap-6 text-sm font-medium md:flex">
+        <a href="#hero" class="text-slate-600 hover:text-primary-600 dark:text-slate-200 dark:hover:text-primary-400">홈</a>
+        <a href="#components" class="text-slate-600 hover:text-primary-600 dark:text-slate-200 dark:hover:text-primary-400">컴포넌트</a>
+        <a href="#forms" class="text-slate-600 hover:text-primary-600 dark:text-slate-200 dark:hover:text-primary-400">폼</a>
+        <a href="#layouts" class="text-slate-600 hover:text-primary-600 dark:text-slate-200 dark:hover:text-primary-400">레이아웃</a>
+        <button onclick="toggleDarkMode()" class="inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+          다크 모드 토글
+        </button>
+      </div>
+    </nav>
+    <!-- 모바일 메뉴 -->
+    <div id="mobileMenu" class="hidden border-t border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900 md:hidden">
+      <div class="flex flex-col gap-2">
+        <a href="#hero" class="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">홈</a>
+        <a href="#components" class="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">컴포넌트</a>
+        <a href="#forms" class="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">폼</a>
+        <a href="#layouts" class="rounded-lg px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">레이아웃</a>
+        <button onclick="toggleDarkMode()" class="mt-1 inline-flex w-max items-center rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+          다크 모드 토글
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 히어로 섹션 -->
+  <section id="hero" class="border-b border-slate-200 bg-gradient-to-b from-primary-50 via-slate-50 to-slate-50 py-12 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
+    <div class="mx-auto flex max-w-6xl flex-col gap-10 px-4 md:flex-row md:items-center">
+      <div class="flex-1 space-y-5">
+        <div class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-primary-700 shadow-sm ring-1 ring-primary-100 dark:bg-slate-900/80 dark:text-primary-300 dark:ring-primary-900">
+          <span class="inline-block h-2 w-2 rounded-full bg-primary-500 animate-pulse"></span>
+          Tailwind CSS 핵심 유틸리티 한눈에 보기
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-white">
+          Tailwind CSS 기본 컴포넌트 &<br class="hidden sm:block" />
+          레이아웃 데모 페이지
+        </h1>
+        <p class="max-w-xl text-sm text-slate-600 sm:text-base dark:text-slate-300">
+          이 페이지는 유틸리티 클래스, 반응형 레이아웃, 다크 모드 등 Tailwind CSS의 특징을
+          단일 HTML 파일로 간단히 살펴볼 수 있도록 구성한 예제입니다.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#components" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/40 hover:bg-primary-700">
+            기본 컴포넌트 보기
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 4.5 21 12l-7.5 7.5M3 12h18" />
+            </svg>
+          </a>
+          <a href="#forms" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800">
+            폼 & 입력 요소 보기
+          </a>
+        </div>
+        <dl class="grid max-w-lg grid-cols-3 gap-4 text-xs sm:text-sm">
+          <div>
+            <dt class="text-slate-500 dark:text-slate-400">유틸리티 클래스</dt>
+            <dd class="font-semibold text-slate-900 dark:text-white">간결한 조합식 스타일</dd>
+          </div>
+          <div>
+            <dt class="text-slate-500 dark:text-slate-400">반응형 디자인</dt>
+            <dd class="font-semibold text-slate-900 dark:text-white">모바일 우선 브레이크포인트</dd>
+          </div>
+          <div>
+            <dt class="text-slate-500 dark:text-slate-400">다크 모드</dt>
+            <dd class="font-semibold text-slate-900 dark:text-white">클래스 기반 제어</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="flex-1">
+        <div class="relative mx-auto max-w-md">
+          <div class="absolute -inset-1 rounded-3xl bg-gradient-to-tr from-primary-500/40 via-sky-500/40 to-indigo-500/40 blur-xl opacity-70"></div>
+          <div class="relative rounded-3xl bg-white/90 p-5 shadow-2xl ring-1 ring-slate-100 dark:bg-slate-900/90 dark:ring-slate-700">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-primary-600 dark:text-primary-300">
+              Tailwind의 느낌
+            </p>
+            <div class="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+              <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <span class="h-2 w-2 rounded-full bg-primary-500"></span>
+                <span class="font-medium">유틸리티 우선</span>
+                <span class="ml-auto text-[11px] text-slate-500">flex, grid, gap, ...</span>
+              </div>
+              <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                <span class="font-medium">반응형 브레이크포인트</span>
+                <span class="ml-auto text-[11px] text-slate-500">sm, md, lg, xl</span>
+              </div>
+              <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                <span class="font-medium">상태/다크 모드</span>
+                <span class="ml-auto text-[11px] text-slate-500">hover:, focus:, dark:</span>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between border-t border-dashed border-slate-200 pt-3 text-[11px] text-slate-500 dark:border-slate-700 dark:text-slate-400">
+              <span>순수 Tailwind + CDN</span>
+              <span>단일 HTML 파일</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 컴포넌트 섹션 -->
+  <section id="components" class="py-12">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight sm:text-2xl">기본 UI 컴포넌트</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            Tailwind 유틸리티로 구성한 카드, 버튼, 알림, 배지, 탭 등을 한 곳에서 확인해 보세요.
+          </p>
+        </div>
+        <span class="hidden rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-slate-100 shadow-sm dark:bg-slate-100 dark:text-slate-900 md:inline-flex">
+          클래스 조합으로 바로 UI를 구성
+        </span>
+      </div>
+
+      <!-- 카드 그리드 -->
+      <div class="mt-8 grid gap-6 md:grid-cols-3">
+        <article class="group flex flex-col rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80">
+          <header class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              카드 레이아웃
+              <span class="ml-2 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-700 dark:bg-primary-900/50 dark:text-primary-200">
+                utility
+              </span>
+            </h3>
+          </header>
+          <p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
+            padding, rounded, shadow, gap 등의 유틸리티 클래스를 조합해 빠르게 카드 컴포넌트를 만들 수 있습니다.
+          </p>
+          <div class="mt-4 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 dark:bg-slate-800">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> border / shadow
+            </span>
+            <button class="text-primary-600 hover:underline dark:text-primary-300">자세히</button>
+          </div>
+        </article>
+
+        <article class="group flex flex-col rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80">
+          <header class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              상태 스타일
+            </h3>
+            <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">
+              hover / active
+            </span>
+          </header>
+          <p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
+            <code class="rounded bg-slate-100 px-1 py-0.5 text-[10px] dark:bg-slate-800">hover:</code>,
+            <code class="rounded bg-slate-100 px-1 py-0.5 text-[10px] dark:bg-slate-800">focus:</code> 등의 접두사로 상태별 스타일을 간결하게 정의할 수 있습니다.
+          </p>
+          <div class="mt-4 flex gap-2">
+            <button class="flex-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900">
+              기본 버튼
+            </button>
+            <button class="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-800">
+              테두리 버튼
+            </button>
+          </div>
+        </article>
+
+        <article class="group flex flex-col rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-slate-700 dark:bg-slate-900/80">
+          <header class="flex items-start justify-between gap-2">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">
+              배지 & 라벨
+            </h3>
+          </header>
+          <p class="mt-2 text-xs text-slate-600 dark:text-slate-300">
+            색상 팔레트와 둥근 모서리, 폰트 크기 유틸리티만으로도 다양한 형태의 배지를 만들 수 있습니다.
+          </p>
+          <div class="mt-3 flex flex-wrap gap-2 text-[11px]">
+            <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-200">Success</span>
+            <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 dark:bg-amber-900/50 dark:text-amber-200">Warning</span>
+            <span class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 font-medium text-rose-700 dark:bg-rose-900/50 dark:text-rose-200">99+</span>
+          </div>
+        </article>
+      </div>
+
+      <!-- 알림 & 탭 -->
+      <div class="mt-10 grid gap-6 md:grid-cols-2">
+        <div class="space-y-3">
+          <h3 class="text-sm font-semibold">알림(Alerts)</h3>
+          <div class="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-xs text-sky-900 dark:border-sky-900/60 dark:bg-sky-900/40 dark:text-sky-100">
+            <span class="font-semibold">Info</span> — Tailwind는 기본 컴포넌트가 아니라 유틸리티 클래스를 제공하는 프레임워크입니다.
+          </div>
+          <div class="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-xs text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-900/40 dark:text-emerald-100">
+            <span class="font-semibold">Success</span> — 필요한 모양을 직접 조합하여 알림, 카드, 배지 등을 만들 수 있습니다.
+          </div>
+          <div class="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-900 dark:border-amber-900/60 dark:bg-amber-900/40 dark:text-amber-100">
+            <span class="font-semibold">Warning</span> — 디자인 시스템을 커스터마이징할 때 매우 유연합니다.
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-semibold">간단한 탭(Tab)</h3>
+          <div class="mt-2 rounded-2xl border border-slate-200 bg-white/80 p-2 text-xs dark:border-slate-700 dark:bg-slate-900/80">
+            <div class="flex gap-1 rounded-xl bg-slate-100 p-1 text-[11px] dark:bg-slate-800">
+              <button class="tab-btn flex-1 rounded-lg bg-white px-2 py-1.5 font-medium text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100" data-target="tab1">
+                개념
+              </button>
+              <button class="tab-btn flex-1 rounded-lg px-2 py-1.5 font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100" data-target="tab2">
+                장점
+              </button>
+              <button class="tab-btn flex-1 rounded-lg px-2 py-1.5 font-medium text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100" data-target="tab3">
+                활용
+              </button>
+            </div>
+            <div class="mt-3 space-y-2">
+              <div class="tab-panel" id="tab1">
+                <p class="text-slate-600 dark:text-slate-300">
+                  Tailwind는 미리 정의된 컴포넌트가 아닌, 저수준 유틸리티 클래스를 제공하는 <span class="font-semibold">Utility-first CSS 프레임워크</span>입니다.
+                </p>
+              </div>
+              <div class="tab-panel hidden" id="tab2">
+                <p class="text-slate-600 dark:text-slate-300">
+                  디자인 일관성을 유지하면서도 컴포넌트별로 커스터마이징하기 쉬우며, 사용하지 않는 클래스를 제거해 번들 사이즈를 줄일 수 있습니다.
+                </p>
+              </div>
+              <div class="tab-panel hidden" id="tab3">
+                <p class="text-slate-600 dark:text-slate-300">
+                  프로토타이핑, 디자인 시스템 구축, 반응형/다크 모드 지원 등 다양한 상황에서 빠르게 UI를 제작할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 폼 섹션 -->
+  <section id="forms" class="border-y border-slate-200 bg-slate-50/60 py-12 dark:border-slate-800 dark:bg-slate-950/40">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight sm:text-2xl">폼 & 입력 요소</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            spacing, border, ring, focus 스타일만으로도 꽤 완성도 있는 폼 UI를 만들 수 있습니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-8 md:grid-cols-2">
+        <!-- 기본 폼 -->
+        <form class="space-y-4 rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/80 dark:ring-slate-700">
+          <div>
+            <label for="email" class="text-xs font-medium text-slate-700 dark:text-slate-200">이메일</label>
+            <input id="email" type="email" placeholder="name@example.com"
+              class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100" />
+          </div>
+          <div>
+            <label for="password" class="text-xs font-medium text-slate-700 dark:text-slate-200">비밀번호</label>
+            <input id="password" type="password" placeholder="비밀번호"
+              class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none placeholder:text-slate-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100" />
+          </div>
+          <div>
+            <label for="role" class="text-xs font-medium text-slate-700 dark:text-slate-200">역할</label>
+            <select id="role"
+              class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100">
+              <option>선택하세요</option>
+              <option>관리자</option>
+              <option>에디터</option>
+              <option>뷰어</option>
+            </select>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <label class="inline-flex items-center gap-2 text-slate-600 dark:text-slate-300">
+              <input type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600 dark:bg-slate-900" />
+              <span>자동 로그인</span>
+            </label>
+            <a href="#" class="text-primary-600 hover:underline dark:text-primary-300">비밀번호 찾기</a>
+          </div>
+          <button
+            class="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-primary-500/40 transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900">
+            로그인
+          </button>
+        </form>
+
+        <!-- 인풋 상태 / 인풋 그룹 -->
+        <div class="space-y-4 text-xs">
+          <div class="rounded-2xl bg-white/80 p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/80 dark:ring-slate-700">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">입력 상태</h3>
+            <div class="mt-3 space-y-3">
+              <div>
+                <label class="text-[11px] font-medium text-slate-600 dark:text-slate-300">읽기 전용</label>
+                <input type="text" value="readonly 상태"
+                  class="mt-1 w-full rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                  readonly />
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-600 dark:text-slate-300">비활성</label>
+                <input type="text" placeholder="disabled"
+                  class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-xs text-slate-400 dark:border-slate-700 dark:bg-slate-800/80"
+                  disabled />
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Input 그룹</label>
+                <div class="mt-1 flex rounded-lg border border-slate-300 bg-white text-xs dark:border-slate-600 dark:bg-slate-900">
+                  <span class="inline-flex items-center border-r border-slate-200 px-3 text-slate-500 dark:border-slate-700">@</span>
+                  <input type="text" placeholder="username"
+                    class="w-full rounded-r-lg border-0 bg-transparent px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0 dark:text-slate-100" />
+                </div>
+              </div>
+              <div>
+                <label class="text-[11px] font-medium text-slate-600 dark:text-slate-300">Range</label>
+                <input type="range" min="0" max="100"
+                  class="mt-1 w-full accent-primary-600" />
+              </div>
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-white/80 p-5 text-xs shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/80 dark:ring-slate-700">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-white">간단한 토글/태그</h3>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button class="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
+                필터 1
+              </button>
+              <button class="inline-flex items-center gap-1 rounded-full border border-primary-500/40 bg-primary-50 px-3 py-1 text-[11px] font-medium text-primary-700 hover:bg-primary-100 dark:border-primary-500/60 dark:bg-primary-900/40 dark:text-primary-100">
+                활성 필터
+              </button>
+              <button class="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-[11px] font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
+                + 태그 추가
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 레이아웃 & 기타 요소 -->
+  <section id="layouts" class="py-12">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold tracking-tight sm:text-2xl">레이아웃 & 기타 요소</h2>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            grid, flex, gap, divide, rounded, shadow 등을 활용한 레이아웃 예제입니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-8 lg:grid-cols-[1.5fr,1fr]">
+        <!-- 작업 목록 + 진행률 -->
+        <div class="space-y-4 rounded-2xl bg-white/80 p-6 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/80 dark:ring-slate-700">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-white">간단한 대시보드 레이아웃</h3>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">오늘 작업</p>
+              <p class="mt-1 text-lg font-semibold">12개</p>
+            </div>
+            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">진행 중</p>
+              <p class="mt-1 text-lg font-semibold text-amber-500">4개</p>
+            </div>
+            <div class="rounded-xl bg-slate-50 px-4 py-3 text-xs text-slate-700 ring-1 ring-slate-100 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">완료율</p>
+              <p class="mt-1 text-lg font-semibold text-emerald-500">68%</p>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+              <span>진행률</span>
+              <span>68%</span>
+            </div>
+            <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+              <div class="h-full w-[68%] bg-gradient-to-r from-primary-500 to-emerald-500"></div>
+            </div>
+          </div>
+
+          <div class="mt-4 grid gap-3 text-xs md:grid-cols-2">
+            <div class="space-y-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+              <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">할 일 목록</p>
+              <ul class="space-y-1.5">
+                <li class="flex items-center gap-2">
+                  <input type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600" checked>
+                  <span class="line-through text-slate-400 dark:text-slate-500">Tailwind CDN 데모 페이지 만들기</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600">
+                  <span>다크 모드 토글 추가</span>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 dark:border-slate-600">
+                  <span>컴포넌트 예제 정리</span>
+                </li>
+              </ul>
+            </div>
+            <div class="space-y-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
+              <p class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">태그 / 필터 예시</p>
+              <div class="flex flex-wrap gap-1.5">
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] dark:bg-slate-800">#tailwind</span>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] dark:bg-slate-800">#utility-first</span>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] dark:bg-slate-800">#responsive</span>
+                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] dark:bg-slate-800">#dark-mode</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 타임라인 / 리스트 -->
+        <div class="space-y-4 rounded-2xl bg-white/80 p-6 text-xs shadow-sm ring-1 ring-slate-200 dark:bg-slate-900/80 dark:ring-slate-700">
+          <h3 class="text-sm font-semibold text-slate-900 dark:text-white">간단한 타임라인</h3>
+          <ol class="relative mt-3 space-y-4 border-s-l border-slate-200 pl-4 dark:border-slate-700">
+            <li class="space-y-1">
+              <div class="absolute -left-[7px] mt-1 h-3 w-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100 dark:ring-emerald-900/40"></div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">10:00</p>
+              <p class="font-medium text-slate-900 dark:text-slate-100">프로젝트 구조 초안 작성</p>
+            </li>
+            <li class="space-y-1">
+              <div class="absolute -left-[7px] mt-1 h-3 w-3 rounded-full bg-primary-500 ring-4 ring-primary-100 dark:ring-primary-900/40"></div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">13:00</p>
+              <p class="font-medium text-slate-900 dark:text-slate-100">Tailwind 데모 페이지 제작</p>
+            </li>
+            <li class="space-y-1">
+              <div class="absolute -left-[7px] mt-1 h-3 w-3 rounded-full bg-amber-500 ring-4 ring-amber-100 dark:ring-amber-900/40"></div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">16:00</p>
+              <p class="font-medium text-slate-900 dark:text-slate-100">코드 정리 및 문서화</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="border-t border-slate-200 bg-white/80 py-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-400">
+    <p>Tailwind CSS 기본 컴포넌트 & 레이아웃 데모 · 단일 HTML 파일 · CDN 기반</p>
+  </footer>
+
+  <script>
+    // 모바일 메뉴 토글
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (menuToggle && mobileMenu) {
+      menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+    }
+
+    // 간단한 탭 기능
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        tabButtons.forEach((b) => {
+          b.classList.remove('bg-white', 'shadow-sm', 'text-slate-900', 'dark:bg-slate-900', 'dark:text-slate-100');
+          b.classList.add('text-slate-600', 'dark:text-slate-300');
+        });
+        btn.classList.add('bg-white', 'shadow-sm', 'text-slate-900', 'dark:bg-slate-900', 'dark:text-slate-100');
+        btn.classList.remove('text-slate-600', 'dark:text-slate-300');
+
+        tabPanels.forEach((panel) => {
+          if (panel.id === targetId) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
