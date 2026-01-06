@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mini React useState (Vanilla JS)</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+        }
+        button {
+            margin-right: 8px;
+        }
+        .box {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 320px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mini React(useState) - Vanilla JS</h1>
+    <div id="root"></div>
+
+    <script>
+        /****************************************************************
+         * 1) "React 내부 저장소" 흉내
+         ****************************************************************/
+        let hookStates = []; // 상태들이 순서대로 저장되는 배열
+        let hookIndex = 0; // 현재 렌더에서 useState가 몇 번째 호출인지
+
+        /****************************************************************
+         * 2) useState 구현
+         * - 핵심: [값, setter함수]를 "배열"로 반환한다
+         * - setter가 호출되면 render()를 다시 실행한다
+         ****************************************************************/
+        function useState(initialValue) {
+            const currentIndex = hookIndex;
+
+            // 최초 렌더일 때만 초기값 저장
+            if (hookStates[currentIndex] === undefined) {
+                hookStates[currentIndex] = initialValue;
+            }
+
+            const setState = (nextValueOrUpdater) => {
+                // React처럼 함수 업데이트도 지원: setCount(prev => prev + 1)
+                const prev = hookStates[currentIndex];
+                const next =
+                    typeof nextValueOrUpdater === 'function' ? nextValueOrUpdater(prev) : nextValueOrUpdater;
+
+                hookStates[currentIndex] = next;
+
+                // 상태 변경 → 다시 렌더
+                render();
+            };
+
+            const value = hookStates[currentIndex];
+
+            hookIndex++; // 다음 useState는 다음 칸에 저장되게 인덱스 증가
+            return [value, setState];
+        }
+
+        /****************************************************************
+         * 3) "컴포넌트" (그냥 함수)
+         * - 렌더 때마다 다시 호출되지만, 상태는 hookStates에 남아있다
+         ****************************************************************/
+        function App() {
+            const [count, setCount] = useState(0);
+            const [name, setName] = useState('홍길동');
+
+            // JSX 대신 문자열 템플릿으로 HTML 생성
+            return `
+                <div class="box">
+                <h2>안녕하세요, ${name}님</h2>
+                <p>count: <b>${count}</b></p>
+
+                <div style="margin: 10px 0;">
+                    <button id="inc">+1</button>
+                    <button id="reset">reset</button>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <input id="nameInput" value="${name}" />
+                    <button id="applyName">이름 적용</button>
+                </div>
+                </div>
+            `;
+        }
+
+        /****************************************************************
+         * 4) 렌더 함수
+         * - App() 호출 → HTML 갱신 → 이벤트 재바인딩
+         * - 매 렌더마다 hookIndex를 0으로 초기화 (순서 매칭!)
+         ****************************************************************/
+        function render() {
+            hookIndex = 0; // ★ 중요: 매 렌더마다 0부터 다시 훅을 읽는다
+
+            const root = document.getElementById('root');
+            root.innerHTML = App();
+
+            // 이벤트 바인딩 (렌더가 새로 되면 DOM이 새로 생기므로 다시 연결)
+            document.getElementById('inc').onclick = () => {
+                // 함수 업데이트(React와 동일한 패턴)
+                const [, setCount] = [hookStates[0], (v) => v]; // (설명용) 실제로는 아래처럼 직접 호출
+                // 아래가 진짜:
+                // setCount(prev => prev + 1)
+                // → 우리는 App 내부의 setCount를 밖에서 못 쓰니 다른 방식으로 바인딩 필요
+            };
+
+            // "바깥에서 setCount에 접근"하기 위한 간단한 트릭:
+            // 렌더 후에 다시 App을 호출해서 setCount를 얻는 건 비효율이니,
+            // 여기서는 render() 안에서 '현재 훅 인덱스'를 예측해서 setter를 다시 만든다.
+            // (학습용이니 단순화합니다.)
+
+            // 첫 번째 state(count)의 setter 재생성
+            const setCount = (updater) => {
+                const prev = hookStates[0];
+                hookStates[0] = typeof updater === 'function' ? updater(prev) : updater;
+                render();
+            };
+
+            // 두 번째 state(name)의 setter 재생성
+            const setName = (updater) => {
+                const prev = hookStates[1];
+                hookStates[1] = typeof updater === 'function' ? updater(prev) : updater;
+                render();
+            };
+
+            document.getElementById('inc').onclick = () => setCount((c) => c + 1);
+            document.getElementById('reset').onclick = () => setCount(0);
+
+            document.getElementById('applyName').onclick = () => {
+                const input = document.getElementById('nameInput').value;
+                setName(input);
+            };
+        }
+
+        /****************************************************************
+         * 5) 최초 렌더
+         ****************************************************************/
+        render();
+    </script>
+</body>
+</html>
