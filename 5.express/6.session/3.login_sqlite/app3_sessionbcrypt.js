@@ -55,6 +55,13 @@ app.post('/login', (req, res) => {
     });
 });
 
+app.get('/check-login', (req, res) => {
+    if (req.session && req.session.user) {
+        return res.json({ id: req.session.user.id, username: req.session.user.username });
+    }
+    return res.json({ username: null });
+});
+
 // 프로필 확인 라우트
 app.get('/profile', (req, res) => {
     const user = req.session.user;
