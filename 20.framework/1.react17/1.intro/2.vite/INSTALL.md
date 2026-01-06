@@ -37,6 +37,16 @@ npm create vite@latest
 ✔ Select a variant: JavaScript
 ```
 
+### 2-3. 질문에 대한 기본값으로 선택해서 실행
+
+```bash
+npm create vite@latest my-react -- --template react
+
+[npm] [create] [vite@latest] [my-react] -- [--template react]
+- 앞부분: npm이 해석
+- 뒤부분: npm이 실행하는 프로그램(vite)이 해석
+```
+
 ---
 
 ## 3. 프로젝트 폴더로 이동
