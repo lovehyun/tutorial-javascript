@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import TodoForm from './components/TodoForm.jsx';
 import TodoList from './components/TodoList.jsx';
 
-export default function App() {
+export default function TodoApp() {
     // 목록(리스트 렌더링 대상)
     const [todos, setTodos] = useState([
         { id: 1, text: 'Vite 실행하기', done: true },
@@ -11,13 +11,16 @@ export default function App() {
 
     // 폼 입력(Controlled)
     const [text, setText] = useState('');
-    const [showDone, setShowDone] = useState(true); // 조건부 렌더링(필터)
+    const [hideDone, setHideDone] = useState(false); // 조건부 렌더링(필터) - 완료 항목 숨기기
 
     const visibleTodos = useMemo(() => {
-        return showDone ? todos : todos.filter((t) => !t.done);
-    }, [todos, showDone]);
+        return hideDone ? todos.filter((t) => !t.done) : todos;
+    }, [todos, hideDone]);
 
-    const doneCount = useMemo(() => todos.filter((t) => t.done).length, [todos]);
+    // (추가) 갯수 표시용
+    const doneCount = useMemo(() => 
+        todos.filter((t) => t.done).length
+    , [todos]);
 
     function addTodo(e) {
         e.preventDefault();
@@ -61,8 +64,8 @@ export default function App() {
             {/* 조건부 렌더링: 필터 토글 */}
             <div style={{ marginTop: 12 }}>
                 <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} />
-                    완료 항목도 보기
+                    <input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} />
+                    완료 항목 숨기기
                 </label>
             </div>
 
@@ -70,7 +73,7 @@ export default function App() {
             <TodoList todos={visibleTodos} onToggle={toggleTodo} onRemove={removeTodo} />
 
             {/* 조건부 렌더링: 필터 결과가 비었을 때 */}
-            {!showDone && visibleTodos.length === 0 && todos.length > 0 && (
+            {hideDone && visibleTodos.length === 0 && todos.length > 0 && (
                 <p style={{ marginTop: 12 }}>미완료 항목이 없습니다 🎉</p>
             )}
         </div>
