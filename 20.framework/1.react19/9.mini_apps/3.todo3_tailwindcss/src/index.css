@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  /* 기본 배경과 텍스트 색상 - 부드러운 회색 배경으로 눈의 피로 감소 */
+  body { @apply min-h-screen bg-gray-50 text-gray-900; }
+  html.dark body { @apply bg-gray-950 text-gray-50; }
+}
+
+@layer components {
+  /* 전체 레이아웃 컨테이너 - 적절한 여백으로 집중력 향상 */
+  .layout { @apply mx-auto max-w-2xl p-4; }
+
+  /* 카드 형태의 메인 컨테이너 - 얇은 테두리와 은은한 그림자로 깔끔한 분리감 */
+  .card { 
+    @apply rounded-lg border border-gray-200 bg-white p-5 shadow-sm;
+  }
+  .dark .card { 
+    @apply border-gray-800 bg-gray-900; 
+  }
+
+  /* 제목 스타일 - 과하지 않은 굵기로 가독성 유지 */
+  .heading { 
+    @apply mb-4 text-xl font-semibold text-gray-800; 
+  }
+  .dark .heading {
+    @apply text-gray-100;
+  }
+
+  /* 입력 폼 행 레이아웃 - 타이트한 간격으로 컴팩트한 레이아웃 */
+  .inputRow { @apply flex gap-2; }
+
+  /* 텍스트 입력 필드 - 포커스 시 ring으로 명확한 상태 표시 */
+  .input { 
+    @apply flex-1 rounded-md border border-gray-300 bg-white px-3 py-2
+           text-sm outline-none transition-all
+           placeholder:text-gray-400
+           focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20; 
+  }
+  .dark .input { 
+    @apply border-gray-700 bg-gray-950 text-gray-100
+           placeholder:text-gray-500
+           focus:border-blue-400 focus:ring-blue-400/20; 
+  }
+
+  /* 주요 액션 버튼 (추가 버튼) - 강한 파란색으로 주요 액션 강조, scale로 클릭 피드백 */
+  .btn-primary { 
+    @apply shrink-0 rounded-md bg-blue-600 px-4 py-2
+           text-sm font-medium text-white transition-all
+           hover:bg-blue-700 hover:shadow-md active:scale-95;
+  }
+
+  /* 아웃라인 버튼 (테마 토글) - 중립적인 회색으로 부차적 기능 표현 */
+  .btn-outline { 
+    @apply rounded-md border border-gray-300 bg-white px-3 py-1.5
+           text-sm font-medium text-gray-700 transition-all
+           hover:bg-gray-100 hover:border-gray-400;
+  }
+  .dark .btn-outline {
+    @apply border-gray-700 bg-gray-900 text-gray-300
+           hover:bg-gray-800 hover:border-gray-600;
+  }
+
+  /* 삭제 버튼 (빨간색 강조) - 명확한 배경색과 테두리로 버튼임을 강조, 빨간색으로 위험 행동 경고 */
+  .btn-danger { 
+    @apply shrink-0 rounded-md border border-red-300 bg-red-100 px-3 py-1.5
+           text-sm font-medium text-red-700 transition-all
+           hover:bg-red-200 hover:border-red-400 active:scale-95;
+  }
+  .dark .btn-danger {
+    @apply border-red-800 bg-red-950 text-red-400
+           hover:bg-red-900 hover:border-red-700;
+  }
+
+  /* 할일 목록 컨테이너 - 좁은 간격으로 많은 항목도 한눈에 */
+  .list { @apply mt-4 space-y-1.5; }
+
+  /* 개별 할일 항목 - 호버 시 배경색 변화로 상호작용 가능함을 표시 */
+  .item { 
+    @apply flex items-center justify-between gap-3 rounded-md
+           border border-gray-200 bg-white px-3 py-2
+           cursor-pointer transition-all
+           hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm; 
+  }
+  .dark .item { 
+    @apply border-gray-800 bg-gray-950
+           hover:border-gray-700 hover:bg-gray-900; 
+  }
+
+  /* 완료된 할일 스타일 - 취소선과 흐린 색으로 완료 상태 직관적 표현 */
+  .done { 
+    @apply text-gray-400 line-through decoration-2; 
+  }
+  .dark .done {
+    @apply text-gray-600;
+  }
+}
