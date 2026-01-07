@@ -1,0 +1,69 @@
+/* 기본 여백 제거 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* 테마 변수: light 기본값 */
+:root {
+    --bg: #f8fafc;
+    --text: #0f172a;
+    --card: #ffffff;
+    --border: #cbd5e1;
+    --muted: rgba(15, 23, 42, 0.75);
+    --btn-bg: #0f172a;
+    --btn-text: #ffffff;
+}
+
+/* 다크 테마 변수 */
+:root[data-theme='dark'] {
+    --bg: #0f172a;
+    --text: #e2e8f0;
+    --card: #111827;
+    --border: #334155;
+    --muted: rgba(226, 232, 240, 0.8);
+    --btn-bg: #e2e8f0;
+    --btn-text: #0f172a;
+}
+
+/* 페이지 전체 적용 */
+.page {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+/* 카드 */
+.card {
+    width: min(420px, 100%);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+/* 행 */
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+/* 버튼 */
+.btn {
+    border: 1px solid var(--border);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
