@@ -2,11 +2,6 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 
-// index.html 에서 CDN으로 추가하거나, 여기에서 불러오거나...
-// npm install bootstrap
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <App />

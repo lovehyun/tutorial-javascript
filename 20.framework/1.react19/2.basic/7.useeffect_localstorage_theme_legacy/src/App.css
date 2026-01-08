@@ -1,0 +1,75 @@
+/* 기본 여백 제거 */
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* 기본(light) 스타일 */
+body {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+/* body.dark 가 붙으면 다크 스타일로 "직접" 덮어씀 */
+body.dark {
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+/* 페이지 */
+.page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+/* 카드 (light 기본) */
+.card {
+    width: min(420px, 100%);
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+/* 다크일 때 카드 스타일도 직접 분기 */
+body.dark .card {
+    background: #111827;
+    border-color: #334155;
+}
+
+/* 행 */
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.muted {
+    color: rgba(15, 23, 42, 0.75);
+}
+
+/* 다크일 때 muted도 직접 분기 */
+body.dark .muted {
+    color: rgba(226, 232, 240, 0.8);
+}
+
+/* 버튼 (light 기본) */
+.btn {
+    border: 1px solid #cbd5e1;
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* 다크일 때 버튼도 직접 분기 */
+body.dark .btn {
+    border-color: #334155;
+    background: #e2e8f0;
+    color: #0f172a;
+}

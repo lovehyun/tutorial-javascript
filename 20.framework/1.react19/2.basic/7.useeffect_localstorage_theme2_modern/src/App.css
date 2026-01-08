@@ -1,0 +1,78 @@
+/*
+ * :root
+ * - CSS에서 문서의 최상위 요소를 의미
+ * - HTML 문서에서는 <html> 태그를 가리킴
+ * - JS의 document.documentElement 와 대응됨
+ * - 전역 CSS 변수(테마 변수)의 기준점
+ */
+
+/* 기본 테마 변수 (light) */
+:root {
+    --bg: #f8fafc;      /* 페이지 배경색 */
+    --text: #0f172a;    /* 기본 글자색 */
+    --card: #ffffff;   /* 카드 배경 */
+    --border: #cbd5e1;  /* 테두리 색 */
+    --muted: rgba(15, 23, 42, 0.75); /* 보조 텍스트 */
+    --btn-bg: #0f172a;  /* 버튼 배경 */
+    --btn-text: #ffffff; /* 버튼 글자 */
+}
+
+/*
+ * :root[data-theme='dark']
+ * - <html data-theme="dark"> 일 때 매칭됨
+ * - JS는 data-theme라는 "표식"만 붙임
+ * - 실제 스타일 변경은 CSS 변수가 담당
+ */
+
+/* 다크 테마 변수 */
+:root[data-theme='dark'] {
+    --bg: #0f172a;      /* 다크 배경 */
+    --text: #e2e8f0;    /* 다크 글자 */
+    --card: #111827;   /* 다크 카드 */
+    --border: #334155; /* 다크 테두리 */
+    --muted: rgba(226, 232, 240, 0.8); /* 다크 보조 텍스트 */
+    --btn-bg: #e2e8f0;  /* 다크 버튼 배경 */
+    --btn-text: #0f172a; /* 다크 버튼 글자 */
+}
+
+/* 이하 컴포넌트 스타일은 CSS 변수만 사용 */
+.page {
+    min-height: 100vh;        /* 화면 전체 높이 */
+    background: var(--bg);   /* 테마 배경 */
+    color: var(--text);      /* 테마 글자색 */
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+/* 카드 컨테이너 */
+.card {
+    width: min(420px, 100%);
+    background: var(--card); /* 카드 배경 */
+    border: 1px solid var(--border); /* 테두리 */
+    border-radius: 12px;
+    padding: 16px;
+}
+
+/* 체크박스 행 정렬 */
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+/* 보조 텍스트 */
+.muted {
+    color: var(--muted);
+}
+
+/* 버튼 스타일 */
+.btn {
+    border: 1px solid var(--border);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+}
