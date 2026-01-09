@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect  } from 'react';
 import { Link } from 'react-router-dom';
+
 import { fetchUsers } from '../api/usersApi.js';
 
 // AbortController는 "브라우저 기본 내장(Web API)"입니다
@@ -22,6 +23,7 @@ export default function Users() {
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
+        // (옵셔널)
         const controller = new AbortController();
 
         setLoading(true);
@@ -39,7 +41,7 @@ export default function Users() {
                 setLoading(false);
             });
 
-        // 컴포넌트가 바뀌거나 언마운트되면 요청 취소
+        // (옵셔널) 컴포넌트가 바뀌거나 언마운트되면 요청 취소
         return () => controller.abort();
     }, []);
 

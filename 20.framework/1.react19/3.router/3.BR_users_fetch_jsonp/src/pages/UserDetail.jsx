@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { fetchUserById } from '../api/usersApi.js';
 
 export default function UserDetail() {
@@ -11,6 +12,7 @@ export default function UserDetail() {
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
+        // (옵셔널)
         const controller = new AbortController();
 
         setLoading(true);
@@ -38,6 +40,7 @@ export default function UserDetail() {
                 setLoading(false);
             });
 
+        // (옵셔널)
         return () => controller.abort();
     }, [userId]);
 

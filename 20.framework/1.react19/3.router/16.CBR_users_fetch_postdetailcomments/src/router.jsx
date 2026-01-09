@@ -17,6 +17,7 @@ import PostDetail from './pages/PostDetail.jsx';
 import {
     fetchUsers,
     fetchUserById,
+    deleteUserById,
     fetchPosts,
     fetchPostById,
     fetchCommentsByPostId,
@@ -69,13 +70,9 @@ const router = createBrowserRouter([
             // 삭제 전용 라우트 (화면 없음, action만)
             {
                 path: 'users/:userId/delete',
-                // action: deleteUserAction,
                 action: async ({ params }) => {
-                    const res = await fetch(`https://jsonplaceholder.typicode.com/users/${params.userId}`, {
-                        method: "DELETE",
-                    });
-                    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-
+                    await deleteUserById(params.userId);
+                    
                     // 삭제 후 목록으로 이동
                     return redirect("/users");
                 },

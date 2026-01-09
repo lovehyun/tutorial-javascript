@@ -29,7 +29,7 @@ import NotFound from './pages/NotFound.jsx';
 // 5단계 추가
 import Posts from './pages/Posts.jsx';
 
-import { fetchUsers, fetchUserById, fetchPosts } from './api/usersApi.js';
+import { fetchUsers, fetchUserById, deleteUserById, fetchPosts } from './api/usersApi.js';
 
 const router = createBrowserRouter([
     {
@@ -73,12 +73,8 @@ const router = createBrowserRouter([
             // 삭제 전용 라우트 (화면 없음, action만)
             {
                 path: 'users/:userId/delete',
-                // action: deleteUserAction,
                 action: async ({ params }) => {
-                    const res = await fetch(`https://jsonplaceholder.typicode.com/users/${params.userId}`, {
-                        method: "DELETE",
-                    });
-                    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                    await deleteUserById(params.userId);
 
                     // 삭제 후 목록으로 이동
                     return redirect("/users");

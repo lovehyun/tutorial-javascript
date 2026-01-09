@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+
 import RootLayout from './layouts/RootLayout.jsx';
 import Home from './pages/Home.jsx';
 import Users from './pages/Users.jsx';

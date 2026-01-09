@@ -26,25 +26,7 @@ import UserDetail from './pages/UserDetail.jsx';
 import About from './pages/About.jsx';
 import NotFound from './pages/NotFound.jsx';
 
-import { fetchUsers, fetchUserById } from './api/usersApi.js';
-
-/*
-async function deleteUserAction({ params, request }) {
-    const { userId } = params;
-
-    const res = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
-        method: 'DELETE',
-        signal: request.signal, // (선택) 라우터가 주는 signal로 취소 지원
-    });
-
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status} ${res.statusText}`);
-    }
-
-    // 삭제 후 목록으로 이동
-    return redirect('/users');
-}
-*/
+import { fetchUsers, fetchUserById, deleteUserById } from './api/usersApi.js';
 
 const router = createBrowserRouter([
     {
@@ -78,12 +60,8 @@ const router = createBrowserRouter([
             // 삭제 전용 라우트 (화면 없음, action만)
             {
                 path: 'users/:userId/delete',
-                // action: deleteUserAction,
                 action: async ({ params }) => {
-                    const res = await fetch(`https://jsonplaceholder.typicode.com/users/${params.userId}`, {
-                        method: "DELETE",
-                    });
-                    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+                    await deleteUserById(params.userId);
 
                     // 삭제 후 목록으로 이동
                     return redirect("/users");

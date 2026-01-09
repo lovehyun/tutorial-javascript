@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect  } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+
 import { fetchUserById } from '../api/fakeUsersApi.js';
 
 export default function UserDetail() {

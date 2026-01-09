@@ -45,11 +45,11 @@ export default function RootLayout() {
                 {isLoading && (
                     <div
                         style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'grid',
-                        placeItems: 'center',
-                        background: 'rgba(255,255,255,0.7)',
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'grid',
+                            placeItems: 'center',
+                            background: 'rgba(255,255,255,0.7)',
                         }}
                     >
                         <p>로딩 중...</p>

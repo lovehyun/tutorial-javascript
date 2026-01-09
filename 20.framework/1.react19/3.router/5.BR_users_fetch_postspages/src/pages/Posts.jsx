@@ -10,10 +10,10 @@ const PAGE_SIZE = 20;
 
 export default function Posts() {
     const [posts, setPosts] = useState([]);
-    const [page, setPage] = useState(1); // 1~5
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState('');
-
+    const [page, setPage] = useState(1); // 1~5
+    
     useEffect(() => {
         const controller = new AbortController();
 
@@ -73,7 +73,7 @@ export default function Posts() {
         <div>
             <h1>Posts</h1>
 
-            <p style={{ color: '#666' }}>
+            <p style={{ color: '#555' }}>
                 전체 {posts.length}개 / 페이지 {page} / {totalPages}
             </p>
 

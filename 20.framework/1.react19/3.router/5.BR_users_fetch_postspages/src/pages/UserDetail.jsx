@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { fetchUserById } from '../api/usersApi.js';
+import { fetchUserById, deleteUserById } from '../api/usersApi.js';
 
 export default function UserDetail() {
     const { userId } = useParams();
@@ -45,13 +45,7 @@ export default function UserDetail() {
         setDeleting(true);
 
         try {
-            const res = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
-                method: 'DELETE',
-            });
-
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status} ${res.statusText}`);
-            }
+            await deleteUserById(userId);
 
             // 삭제 성공 처리: 목록으로 이동 (실데이터 반영은 안 되지만 흐름 학습)
             // 돌아가면 목록이 다시 fetch 되면서 삭제된게 모두 초기화 됨 (그냥 jsonplaceholder 의 특징)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchUsers } from '../api/usersApi.js';
+import { fetchUsers, deleteUserById } from '../api/usersApi.js';
 
 // 목록은 이름만
 // 각 항목에 삭제 버튼
@@ -46,13 +46,7 @@ export default function Users() {
 
         try {
             // JSONPlaceholder: DELETE는 "성공 응답"만 주고 실제 데이터는 유지됨(학습용)
-            const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status} ${res.statusText}`);
-            }
+            await deleteUserById(id);
 
             // 성공한 것처럼 UI에서 제거 (학습 포인트)
             setUsers((prev) => prev.filter((u) => u.id !== id));
@@ -99,7 +93,7 @@ export default function Users() {
                 })}
             </ul>
 
-            {users.length === 0 && <p className="text-muted">표시할 사용자가 없습니다.</p>}
+            {users.length === 0 && <p style={{ color: 'gray'}}>표시할 사용자가 없습니다.</p>}
         </div>
     );
 }
