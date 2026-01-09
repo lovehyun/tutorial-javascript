@@ -9,6 +9,7 @@ export function useLoginForm() {
 
     const idRef = useRef(null);
     const pwRef = useRef(null);
+    const pendingFocus = useRef(null); // 'id' | 'pw' | null
 
     // 초기 로드: 저장된 아이디 + 포커스
     useEffect(() => {
@@ -53,44 +54,48 @@ export function useLoginForm() {
         });
     };
 
-    const submit = async (e) => {
-        e.preventDefault();
+    // 포커스 처리를 예약해준것 랜더링 이후에 처리
+    useEffect(() => {
+        if (loading) return;
+        if (pendingFocus.current === 'pw') {
+            pwRef.current?.focus();
+        } else if (pendingFocus.current === 'id') {
+            idRef.current?.focus();
+        }
+        pendingFocus.current = null;
+    }, [loading]);
+
+
+    // ✅ 이 함수는 "성공이면 resolve, 실패면 throw" 해야
+    // LoginPage에서 성공 시 navigate가 가능합니다.
+    const submit = async () => {
+        if (!canSubmit) return;
         setMessage({ type: '', text: '' });
+        setLoading(true);
 
         const id = form.id.trim();
         const pw = form.pw.trim();
 
-        if (!id || !pw) {
-            setMessage({ type: 'error', text: '아이디와 비밀번호를 모두 입력해 주세요.' });
-            if (!id) idRef.current?.focus();
-            else pwRef.current?.focus();
-            return;
-        }
-
-        if (!canSubmit) return;
-
-        setLoading(true);
         try {
-            const res = await fakeLoginApi({ id, pw });
-            setMessage({ type: 'success', text: `✅ 로그인 성공! (${res.user.id})` });
+            const {ok, user} = await fakeLoginApi({ id, pw });
+            if (!ok) throw new Error('로그인에 실패했습니다.');
+
+            setMessage({ type: 'success', text: `✅ 로그인 성공! (${user.id})` });
             setForm((prev) => ({ ...prev, pw: '' }));
-            pwRef.current?.focus();
+            return user; // ✅ 성공 반환
         } catch (err) {
             setMessage({ type: 'error', text: `❌ 로그인 실패: ${err.message || '오류가 발생했습니다.'}` });
             setForm((prev) => ({ ...prev, pw: '' }));
-            
-            setLoading(false); // 먼저 풀어줌
-            requestAnimationFrame(() => { // 렌더 반영 후
-                pwRef.current?.focus();
-            });
-            return; // finally에서 또 setLoading(false) 안 하게
+            // pwRef.current?.focus();
+            pendingFocus.current = 'pw';   // ✅ 지금 말고, 로딩 끝난 다음에 포커스 (pw 입력필드가 setLoading(true) 상태라 focus 불가함)
+            throw err; // ✅ 실패 throw
         } finally {
             setLoading(false);
         }
     };
 
     const reset = () => {
-        setForm((prev) => ({ ...prev, pw: '' })); // 정책: id/rememberId는 유지
+        setForm((p) => ({ ...p, pw: '' })); // 정책: id/rememberId는 유지
         setMessage({ type: '', text: '' });
         if (form.id.trim()) pwRef.current?.focus();
         else idRef.current?.focus();

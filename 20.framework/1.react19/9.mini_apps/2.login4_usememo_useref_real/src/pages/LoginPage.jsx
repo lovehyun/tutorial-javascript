@@ -12,7 +12,8 @@
 // 이 예제에서 useMemo는 "canSubmit이 state가 아니라 파생값(derived value)임을 명확히 표현하기 위한 목적" 입니다.
 // 성능 향상의 목적보다는 의미적 목적(semantic clarity) 이 더 큽니다
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
+
 import LoginForm from '../components/LoginForm.jsx';
 
 const SAVED_ID_KEY = 'saved_login_id';
@@ -68,7 +69,7 @@ export default function LoginPage() {
     // useMemo 없이 그냥 아래처럼 써도 무방함.
     // const canSubmit = !loading && form.id.trim() !== '' && form.pw.trim() !== '';
 
-    // ✅ field 업데이트 + 아이디 저장 정책을 “즉시 반영” (체크박스 토글 순간)
+    // ✅ field 업데이트 + 아이디 저장 정책을 "즉시 반영" (체크박스 토글 순간)
     const updateField = (name, value) => {
         setForm((prev) => {
             const next = { ...prev, [name]: value };
@@ -133,6 +134,16 @@ export default function LoginPage() {
             // 실패 후 pw만 초기화 + 비밀번호 재입력 포커스
             setForm((prev) => ({ ...prev, pw: '' }));
             pwRef.current?.focus();
+
+            // (퀴즈) 버그. 위에꺼로 focus 안됨. (아직 setLoading 상태라 disabled 되어 있는 상태에서 focus 적용하는지라 실패함.)
+
+            /* 해결책.
+            setLoading(false); // 먼저 풀어줌
+            requestAnimationFrame(() => { // 렌더 반영 후
+                pwRef.current?.focus();
+            });
+            return; // finally에서 또 setLoading(false) 안 하게
+            */
         } finally {
             setLoading(false);
         }
