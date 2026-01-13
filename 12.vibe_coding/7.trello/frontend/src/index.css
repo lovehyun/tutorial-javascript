@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Reset or global overrides if needed */
+body {
+    background-color: #f9fafb; /* pastel-gray-50 */
+    font-family: 'Inter', sans-serif;
+}
