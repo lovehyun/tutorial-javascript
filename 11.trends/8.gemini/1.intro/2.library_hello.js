@@ -13,16 +13,16 @@ if (!process.env.GOOGLE_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
-async function run() {
+async function ask_question(question) {
     const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
-        contents: '인공지능을 3문장으로 아주 쉽게 설명해 주세요.',
+        contents: question,
     });
 
     console.log(response.text);
 }
 
-run().catch((e) => {
+ask_question('인공지능을 3문장으로 아주 쉽게 설명해 주세요.').catch((e) => {
     console.error(e);
     process.exit(1);
 });

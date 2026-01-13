@@ -1,5 +1,8 @@
+// const dotenv = require('dotenv');
+// dotenv.config();
+
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const key = process.env.GOOGLE_API_KEY;
 
