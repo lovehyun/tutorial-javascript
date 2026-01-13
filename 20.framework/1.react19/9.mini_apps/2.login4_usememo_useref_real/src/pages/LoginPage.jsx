@@ -7,6 +7,10 @@
 
 // useRef는 "렌더링과 상관없이 값을 보관하거나, DOM에 직접 접근하기 위한 도구"입니다.
 // 이 예제에서 useRef의 목적은 "렌더링과 무관한 DOM 조작(포커스 이동)을 명확하고 안전하게 수행하기 위함" 입니다.
+// useRef 는 아래와 같음.
+// {
+//     current: null
+// }
 
 // useMemo는 "렌더링 중 계산 결과를 캐싱하는 도구" 이고,
 // 이 예제에서 useMemo는 "canSubmit이 state가 아니라 파생값(derived value)임을 명확히 표현하기 위한 목적" 입니다.
@@ -41,12 +45,28 @@ export default function LoginPage() {
 
     // ✅ 시작 시 저장된 아이디가 있으면 불러오기 (+ 자동 포커스)
     useEffect(() => {
+        // React 19.x 에서는 아래 3줄 삭제 및 getState()의 초기값으로 lazy init.
         const savedId = localStorage.getItem(SAVED_ID_KEY) || '';
         if (savedId) {
             setForm((prev) => ({ ...prev, id: savedId, rememberId: true }));
         }
+
         // 페이지 진입 시 아이디 입력창에 포커스
         idRef.current?.focus();
+
+        /* ID/PW 중 어디에 포커스 할지, 디테일한 체크...
+        if (savedId) {
+            setForm((prev) => ({ ...prev, id: savedId, rememberId: true }));
+
+            // 저장된 ID가 있으면 PW로 포커스
+            requestAnimationFrame(() => {
+                pwRef.current?.focus();
+            });
+        } else {
+            // 없으면 ID로 포커스
+            idRef.current?.focus();
+        }
+        */
     }, []);
 
     // ✅ (추가기능) 로그인 성공 메시지 2초 후 자동 제거
@@ -57,8 +77,8 @@ export default function LoginPage() {
             setMessage({ type: '', text: '' });
         }, 2000); // 2초
 
-        // cleanup: 메시지가 바뀌거나 컴포넌트 언마운트 시 타이머 제거
-        return () => clearTimeout(timer);
+        // cleanup: 메시지가 바뀌거나 컴포넌트 언마운트 시 타이머 제거. 이럴때는 message 자체를 dep로 해야함
+        // return () => clearTimeout(timer);
     }, [message.type]);
 
     // ✅ 파생값(derived): 제출(submit) 가능 여부

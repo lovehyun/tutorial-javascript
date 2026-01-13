@@ -7,7 +7,37 @@ import LoginForm from '../components/LoginForm.jsx';
 
 const SAVED_ID_KEY = 'saved_login_id';
 
+// React 19.x
+// https://react.dev/learn/you-might-not-need-an-effect
+// https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
+// 렌더 전에 이미 알 수 있는 값(초기값, 계산값)을 넣으려고 쓰면 안 된다
+// fetch, timer, event, websocket 에서는 OK.
+// localStorage 등은 NG.
+function getInitialForm() {
+    const savedId = localStorage.getItem(SAVED_ID_KEY) || '';
+    return {
+        id: savedId,
+        pw: '',
+        rememberId: Boolean(savedId),
+    };
+}
+
+// useEffect(() => {
+//     setForm(getInitialForm());
+// }, []);
+// 구버전 방식의 흐름이 이렇게 됩니다:
+// 첫 렌더: form은 기본값(빈 값)
+//  - effect 실행
+//  - setForm 실행
+//  - 리렌더 1번 추가
+//  => 총 2번 렌더가 발생합니다.
+// (React/ESLint가 싫어하는 "불필요한 추가 렌더"가 발생함.)
+
 export default function LoginPage() {
+    // React 19.x
+    // const [form, setForm] = useState(() => getInitialForm()); // lazy initilization, 콜백 함수로 등록해먼 최초 컴포넌트가 마운트 되는 1회시
+    // const [form, setForm] = useState(getInitialForm()); // 값으로 셋팅하면, 매번 진입 시마다
+
     const [form, setForm] = useState({ id: '', pw: '', rememberId: false });
     const [message, setMessage] = useState({ type: '', text: '' }); // type: "success" | "error" | ""
 
@@ -15,6 +45,7 @@ export default function LoginPage() {
     useEffect(() => {
         const savedId = localStorage.getItem(SAVED_ID_KEY) || '';
         if (savedId) {
+            // React 19.x 부터는 이렇게 초기화 하는것 싫어함.
             setForm((prev) => ({ ...prev, id: savedId, rememberId: true }));
         }
     }, []);

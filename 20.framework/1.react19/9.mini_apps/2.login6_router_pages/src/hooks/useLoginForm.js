@@ -86,6 +86,7 @@ export function useLoginForm() {
         } catch (err) {
             setMessage({ type: 'error', text: `❌ 로그인 실패: ${err.message || '오류가 발생했습니다.'}` });
             setForm((prev) => ({ ...prev, pw: '' }));
+            
             // pwRef.current?.focus();
             pendingFocus.current = 'pw';   // ✅ 지금 말고, 로딩 끝난 다음에 포커스 (pw 입력필드가 setLoading(true) 상태라 focus 불가함)
             throw err; // ✅ 실패 throw
