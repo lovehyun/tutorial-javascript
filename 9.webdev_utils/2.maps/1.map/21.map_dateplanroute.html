@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이트 플랜 경로 짜기 (구간 하이라이트)</title>
+
+    <!-- Leaflet 기본 CSS/JS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Leaflet Routing Machine CSS/JS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+    />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        h1 {
+            font-size: 1.1rem;
+            margin: 0 0 4px;
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .controls {
+            padding: 10px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        /* 여러 장소 입력칸을 가로로 배치 */
+        #places-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1 1 auto;
+        }
+
+        .place-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+            max-width: 200px;
+        }
+
+        .place-row label {
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .place-row input {
+            padding: 6px 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        @media (min-width: 600px) {
+            .btn-group {
+                flex-direction: row;
+            }
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #e9ecef;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #666;
+            padding: 0 16px 4px;
+            min-height: 16px;
+        }
+
+        .results {
+            font-size: 0.8rem;
+            color: #333;
+            padding: 0 16px 4px;
+            white-space: pre-line;
+        }
+
+        .segment-controls {
+            font-size: 0.8rem;
+            padding: 0 16px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        #map {
+            height: 480px;
+        }
+
+        /* 필요하면 라우팅 패널 숨기는 옵션
+        .leaflet-routing-container {
+            display: none;
+        }
+        */
+    </style>
+</head>
+<body>
+<header>
+    <h1>서울 데이트 플랜 경로 짜기 (구간별 하이라이트)</h1>
+    <div class="subtitle">
+        출발지와 데이트 코스를 순서대로 입력하면, 자동차 경로와 구간별 하이라이트를 보여줍니다.
+    </div>
+</header>
+
+<div class="controls">
+    <div id="places-container">
+        <!-- 여기 안에 주소 입력칸들이 가로로 배치됩니다 -->
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-secondary" id="add-place-btn">+ 장소 추가</button>
+        <button class="btn btn-primary" id="route-btn">경로 찾기</button>
+    </div>
+</div>
+
+<div class="status" id="status"></div>
+<div class="results" id="results"></div>
+
+<!-- 구간 선택용 -->
+<div class="segment-controls">
+    <label for="segment-select">하이라이트할 구간 선택:</label>
+    <select id="segment-select" disabled>
+        <option value="">(경로 계산 후 선택 가능)</option>
+    </select>
+</div>
+
+<div id="map"></div>
+
+<script>
+    // ===== 1. 지도 기본 설정 =====
+    const map = L.map("map").setView([37.5665, 126.9780], 12); // 서울 시청 근처
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {}).addTo(map);
+
+    let markers = [];           // 마커 저장용
+    let routingControl = null;  // 전체 경로 컨트롤
+    let highlightLine = null;   // 구간 하이라이트용 polyline
+
+    // OSRM 라우터 (구간별 하이라이트 계산에 사용)
+    const router = L.Routing.osrmv1();
+
+    const placesContainer = document.getElementById("places-container");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+    const addBtn = document.getElementById("add-place-btn");
+    const routeBtn = document.getElementById("route-btn");
+    const segmentSelect = document.getElementById("segment-select");
+
+    // 최근 계산된 좌표/주소를 저장 (구간 하이라이트 때 사용)
+    let lastCoords = [];
+    let lastAddresses = [];
+
+    // ===== 2. 주소 입력칸 하나 만들어주는 함수 =====
+    let placeIndex = 0;
+    function createPlaceRow(labelText, placeholder) {
+        const row = document.createElement("div");
+        row.className = "place-row";
+
+        const label = document.createElement("label");
+        label.textContent = labelText;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = placeholder;
+        input.className = "place-input";
+        input.dataset.index = placeIndex++;
+
+        row.appendChild(label);
+        row.appendChild(input);
+
+        placesContainer.appendChild(row);
+
+        return input;
+    }
+
+    // 초기 출발지 + 두 개 정도 예시 경유지
+    const firstInput = createPlaceRow("출발지", "예: 서울역");
+    firstInput.value = "서울역";
+
+    const secondInput = createPlaceRow("경유지 1", "예: 남산타워");
+    secondInput.value = "남산타워";
+
+    const thirdInput = createPlaceRow("경유지 2", "예: 롯데월드");
+    thirdInput.value = "롯데월드";
+
+    // "+ 장소 추가" 버튼 클릭 시 새로운 경유지 추가
+    addBtn.addEventListener("click", () => {
+        const count = document.querySelectorAll(".place-input").length;
+        createPlaceRow(`경유지 ${count}`, "예: 한강공원 뚝섬유원지");
+    });
+
+    // ===== 3. Nominatim을 이용해 주소 → (lat, lon) 변환 =====
+    async function geocodeAddress(address) {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(
+            address
+        )}`;
+
+        const res = await fetch(url, {
+            headers: {
+                Accept: "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`지오코딩 요청 실패: ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            throw new Error(`"${address}" 위치를 찾을 수 없습니다.`);
+        }
+
+        const first = data[0];
+        const lat = parseFloat(first.lat);
+        const lon = parseFloat(first.lon);
+        return [lat, lon];
+    }
+
+    // ===== 4. 특정 구간을 두껍고 반투명한 빨간색으로 하이라이트 =====
+    function highlightSegment(segmentIndex) {
+        // 이전 하이라이트 라인이 있으면 제거
+        if (highlightLine) {
+            map.removeLayer(highlightLine);
+            highlightLine = null;
+        }
+
+        if (
+            !lastCoords.length ||
+            segmentIndex < 0 ||
+            segmentIndex >= lastCoords.length - 1
+        ) {
+            return;
+        }
+
+        const from = lastCoords[segmentIndex];
+        const to = lastCoords[segmentIndex + 1];
+
+        statusEl.textContent = `구간 ${segmentIndex + 1} 경로를 상세 계산 중...`;
+
+        // OSRM에 from → to만 따로 요청해서 해당 구간 polyline만 그리기
+        router.route(
+            [
+                { latLng: L.latLng(from[0], from[1]) },
+                { latLng: L.latLng(to[0], to[1]) },
+            ],
+            function (err, routes) {
+                if (err || !routes || !routes[0]) {
+                    console.error(err);
+                    statusEl.textContent = "구간 경로 계산 중 오류가 발생했습니다.";
+                    return;
+                }
+
+                const coords = routes[0].coordinates; // LatLng 배열
+                highlightLine = L.polyline(coords, {
+                    color: "red",
+                    opacity: 0.6,   // 반투명
+                    weight: 8,      // 좀 더 굵게
+                }).addTo(map);
+
+                // 전체 경로는 그대로 두고, 하이라이트만 위에 얹기
+                highlightLine.bringToFront();
+                statusEl.textContent = `구간 ${segmentIndex + 1} 하이라이트 완료!`;
+            }
+        );
+    }
+
+    // 구간 선택 셀렉트 박스 변경 시 하이라이트 업데이트
+    segmentSelect.addEventListener("change", () => {
+        const value = segmentSelect.value;
+        if (value === "") {
+            // 선택 해제 시 하이라이트 제거
+            if (highlightLine) {
+                map.removeLayer(highlightLine);
+                highlightLine = null;
+            }
+            statusEl.textContent = "하이라이트를 해제했습니다.";
+            return;
+        }
+        const idx = parseInt(value, 10);
+        highlightSegment(idx);
+    });
+
+    // ===== 5. 경로 찾기 버튼 클릭 시 처리 (전체 경로 + 구간 정보 준비) =====
+    routeBtn.addEventListener("click", async () => {
+        const inputs = Array.from(
+            document.querySelectorAll(".place-input")
+        );
+        const addresses = inputs
+            .map((input) => input.value.trim())
+            .filter((v) => v.length > 0);
+
+        if (addresses.length < 2) {
+            alert("최소 출발지 + 1개 이상의 장소를 입력해주세요.");
+            return;
+        }
+
+        statusEl.textContent = "주소를 지도 좌표로 변환 중입니다... (잠시만 기다려주세요)";
+        resultsEl.textContent = "";
+        segmentSelect.innerHTML = '<option value="">(구간 선택)</option>';
+        segmentSelect.disabled = true;
+
+        routeBtn.disabled = true;
+        addBtn.disabled = true;
+
+        try {
+            const coords = [];
+            const resultLines = [];
+
+            // 순서대로 하나씩 지오코딩
+            for (const addr of addresses) {
+                statusEl.textContent = `"${addr}" 위치 찾는 중...`;
+                const c = await geocodeAddress(addr);
+                coords.push(c);
+                resultLines.push(`${addr} → lat: ${c[0].toFixed(5)}, lng: ${c[1].toFixed(5)}`);
+                resultsEl.textContent = resultLines.join("\n");
+            }
+
+            statusEl.textContent = "전체 자동차 경로를 계산 중입니다...";
+
+            // 상태 저장 (구간 하이라이트에 사용)
+            lastCoords = coords;
+            lastAddresses = addresses;
+
+            // 기존 마커 제거
+            markers.forEach((m) => map.removeLayer(m));
+            markers = [];
+
+            // 기존 라우팅 컨트롤 제거
+            if (routingControl) {
+                map.removeControl(routingControl);
+                routingControl = null;
+            }
+
+            // 기존 하이라이트 제거
+            if (highlightLine) {
+                map.removeLayer(highlightLine);
+                highlightLine = null;
+            }
+
+            // 마커 추가
+            coords.forEach((c, idx) => {
+                const marker = L.marker(c).addTo(map);
+                const label =
+                    idx === 0
+                        ? `출발: ${addresses[idx]}`
+                        : `경유지 ${idx}: ${addresses[idx]}`;
+                marker.bindPopup(label);
+                markers.push(marker);
+            });
+
+            // 전체 경로 (자동차 기준) 그리기
+            routingControl = L.Routing.control({
+                waypoints: coords.map((c) => L.latLng(c[0], c[1])),
+                routeWhileDragging: false,
+                addWaypoints: false,
+                draggableWaypoints: false,
+                showAlternatives: false,
+            })
+                .on("routesfound", function (e) {
+                    const route = e.routes[0];
+                    if (route && route.bounds) {
+                        map.fitBounds(route.bounds, { padding: [40, 40] });
+                    }
+                    statusEl.textContent =
+                        "전체 경로 계산 완료! 하단의 구간 선택에서 하이라이트할 구간을 고를 수 있습니다.";
+                })
+                .addTo(map);
+
+            // 구간 선택 셀렉트 박스 채우기 (주소[i] → 주소[i+1])
+            segmentSelect.innerHTML = '<option value="">(구간 선택)</option>';
+            for (let i = 0; i < addresses.length - 1; i++) {
+                const opt = document.createElement("option");
+                opt.value = String(i);
+                opt.textContent = `${i + 1}구간: ${addresses[i]} → ${addresses[i + 1]}`;
+                segmentSelect.appendChild(opt);
+            }
+            segmentSelect.disabled = false;
+
+        } catch (err) {
+            console.error(err);
+            alert(err.message || "경로를 찾는 중 오류가 발생했습니다.");
+            statusEl.textContent = "오류가 발생했습니다. 콘솔을 확인해주세요.";
+        } finally {
+            routeBtn.disabled = false;
+            addBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

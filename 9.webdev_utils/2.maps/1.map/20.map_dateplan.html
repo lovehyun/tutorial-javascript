@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>데이트 플랜 경로 짜기</title>
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+        h1 {
+            font-size: 1.1rem;
+            margin: 0 0 4px;
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .controls {
+            padding: 10px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        /* 여러 장소 입력칸을 가로로 배치 */
+        #places-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1 1 auto;
+        }
+
+        .place-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 140px;
+            max-width: 200px;
+        }
+
+        .place-row label {
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: #555;
+        }
+
+        .place-row input {
+            padding: 6px 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        @media (min-width: 600px) {
+            .btn-group {
+                flex-direction: row;
+            }
+        }
+
+        .btn {
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: #fff;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #007bff;
+            border-color: #007bff;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #e9ecef;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #666;
+            padding: 0 16px 4px;
+            min-height: 16px;
+        }
+
+        /* 주소별 (lat, lng) 결과 보여주는 영역 */
+        .results {
+            font-size: 0.8rem;
+            color: #333;
+            padding: 0 16px 8px;
+            white-space: pre-line; /* \n 유지해서 줄바꿈 */
+        }
+
+        #map {
+            height: 480px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>서울 데이트 플랜 경로 짜기</h1>
+    <div class="subtitle">
+        출발지와 데이트 코스를 순서대로 입력하면, 지도로 동선을 보여줍니다.
+    </div>
+</header>
+
+<div class="controls">
+    <div id="places-container">
+        <!-- 여기 안에 주소 입력칸들이 가로로 배치됩니다 -->
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-secondary" id="add-place-btn">+ 장소 추가</button>
+        <button class="btn btn-primary" id="route-btn">경로 찾기</button>
+    </div>
+</div>
+
+<div class="status" id="status"></div>
+<div class="results" id="results"></div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // ===== 1. 지도 기본 설정 =====
+    const map = L.map("map").setView([37.5665, 126.9780], 12); // 서울 시청 근처
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {}).addTo(map);
+
+    let routeLine = null;    // polyline 저장용
+    let markers = [];        // 마커 저장용
+
+    const placesContainer = document.getElementById("places-container");
+    const statusEl = document.getElementById("status");
+    const resultsEl = document.getElementById("results");
+    const addBtn = document.getElementById("add-place-btn");
+    const routeBtn = document.getElementById("route-btn");
+
+    // ===== 2. 주소 입력칸 하나 만들어주는 함수 =====
+    let placeIndex = 0;
+    function createPlaceRow(labelText, placeholder) {
+        const row = document.createElement("div");
+        row.className = "place-row";
+
+        const label = document.createElement("label");
+        label.textContent = labelText;
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = placeholder;
+        input.className = "place-input";
+        input.dataset.index = placeIndex++;
+
+        row.appendChild(label);
+        row.appendChild(input);
+
+        placesContainer.appendChild(row);
+
+        return input;
+    }
+
+    // 초기 출발지 + 두 개 정도 예시 경유지
+    const firstInput = createPlaceRow("출발지", "예: 서울역");
+    firstInput.value = "서울역";
+
+    const secondInput = createPlaceRow("경유지 1", "예: 남산타워");
+    secondInput.value = "남산타워";
+
+    const thirdInput = createPlaceRow("경유지 2", "예: 롯데월드");
+    thirdInput.value = "롯데월드";
+
+    // "+ 장소 추가" 버튼 클릭 시 새로운 경유지 추가
+    addBtn.addEventListener("click", () => {
+        const count = document.querySelectorAll(".place-input").length;
+        createPlaceRow(`경유지 ${count}`, "예: 한강공원 뚝섬유원지");
+    });
+
+    // ===== 3. Nominatim을 이용해 주소 → (lat, lon) 변환 =====
+    async function geocodeAddress(address) {
+        // Nominatim (OpenStreetMap) - 무료, 키 없음
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(
+            address
+        )}`;
+
+        const res = await fetch(url, {
+            headers: {
+                Accept: "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            throw new Error(`지오코딩 요청 실패: ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+            throw new Error(`"${address}" 위치를 찾을 수 없습니다.`);
+        }
+
+        const first = data[0];
+        const lat = parseFloat(first.lat);
+        const lon = parseFloat(first.lon);
+        return [lat, lon];
+    }
+
+    // ===== 4. 경로 찾기 버튼 클릭 시 처리 =====
+    routeBtn.addEventListener("click", async () => {
+        const inputs = Array.from(
+            document.querySelectorAll(".place-input")
+        );
+        const addresses = inputs
+            .map((input) => input.value.trim())
+            .filter((v) => v.length > 0);
+
+        if (addresses.length < 2) {
+            alert("최소 출발지 + 1개 이상의 장소를 입력해주세요.");
+            return;
+        }
+
+        statusEl.textContent = "주소를 지도 좌표로 변환 중입니다... (잠시만 기다려주세요)";
+        resultsEl.textContent = "";
+        routeBtn.disabled = true;
+        addBtn.disabled = true;
+
+        try {
+            const coords = [];
+            const resultLines = [];
+
+            // 순서대로 하나씩 지오코딩 (간단하게 직렬 처리)
+            for (const addr of addresses) {
+                statusEl.textContent = `"${addr}" 위치 찾는 중...`;
+                const c = await geocodeAddress(addr);
+                coords.push(c);
+                // 찾은 결과 (lat, lng)를 문자열로 누적
+                resultLines.push(`${addr} → lat: ${c[0].toFixed(5)}, lng: ${c[1].toFixed(5)}`);
+                resultsEl.textContent = resultLines.join("\n");
+            }
+
+            statusEl.textContent = "경로를 그리는 중입니다...";
+
+            // 기존 경로/마커 제거
+            if (routeLine) {
+                map.removeLayer(routeLine);
+            }
+            markers.forEach((m) => map.removeLayer(m));
+            markers = [];
+
+            // 마커 추가
+            coords.forEach((c, idx) => {
+                const marker = L.marker(c).addTo(map);
+                const label =
+                    idx === 0
+                        ? `출발: ${addresses[idx]}`
+                        : `경유지 ${idx}: ${addresses[idx]}`;
+                marker.bindPopup(label);
+                markers.push(marker);
+            });
+
+            // polyline으로 경로 연결
+            routeLine = L.polyline(coords, {
+                color: "red",
+                weight: 4,
+            }).addTo(map);
+
+            // 지도 화면을 경로에 맞게 조정
+            map.fitBounds(routeLine.getBounds(), { padding: [40, 40] });
+
+            statusEl.textContent = "완료! 마커를 클릭하면 장소 이름을 볼 수 있습니다.";
+        } catch (err) {
+            console.error(err);
+            alert(err.message || "경로를 찾는 중 오류가 발생했습니다.");
+            statusEl.textContent = "오류가 발생했습니다. 콘솔을 확인해주세요.";
+        } finally {
+            routeBtn.disabled = false;
+            addBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
