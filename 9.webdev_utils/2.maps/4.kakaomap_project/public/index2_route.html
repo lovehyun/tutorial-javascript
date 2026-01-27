@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>카카오 지도 + Node.js + 길찾기 예제</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 500px;
+        }
+        #list {
+            margin-top: 10px;
+            font-family: sans-serif;
+        }
+        .place-item {
+            margin-bottom: 6px;
+        }
+        .place-item button {
+            margin-left: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>카카오 지도 + Node.js 연동 (대중교통 / 자동차 길찾기)</h1>
+    <div id="map"></div>
+    <div id="list"></div>
+
+    <!-- 카카오 지도 JS SDK (본인 JavaScript 키로 교체) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=KAKAO_JS_API_KEY&autoload=false"></script>
+
+    <script>
+        // ===== 출발지(예시) : 서울 시청 근처 =====
+        // 실제로는 회사 위치나 사용자가 입력한 위치로 바꾸셔도 됩니다.
+        const START_NAME = '출발지(서울 시청 근처)';
+        const START_LAT  = 37.5665;
+        const START_LNG  = 126.9780;
+
+        // ===== 카카오맵 길찾기 공통 함수 =====
+        // mode: 'car' (자동차) | 'traffic' (대중교통)
+        function openRoute(mode, startName, startLat, startLng, endName, endLat, endLng) {
+            const sName = encodeURIComponent(startName);
+            const eName = encodeURIComponent(endName);
+
+            const url = `https://map.kakao.com/link/by/${mode}/${sName},${startLat},${startLng}/${eName},${endLat},${endLng}`;
+            window.open(url, '_blank'); // 새 탭으로 열기
+        }
+
+        // 특정 장소에 대해 대중교통 길찾기
+        function goTransit(place) {
+            openRoute(
+                'traffic',          // 대중교통
+                START_NAME, START_LAT, START_LNG,
+                place.name, place.lat, place.lng
+            );
+        }
+
+        // 특정 장소에 대해 자동차 길찾기
+        function goCar(place) {
+            openRoute(
+                'car',              // 자동차
+                START_NAME, START_LAT, START_LNG,
+                place.name, place.lat, place.lng
+            );
+        }
+
+        // ===== 카카오 지도 로드 후 실행 =====
+        kakao.maps.load(async function () {
+            const mapContainer = document.getElementById('map');
+            const mapOption = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 중심: 서울
+                level: 7,
+            };
+
+            const map = new kakao.maps.Map(mapContainer, mapOption);
+            const listDiv = document.getElementById('list');
+
+            try {
+                // 1) 백엔드에서 장소 데이터 가져오기
+                const res = await fetch('/api/places');
+                const places = await res.json();
+
+                listDiv.innerHTML = '<h3>백엔드에서 받은 장소 목록</h3>';
+
+                // 2) 각 장소에 대해 마커 + 인포윈도우 + 길찾기 버튼 만들기
+                places.forEach((place) => {
+                    const position = new kakao.maps.LatLng(place.lat, place.lng);
+
+                    // 지도에 마커 표시
+                    const marker = new kakao.maps.Marker({
+                        map: map,
+                        position: position,
+                    });
+
+                    // 인포윈도우 내용
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `
+                            <div style="padding:5px;font-size:12px;">
+                                <strong>${place.name}</strong><br/>
+                                ${place.desc}
+                            </div>
+                        `,
+                    });
+
+                    // 마커에 마우스 오버/아웃 이벤트
+                    kakao.maps.event.addListener(marker, 'mouseover', () => {
+                        infowindow.open(map, marker);
+                    });
+                    kakao.maps.event.addListener(marker, 'mouseout', () => {
+                        infowindow.close();
+                    });
+
+                    // 리스트 영역에 장소 + 버튼 추가
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'place-item';
+
+                    const text = document.createElement('span');
+                    text.textContent = `${place.name} (${place.lat}, ${place.lng}) - ${place.desc}`;
+
+                    const btnTransit = document.createElement('button');
+                    btnTransit.textContent = '대중교통 길찾기';
+                    btnTransit.addEventListener('click', () => goTransit(place));
+
+                    const btnCar = document.createElement('button');
+                    btnCar.textContent = '자동차 길찾기';
+                    btnCar.addEventListener('click', () => goCar(place));
+
+                    wrapper.appendChild(text);
+                    wrapper.appendChild(btnTransit);
+                    wrapper.appendChild(btnCar);
+
+                    listDiv.appendChild(wrapper);
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert('백엔드에서 장소 데이터를 가져오지 못했습니다.');
+            }
+        });
+    </script>
+</body>
+</html>

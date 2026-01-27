@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>Kakao Maps SDK 최종 테스트</title>
+</head>
+<body>
+    <h1>Kakao Maps SDK 최종 테스트</h1>
+    <pre id="log" style="padding: 10px; background: #eee"></pre>
+
+    <script>
+        const log = (msg) => {
+            const el = document.getElementById('log');
+            el.textContent += msg + '\n';
+            console.log(msg);
+        };
+
+        // 여기에 "JavaScript 키" 넣으셔야 합니다 (REST 키 X)
+        const JS_KEY = '여기에_카카오_JavaScript_키_붙여넣기';
+
+        log('0. 테스트 시작');
+
+        // SDK 스크립트를 동적으로 로드
+        const script = document.createElement('script');
+        script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${JS_KEY}&autoload=false`;
+        script.async = true;
+
+        script.onload = () => {
+            log('1. sdk.js script.onload 호출됨');
+            log('2. window.kakao 타입: ' + typeof window.kakao);
+
+            if (window.kakao && window.kakao.maps) {
+                window.kakao.maps.load(function () {
+                    log('3. kakao.maps.load 콜백 실행 ✔');
+                    log('4. kakao.maps.LatLng 타입: ' + typeof window.kakao.maps.LatLng);
+                });
+            } else {
+                log('3. window.kakao 또는 window.kakao.maps 없음 (키/도메인/네트워크 문제 가능)');
+            }
+        };
+
+        script.onerror = (e) => {
+            log('1. sdk.js script.onerror 발생 ❌');
+            log('   → 이 경우는 거의 100% "도메인 설정" 또는 "키" 문제입니다.');
+            log('   → Network 탭에서 sdk.js 상태코드(401/403 등)를 확인해 보세요.');
+            console.error(e);
+        };
+
+        document.head.appendChild(script);
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>카카오 지도 + Node.js 연동 예제</title>
+    <style>
+        #map {
+            width: 100%;
+            height: 600px;
+        }
+        #list {
+            margin-top: 10px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>카카오 지도 + Node.js 연동</h1>
+    <div id="map"></div>
+    <div id="list"></div>
+
+    <!-- 카카오 지도 JS SDK (본인 JS 키로 교체) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=KAKAO_JS_API_KEY&autoload=false"></script>
+
+    <script>
+        // 카카오 SDK 로드 후 실행
+        kakao.maps.load(async function () {
+            const mapContainer = document.getElementById('map');
+
+            // 기본 지도 옵션 (서울 시청 근처)
+            const mapOption = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 7,
+            };
+
+            const map = new kakao.maps.Map(mapContainer, mapOption);
+
+            try {
+                // 👉 Node.js 백엔드에서 장소 목록 가져오기
+                const res = await fetch('/api/places');
+                const places = await res.json();
+
+                const listDiv = document.getElementById('list');
+                listDiv.innerHTML = '<h3>백엔드에서 받은 장소 목록</h3>';
+
+                places.forEach((place) => {
+                    // 1) 지도에 마커 찍기
+                    const position = new kakao.maps.LatLng(place.lat, place.lng);
+
+                    const marker = new kakao.maps.Marker({
+                        map: map,
+                        position: position,
+                    });
+
+                    // 2) 인포윈도우
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: `
+                          <div style="padding:5px;font-size:12px;">
+                            <strong>${place.name}</strong><br/>
+                            ${place.desc}
+                          </div>
+                        `,
+                    });
+
+                    // 마커에 마우스오버/아웃 이벤트 등록
+                    kakao.maps.event.addListener(marker, 'mouseover', () => {
+                        infowindow.open(map, marker);
+                    });
+                    kakao.maps.event.addListener(marker, 'mouseout', () => {
+                        infowindow.close();
+                    });
+
+                    // 3) 아래 리스트에도 표시
+                    const p = document.createElement('p');
+                    p.textContent = `${place.name} (${place.lat}, ${place.lng}) - ${place.desc}`;
+                    listDiv.appendChild(p);
+                });
+
+            } catch (err) {
+                console.error(err);
+                alert('백엔드에서 장소 데이터를 가져오지 못했습니다.');
+            }
+        });
+    </script>
+</body>
+</html>
