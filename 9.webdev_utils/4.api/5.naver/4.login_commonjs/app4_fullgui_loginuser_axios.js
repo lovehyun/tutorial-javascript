@@ -5,6 +5,13 @@ const axios = require('axios');
 const path = require('path');
 const morgan = require('morgan');
 
+// import express from 'express';
+// import session from 'express-session';
+// import axios from 'axios';
+// import path from 'path';
+// import dotenv from 'dotenv';
+// dotenv.config({ quiet: true });
+
 const app = express();
 const PORT = 3000;
 
@@ -62,7 +69,7 @@ app.get('/login', (req, res) => {
 });
 
 // 네이버 OAuth 콜백 처리
-app.get('/callback', async (req, res) => {
+app.get('/api/oauth2/callback', async (req, res) => {
     const { code, state } = req.query;
 
     try {
@@ -117,16 +124,6 @@ app.get('/callback', async (req, res) => {
 });
 
 // 보호된 페이지
-// app.get('/dashboard', ensureLoggedIn, (req, res) => {
-//     const user = req.session.user;
-//     res.send(`
-//         <h1>Welcome, ${user.name}</h1>
-//         <p>Email: ${user.email}</p>
-//         <img src="${user.profileImage}" alt="Profile Image">
-//         <br><br>
-//         <a href="/logout">Logout</a>
-//     `);
-// });
 app.get('/dashboard', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
 });

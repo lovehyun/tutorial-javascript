@@ -1,7 +1,14 @@
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ quiet: 'true' });
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
+
+// import express from 'express';
+// import axios from 'axios';
+// import path from 'path';
+// import dotenv from 'dotenv';
+// dotenv.config({ quiet: true });
 
 const app = express();
 const PORT = 3000;

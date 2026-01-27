@@ -6,7 +6,8 @@ const client_secret = process.env.NAVER_CLIENT_SECRET;
 
 const text = '반갑습니다';
 const encText = encodeURIComponent(text);
-const url = `https://openapi.naver.com/v1/search/blog?query=${encText}`;
+const url = `https://openapi.naver.com/v1/search/blog?query=${encText}`; // JON 결과
+// const url = `https://openapi.naver.com/v1/search/blog.xml?query=${encText}`; // XML 결과
 
 const headers = {
     'X-Naver-Client-Id': client_id,
