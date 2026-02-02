@@ -4,6 +4,12 @@ const path = require('path');
 const http = require('http');
 const WebSocket = require('ws');
 
+// Express 앱을 만든다 → 
+//   HTTP 서버로 감싼다 → 
+//   그 HTTP 서버 위에 WebSocket을 붙인다 → 
+//   정적 파일을 제공한다 → 
+//   소켓 연결 시 게임데이터를 주고 받는다
+
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
