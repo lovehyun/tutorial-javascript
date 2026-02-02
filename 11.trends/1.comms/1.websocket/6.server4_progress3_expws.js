@@ -1,4 +1,4 @@
-
+// express-ws 통합 라이브러리
 const express = require('express');
 const expressWs = require('express-ws');
 const path = require('path');
@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 });
 
 // WebSocket 엔드포인트
-// app.ws('/', (ws, req) => {  // progress.html
+// app.ws('/', (ws, req) => {
 app.ws('/ws', (ws, req) => {  // progress2.html
     console.log('Client connected via express-ws');
     let interval;

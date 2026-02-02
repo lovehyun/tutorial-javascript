@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>WebSocket Test (JSON 버전)</h1>
+    <input id="msg" type="text" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">전송</button>
+
+    <div id="log" style="margin-top:20px; width:400px; height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px;">
+    </div>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+
+        const logBox = document.getElementById("log");
+
+        function display(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            logBox.appendChild(div);
+        }
+
+        socket.onopen = () => {
+            console.log("서버와 연결됨!");
+        };
+
+        // socket.onmessage = (event) => {
+        //     try {
+        //         const data = JSON.parse(event.data);
+        //         console.log("서버 메시지:", data);
+        //     } catch {
+        //         console.log("서버 메시지(JSON 아님):", event.data);
+        //     }
+        // };
+
+        socket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log(`서버: ${data.content}`);
+                display(data.content);
+            } catch {
+                console.log(`서버(문자열): ${event.data}`);
+                display(event.data);
+            }
+        };
+
+        function sendMessage() {
+            const msg = document.getElementById("msg").value;
+
+            const packet = {
+                type: "chat",
+                content: msg
+            };
+
+            socket.send(JSON.stringify(packet));
+        }
+    </script>
+</body>
+</html>

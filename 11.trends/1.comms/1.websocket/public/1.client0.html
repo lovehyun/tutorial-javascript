@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>WebSocket Test</h1>
+    <input id="msg" type="text" placeholder="메시지 입력" />
+    <button onclick="sendMessage()">전송</button>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+
+        socket.onopen = () => {
+            console.log("서버와 연결됨!");
+        };
+
+        socket.onmessage = (event) => {
+            console.log("서버 메시지:", event.data);
+        };
+
+        function sendMessage() {
+            const msg = document.getElementById("msg").value;
+            socket.send(msg);
+        }
+    </script>
+</body>
+</html>

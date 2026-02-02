@@ -133,6 +133,7 @@
             socket.onclose = () => {
                 alert('서버와의 연결이 종료되었습니다.');
                 document.getElementById('chatInterface').style.display = 'none';
+                fetchRooms(); // 연결 종료 후 방 목록 갱신
             };
         }
 
@@ -158,7 +159,6 @@
         function leaveRoom() {
             socket.close();
             document.getElementById('chatInterface').style.display = 'none';
-            fetchRooms(); // 방 목록 업데이트
         }
 
         // 방 생성

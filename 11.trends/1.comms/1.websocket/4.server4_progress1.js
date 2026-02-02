@@ -18,7 +18,6 @@ const server = app.listen(PORT, () => {
 
 // WebSocket 서버 생성 (HTTP Upgrade 메커니즘)
 const { WebSocketServer } = require('ws');
-
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {

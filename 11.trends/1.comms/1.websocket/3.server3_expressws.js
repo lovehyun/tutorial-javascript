@@ -1,3 +1,4 @@
+// express 서버와 웹소켓 통합
 const express = require('express');
 const expressWs = require('express-ws');
 const path = require('path');

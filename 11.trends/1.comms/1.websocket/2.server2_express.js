@@ -1,9 +1,10 @@
-const WebSocket = require('ws');
+// express 서버와 웹소켓 완전히 분리
 const express = require('express');
 const path = require('path');
+const WebSocket = require('ws');
 
-const ws_port = 8000;
 const express_port = 3000;
+const ws_port = 8000;
 
 const app = express();
 

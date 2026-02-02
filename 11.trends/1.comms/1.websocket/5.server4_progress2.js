@@ -1,6 +1,8 @@
-const express = require('express');
+// 웹서버를 만들고 웹소켓 바인딩
 const http = require('http');
 const { WebSocketServer } = require('ws');
+
+const express = require('express');
 const path = require('path');
 
 const app = express();
@@ -20,6 +22,9 @@ wss.on('connection', (ws) => {
         if (message.toString() === 'start') {
             let progress = 0;
 
+             // 500~2000 랜덤 딜레이
+            const delay = Math.floor(Math.random() * (2000 - 500 + 1)) + 500;
+
             const interval = setInterval(() => {
                 progress += 10;
                 console.log(`서버 메세지: ${progress}`);
@@ -29,7 +34,7 @@ wss.on('connection', (ws) => {
                     clearInterval(interval);
                     console.log('Progress completed for client');
                 }
-            }, 500); // 500 ms
+            }, delay); // 500~2000 ms
         }
     });
 

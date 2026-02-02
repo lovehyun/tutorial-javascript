@@ -1,3 +1,5 @@
+// Socket.IO = WebSocket + 폴백(HTTP-long-polling) + 자동 재연결 + 룸/네임스페이스 + 이벤트 시스템 + 브로드캐스트 + 버전 호환 + 프레임워크 수준의 편의 기능
+// npm i socket.io
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');

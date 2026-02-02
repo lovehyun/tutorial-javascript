@@ -1,9 +1,12 @@
+// npm install ws
 const WebSocket = require('ws');
-
-const port = 8000;
-
 // 웹소켓 서버 생성
+const port = 8080;
 const wss = new WebSocket.Server({ port: port });
+
+// import { WebSocketServer } from "ws";
+// const wss = new WebSocketServer({ port: port });
+
 
 // 서버 시작 시 이벤트 처리
 wss.on('listening', () => {
