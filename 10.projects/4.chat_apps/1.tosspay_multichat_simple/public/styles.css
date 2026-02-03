@@ -1,0 +1,110 @@
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #f5f5f5;
+}
+header {
+    padding: 10px 16px;
+    background: #1f2933;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+header h1 {
+    margin: 0;
+    font-size: 16px;
+}
+header .info {
+    font-size: 13px;
+}
+main {
+    display: flex;
+    padding: 10px;
+    gap: 10px;
+}
+.panel {
+    background: white;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.rooms {
+    width: 30%;
+    max-height: 420px;
+    overflow-y: auto;
+}
+.chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 420px;
+}
+.room-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 6px 4px;
+    font-size: 13px;
+}
+.room-row:last-child {
+    border-bottom: none;
+}
+.room-name {
+    font-weight: 600;
+}
+.room-sub {
+    font-size: 11px;
+    color: #6b7280;
+}
+.btn {
+    border-radius: 999px;
+    border: none;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+.btn-primary {
+    background: #10b981;
+    color: white;
+}
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+#messages {
+    flex: 1;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 6px;
+    overflow-y: auto;
+    font-size: 13px;
+    background: #f9fafb;
+}
+.msg-me {
+    text-align: right;
+    margin: 4px 0;
+}
+.msg-other {
+    text-align: left;
+    margin: 4px 0;
+}
+.msg-system {
+    text-align: center;
+    margin: 4px 0;
+    font-size: 11px;
+    color: #6b7280;
+}
+.input-row {
+    display: flex;
+    margin-top: 6px;
+    gap: 4px;
+}
+.input-row input {
+    flex: 1;
+    padding: 6px;
+    font-size: 13px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+}

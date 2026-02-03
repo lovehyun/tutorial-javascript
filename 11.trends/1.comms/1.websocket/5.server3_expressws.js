@@ -32,6 +32,7 @@ app.ws('/chat', (ws, req) => {
         const parsedMessage = JSON.parse(messageString);
         const username = parsedMessage.username;
         const content = parsedMessage.content;
+        const type = parsedMessage.type;
 
         // 세션 ID 설정 (한 번만 설정하면 됨)
         if (username && !wsClients.has(username)) {
@@ -43,7 +44,7 @@ app.ws('/chat', (ws, req) => {
         console.log(`Received message from [${clientIp}]: `, username);
 
         // 모든 클라이언트에게 메시지 전송
-        if (parsedMessage.type !== 'session') {
+        if (type !== 'session') {
             const messageObj = {
                 type: 'received',
                 content: content,
@@ -64,20 +65,19 @@ app.ws('/chat', (ws, req) => {
     // 클라이언트와 연결 해제 시 이벤트 처리
     ws.on('close', () => {
         console.log('Client disconnected');
-        // console.log(`Client [${ws.username}] disconnected.`);
+        // console.log(`Client [${ws.username}] disconnected.`);  // 웹소켓에 저장을 했다면
 
-        // if (ws.username) {  // 이전에 저장한 ws.username을 사용하여 직접 삭제
-        //     wsClients.delete(ws.username);
-        //     broadcastMessage(`[${ws.username}] left the chat.`);
-        // }
+        let leftUser;
 
         // 연결이 끊긴 클라이언트의 세션을 맵에서 제거
         wsClients.forEach((client, clientId) => {
             if (client === ws) {
+                leftUser = clientId;
                 wsClients.delete(clientId);
-                broadcastMessage(`[${clientId}] left the chat.`);
             }
         });
+        
+        broadcastMessage(`[${leftUser}] left the chat.`);
     });
 
     // 함수를 사용하여 메시지를 모든 클라이언트에 브로드캐스트

@@ -13,7 +13,7 @@ app.use(express.json());
 // 환경 변수에서 시크릿 키를 읽어옵니다.
 const apiSecretKey = process.env.TOSS_SECRET_KEY;
 if (!apiSecretKey) {
-    throw new Error('API_SECRET_KEY 환경 변수를 설정해주세요.');
+    throw new Error('TOSS_SECRET_KEY 환경 변수를 설정해주세요.');
 }
 const encodedApiSecretKey = 'Basic ' + Buffer.from(apiSecretKey + ':').toString('base64');
 

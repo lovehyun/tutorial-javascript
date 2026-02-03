@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Toss + WebSocket 멀티룸 채팅</title>
+
+        <!-- Tailwind CSS CDN 로드: 기본 유틸리티 기반 디자인 사용 -->
+        <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- 최소 커스텀 CSS: 채팅 메시지 정렬/색상만 별도 정의 -->
+        <link rel="stylesheet" href="/styles.css" />
+
+        <!-- Toss Payments 결제 스크립트 -->
+        <script src="https://js.tosspayments.com/v2/standard"></script>
+    </head>
+
+    <!-- 페이지 전체: 옅은 회색 배경, 세로 스크롤이 가능한 전체 화면 -->
+    <body class="bg-slate-100 min-h-screen">
+        <!-- 전체 앱 컨테이너: 가운데 정렬, 최대 너비 제한, 좌우 패딩 -->
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-6">
+            <!-- 상단 헤더: 파란 그라데이션 배경, 둥근 모서리, 그림자 있는 카드 형태 -->
+            <header
+                class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 px-5 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"
+            >
+                <!-- 헤더 왼쪽: 제목 + 설명 텍스트 -->
+                <div>
+                    <!-- 메인 타이틀: 약간 크게, 볼드 텍스트 -->
+                    <h1 class="text-xl md:text-2xl font-bold">Toss 결제 + 크레딧 멀티룸 채팅</h1>
+                    <!-- 서브타이틀: 작은 글씨, 살짝 투명한 흰색 -->
+                    <p class="text-xs md:text-sm text-slate-100/80 mt-1">
+                        결제로 크레딧을 충전하고, 기본 채팅방에서 먼저 10마디 써볼 수 있어요.
+                    </p>
+                </div>
+
+                <!-- 헤더 오른쪽: 사용자 이름/크레딧/사용자 변경 버튼이 들어간 pill 형태 박스 -->
+                <div class="flex items-center gap-4 bg-slate-900/20 rounded-full px-4 py-2 text-sm">
+                    <!-- 사용자 이름 표시: 라벨 + 값 pill -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-100/80 text-xs">사용자</span>
+                        <span id="usernameDisplay" class="font-semibold bg-slate-900/30 px-2 py-1 rounded-full"></span>
+                    </div>
+
+                    <!-- 크레딧 표시: 라벨 + 값 pill -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-100/80 text-xs">크레딧</span>
+                        <span id="creditDisplay" class="font-semibold bg-slate-900/30 px-2 py-1 rounded-full">0</span>
+                    </div>
+
+                    <!-- 사용자 변경 버튼: 흰색 pill 버튼, hover 시 살짝 진해지는 효과 -->
+                    <button
+                        id="changeUserBtn"
+                        class="text-xs md:text-sm px-3 py-1.5 rounded-full bg-white/90 text-slate-900 hover:bg-white transition"
+                    >
+                        사용자 변경
+                    </button>
+                </div>
+            </header>
+
+            <!-- 결제 섹션: 흰 배경 카드, 라운드 + 그림자 -->
+            <section id="paymentSection" class="mt-5 bg-white rounded-2xl shadow-sm p-4 md:p-5">
+                <!-- 카드 타이틀: 약간 큰 글씨, 볼드 -->
+                <h2 class="text-lg font-semibold mb-3">크레딧 충전 (100원당 1크레딧)</h2>
+
+                <!-- 결제 입력 줄: 라벨 + 금액 입력 + 결제 버튼이 한 줄로 배치 -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <!-- 금액 라벨: 작은 볼드 텍스트 -->
+                    <label for="chargeAmount" class="text-sm font-medium text-slate-700 min-w-[90px]">
+                        충전 금액(원)
+                    </label>
+
+                    <!-- 금액 입력 인풋: pill 모양, 포커스 시 파란 라인/아우라 -->
+                    <input
+                        type="number"
+                        id="chargeAmount"
+                        value="10000"
+                        min="100"
+                        step="100"
+                        class="flex-1 min-w-[120px] rounded-full border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+
+                    <!-- 결제 버튼: 파란 배경 pill 버튼, 그림자 + hover 시 진해짐 -->
+                    <button
+                        id="chargeBtn"
+                        class="px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 transition"
+                    >
+                        토스로 결제하기
+                    </button>
+                </div>
+
+                <!-- 설명 텍스트: 회색 작은 글씨 -->
+                <p class="text-xs text-slate-500 mt-2">예) 10,000원 결제 → 100 크레딧 적립</p>
+            </section>
+
+            <!-- 메인 2컬럼 레이아웃: 좌측 방 목록, 우측 채팅 (데스크톱에서 30:70 비율) -->
+            <div class="mt-5 grid grid-cols-1 md:grid-cols-[3fr,7fr] gap-4 items-start">
+                <!-- 왼쪽 방 목록 카드: 흰 배경, 라운드 + 그림자 -->
+                <section class="bg-white rounded-2xl shadow-sm p-4 md:p-5">
+                    <!-- 카드 타이틀 -->
+                    <h2 class="text-lg font-semibold mb-3">방 목록</h2>
+
+                    <!-- 방 생성 영역: 인풋 + 버튼이 한 줄로 있는 영역 -->
+                    <div class="flex gap-2 mb-3">
+                        <!-- 새 방 이름 입력: pill 모양 인풋 -->
+                        <input
+                            type="text"
+                            id="newRoomName"
+                            class="flex-1 rounded-full border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="새 방 이름을 입력하세요"
+                        />
+                        <!-- 방 생성 버튼: 파란 테두리, 흰 배경 아웃라인 버튼 -->
+                        <button
+                            id="createRoomBtn"
+                            class="px-3 md:px-4 py-2 rounded-full border border-blue-500 text-blue-600 text-xs md:text-sm font-medium hover:bg-blue-50 transition whitespace-nowrap"
+                        >
+                            방 생성 (10 크레딧)
+                        </button>
+                    </div>
+
+                    <!-- 방 목록 영역: 옅은 회색 배경, 둥근 모서리, 최대 높이 제한 + 스크롤 -->
+                    <div
+                        id="rooms"
+                        class="rounded-xl border border-slate-200 bg-slate-50 max-h-80 overflow-y-auto text-sm"
+                    >
+                        <!-- 방 목록이 JS로 동적으로 채워집니다 -->
+                    </div>
+                </section>
+
+                <!-- 오른쪽 채팅 카드: 흰 배경, 라운드 + 그림자 -->
+                <section class="bg-white rounded-2xl shadow-sm p-4 md:p-5">
+                    <!-- 채팅 헤더: 제목 + 현재 방 표시 pill -->
+                    <div class="flex items-center justify-between mb-3">
+                        <!-- 채팅 타이틀 -->
+                        <h2 class="text-lg font-semibold">채팅</h2>
+
+                        <!-- 현재 방 표시: 작은 텍스트 + 파란 pill 뱃지 -->
+                        <div class="text-xs md:text-sm text-slate-600">
+                            현재 방:
+                            <span
+                                id="currentRoom"
+                                class="inline-flex items-center px-3 py-1 rounded-full bg-blue-50 text-blue-600 font-semibold text-xs"
+                                >-</span
+                            >
+                        </div>
+                    </div>
+
+                    <!-- 메시지 영역: 옅은 회색 배경, 경계선, 둥근 모서리, 지정된 높이 + 스크롤 -->
+                    <div
+                        id="messages"
+                        class="messages rounded-xl border border-slate-200 bg-slate-50 h-64 md:h-72 px-3 py-2 overflow-y-auto text-sm"
+                    >
+                        <!-- 채팅 메시지가 JS로 추가됩니다 (.message-me / .message-other / .message-system) -->
+                    </div>
+
+                    <!-- 채팅 입력 줄: 인풋 + 전송 버튼이 한 줄로 배치 -->
+                    <div class="mt-3 flex gap-2">
+                        <!-- 메시지 입력 인풋: pill 모양, 포커스 시 파란 아우라 -->
+                        <input
+                            type="text"
+                            id="messageInput"
+                            class="flex-1 rounded-full border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="메시지를 입력하세요..."
+                        />
+                        <!-- 전송 버튼: 파란 배경 pill 버튼, 그림자 + hover 효과 -->
+                        <button
+                            id="sendMessageBtn"
+                            class="px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium shadow hover:bg-blue-700 transition whitespace-nowrap"
+                        >
+                            전송 (1 크레딧)
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 채팅/결제 로직 JS -->
+        <script src="/app.js"></script>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<!-- public/index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>크레딧 채팅 데모</title>
+    <!-- 간단한 전체 레이아웃 / 색상만 정의 -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- TossPayments SDK -->
+    <script src="https://js.tosspayments.com/v1"></script>
+</head>
+<body>
+    <header>
+        <h1>크레딧 채팅 데모</h1>
+        <div class="info">
+            <span id="userNameDisplay">사용자: -</span> |
+            <span id="creditDisplay">크레딧: -</span>
+            <button id="chargeButton" class="btn btn-primary" style="margin-left: 8px">
+                1,000원 충전 (10크레딧)
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 방 목록 패널 -->
+        <section class="panel rooms">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px">
+                <strong>방 목록</strong>
+                <button id="createRoomButton" class="btn btn-secondary">방 생성 (10 크레딧)</button>
+            </div>
+            <div id="rooms"></div>
+        </section>
+
+        <!-- 채팅 패널 -->
+        <section class="panel chat">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px">
+                <strong id="currentRoomTitle">현재 방: -</strong>
+                <button id="leaveButton" class="btn btn-secondary">방 나가기</button>
+            </div>
+            <div id="messages"></div>
+            <div class="input-row">
+                <input id="messageInput" type="text" placeholder="메시지 입력 후 Enter 또는 전송 버튼" />
+                <button id="sendButton" class="btn btn-primary">전송 (1 크레딧)</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="/app.js"></script>
+</body>
+</html>

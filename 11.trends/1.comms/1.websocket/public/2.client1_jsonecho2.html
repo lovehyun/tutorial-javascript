@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>WebSocket Test (JSON 버전)</h1>
+
+    <input id="msg" type="text" placeholder="메시지 입력" />
+    <button onclick="sendChat()">전송</button>
+
+    <h3>채팅 로그</h3>
+    <div id="log"
+        style="margin-top:10px; width:400px; height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px;">
+    </div>
+
+    <h3>상태(status) 로그 (Ping / Pong 등)</h3>
+    <textarea id="statusLog" readonly
+        style="margin-top:10px; width:400px; height:150px; padding:10px; border:1px solid #bbb; color:#444; font-size:13px;">
+    </textarea>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+        // const socket = new WebSocket("ws://${window.location.hostname}:8080");
+
+        const logBox = document.getElementById("log");
+        const statusBox = document.getElementById("statusLog");
+
+        const MESSAGE_TYPES = {
+            CHAT: 'chat',
+            PING: 'ping',
+            PONG: 'pong',
+            SYSTEM: 'system',
+        };
+
+        // 일반 메시지 로그
+        function addChat(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            logBox.appendChild(div);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // 상태 로그 (시간 포함)
+        function addStatus(text) {
+            const now = new Date().toLocaleTimeString();
+            statusBox.value += `[${now}] ${text}\n`;
+            statusBox.scrollTop = statusBox.scrollHeight;
+        }
+
+        socket.onopen = () => {
+            addStatus("서버와 WebSocket 연결됨");
+        };
+
+        socket.onmessage = (event) => {
+            let data;
+            try {
+                data = JSON.parse(event.data);
+            } catch {
+                addChat("서버(문자열): " + event.data);
+                return;
+            }
+
+            switch (data.type) {
+                case MESSAGE_TYPES.SYSTEM:
+                    addChat("📢 SYSTEM: " + data.content);
+                    break;
+
+                case MESSAGE_TYPES.CHAT:
+                    addChat("💬 CHAT: " + data.content);
+                    break;
+
+                case MESSAGE_TYPES.PING:
+                    addStatus("📡 서버가 ping 보냄 → 자동 pong 응답함");
+                    socket.send(JSON.stringify({
+                        type: MESSAGE_TYPES.PONG,
+                        ts: Date.now()
+                    }));
+                    break;
+
+                case MESSAGE_TYPES.PONG:
+                    addStatus("📡 서버로부터 PONG 수신");
+                    break;
+
+                default:
+                    addStatus("❓ Unknown type: " + data.type);
+            }
+        };
+
+        function sendChat() {
+            const msg = document.getElementById("msg").value;
+            if (!msg) return;
+
+            socket.send(JSON.stringify({
+                type: MESSAGE_TYPES.CHAT,
+                content: msg
+            }));
+
+            addChat("👤 나: " + msg);
+            document.getElementById("msg").value = "";
+        }
+    </script>
+</body>
+</html>

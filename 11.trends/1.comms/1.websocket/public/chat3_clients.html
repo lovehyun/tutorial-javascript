@@ -63,7 +63,7 @@
     <script>
         // const socket = new WebSocket(`ws://localhost:3000/chat`);
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const socket = new WebSocket(`${protocol}://${window.location.host}/chat`);
+        const socket = new WebSocket(`${protocol}://${window.location.host}/chat`); // host = domain:port, hostname = domain
 
         // 클라이언트 (사용자) 이름
         let username;
@@ -98,8 +98,8 @@
         // 메시지 전송
         function sendMessage(message) {
             const messageObj = {
-                content: message,
-                username: username
+                username: username,
+                content: message
             };
             socket.send(JSON.stringify(messageObj));
         }

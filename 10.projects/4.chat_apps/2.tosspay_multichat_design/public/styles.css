@@ -1,0 +1,23 @@
+/* 오른쪽 정렬, 파란색 텍스트의 '내 메시지' 스타일 */
+.message-me {
+    text-align: right;
+    margin: 4px 0;
+    color: #2563eb; /* Tailwind blue-600 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+/* 왼쪽 정렬, 기본 진한 글자색의 '상대방 메시지' 스타일 */
+.message-other {
+    text-align: left;
+    margin: 4px 0;
+    color: #111827; /* gray-900 */
+    font-size: 0.875rem; /* text-sm */
+}
+
+/* 가운데 정렬, 작은 회색 글자의 '시스템/안내 메시지' 스타일 */
+.message-system {
+    text-align: center;
+    margin: 8px 0;
+    color: #6b7280; /* gray-500 */
+    font-size: 0.75rem; /* text-xs */
+}

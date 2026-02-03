@@ -36,7 +36,7 @@ wss.on('connection', (ws, req) => {
         try {
             const parsedMessage = JSON.parse(messageString);
             content = parsedMessage.content;
-        } catch {
+        } catch (error) {
             // 유효하지 않은 JSON 형식인 경우 에러 처리
             console.error('Invalid JSON format:', error);
             return;

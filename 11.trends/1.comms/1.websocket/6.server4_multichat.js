@@ -13,8 +13,8 @@ app.use(express.json());
 const rooms = new Map(); // 각 방을 { 방이름: { users: Map(username, ws) } } 형태로 저장
 
 app.get('/', (req, res) => {
-    // res.sendFile(path.join(__dirname, 'public', 'chat7_rooms.html'));
-    res.sendFile(path.join(__dirname, 'public', 'chat7_rooms2_design.html'));
+    // res.sendFile(path.join(__dirname, 'public', 'chat4_rooms.html'));
+    res.sendFile(path.join(__dirname, 'public', 'chat4_rooms2_design.html'));
 });
 
 // 방 목록 제공 (프론트엔드에서 방 조회 가능)

@@ -10,6 +10,13 @@ wss.on("connection", (ws) => {
 
     ws.send("서버에 연결되었습니다!");
 
+    // 5초마다 메시지 보내기
+    // const intervalId = setInterval(() => {
+    //     if (ws.readyState === WebSocket.OPEN) {
+    //         ws.send("ping");
+    //     }
+    // }, 5000);
+
     ws.on("message", (message) => {
         console.log("클라이언트 메시지:", message.toString());
 
