@@ -1,0 +1,16 @@
+{
+  "name": "stripe-express-example",
+  "version": "1.0.0",
+  "description": "Minimal Stripe payment example with Express",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "stripe": "^17.5.0"
+  }
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>결제 내역</title>
+</head>
+<body>
+  <h1>결제 내역</h1>
+  <p><a href="/">결제하기</a></p>
+  <div id="list">불러오는 중…</div>
+
+  <script>
+    async function load() {
+      const res = await fetch("/api/payments");
+      const data = await res.json();
+      const el = document.getElementById("list");
+      if (data.error) {
+        el.textContent = "오류: " + data.error;
+        return;
+      }
+      if (!data.payments?.length) {
+        el.innerHTML = "<p>결제 내역이 없습니다.</p>";
+        return;
+      }
+      el.innerHTML =
+        "<table><thead><tr><th>세션 ID</th><th>금액</th><th>일시</th><th></th></tr></thead><tbody>" +
+        data.payments
+          .map(
+            (p) =>
+              "<tr data-id=\"" + p.id + "\"><td>" +
+              p.id +
+              "</td><td>" +
+              (p.amount_total ?? 0).toLocaleString("ko-KR") +
+              " " +
+              (p.currency ?? "krw").toUpperCase() +
+              "</td><td>" +
+              new Date(p.created * 1000).toLocaleString("ko-KR") +
+              "</td><td><button type=\"button\" class=\"refund-btn\">환불</button></td></tr>"
+          )
+          .join("") +
+        "</tbody></table>";
+      el.querySelectorAll(".refund-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const row = btn.closest("tr");
+          const sessionId = row?.dataset?.id;
+          if (!sessionId) return;
+          if (!confirm("이 결제를 전액 환불할까요?")) return;
+          btn.disabled = true;
+          const res = await fetch("/api/refund", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session_id: sessionId }),
+          });
+          const result = await res.json();
+          if (result.ok) {
+            row.remove();
+          } else {
+            alert(result.error || "환불 실패");
+            btn.disabled = false;
+          }
+        });
+      });
+    }
+    load();
+  </script>
+</body>
+</html>

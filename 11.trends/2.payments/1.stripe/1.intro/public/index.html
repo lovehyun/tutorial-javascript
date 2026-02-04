@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stripe 결제</title>
+</head>
+<body>
+  <h1>Stripe 결제</h1>
+  <form id="payment-form">
+    <p>
+      <label for="amount">금액 (원)</label><br />
+      <input type="number" id="amount" value="10000" min="100" step="100" />
+    </p>
+    <button type="submit">결제하기</button>
+  </form>
+
+  <script>
+    document.getElementById("payment-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const amount = Number(document.getElementById("amount").value) || 10000;
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+      else alert(data.error || "결제 세션 생성 실패");
+    });
+  </script>
+</body>
+</html>
