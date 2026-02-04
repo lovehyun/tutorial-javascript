@@ -1,8 +1,25 @@
 {
+  "name": "tosspay-multichat",
+  "version": "1.0.0",
+  "description": "Toss 결제 + SQLite 기반 로그인/회원가입 멀티룸 채팅 (크레딧 충전·결제 취소·사용 내역)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "list-users": "node scripts/list-users.js",
+    "reset-password": "node scripts/reset-password.js",
+    "delete-user": "node scripts/delete-user.js"
+  },
+  "private": true,
   "dependencies": {
     "axios": "^1.13.4",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.6.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "express-ws": "^5.0.2"
+    "express-session": "^1.18.1",
+    "express-ws": "^5.0.2",
+    "morgan": "^1.10.0"
   }
 }

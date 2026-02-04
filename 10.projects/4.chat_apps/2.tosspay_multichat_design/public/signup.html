@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- 회원가입 페이지: POST /signup 으로 아이디·비밀번호(4자 이상) 전송, 실패 시 ?error= 메시지 표시 -->
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>회원가입</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6">
+        <h1 class="text-xl font-bold text-center text-slate-800 mb-6">회원가입</h1>
+        <!-- 서버 리다이렉트 시 ?error= 로 넘긴 메시지 표시 -->
+        <div id="message" class="mb-3 text-sm text-red-600 text-center"></div>
+        <form action="/signup" method="post" class="space-y-4">
+            <div>
+                <label for="username" class="block text-sm font-medium text-slate-700 mb-1">아이디</label>
+                <input type="text" id="username" name="username" required
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-slate-700 mb-1">비밀번호 (4자 이상)</label>
+                <input type="password" id="password" name="password" required minlength="4"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <button type="submit" class="w-full py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700">
+                가입하기
+            </button>
+        </form>
+        <p class="mt-4 text-center text-sm text-slate-500">
+            이미 계정이 있으신가요? <a href="/login" class="text-blue-600 hover:underline">로그인</a>
+        </p>
+    </div>
+    <script>
+        // 쿼리 ?error= 에 담긴 에러 메시지를 상단 #message 에 표시
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        const el = document.getElementById('message');
+        if (error) el.textContent = error;
+    </script>
+</body>
+</html>

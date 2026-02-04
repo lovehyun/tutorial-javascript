@@ -1,23 +1,46 @@
-/* 오른쪽 정렬, 파란색 텍스트의 '내 메시지' 스타일 */
+/* 말풍선 컨테이너: 내 메시지는 오른쪽, 상대는 왼쪽 */
 .message-me {
     text-align: right;
-    margin: 4px 0;
-    color: #2563eb; /* Tailwind blue-600 */
-    font-size: 0.875rem; /* text-sm */
+    margin: 6px 0;
+    font-size: 0.875rem;
 }
 
-/* 왼쪽 정렬, 기본 진한 글자색의 '상대방 메시지' 스타일 */
 .message-other {
     text-align: left;
-    margin: 4px 0;
-    color: #111827; /* gray-900 */
-    font-size: 0.875rem; /* text-sm */
+    margin: 6px 0;
+    font-size: 0.875rem;
 }
 
-/* 가운데 정렬, 작은 회색 글자의 '시스템/안내 메시지' 스타일 */
+/* 내 메시지 말풍선: 파란 배경(투명), 오른쪽 정렬 */
+.message-me .bubble {
+    display: inline-block;
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 14px 14px 4px 14px;
+    background: rgba(37, 99, 235, 0.85);
+    color: #fff;
+    text-align: left;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* 상대 메시지 말풍선: 연한 회색 배경(투명), 왼쪽 정렬 */
+.message-other .bubble {
+    display: inline-block;
+    max-width: 75%;
+    padding: 8px 12px;
+    border-radius: 14px 14px 14px 4px;
+    background: rgba(226, 232, 240, 0.9);
+    color: #1e293b;
+    text-align: left;
+    word-break: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* 가운데 정렬, 작은 회색의 '시스템/안내 메시지' */
 .message-system {
     text-align: center;
     margin: 8px 0;
-    color: #6b7280; /* gray-500 */
-    font-size: 0.75rem; /* text-xs */
+    color: #6b7280;
+    font-size: 0.75rem;
 }
