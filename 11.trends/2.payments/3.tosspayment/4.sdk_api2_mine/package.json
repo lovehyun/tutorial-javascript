@@ -1,0 +1,15 @@
+{
+  "name": "express-javascript",
+  "version": "1.0.0",
+  "description": "TossPayments Express + JavaScript Sample",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

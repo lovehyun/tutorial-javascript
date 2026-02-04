@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>결제 페이지</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <style>
+        /* 최소한의 UI */
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        #payment-method,
+        #agreement {
+            margin-top: 12px;
+        }
+
+        #go-pay {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <h1>결제 페이지</h1>
+        <p>선택한 상품의 결제를 진행합니다.</p>
+
+        <div id="order-info">
+            <div>주문명: <span id="orderName"></span></div>
+            <div>결제금액: <span id="amount"></span>원</div>
+        </div>
+
+        <div id="payment-method"><!--토스 실제 페이지로 삽입--></div>
+        <div id="agreement"><!--동의 화면 삽입--></div>
+
+        <button id="go-pay">결제하기</button>
+    </div>
+
+    <script>
+        // URL 파라미터에서 값 확인
+        const urlParams = new URLSearchParams(window.location.search);
+        const amount = Number(urlParams.get("amount")) || 0;
+        const orderName = urlParams.get("orderName") || "상품 결제";
+
+        document.getElementById("orderName").textContent = orderName;
+        document.getElementById("amount").textContent = amount.toLocaleString("ko-KR");
+
+        const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+        const customerKey = btoa(Math.random()).slice(0, 20);
+
+        async function main() {
+            const tossPayments = TossPayments(clientKey);
+
+            const widgets = tossPayments.widgets({
+                customerKey: customerKey
+            });
+
+            // 금액 설정
+            await widgets.setAmount({
+                currency: "KRW",
+                value: amount
+            });
+
+            // UI 렌더링
+            await widgets.renderPaymentMethods({
+                selector: "#payment-method",
+                variantKey: "DEFAULT"
+            });
+
+            await widgets.renderAgreement({
+                selector: "#agreement",
+                variantKey: "AGREEMENT"
+            });
+
+            // 결제 요청
+            document.getElementById("go-pay").addEventListener("click", async () => {
+                await widgets.requestPayment({
+                    orderId: btoa(Math.random()).slice(0, 20),
+                    orderName: orderName,
+                    successUrl: window.location.origin + "/success",
+                    failUrl: window.location.origin + "/fail",
+                });
+            });
+        }
+
+        main();
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상품 목록 · 토스페이먼츠 샘플</title>
+    <style>
+      .product-list { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+      .product-card {
+        background: var(--grey50, #f9fafb);
+        border: 1px solid var(--grey200, #e5e8eb);
+        border-radius: 8px;
+        padding: 16px 20px;
+        min-width: 140px;
+        text-align: center;
+      }
+      .product-name { font-weight: 600; color: var(--grey800, #333d4b); margin-bottom: 4px; }
+      .product-price { color: var(--blue600); font-size: 15px; margin-bottom: 12px; }
+      .cart-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+      .cart-table th, .cart-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--grey200); }
+      .cart-table th { background: var(--grey100); font-weight: 600; }
+      .qty-wrap { display: inline-flex; align-items: center; gap: 8px; }
+      .qty-wrap button { width: 28px; height: 28px; padding: 0; font-size: 16px; line-height: 1; border-radius: 6px; border: 1px solid var(--grey300); background: #fff; cursor: pointer; }
+      .qty-wrap button:hover { background: var(--grey100); }
+      .qty-num { min-width: 24px; text-align: center; font-weight: 600; }
+      .total-row { font-weight: 700; font-size: 17px; }
+      .empty-cart { color: var(--grey500); padding: 24px; text-align: center; }
+      .btn-cancel {
+        margin-top: 12px;
+        padding: 11px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--grey800, #333d4b);
+        background: var(--grey200, #e5e8eb);
+        border: none;
+        border-radius: 7px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+      .btn-cancel:hover {
+        background: var(--grey300, #d1d6db);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="box_section" style="padding: 40px 30px; margin-top: 30px;">
+        <h1 class="title" style="margin-bottom: 24px;">상품 목록</h1>
+        <div class="product-list" id="product-list"></div>
+      </div>
+      <div class="box_section" style="padding: 40px 30px; margin-top: 30px;">
+        <h2 class="title" style="margin-bottom: 16px;">장바구니</h2>
+        <div id="cart-area">
+          <table class="cart-table" id="cart-table" style="display: none;">
+            <thead>
+              <tr>
+                <th>상품</th>
+                <th>단가</th>
+                <th>수량</th>
+                <th>소계</th>
+              </tr>
+            </thead>
+            <tbody id="cart-body"></tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="3" style="text-align: right;">총 결제 금액</td>
+                <td id="cart-total">0원</td>
+              </tr>
+            </tfoot>
+          </table>
+          <div class="empty-cart" id="empty-cart">장바구니가 비어 있습니다.</div>
+        </div>
+        <button class="button" id="payment-button" style="margin-top: 24px; display: none;" disabled>결제하기</button>
+        <div id="payment-choice" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--grey200);">
+          <p style="margin-bottom: 12px; font-weight: 600; color: var(--grey800);">결제 수단을 선택하세요</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button type="button" class="button" id="pay-widget" style="width: auto;">위젯으로 결제</button>
+            <button type="button" class="button" id="pay-general" style="width: auto;">일반 결제창으로 결제</button>
+            <button type="button" class="button" id="pay-brandpay" style="width: auto;">브랜드페이로 결제</button>
+          </div>
+          <button type="button" class="btn-cancel" id="payment-choice-cancel">취소</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const PRODUCTS = [
+        { id: "A", name: "상품 A", price: 1000 },
+        { id: "B", name: "상품 B", price: 1500 },
+        { id: "C", name: "상품 C", price: 2000 },
+      ];
+
+      let cart = {}; // { productId: quantity }
+
+      function renderProducts() {
+        const list = document.getElementById("product-list");
+        list.innerHTML = PRODUCTS.map(
+          (p) => `
+          <div class="product-card" data-id="${p.id}">
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${p.price.toLocaleString()}원</div>
+            <button type="button" class="button" data-add="${p.id}" style="width: auto; padding: 8px 16px;">담기</button>
+          </div>
+        `
+        ).join("");
+        list.querySelectorAll("[data-add]").forEach((btn) => {
+          btn.addEventListener("click", () => addToCart(btn.dataset.add));
+        });
+      }
+
+      function addToCart(productId) {
+        cart[productId] = (cart[productId] || 0) + 1;
+        renderCart();
+      }
+
+      function setQuantity(productId, qty) {
+        if (qty <= 0) {
+          delete cart[productId];
+        } else {
+          cart[productId] = qty;
+        }
+        renderCart();
+      }
+
+      function renderCart() {
+        const tbody = document.getElementById("cart-body");
+        const table = document.getElementById("cart-table");
+        const empty = document.getElementById("empty-cart");
+        const totalEl = document.getElementById("cart-total");
+        const payBtn = document.getElementById("payment-button");
+
+        const entries = Object.entries(cart).filter(([, q]) => q > 0);
+        const total = entries.reduce((sum, [id]) => {
+          const p = PRODUCTS.find((x) => x.id === id);
+          return sum + (p ? p.price * cart[id] : 0);
+        }, 0);
+
+        if (entries.length === 0) {
+          table.style.display = "none";
+          empty.style.display = "block";
+          payBtn.style.display = "none";
+          return;
+        }
+        table.style.display = "table";
+        empty.style.display = "none";
+        payBtn.style.display = "inline-block";
+        payBtn.disabled = total <= 0;
+
+        tbody.innerHTML = entries
+          .map(([id]) => {
+            const p = PRODUCTS.find((x) => x.id === id);
+            const q = cart[id];
+            const lineTotal = p.price * q;
+            return `
+              <tr>
+                <td>${p.name}</td>
+                <td>${p.price.toLocaleString()}원</td>
+                <td>
+                  <div class="qty-wrap">
+                    <button type="button" data-minus="${id}">−</button>
+                    <span class="qty-num">${q}</span>
+                    <button type="button" data-plus="${id}">+</button>
+                  </div>
+                </td>
+                <td>${lineTotal.toLocaleString()}원</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        totalEl.textContent = total.toLocaleString() + "원";
+
+        tbody.querySelectorAll("[data-minus]").forEach((btn) => {
+          btn.addEventListener("click", () => setQuantity(btn.dataset.minus, (cart[btn.dataset.minus] || 1) - 1));
+        });
+        tbody.querySelectorAll("[data-plus]").forEach((btn) => {
+          btn.addEventListener("click", () => setQuantity(btn.dataset.plus, (cart[btn.dataset.plus] || 0) + 1));
+        });
+      }
+
+      function getCartSummary() {
+        const entries = Object.entries(cart).filter(([, q]) => q > 0);
+        const total = entries.reduce((sum, [id]) => {
+          const p = PRODUCTS.find((x) => x.id === id);
+          return sum + (p ? p.price * cart[id] : 0);
+        }, 0);
+        const orderName = entries
+          .map(([id]) => {
+            const p = PRODUCTS.find((x) => x.id === id);
+            return `${p.name} ${cart[id]}개`;
+          })
+          .join(", ");
+        return { total, orderName, entries };
+      }
+
+      document.getElementById("payment-button").addEventListener("click", function () {
+        const { total, orderName } = getCartSummary();
+        if (total <= 0) return;
+        sessionStorage.setItem("paymentAmount", String(total));
+        sessionStorage.setItem("paymentOrderName", orderName);
+        document.getElementById("payment-choice").style.display = "block";
+      });
+
+      document.getElementById("payment-choice-cancel").addEventListener("click", function () {
+        document.getElementById("payment-choice").style.display = "none";
+      });
+
+      document.getElementById("pay-widget").addEventListener("click", function () {
+        location.href = "/widget/checkout.html";
+      });
+      document.getElementById("pay-general").addEventListener("click", function () {
+        location.href = "/payment/checkout.html";
+      });
+      document.getElementById("pay-brandpay").addEventListener("click", function () {
+        location.href = "/brandpay/checkout.html";
+      });
+
+      renderProducts();
+      renderCart();
+    </script>
+  </body>
+</html>

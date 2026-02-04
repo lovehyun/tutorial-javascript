@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <link rel="stylesheet" type="text/css" href="/style.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>토스페이먼츠 샘플 프로젝트</title>
+    <!-- SDK 추가 -->
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="box_section" style="padding: 40px 30px 50px 30px; margin-top: 30px; margin-bottom: 50px; display: flex; flex-direction: column">
+        <button class="button" style="margin-top: 30px" onclick="requestPayment()">결제하기</button>
+        <button class="button" style="margin-top: 30px" onclick="addPaymentMethod()">결제수단추가</button>
+        <button class="button" style="margin-top: 30px" onclick="changeOneTouchPay()">원터치페이설정변경</button>
+        <button class="button" style="margin-top: 30px" onclick="changePassword()">비밀번호변경</button>
+        <button class="button" style="margin-top: 30px" onclick="isOneTouchPayEnabled()">원터치결제사용가능여부 조회</button>
+        <button class="button" style="margin-top: 30px" onclick="openSettings()">브랜드페이 설정 열기</button>
+      </div>
+    </div>
+    <script>
+      // ------  SDK 초기화 (config 로드 후 실행) ------
+      // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
+      let customerKey;
+      let brandpay;
+
+      // index 장바구니에서 넘어온 경우 sessionStorage 값 사용
+      const storedAmount = sessionStorage.getItem("paymentAmount");
+      const storedOrderName = sessionStorage.getItem("paymentOrderName");
+      const paymentAmount = storedAmount ? Number(storedAmount) : 50000;
+      const paymentOrderName = storedOrderName || "토스 티셔츠 외 2건";
+
+      const brandpayReady = (async function () {
+        const configRes = await fetch("/api/config");
+        const config = await configRes.json();
+        const clientKey = config.apiClientKey;
+        const baseUrl = config.baseUrl || window.location.origin;
+        if (!clientKey) {
+          console.error("TOSSPAYMENTS_API_CLIENT_KEY가 .env에 설정되지 않았습니다.");
+        }
+        customerKey = generateRandomString();
+        const tossPayments = TossPayments(clientKey);
+        brandpay = tossPayments.brandpay({
+          customerKey,
+          redirectUrl: baseUrl + "/callback-auth",
+        });
+      })();
+
+      // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+      // @docs https://docs.tosspayments.com/sdk/v2/js#brandpayrequestpayment
+      async function requestPayment() {
+        await brandpayReady;
+        // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
+        await brandpay.requestPayment({
+          amount: {
+            currency: "KRW",
+            value: paymentAmount,
+          },
+          orderId: generateRandomString(),
+          orderName: paymentOrderName,
+          successUrl: window.location.origin + `/brandpay/success.html?customerKey=${customerKey}&`, // 결제 요청이 성공하면 리다이렉트되는 URL
+          failUrl: window.location.origin + "/fail.html", // 결제 요청이 실패하면 리다이렉트되는 URL
+          customerEmail: "customer123@gmail.com",
+          customerName: "김토스",
+        });
+      }
+
+      async function addPaymentMethod() {
+        await brandpayReady;
+        await brandpay.addPaymentMethod();
+      }
+
+      async function changeOneTouchPay() {
+        await brandpayReady;
+        await brandpay.changeOneTouchPay();
+      }
+
+      async function changePassword() {
+        await brandpayReady;
+        await brandpay.changePassword();
+      }
+
+      async function isOneTouchPayEnabled() {
+        await brandpayReady;
+        const result = await brandpay.isOneTouchPayEnabled();
+
+        alert(result);
+      }
+
+      async function openSettings() {
+        await brandpayReady;
+        await brandpay.openSettings();
+      }
+
+      function generateRandomString() {
+        return window.btoa(Math.random()).slice(0, 20);
+      }
+    </script>
+  </body>
+</html>

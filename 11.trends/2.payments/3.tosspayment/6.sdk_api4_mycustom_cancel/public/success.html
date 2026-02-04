@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+        <link rel="stylesheet" type="text/css" href="/style.css" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>결제 성공</title>
+    </head>
+
+    <body>
+        <div class="box_section" style="width: 600px; margin: auto; padding: 20px">
+            <img width="100px" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" />
+            <h2>결제가 성공적으로 완료되었습니다!</h2>
+
+            <div class="p-grid typography--p" style="margin-top: 50px">
+                <div class="p-grid-col text--left"><b>결제금액</b></div>
+                <div class="p-grid-col text--right" id="amount"></div>
+            </div>
+            <div class="p-grid typography--p" style="margin-top: 10px">
+                <div class="p-grid-col text--left"><b>주문번호</b></div>
+                <div class="p-grid-col text--right" id="orderId"></div>
+            </div>
+            <div class="p-grid typography--p" style="margin-top: 10px">
+                <div class="p-grid-col text--left"><b>결제 키</b></div>
+                <div class="p-grid-col text--right" id="paymentKey" style="white-space: initial; width: 250px"></div>
+            </div>
+            <div class="p-grid" style="margin-top: 30px">
+                <button class="button p-grid-col5" onclick="location.href='/';">메인으로 돌아가기</button>
+            </div>
+        </div>
+
+        <div class="box_section" style="width: 600px; margin: auto; margin-top: 20px; text-align: left">
+            <b>응답 데이터 :</b>
+            <div
+                id="response"
+                style="white-space: pre-wrap; background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd"
+            ></div>
+        </div>
+
+        <script>
+            // URL에서 쿼리 파라미터를 추출합니다.
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // 결제 정보 표시
+            document.getElementById('orderId').textContent = urlParams.get('orderId');
+            document.getElementById('amount').textContent = `${urlParams.get('amount')}원`;
+            document.getElementById('paymentKey').textContent = urlParams.get('paymentKey');
+
+            // 서버에 결제 검증 요청
+            async function confirmPayment() {
+                try {
+                    const response = await fetch('/confirm/payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            paymentKey: urlParams.get('paymentKey'),
+                            orderId: urlParams.get('orderId'),
+                            amount: urlParams.get('amount'),
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(data.message || '결제 검증에 실패했습니다.');
+                    }
+
+                    // 결제 승인 성공 시 응답 데이터를 표시합니다. (data, replacer(null=모든키와값), space(4칸))
+                    document.getElementById('response').textContent = JSON.stringify(data, null, 4);
+                } catch (error) {
+                    console.error('결제 검증 실패:', error);
+                    // 실패 시 /fail.html로 리다이렉트
+                    // window.location.href = `/payment/fail?message=${error.message}`;
+                }
+            }
+
+            // 결제 검증 실행
+            confirmPayment();
+        </script>
+    </body>
+</html>

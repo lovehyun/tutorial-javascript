@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="https://static.toss.im/icons/png/4x/icon-toss-logo.png" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>토스페이먼츠 샘플 프로젝트</title>
+  </head>
+
+  <body>
+    <div class="box_section" style="width: 600px">
+      <img width="100px" src="https://static.toss.im/illusts/check-blue-spot-ending-frame.png" />
+      <h2>결제를 완료했어요</h2>
+
+      <div class="p-grid typography--p" style="margin-top: 50px">
+        <div class="p-grid-col text--left"><b>결제금액</b></div>
+        <div class="p-grid-col text--right" id="amount"></div>
+      </div>
+      <div class="p-grid typography--p" style="margin-top: 10px">
+        <div class="p-grid-col text--left"><b>주문번호</b></div>
+        <div class="p-grid-col text--right" id="orderId"></div>
+      </div>
+      <div class="p-grid typography--p" style="margin-top: 10px">
+        <div class="p-grid-col text--left"><b>paymentKey</b></div>
+        <div class="p-grid-col text--right" id="paymentKey" style="white-space: initial; width: 250px"></div>
+      </div>
+      <div class="p-grid" style="margin-top: 30px">
+        <button class="button p-grid-col5" onclick="location.href='https://docs.tosspayments.com/guides/v2/payment-widget/integration';">연동 문서</button>
+        <!-- <button class="button p-grid-col5" onclick="location.href='https://discord.gg/A4fRFXQhRu';" style="background-color: #e8f3ff; color: #1b64da">실시간 문의</button> -->
+        <button class="button p-grid-col5" id="cancel-button">결제 취소</button>
+      </div>
+    </div>
+
+    <div class="box_section" style="width: 600px; text-align: left">
+      <b>Response Data :</b>
+      <div id="response" style="white-space: initial"></div>
+    </div>
+
+    <script>
+      // 쿼리 파라미터 값이 결제 요청할 때 보낸 데이터와 동일한지 반드시 확인하세요.
+      // 클라이언트에서 결제 금액을 조작하는 행위를 방지할 수 있습니다.
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // 서버로 결제 승인에 필요한 결제 정보를 보내세요.
+      async function confirm() {
+        var requestData = {
+          paymentKey: urlParams.get("paymentKey"),
+          orderId: urlParams.get("orderId"),
+          amount: urlParams.get("amount"),
+        };
+
+        const response = await fetch("/confirm", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        });
+
+        const json = await response.json();
+
+        if (!response.ok) {
+          // TODO: 결제 실패 비즈니스 로직을 구현하세요.
+          console.log(json);
+          window.location.href = `/fail?message=${json.message}&code=${json.code}`;
+        }
+
+        // TODO: 결제 성공 비즈니스 로직을 구현하세요.
+        console.log(json);
+        return json;
+      }
+
+      const paymentKeyElement = document.getElementById("paymentKey");
+      const orderIdElement = document.getElementById("orderId");
+      const amountElement = document.getElementById("amount");
+
+      orderIdElement.textContent = urlParams.get("orderId");
+      amountElement.textContent = urlParams.get("amount") + "원";
+      paymentKeyElement.textContent = urlParams.get("paymentKey");
+
+      // 요약을 표시할 영역 (Response Data 박스를 재활용)
+      const responseBox = document.getElementById("response");
+
+      // 결제 승인 후, 핵심 필드만 골라서 표시
+      confirm().then(function (data) {
+        const lines = [];
+
+        // 안전하게 optional chaining 사용
+        lines.push("주문명: " + (data.orderName || "-"));
+        lines.push("결제상태: " + (data.status || "-"));
+        lines.push("결제수단: " + (data.method || "-") +
+          (data.card && data.card.company ? " (" + data.card.company + ")" : ""));
+        lines.push("승인시각: " + (data.approvedAt || "-"));
+        lines.push("총 결제금액: " +
+          (data.totalAmount.toLocaleString("ko-KR") + "원")
+        );
+        if (data.receipt && data.receipt.url) {
+          lines.push('영수증: <a href="' + data.receipt.url + '" target="_blank">보기</a>');
+        }
+
+        // div 여러 줄로 출력
+        responseBox.innerHTML = lines.map((t) => "<div>" + t + "</div>").join("");
+      });
+      
+      // 여기서부터 취소 관련 코드 추가
+      const cancelButton = document.getElementById("cancel-button");
+      const cancelResult = document.getElementById("response");
+
+      cancelButton.addEventListener("click", async () => {
+        const paymentKey = urlParams.get("paymentKey");
+        if (!paymentKey) {
+          alert("paymentKey가 없습니다.");
+          return;
+        }
+
+        const res = await fetch("/cancel", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            paymentKey: paymentKey,
+            cancelReason: "사용자 요청으로 즉시 취소",
+          }),
+        });
+
+        const json = await res.json();
+
+        if (res.ok) {
+          // 간단한 응답 버전
+          // cancelResult.textContent = "결제가 취소되었습니다. (status: " + json.status + ")";
+          // console.log("결제 취소 결과:", json);
+
+          // 상세 응답 버전
+          const lastCancel = Array.isArray(json.cancels) && json.cancels.length > 0
+            ? json.cancels[json.cancels.length - 1]
+            : null;
+
+          const lines = [];
+
+          lines.push("결제가 취소되었습니다.");
+          lines.push("주문번호: " + (json.orderId || "-"));
+          lines.push("결제수단: " + (json.method || "-"));
+          lines.push("상태: " + (json.status || "-"));
+          lines.push("총 결제금액: " + (json.totalAmount?.toLocaleString("ko-KR") + "원"));
+
+          if (lastCancel) {
+            lines.push("취소 금액: " + (lastCancel.cancelAmount?.toLocaleString("ko-KR") + "원"));
+            lines.push("취소 시각: " + (lastCancel.canceledAt || "-"));
+            lines.push("취소 사유: " + (lastCancel.cancelReason || "-"));
+          }
+
+          if (json.receipt && json.receipt.url) {
+            lines.push(
+              '영수증: <a href="' + json.receipt.url + '" target="_blank">보기</a>'
+            );
+          }
+
+          // 기존처럼 여러 줄 HTML로 보여주기
+          cancelResult.innerHTML = lines.map((t) => "<div>" + t + "</div>").join("");
+          console.log("결제 취소 결과:", json);
+        } else {
+          cancelResult.textContent = "취소 실패: " + (json.message || "알 수 없는 오류");
+          console.log("결제 취소 실패:", json);
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<!-- 
+/confirm 응답에는 보통 이런 정보들이 들어옵니다(토스 기준):
+- 공통
+  - paymentKey : 토스 쪽 결제 식별자(취소/조회할 때 필수)
+  - orderId : 내 서비스에서 만든 주문번호 (내 DB와 매핑)
+  - orderName : 주문 이름
+  - status : PAID / CANCELED …
+  - approvedAt : 결제 승인 시각
+  - totalAmount : 총 결제금액
+  - method : 카드, 가상계좌, 계좌이체 등
+- 카드 결제라면 card 필드 안에
+  - 카드사, 카드번호(마스킹), 무이자/할부 여부 등
+- 기타
+  - receipt.url : 영수증 페이지 URL
+  - country, currency, vat 등 
+-->

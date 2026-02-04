@@ -1,0 +1,102 @@
+.wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.box_section {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.product-button,
+.button2,
+.button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+.button {
+    background-color: #0070f3;
+    color: white;
+}
+
+/* 텍스트 정렬 */
+.text--left {
+    text-align: left;
+}
+.text--right {
+    text-align: right;
+}
+
+/* 그리드 레이아웃 */
+.p-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.p-grid-col {
+    flex: 1;
+}
+
+/* 문단 스타일 */
+.typography--p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* 결제 내역 테이블 - 컬럼 폭 확보 */
+.transaction-table {
+    width: 100%;
+    min-width: 800px;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.transaction-table th,
+.transaction-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+.transaction-table th {
+    border-bottom: 1px solid #ddd;
+    background: #f5f5f5;
+    white-space: nowrap;
+}
+.transaction-table td:nth-child(1) { min-width: 160px; }
+.transaction-table td:nth-child(2) { min-width: 140px; word-break: break-all; }
+.transaction-table td:nth-child(3) { min-width: 90px; }
+.transaction-table td:nth-child(4) { text-align: right; min-width: 90px; }
+.transaction-table td:nth-child(5) { min-width: 80px; }
+.transaction-table td:nth-child(6) { text-align: center; min-width: 70px; }
+
+/* 거래 내역 로딩 */
+.loading-box {
+    text-align: center;
+    padding: 32px 16px;
+    color: #666;
+}
+.loading-box p {
+    margin: 16px 0 0;
+    font-size: 14px;
+}
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    border: 3px solid #eee;
+    border-top-color: #0070f3;
+    border-radius: 50%;
+    animation: loading-spin 0.8s linear infinite;
+}
+@keyframes loading-spin {
+    to { transform: rotate(360deg); }
+}

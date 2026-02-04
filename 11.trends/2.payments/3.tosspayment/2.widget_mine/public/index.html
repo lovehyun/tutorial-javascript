@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <title>상품 선택 | 샘플 결제</title>
+    <style>
+        /* 진짜 최소한: 여백 + 폭 제한 + flex 정렬만 */
+
+        body {
+            margin: 0;
+            padding: 16px;
+            font-family: sans-serif;
+        }
+
+        .page-wrapper {
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .product-list {
+            margin-top: 8px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .qty-controls button {
+            width: 22px;
+            height: 22px;
+            padding: 0;
+        }
+
+        .qty {
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .summary {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #ccc;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <h1>샘플 쇼핑몰</h1>
+        <p>상품을 담고 결제 페이지로 이동합니다.</p>
+
+        <div class="product-list">
+            <div class="product-item" data-id="1" data-name="베이직 티셔츠" data-price="20000">
+                <div>
+                    <div>베이직 티셔츠</div>
+                    <div>20,000원</div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-minus">-</button>
+                    <span class="qty">0</span>
+                    <button class="qty-plus">+</button>
+                </div>
+            </div>
+
+            <div class="product-item" data-id="2" data-name="데일리 에코백" data-price="18000">
+                <div>
+                    <div>데일리 에코백</div>
+                    <div>18,000원</div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-minus">-</button>
+                    <span class="qty">0</span>
+                    <button class="qty-plus">+</button>
+                </div>
+            </div>
+
+            <div class="product-item" data-id="3" data-name="머그컵 세트" data-price="12000">
+                <div>
+                    <div>머그컵 세트</div>
+                    <div>12,000원</div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-minus">-</button>
+                    <span class="qty">0</span>
+                    <button class="qty-plus">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <div>
+                <div>선택한 상품 수</div>
+                <div id="summary-count">0개</div>
+            </div>
+            <div>
+                <div>총 결제 금액</div>
+                <div id="summary-amount"><strong>0원</strong></div>
+            </div>
+        </div>
+
+        <p>※ 최소 1개 이상의 상품을 담으면 결제하기 버튼이 활성화됩니다.</p>
+
+        <button class="button" id="go-checkout" disabled>결제 페이지로 이동</button>
+    </div>
+
+    <script>
+        const items = document.querySelectorAll('.product-item');
+        const countSpan = document.getElementById('summary-count');
+        const amountSpan = document.getElementById('summary-amount');
+        const goCheckoutButton = document.getElementById('go-checkout');
+
+        function formatKRW(value) {
+            return value.toLocaleString('ko-KR') + '원';
+        }
+
+        function calculateSummary() {
+            let totalCount = 0;
+            let totalAmount = 0;
+            let names = [];
+
+            items.forEach((item) => {
+                const price = Number(item.dataset.price);
+                const name = item.dataset.name;
+                const qty = Number(item.querySelector('.qty').textContent);
+
+                if (qty > 0) {
+                    totalCount += qty;
+                    totalAmount += price * qty;
+                    names.push(`${name} x${qty}`);
+                }
+            });
+
+            countSpan.textContent = `${totalCount}개`;
+            amountSpan.innerHTML = `<strong>${formatKRW(totalAmount)}</strong>`;
+
+            if (totalCount > 0) {
+                goCheckoutButton.disabled = false;
+                goCheckoutButton.textContent = `${formatKRW(totalAmount)} 결제하기`;
+            } else {
+                goCheckoutButton.disabled = true;
+                goCheckoutButton.textContent = '결제 페이지로 이동';
+            }
+
+            return { totalCount, totalAmount, names };
+        }
+
+        items.forEach((item) => {
+            const minusBtn = item.querySelector('.qty-minus');
+            const plusBtn = item.querySelector('.qty-plus');
+            const qtySpan = item.querySelector('.qty');
+
+            minusBtn.addEventListener('click', () => {
+                let qty = Number(qtySpan.textContent);
+                if (qty > 0) {
+                    qtySpan.textContent = qty - 1;
+                    calculateSummary();
+                }
+            });
+
+            plusBtn.addEventListener('click', () => {
+                let qty = Number(qtySpan.textContent);
+                qtySpan.textContent = qty + 1;
+                calculateSummary();
+            });
+        });
+
+        goCheckoutButton.addEventListener('click', () => {
+            const { totalAmount, names } = calculateSummary();
+            if (totalAmount <= 0) return;
+
+            let orderName = '장바구니 상품';
+            if (names.length === 1) {
+                orderName = names[0];
+            } else if (names.length > 1) {
+                orderName = `${names[0]} 외 ${names.length - 1}건`;
+            }
+
+            const params = new URLSearchParams();
+            params.set('amount', totalAmount);
+            params.set('orderName', orderName);
+
+            window.location.href = `/checkout?${params.toString()}`;
+        });
+
+        calculateSummary();
+    </script>
+</body>
+</html>
