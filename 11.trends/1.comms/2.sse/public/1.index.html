@@ -14,8 +14,8 @@
         const eventSource = new EventSource('http://localhost:3000/events');
 
         // 메시지 수신 시
+        const outputDiv = document.getElementById('output');
         eventSource.onmessage = (event) => {
-            const outputDiv = document.getElementById('output');
             outputDiv.textContent = `Message from server: ${event.data}`;
 
             // 메세지 누적 출력

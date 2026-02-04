@@ -1,0 +1,280 @@
+<!-- public/news.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>SSE 뉴스 피드 데모</title>
+    <style>
+        body {
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 16px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #status {
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        #messages {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .msg {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+        }
+
+        .msg-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .msg-content {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .msg-time {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .system {
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+        }
+
+        #controls {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #connectBtn {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        #disconnectBtn {
+            background-color: #e11d48;
+            color: white;
+            margin-left: 8px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SSE 뉴스 피드 (채팅처럼 전송)</h1>
+        <div id="status">연결되지 않음</div>
+        <div id="messages"></div>
+
+        <div id="controls">
+            <button id="connectBtn">뉴스 스트림 시작</button>
+            <button id="disconnectBtn" disabled>연결 끊기</button>
+        </div>
+    </div>
+
+    <script>
+    let eventSource = null;
+
+    const statusEl = document.getElementById('status');
+    const messagesEl = document.getElementById('messages');
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+
+    // id → 말풍선 요소 캐시 (GPT에서 하나의 답변 말풍선처럼)
+    const messageBubbleMap = new Map();
+
+    function addSystemMessage(text) {
+        const div = document.createElement('div');
+        div.className = 'system';
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function createOrGetBubble(data) {
+        let wrapper = messageBubbleMap.get(data.id);
+
+        if (!wrapper) {
+            // 새 말풍선 생성
+            wrapper = document.createElement('div');
+            wrapper.className = 'msg';
+            wrapper.dataset.msgId = data.id;
+
+            const title = document.createElement('div');
+            title.className = 'msg-title';
+            title.textContent = data.title || '(제목 없음)';
+
+            const content = document.createElement('div');
+            content.className = 'msg-content';
+            content.textContent = ''; // 여기다가 chunk를 계속 이어붙임
+
+            const time = document.createElement('div');
+            time.className = 'msg-time';
+            time.textContent = ''; // done 이벤트에서 채움
+
+            wrapper.appendChild(title);
+            wrapper.appendChild(content);
+            wrapper.appendChild(time);
+
+            messagesEl.appendChild(wrapper);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            messageBubbleMap.set(data.id, wrapper);
+        } else {
+            // 기존 버블인데, title이 비어 있었고 첫 chunk에서만 title이 올 수도 있어서 보정
+            if (data.title) {
+                const titleEl = wrapper.querySelector('.msg-title');
+                if (titleEl && !titleEl.textContent.trim()) {
+                    titleEl.textContent = data.title;
+                }
+            }
+        }
+
+        return wrapper;
+    }
+
+    function handleChunk(data) {
+        const wrapper = createOrGetBubble(data);
+        const contentEl = wrapper.querySelector('.msg-content');
+
+        // GPT처럼 조각이 계속 이어 붙는 느낌
+        if (contentEl.textContent.length > 0) {
+            contentEl.textContent += ' ' + data.chunk;
+        } else {
+            contentEl.textContent = data.chunk;
+        }
+
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function handleDone(data) {
+        const wrapper = messageBubbleMap.get(data.id);
+        if (!wrapper) return;
+
+        const timeEl = wrapper.querySelector('.msg-time');
+        if (timeEl) {
+            timeEl.textContent = new Date(data.timestamp).toLocaleTimeString();
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    connectBtn.addEventListener('click', () => {
+        if (eventSource) return;
+
+        eventSource = new EventSource('/news-stream');
+
+        statusEl.textContent = '서버에 연결 중...';
+
+        eventSource.onopen = () => {
+            statusEl.textContent = '서버와 연결됨 (뉴스를 GPT처럼 스트리밍 중)';
+            addSystemMessage('서버와 연결되었습니다. 잠시 후부터 뉴스가 한 문단씩 스트리밍됩니다.');
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = false;
+        };
+
+        eventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+
+                if (data.type === 'chunk') {
+                    handleChunk(data);
+                } else if (data.type === 'done') {
+                    handleDone(data);
+                } else {
+                    addSystemMessage('(기타 데이터) ' + event.data);
+                }
+            } catch (err) {
+                addSystemMessage(`(raw) ${event.data}`);
+            }
+        };
+
+        eventSource.addEventListener('info', (event) => {
+            const data = JSON.parse(event.data);
+            addSystemMessage(data.message);
+        });
+
+        eventSource.addEventListener('end', (event) => {
+            const data = JSON.parse(event.data);
+            addSystemMessage(data.message);
+            statusEl.textContent = '뉴스 스트림 종료됨';
+            eventSource.close();
+            eventSource = null;
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        });
+
+        eventSource.onerror = (event) => {
+            console.error('SSE error:', event);
+            statusEl.textContent = '⚠️ 오류 발생 또는 연결 끊김';
+            addSystemMessage('오류가 발생했거나 연결이 끊어진 것 같습니다.');
+            eventSource.close();
+            eventSource = null;
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        };
+    });
+
+    disconnectBtn.addEventListener('click', () => {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+            statusEl.textContent = '수동으로 연결을 끊었습니다.';
+            addSystemMessage('사용자가 수동으로 연결을 종료했습니다.');
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+        }
+    });
+</script>
+
+</body>
+</html>

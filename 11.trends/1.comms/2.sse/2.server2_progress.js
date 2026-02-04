@@ -57,7 +57,7 @@ app.get('/stop', cors(sseCorsOptions), (req, res) => {
 
 // '/' 접속 시 progress.html 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'progress.html'));
+    res.sendFile(path.join(__dirname, 'public', '2.progress.html'));
 });
 
 // 정적 파일 제공

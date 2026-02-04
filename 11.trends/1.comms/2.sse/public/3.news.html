@@ -20,8 +20,7 @@
             border-bottom: 1px solid #eee;
         }
         .highlight {
-            background-color: yellow;
-            opacity: 1;
+            background-color: rgba(255, 255, 0, 0.5); /* 노랑 */
         }
     </style>
 </head>
@@ -42,15 +41,15 @@
                 newsList.pop();  // 5개 초과 시 오래된 기사 제거 (배열 마지막 요소 삭제)
             }
 
-            // 뉴스 업데이트
+            // 1. 뉴스 업데이트
             // newsContainer.innerHTML = newsList.map(news => `<div class="news-item">${news}</div>`).join('');
 
-            // 뉴스 업데이트 (하이라이트 효과 추가)
+            // 2. 뉴스 업데이트 (하이라이트 효과 추가)
             newsContainer.innerHTML = newsList.map((news, index) => {
                 return `<div class="news-item ${index === 0 ? 'highlight' : ''}">${news}</div>`;
             }).join('');
 
-            // 하이라이트 효과 제거 (1초 후)
+            // 3. 하이라이트 효과 제거 (1초 후)
             setTimeout(() => {
                 const highlightedItem = document.querySelector('.highlight');
                 if (highlightedItem) {

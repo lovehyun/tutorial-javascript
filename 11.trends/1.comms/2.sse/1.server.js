@@ -1,3 +1,11 @@
+// SSE 통신: HTTP + TCP 스트리밍, 서버 측 핵심은 'flush + keep-alive'
+// GET /stream
+// Accept: text/event-stream
+
+// SSE는 기본적으로 cross-site 쿠키 포함을 허용하지 않으며,
+// Credentials를 허용하려면 설정 추가가 필요합니다
+// const es = new EventSource("https://api.example.com/events", { withCredentials: true });
+
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -18,6 +26,11 @@ const sseCorsOptions = {
 // 정적 파일 제공 경로 설정 (public 폴더)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// '/' 접속 시 index.html 제공
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', '1.index.html'));
+});
+
 // SSE 엔드포인트
 app.get('/events', cors(sseCorsOptions), (req, res) => {
     // 헤더 설정
@@ -27,6 +40,8 @@ app.get('/events', cors(sseCorsOptions), (req, res) => {
 
     // 클라이언트 연결 시 현재 시간 전송
     const sendTime = () => {
+        // HTML 명세의 9.2.4 Parsing an event stream
+        // data: 내용\n\n
         res.write(`data: ${new Date().toISOString()}\n\n`);
     };
 

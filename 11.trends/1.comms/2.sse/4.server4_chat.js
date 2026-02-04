@@ -34,7 +34,7 @@ app.get('/chat', (req, res) => {
 // 메시지 수신 및 브로드캐스트 (클라이언트가 POST로 보낼 때)
 app.post('/send-message', (req, res) => {
     const { username, message } = req.body;
-    const newMessage = { username, message, timestamp: new Date().toISOString() };
+    const newMessage = { username, message, timestamp: new Date().toLocaleTimeString() };
     messages.push(newMessage); // 메시지 저장
 
     // 모든 클라이언트에게 브로드캐스트
@@ -47,7 +47,7 @@ app.post('/send-message', (req, res) => {
 
 // 정적 파일 제공
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'chat.html'));
+    res.sendFile(path.join(__dirname, 'public', '4.chat.html'));
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
