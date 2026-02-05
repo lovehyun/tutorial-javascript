@@ -1,8 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const axios = require('axios');
 const path = require('path');
-require('dotenv').config();
 
 const app = express();
 const port = 3000;
@@ -20,12 +20,9 @@ const encodedApiSecretKey = 'Basic ' + Buffer.from(apiSecretKey + ':').toString(
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'product.html'));
-})
-
-// 결제 승인 요청
-app.post('/confirm/payment', async (req, res) => {
+// 결제 승인 요청 (API)
+// 프론트엔드에서는 `/api/confirm/payment` 로 호출합니다.
+app.post('/api/confirm/payment', async (req, res) => {
     const { paymentKey, orderId, amount } = req.body;
 
     try {
@@ -52,40 +49,17 @@ app.post('/confirm/payment', async (req, res) => {
     }
 });
 
-// 결제 성공 처리
-app.get('/payment/success', async (req, res) => {
-    const { paymentKey, orderId, amount } = req.query;
+// 메인 상품 페이지
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'product.html'));
+})
 
-    if (!paymentKey || !orderId || !amount) {
-        return res.status(400).send('필수 결제 정보가 누락되었습니다.');
-    }
-
-    try {
-        // Toss Payments API로 결제 확인
-        const response = await axios.post(
-            'https://api.tosspayments.com/v1/payments/confirm',
-            {
-                paymentKey,
-                orderId,
-                amount,
-            },
-            {
-                headers: {
-                    Authorization: encodedApiSecretKey,
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
-
-        // 검증 성공 시 성공 페이지로 리다이렉트
-        res.sendFile(path.join(__dirname, 'public', 'success.html'));
-    } catch (error) {
-        console.error('결제 검증 실패:', error.response?.data || error.message);
-        res.redirect('/payment/fail');
-    }
+// 결제 성공 페이지
+app.get('/payment/success', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'success.html'));
 });
 
-// 결제 실패 처리
+// 결제 실패 페이지
 app.get('/payment/fail', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'fail.html'));
 });

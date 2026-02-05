@@ -45,8 +45,8 @@ async function requestPayment() {
             amount: { currency: "KRW", value: price },
             orderId: orderId,
             orderName: name,
-            successUrl: `${window.location.origin}/success.html`,
-            failUrl: `${window.location.origin}/fail.html`,
+            successUrl: `${window.location.origin}/success`, // 바로 ${window.location.origin}/success.html 을 호출해도 무방
+            failUrl: `${window.location.origin}/fail`,       // 바로 ${window.location.origin}/fail.html 을 호출해도 무방
         });
     } catch (error) {
         alert(`결제 요청 중 오류가 발생했습니다: ${error.message}`);

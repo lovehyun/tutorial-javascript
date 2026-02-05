@@ -22,14 +22,48 @@ async function initializePayments() {
 
 // 클라이언트 키를 가져오는 함수
 async function fetchClientKey() {
-    const response = await fetch('/config');
+    const response = await fetch('/api/config');
     const data = await response.json();
     return data.clientKey;
 }
 
+// 상품 목록 로드
+async function loadProducts() {
+    const container = document.getElementById("product-list");
+    if (!container) return;
+
+    try {
+        const res = await fetch("/api/products");
+        const data = await res.json();
+
+        if (!res.ok) {
+            container.textContent = "상품 목록을 불러오지 못했습니다: " + (data.message || res.status);
+            return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        if (list.length === 0) {
+            container.textContent = "등록된 상품이 없습니다.";
+            return;
+        }
+
+        container.innerHTML = "";
+        list.forEach((p) => {
+            const btn = document.createElement("button");
+            btn.className = "product-button";
+            btn.textContent = `${p.name} - ${p.price}원`;
+            btn.addEventListener("click", (event) => selectProduct(event, p));
+            container.appendChild(btn);
+        });
+    } catch (err) {
+        container.textContent = "상품 로딩 중 오류: " + err.message;
+    }
+}
+
 // 상품 선택
-function selectProduct(event, name, price) {
-    selectedProduct = { name, price };
+function selectProduct(event, product) {
+    // product: { id, name, price }
+    selectedProduct = product;
     document.querySelectorAll(".product-button").forEach((button) => {
         button.style.backgroundColor = "#ffffff";
     });
@@ -56,18 +90,30 @@ async function requestPayment() {
         return;
     }
 
-    const { name, price } = selectedProduct;
-    const orderId = generateRandomString(); // 주문 ID 생성
-
     try {
-        // Toss 결제창 띄우기
+        // 1) 먼저 백엔드에 주문 생성 요청 → 서버가 orderId와 금액을 결정
+        const orderRes = await fetch("/api/orders", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId: selectedProduct.id }),
+        });
+        
+        const orderData = await orderRes.json();
+        if (!orderRes.ok) {
+            alert("주문 생성 실패: " + (orderData.message || orderRes.status));
+            return;
+        }
+
+        const { orderId, amount, orderName } = orderData;
+
+        // 2) 서버가 내려준 orderId/amount/orderName으로 Toss 결제창 호출
         await payment.requestPayment({
             method: selectedPaymentMethod,
-            amount: { currency: "KRW", value: price },
-            orderId: orderId,
-            orderName: name,
-            successUrl: `${window.location.origin}/success.html`,
-            failUrl: `${window.location.origin}/fail.html`,
+            amount: { currency: "KRW", value: amount },
+            orderId,
+            orderName,
+            successUrl: `${window.location.origin}/payment/success`,
+            failUrl: `${window.location.origin}/payment/fail`,
         });
     } catch (error) {
         alert(`결제 요청 중 오류가 발생했습니다: ${error.message}`);
@@ -199,5 +245,6 @@ function renderTransactionList(el, data) {
 
 // 페이지 로드 시 Toss Payments 초기화
 document.addEventListener("DOMContentLoaded", () => {
-    initializePayments(); // 초기화 함수 호출
+    initializePayments(); // 결제 시스템 초기화
+    loadProducts(); // 상품 목록 로드
 });

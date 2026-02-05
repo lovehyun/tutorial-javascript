@@ -4,8 +4,6 @@
     <meta charset="utf-8" />
     <title>상품 선택 | 샘플 결제</title>
     <style>
-        /* 진짜 최소한: 여백 + 폭 제한 + flex 정렬만 */
-
         body {
             margin: 0;
             padding: 16px;
@@ -128,15 +126,18 @@
     </div>
 
     <script>
+        // 1. DOM 요소 캐싱
         const items = document.querySelectorAll('.product-item');
         const countSpan = document.getElementById('summary-count');
         const amountSpan = document.getElementById('summary-amount');
         const goCheckoutButton = document.getElementById('go-checkout');
 
+        // 2. 유틸 함수: 금액 포맷
         function formatKRW(value) {
             return value.toLocaleString('ko-KR') + '원';
         }
 
+        // 3. 핵심 로직: 요약 정보 계산 + 화면 반영
         function calculateSummary() {
             let totalCount = 0;
             let totalAmount = 0;
@@ -154,9 +155,11 @@
                 }
             });
 
+            // 화면에 요약 정보 반영
             countSpan.textContent = `${totalCount}개`;
             amountSpan.innerHTML = `<strong>${formatKRW(totalAmount)}</strong>`;
 
+            // 버튼 상태 및 텍스트 업데이트
             if (totalCount > 0) {
                 goCheckoutButton.disabled = false;
                 goCheckoutButton.textContent = `${formatKRW(totalAmount)} 결제하기`;
@@ -165,48 +168,64 @@
                 goCheckoutButton.textContent = '결제 페이지로 이동';
             }
 
+            // 결제 페이지 이동 시 사용할 데이터 반환
             return { totalCount, totalAmount, names };
         }
 
-        items.forEach((item) => {
-            const minusBtn = item.querySelector('.qty-minus');
-            const plusBtn = item.querySelector('.qty-plus');
-            const qtySpan = item.querySelector('.qty');
+        // 4. 이벤트 바인딩: 각 상품의 + / - 버튼
+        function bindItemQuantityEvents() {
+            items.forEach((item) => {
+                const minusBtn = item.querySelector('.qty-minus');
+                const plusBtn = item.querySelector('.qty-plus');
+                const qtySpan = item.querySelector('.qty');
 
-            minusBtn.addEventListener('click', () => {
-                let qty = Number(qtySpan.textContent);
-                if (qty > 0) {
-                    qtySpan.textContent = qty - 1;
+                minusBtn.addEventListener('click', () => {
+                    let qty = Number(qtySpan.textContent);
+                    if (qty > 0) {
+                        qtySpan.textContent = qty - 1;
+                        calculateSummary();
+                    }
+                });
+
+                plusBtn.addEventListener('click', () => {
+                    let qty = Number(qtySpan.textContent);
+                    qtySpan.textContent = qty + 1;
                     calculateSummary();
+                });
+            });
+        }
+
+        // 5. 이벤트 바인딩: 결제 버튼 클릭 → /checkout 이동
+        function bindCheckoutButtonEvent() {
+            goCheckoutButton.addEventListener('click', () => {
+                const { totalAmount, names } = calculateSummary();
+                if (totalAmount <= 0) return;
+
+                let orderName = '장바구니 상품';
+                if (names.length === 1) {
+                    orderName = names[0];
+                } else if (names.length > 1) {
+                    orderName = `${names[0]} 외 ${names.length - 1}건`;
                 }
+
+                const params = new URLSearchParams();
+                params.set('amount', totalAmount);
+                params.set('orderName', orderName);
+
+                window.location.href = `/checkout?${params.toString()}`;
             });
+        }
 
-            plusBtn.addEventListener('click', () => {
-                let qty = Number(qtySpan.textContent);
-                qtySpan.textContent = qty + 1;
-                calculateSummary();
-            });
-        });
+        // 6. 초기화: 이벤트 바인딩 + 초기 요약 계산
+        function init() {
+            bindItemQuantityEvents();
+            bindCheckoutButtonEvent();
+            calculateSummary();  // 최초 화면 세팅
+        }
 
-        goCheckoutButton.addEventListener('click', () => {
-            const { totalAmount, names } = calculateSummary();
-            if (totalAmount <= 0) return;
-
-            let orderName = '장바구니 상품';
-            if (names.length === 1) {
-                orderName = names[0];
-            } else if (names.length > 1) {
-                orderName = `${names[0]} 외 ${names.length - 1}건`;
-            }
-
-            const params = new URLSearchParams();
-            params.set('amount', totalAmount);
-            params.set('orderName', orderName);
-
-            window.location.href = `/checkout?${params.toString()}`;
-        });
-
-        calculateSummary();
+        // 스크립트 로드 시 바로 초기화
+        init();
     </script>
+
 </body>
 </html>

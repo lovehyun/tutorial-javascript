@@ -6,6 +6,11 @@ let payment; // 결제 객체
 let selectedProduct = null; // 선택된 상품
 let selectedPaymentMethod = null; // 선택된 결제 수단
 
+// 페이지 로드 시 Toss Payments 초기화
+document.addEventListener("DOMContentLoaded", () => {
+    initializePayments(); // 초기화 함수 호출
+});
+
 // 클라이언트 키를 가져오고 Toss Payments 초기화
 async function initializePayments() {
     try {
@@ -22,7 +27,7 @@ async function initializePayments() {
 
 // 클라이언트 키를 가져오는 함수
 async function fetchClientKey() {
-    const response = await fetch('/config');
+    const response = await fetch('/api/config');
     const data = await response.json();
     return data.clientKey;
 }
@@ -66,8 +71,8 @@ async function requestPayment() {
             amount: { currency: "KRW", value: price },
             orderId: orderId,
             orderName: name,
-            successUrl: `${window.location.origin}/success.html`,
-            failUrl: `${window.location.origin}/fail.html`,
+            successUrl: `${window.location.origin}/success`, // 바로 ${window.location.origin}/success.html 을 호출해도 무방
+            failUrl: `${window.location.origin}/fail`,       // 바로 ${window.location.origin}/fail.html 을 호출해도 무방
         });
     } catch (error) {
         alert(`결제 요청 중 오류가 발생했습니다: ${error.message}`);
@@ -78,8 +83,3 @@ async function requestPayment() {
 function generateRandomString() {
     return Math.random().toString(36).slice(2, 10); // 36진수(0-9a-z) 13자리 중 2~10까지 8자리
 }
-
-// 페이지 로드 시 Toss Payments 초기화
-document.addEventListener("DOMContentLoaded", () => {
-    initializePayments(); // 초기화 함수 호출
-});

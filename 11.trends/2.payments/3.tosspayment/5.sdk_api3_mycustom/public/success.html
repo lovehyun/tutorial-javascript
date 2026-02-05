@@ -51,7 +51,7 @@
             // 서버에 결제 검증 요청
             async function confirmPayment() {
                 try {
-                    const response = await fetch('/confirm/payment', {
+                    const response = await fetch('/api/confirm/payment', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
