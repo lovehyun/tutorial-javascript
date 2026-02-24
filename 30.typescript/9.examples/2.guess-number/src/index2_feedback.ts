@@ -20,17 +20,17 @@ function guessNumber2(target: number, guess: number): Feedback {
 
 // 타겟 숫자 생성
 const targetNumber2: number = Math.floor(Math.random() * 100) + 1;
-console.log('Target Number:', targetNumber);
+console.log('Target Number:', targetNumber2);
 
 // 사용자 추측 (실제 애플리케이션에서는 사용자 입력 대체)
 const userGuess2: number = 50;
 
 // 피드백 출력
-const feedback2: Feedback = guessNumber2(targetNumber, userGuess);
+const feedback2: Feedback = guessNumber2(targetNumber2, userGuess2);
 console.log(FEEDBACK_MESSAGES[feedback2]);
 
 
-// Record 의 일반적인 사용 사례
+// 참고: Record 의 일반적인 사용 사례
 type StatusType = 'success' | 'error' | 'loading';
 const messages: Record<StatusType, string> = {
     success: 'Operation completed successfully.',

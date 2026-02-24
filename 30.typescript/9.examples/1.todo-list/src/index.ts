@@ -1,28 +1,5 @@
 // package.json 만들기 (npm init -y)
 // npm run build, npm start
-//
-// --------------------------------------------------------
-// 예3/4) 인터페이스 사용 및 파일 분리(통합)
-
-// export interface Todo {
-//     id: number;
-//     title: string;
-//     completed: boolean;
-// }
-
-import { Todo } from './todo';
-
-const todos: Todo[] = [];
-
-function addTodo(title: string): void {
-    const newTodo: Todo = { id: Date.now(), title, completed: false };
-    todos.push(newTodo);
-    console.log('Todo added:', newTodo);
-}
-
-addTodo('Learn TypeScript');
-addTodo('Practice JavaScript');
-console.log('Todos:', todos);
 
 
 // --------------------------------------------------------
@@ -62,3 +39,27 @@ addTodo3('Learn TypeScript');
 addTodo3('Practice JavaScript');
 addTodo3('Write Code');
 console.log('Todos:', todos3);
+
+
+// --------------------------------------------------------
+// 예3/4) 인터페이스 사용 및 파일 분리(통합)
+
+// export interface Todo {
+//     id: number;
+//     title: string;
+//     completed: boolean;
+// }
+
+import { Todo } from './todo';
+
+const todos: Todo[] = [];
+
+function addTodo(title: string): void {
+    const newTodo: Todo = { id: Date.now(), title, completed: false };
+    todos.push(newTodo);
+    console.log('Todo added:', newTodo);
+}
+
+addTodo('Learn TypeScript');
+addTodo('Practice JavaScript');
+console.log('Todos:', todos);

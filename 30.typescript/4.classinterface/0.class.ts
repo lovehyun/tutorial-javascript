@@ -15,5 +15,5 @@ class Person {
 }
 
 // 객체 생성
-const person = new Person("Alice", 30, true);
+const person: Person = new Person("Alice", 30, true);
 console.log(person.getInfo());

@@ -1,0 +1,39 @@
+<!-- public/index.html -->
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>숫자 맞추기 게임</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 400px;
+            margin: 40px auto;
+        }
+        input {
+            padding: 4px 8px;
+        }
+        button {
+            padding: 4px 10px;
+            margin-left: 4px;
+        }
+        #log {
+            margin-top: 20px;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <h1>숫자 맞추기 게임</h1>
+    <button id="start-btn">게임 시작 / 리셋</button>
+
+    <div style="margin-top: 16px">
+        <input id="guess-input" type="number" placeholder="숫자 입력" />
+        <button id="guess-btn">맞추기</button>
+    </div>
+
+    <div id="log"></div>
+
+    <script src="main.js"></script>
+</body>
+</html>
