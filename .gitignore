@@ -44,3 +44,6 @@ package-lock.json
 **/.env
 cookie.txt
 gapi-*.json
+
+# nextjs
+.next/

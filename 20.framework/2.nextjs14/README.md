@@ -33,6 +33,7 @@ Next.js는 React를 기반으로 하는 프레임워크로, 서버 사이드 렌
 
 2. **Next.js 설치**
    ```bash
+   npm info create-next-app version
    npx create-next-app@latest .
    ```
 
