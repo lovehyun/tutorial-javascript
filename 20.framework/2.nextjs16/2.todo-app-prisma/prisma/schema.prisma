@@ -1,0 +1,19 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Todo {
+  id        String   @id @default(cuid())
+  text      String
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
