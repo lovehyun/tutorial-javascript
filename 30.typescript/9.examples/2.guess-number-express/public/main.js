@@ -6,7 +6,7 @@ const guessInput = document.getElementById('guess-input');
 const logDiv = document.getElementById('log');
 
 function addLog(message) {
-    logDiv.textContent += message + '\n';
+    logDiv.innerText += message + '\n';
 }
 
 startBtn.addEventListener('click', async () => {

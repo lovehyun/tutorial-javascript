@@ -6,7 +6,7 @@
         "rootDir": "./src", // TS 소스 코드 위치
         "strict": true, // TS 메인 옵션: 모든 엄격한 타입 검사 규칙을 활성화 (주요 포함 내용: noImplicitAny, strictNullChecks, strictFunctionTypes, strictBindCallApply)
         "esModuleInterop": true, // ESM import 문법을 CommonJS 환경에서도 자연스럽게 사용할 수 있게 함
-        "types": ["node"],        // readline, process, __dirname 등 타입 활성화
-        "skipLibCheck": true      // (선택) 라이브러리 타입 검사 스킵 → 빌드 속도 및 잡다한 에러 감소
+        "skipLibCheck": true,      // (선택) 라이브러리 타입 검사 스킵 → 빌드 속도 및 잡다한 에러 감소
+        "types": ["node"]        // readline, process, __dirname 등 타입 활성화
     }
 }

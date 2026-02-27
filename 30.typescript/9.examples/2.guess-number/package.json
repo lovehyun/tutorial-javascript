@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "main": "dist/index.js",
     "scripts": {
-        "start": "npx ts-node src/index3_input.ts"
+        "start": "tsc && node dist/index3_input.js",
+        "dev": "npx ts-node src/index3_input.ts"
     },
     "devDependencies": {
         "@types/node": "^18.0.0",

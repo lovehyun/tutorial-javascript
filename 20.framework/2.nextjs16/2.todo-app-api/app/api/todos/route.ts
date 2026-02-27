@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   }
 
   const todo: Todo = {
-    id: crypto.randomUUID(),
+    id: crypto.randomUUID(), // Date.now()
     text,
     done: false,
   };
