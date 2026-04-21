@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자리 배치도</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f5f5f5;
+    text-align: center;
+}
+
+.container {
+    margin: 20px auto;
+    width: 900px;
+}
+
+.controls {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+/* 교실 */
+.classroom {
+    display: grid;
+    grid-template-columns: repeat(10, 80px);
+    grid-template-rows: repeat(5, 60px);
+    gap: 10px;
+    justify-content: center;
+}
+
+/* 자리 */
+.seat {
+    background: #e6d8b5;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    user-select: none;
+    font-weight: bold;
+}
+
+.empty {
+    background: transparent;
+}
+
+/* 드래그 중 */
+.dragging {
+    opacity: 0.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="controls">
+        <button onclick="shuffleSeats()">🎲 랜덤 셔플</button>
+        <button onclick="manualInput()">✏️ 수동 입력</button>
+    </div>
+
+    <div class="classroom" id="classroom"></div>
+
+</div>
+
+<script>
+const layout = [
+    "", "수강생30", "수강생29", "", "수강생28", "수강생27", "수강생26", "", "수강생25", "수강생24",
+    "", "수강생23", "수강생22", "", "수강생21", "수강생20", "수강생19", "", "수강생18", "수강생17",
+    "", "",         "수강생16", "", "수강생15", "수강생14", "수강생13", "", "수강생12", "수강생11",
+    "", "",         "수강생10", "", "수강생9",  "수강생8",  "수강생7",  "", "수강생6",  "수강생5",
+    "", "",         "",         "", "",         "수강생4",  "수강생3",  "", "수강생2",  "수강생1"
+];
+
+let students = layout.filter(v => v !== "");
+
+/* 렌더 */
+function render() {
+    const classroom = document.getElementById("classroom");
+    classroom.innerHTML = "";
+
+    layout.forEach((name, index) => {
+        const div = document.createElement("div");
+
+        if (name === "") {
+            div.className = "seat empty";
+        } else {
+            div.className = "seat";
+            div.draggable = true;
+            div.innerText = name;
+
+            /* drag 이벤트 */
+            div.addEventListener("dragstart", dragStart);
+            div.addEventListener("dragover", dragOver);
+            div.addEventListener("drop", drop);
+            div.addEventListener("dragend", dragEnd);
+        }
+
+        div.dataset.index = index;
+        classroom.appendChild(div);
+    });
+}
+
+let dragIndex = null;
+
+function dragStart(e) {
+    dragIndex = e.target.dataset.index;
+    e.target.classList.add("dragging");
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function drop(e) {
+    const targetIndex = e.target.dataset.index;
+
+    if (layout[targetIndex] === "") return;
+
+    /* 자리 swap */
+    [layout[dragIndex], layout[targetIndex]] =
+    [layout[targetIndex], layout[dragIndex]];
+
+    render();
+}
+
+function dragEnd(e) {
+    e.target.classList.remove("dragging");
+}
+
+/* 랜덤 셔플 */
+function shuffleSeats() {
+    let names = layout.filter(v => v !== "");
+
+    names.sort(() => Math.random() - 0.5);
+
+    let idx = 0;
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] !== "") {
+            layout[i] = names[idx++];
+        }
+    }
+
+    render();
+}
+
+/* 수동 입력 */
+function manualInput() {
+    const input = prompt("이름을 쉼표로 입력하세요\n예: 홍길동,김철수,이영희");
+
+    if (!input) return;
+
+    const names = input.split(",").map(v => v.trim());
+
+    let idx = 0;
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] !== "") {
+            layout[i] = names[idx] || "";
+            idx++;
+        }
+    }
+
+    render();
+}
+
+render();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자리 배치도 (완성)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+@keyframes explode {
+    0% { transform: translate(0,0) scale(1); opacity:1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0.5); opacity:0; }
+}
+</style>
+
+</head>
+
+<body class="bg-gradient-to-br from-gray-100 to-gray-200">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 버튼 -->
+    <div class="flex gap-3 mb-6">
+        <button id="manualBtn" onclick="toggleManual()" class="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition">✏️ 수동 배치</button>
+        <button id="shuffleBtn" onclick="shuffleSeats()" class="px-4 py-2 bg-green-500 text-white rounded-xl shadow hover:bg-green-600 transition">🎲 랜덤 배치</button>
+        <button id="renameBtn" onclick="toggleRenameMode()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition">🔤 이름 변경</button>
+        <button id="bulkBtn" onclick="openBulkModal()" class="px-4 py-2 bg-orange-400 text-white rounded-xl shadow hover:bg-orange-500 transition">📋 일괄 입력</button>
+        <button id="assignBtn" onclick="assignWaiting()" class="px-4 py-2 bg-teal-500 text-white rounded-xl shadow hover:bg-teal-600 transition">🪑 대기자 배치</button>
+    </div>
+
+    <div class="flex gap-6">
+
+        <!-- 대기 리스트 -->
+        <div class="w-64 bg-white rounded-2xl shadow-lg p-4">
+            <h2 class="font-bold mb-3">대기 목록</h2>
+            <div id="studentList" class="grid grid-cols-2 gap-2 min-h-[400px]"
+                ondragover="allowDrop(event)"
+                ondrop="dropToList(event)"></div>
+        </div>
+
+        <!-- 교실 -->
+        <div id="classroom" class="grid grid-cols-10 gap-x-1 gap-y-3 flex-1"></div>
+
+    </div>
+
+</div>
+
+<!-- 스피너 -->
+<div id="spinnerOverlay" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-2">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent"></div>
+        <p id="spinnerStatus" class="text-sm text-gray-500">섞는 중...</p>
+        <p id="spinnerCountdown" class="text-3xl font-bold text-blue-500"></p>
+    </div>
+</div>
+
+<!-- 스파클 -->
+<div id="sparkleContainer" class="pointer-events-none fixed inset-0"></div>
+
+<!-- 일괄 입력 모달 -->
+<div id="bulkModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[480px]">
+        <h3 class="font-bold text-lg mb-1">📋 일괄 이름 입력</h3>
+        <p class="text-sm text-gray-400 mb-3">쉼표(,)로 구분 · 최대 30명 · 입력 순서대로 좌석 배치</p>
+        <textarea id="bulkInput"
+            class="w-full border rounded-xl p-3 text-sm h-36 resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
+            placeholder="홍길동,김철수,이영희,박민준,..."></textarea>
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="closeBulkModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
+            <button onclick="applyBulkInput()" class="px-4 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-500 transition text-sm">적용</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const fixedLayout = [
+    "", "수강생30", "수강생29", "", "수강생28", "수강생27", "수강생26", "", "수강생25", "수강생24",
+    "", "수강생23", "수강생22", "", "수강생21", "수강생20", "수강생19", "", "수강생18", "수강생17",
+    "", "",         "수강생16", "", "수강생15", "수강생14", "수강생13", "", "수강생12", "수강생11",
+    "", "",         "수강생10", "", "수강생9",  "수강생8",  "수강생7",  "", "수강생6",  "수강생5",
+    "", "",         "",         "", "",         "수강생4",  "수강생3",  "", "수강생2",  "수강생1"
+];
+
+let layout = [...fixedLayout];
+let students = [];
+let isManualMode = false;
+let isRenameMode = false;
+
+const TEACHER_INDEX = 43; // 마지막 행 col3 (수강생9↔10 사이 복도 아래)
+
+function render() {
+    renderClassroom();
+    renderList();
+}
+
+function renderClassroom() {
+    const classroom = document.getElementById("classroom");
+    classroom.innerHTML = "";
+
+    layout.forEach((name, index) => {
+        const div = document.createElement("div");
+
+        if (index === TEACHER_INDEX) {
+            div.className = "h-16 flex items-center justify-center rounded-2xl text-sm font-bold bg-blue-500 text-white shadow-lg";
+            div.innerText = "강사";
+        } else if (fixedLayout[index] === "") {
+            div.className = "h-16 flex items-center justify-center";
+            div.innerHTML = '<div class="w-3 h-16"></div>';
+        } else {
+            div.className = `h-16 flex items-center justify-center rounded-2xl text-sm font-semibold
+                transition transform hover:scale-105
+                ${name
+                    ? "bg-gradient-to-br from-yellow-200 to-yellow-300 shadow-lg ring-1 ring-yellow-400"
+                    : "bg-gray-200 shadow-inner"}`;
+
+            div.innerText = name || "";
+            div.dataset.index = index;
+
+            if (isRenameMode && name) {
+                div.className += " cursor-pointer ring-2 ring-purple-400";
+                div.title = "클릭하여 이름 변경";
+                div.onclick = () => renameSeat(name, index);
+            } else {
+                div.ondragover = allowDrop;
+                div.ondrop = dropToSeat;
+                if (name) {
+                    div.draggable = true;
+                    div.dataset.name = name;
+                    div.ondragstart = drag;
+                }
+            }
+        }
+
+        classroom.appendChild(div);
+    });
+}
+
+function renderList() {
+    const list = document.getElementById("studentList");
+    list.innerHTML = "";
+
+    students.forEach(name => {
+        const div = document.createElement("div");
+        if (isRenameMode) {
+            div.className = "bg-purple-100 hover:bg-purple-200 transition text-center py-2 rounded-xl cursor-pointer text-sm shadow ring-1 ring-purple-300";
+            div.title = "클릭하여 이름 변경";
+            div.onclick = () => renameFromList(name);
+        } else {
+            div.className = "bg-blue-100 hover:bg-blue-200 transition text-center py-2 rounded-xl cursor-grab text-sm shadow";
+            div.draggable = true;
+            div.dataset.name = name;
+            div.ondragstart = drag;
+        }
+        div.innerText = name;
+        list.appendChild(div);
+    });
+}
+
+function toggleManual() {
+    if (isManualMode) {
+        finishManual();
+    } else {
+        initManual();
+    }
+}
+
+function initManual() {
+    isManualMode = true;
+    const seatedStudents = layout.filter(v => v && v !== "");
+    students = [...students, ...seatedStudents];
+    layout = layout.map(v => v === "" ? "" : null);
+    updateManualBtn();
+    render();
+}
+
+function finishManual() {
+    isManualMode = false;
+    updateManualBtn();
+    render();
+}
+
+/* 이름 변경 모드 */
+function toggleRenameMode() {
+    isRenameMode = !isRenameMode;
+    const btn = document.getElementById("renameBtn");
+    if (isRenameMode) {
+        btn.innerHTML = "✅ 변경 완료";
+        btn.className = "px-4 py-2 bg-purple-700 text-white rounded-xl shadow hover:bg-purple-800 transition";
+    } else {
+        btn.innerHTML = "🔤 이름 변경";
+        btn.className = "px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition";
+    }
+    setOtherBtnsDisabled(isRenameMode ? "renameBtn" : null);
+    render();
+}
+
+function renameSeat(oldName, index) {
+    const newName = prompt(`이름 변경\n현재: ${oldName}`, oldName);
+    if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+    layout[index] = newName.trim();
+    render();
+}
+
+function renameFromList(oldName) {
+    const newName = prompt(`이름 변경\n현재: ${oldName}`, oldName);
+    if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+    students = students.map(n => n === oldName ? newName.trim() : n);
+    render();
+}
+
+/* 일괄 입력 */
+function openBulkModal() {
+    document.getElementById("bulkModal").classList.remove("hidden");
+    document.getElementById("bulkInput").focus();
+}
+
+function closeBulkModal() {
+    document.getElementById("bulkModal").classList.add("hidden");
+}
+
+function applyBulkInput() {
+    const input = document.getElementById("bulkInput").value;
+    const names = input.split(",").map(v => v.trim()).filter(v => v);
+    if (names.length === 0) return;
+
+    const seatIndices = fixedLayout.map((v, i) => v !== "" ? i : null).filter(i => i !== null);
+
+    students = [];
+    isManualMode = false;
+    updateManualBtn();
+
+    layout = fixedLayout.map(v => v === "" ? "" : null);
+    seatIndices.forEach((seatIdx, i) => {
+        if (i < names.length) layout[seatIdx] = names[i];
+    });
+
+    closeBulkModal();
+    render();
+}
+
+function updateManualBtn() {
+    const btn = document.getElementById("manualBtn");
+    if (isManualMode) {
+        btn.innerHTML = "✅ 완료";
+        btn.className = "px-4 py-2 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition";
+    } else {
+        btn.innerHTML = "✏️ 수동 배치";
+        btn.className = "px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition";
+    }
+    setOtherBtnsDisabled(isManualMode ? "manualBtn" : null);
+}
+
+function setOtherBtnsDisabled(activeId) {
+    ["manualBtn", "shuffleBtn", "renameBtn", "bulkBtn", "assignBtn"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn || id === activeId) return;
+        btn.disabled = !!activeId;
+        btn.style.opacity = activeId ? "0.4" : "";
+        btn.style.cursor  = activeId ? "not-allowed" : "";
+    });
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("name", ev.target.dataset.name);
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function dropToSeat(ev) {
+    ev.preventDefault();
+
+    const name = ev.dataTransfer.getData("name");
+    const index = ev.target.dataset.index;
+
+    if (layout[index]) return;
+
+    layout[index] = name;
+    students = students.filter(n => n !== name);
+    render();
+}
+
+function dropToList(ev) {
+    ev.preventDefault();
+
+    const name = ev.dataTransfer.getData("name");
+    if (!name) return;
+
+    students.push(name);
+
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] === name) {
+            layout[i] = null;
+        }
+    }
+
+    render();
+}
+
+/* 대기자 랜덤 배치: 대기목록 학생을 빈 자리에 랜덤으로 채움 */
+function assignWaiting() {
+    if (students.length === 0) return;
+
+    const emptySeats = layout.map((v, i) => (!v && fixedLayout[i] !== "") ? i : null).filter(i => i !== null);
+    if (emptySeats.length === 0) return;
+
+    const shuffledStudents = [...students].sort(() => Math.random() - 0.5);
+    const shuffledSeats   = [...emptySeats].sort(() => Math.random() - 0.5);
+
+    const toPlace = Math.min(shuffledStudents.length, shuffledSeats.length);
+    const placed = new Set();
+
+    for (let i = 0; i < toPlace; i++) {
+        layout[shuffledSeats[i]] = shuffledStudents[i];
+        placed.add(shuffledStudents[i]);
+    }
+
+    students = students.filter(n => !placed.has(n));
+    render();
+}
+
+function shuffleSeats() {
+    const spinner = document.getElementById("spinnerOverlay");
+    const statusEl = document.getElementById("spinnerStatus");
+    const countdownEl = document.getElementById("spinnerCountdown");
+
+    spinner.classList.remove("hidden");
+    statusEl.textContent = "섞는 중...";
+    countdownEl.textContent = "";
+
+    const seatedNames = layout.filter(v => v && v !== "");
+    const allSeatIndices = fixedLayout.map((v, i) => (v !== "" ? i : null)).filter(i => i !== null);
+
+    function doShuffle() {
+        const shuffled = [...seatedNames].sort(() => Math.random() - 0.5);
+        const picked = [...allSeatIndices].sort(() => Math.random() - 0.5);
+        layout = layout.map(v => (v === "" ? "" : null));
+        shuffled.forEach((name, i) => { layout[picked[i]] = name; });
+        render();
+    }
+
+    // 셔플 루프: 빠른 속도로 계속 섞음
+    const shuffleInterval = setInterval(doShuffle, 120);
+
+    // 카운트다운: 셔플과 독립적으로 1초마다 감소
+    let sec = 3;
+    statusEl.textContent = "🔥 마지막 찬스!";
+    countdownEl.textContent = sec + "초";
+
+    const countdownInterval = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+            clearInterval(shuffleInterval);
+            clearInterval(countdownInterval);
+            doShuffle(); // 최종 배치
+            countdownEl.textContent = "끝!";
+            statusEl.textContent = "자리 확정!";
+            setTimeout(() => {
+                spinner.classList.add("hidden");
+                triggerFireworks();
+            }, 600);
+        } else {
+            countdownEl.textContent = sec + "초";
+        }
+    }, 1000);
+}
+
+function triggerFireworks() {
+    const container = document.getElementById("sparkleContainer");
+
+    for (let i = 0; i < 80; i++) {
+        const particle = document.createElement("div");
+
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * 150 + 50;
+
+        const x = Math.cos(angle) * distance + 'px';
+        const y = Math.sin(angle) * distance + 'px';
+
+        particle.className = "absolute w-2 h-2 rounded-full";
+        particle.style.background = `hsl(${Math.random()*360}, 100%, 60%)`;
+
+        particle.style.left = window.innerWidth / 2 + 'px';
+        particle.style.top = window.innerHeight / 2 + 'px';
+
+        particle.style.setProperty('--x', x);
+        particle.style.setProperty('--y', y);
+
+        particle.style.animation = "explode 1s ease-out forwards";
+
+        container.appendChild(particle);
+
+        setTimeout(() => particle.remove(), 1000);
+    }
+}
+
+render();
+</script>
+
+</body>
+</html>

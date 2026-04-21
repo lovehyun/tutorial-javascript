@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자리 배치도 (Tailwind)</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-100">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 컨트롤 -->
+    <div class="flex gap-3 mb-6">
+        <button id="manualBtn" onclick="toggleManual()"
+            class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600">
+            ✏️ 수동 배치
+        </button>
+
+        <button id="shuffleBtn" onclick="shuffleSeats()"
+            class="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-green-600">
+            🎲 랜덤 배치
+        </button>
+
+        <button id="assignBtn" onclick="assignWaiting()"
+            class="px-4 py-2 bg-teal-500 text-white rounded-lg shadow hover:bg-teal-600">
+            🪑 대기자 배치
+        </button>
+    </div>
+
+    <div class="flex gap-6">
+
+        <!-- 학생 리스트 -->
+        <div class="w-64 bg-white rounded-xl shadow p-4">
+
+            <h2 class="font-bold mb-3">대기 목록</h2>
+
+            <div id="studentList"
+                class="grid grid-cols-2 gap-2 min-h-[400px]"
+                ondragover="allowDrop(event)"
+                ondrop="dropToList(event)">
+            </div>
+        </div>
+
+        <!-- 교실 -->
+        <div id="classroom"
+            class="grid grid-cols-10 gap-3 flex-1">
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const fixedLayout = [
+    "", "수강생30", "수강생29", "", "수강생28", "수강생27", "수강생26", "", "수강생25", "수강생24",
+    "", "수강생23", "수강생22", "", "수강생21", "수강생20", "수강생19", "", "수강생18", "수강생17",
+    "", "",         "수강생16", "", "수강생15", "수강생14", "수강생13", "", "수강생12", "수강생11",
+    "", "",         "수강생10", "", "수강생9",  "수강생8",  "수강생7",  "", "수강생6",  "수강생5",
+    "", "",         "",         "", "",         "수강생4",  "수강생3",  "", "수강생2",  "수강생1"
+];
+
+let layout = [...fixedLayout];
+let students = [];
+let isManualMode = false;
+
+/* 렌더 */
+function render() {
+    renderClassroom();
+    renderList();
+}
+
+/* 교실 렌더 */
+function renderClassroom() {
+    const classroom = document.getElementById("classroom");
+    classroom.innerHTML = "";
+
+    layout.forEach((name, index) => {
+        const div = document.createElement("div");
+
+        if (fixedLayout[index] === "") {
+            div.className = "h-16";
+        } else {
+            div.className = `
+                h-16 flex items-center justify-center
+                rounded-lg text-sm font-semibold
+                ${name ? "bg-yellow-200" : "bg-gray-300"}
+                shadow
+            `;
+
+            div.innerText = name || "";
+            div.dataset.index = index;
+
+            div.ondragover = allowDrop;
+            div.ondrop = dropToSeat;
+
+            /* 자리에서 드래그 가능 */
+            if (name) {
+                div.draggable = true;
+                div.dataset.name = name;
+                div.ondragstart = drag;
+            }
+        }
+
+        classroom.appendChild(div);
+    });
+}
+
+/* 리스트 렌더 (2컬럼) */
+function renderList() {
+    const list = document.getElementById("studentList");
+    list.innerHTML = "";
+
+    students.forEach(name => {
+        const div = document.createElement("div");
+
+        div.className = `
+            bg-blue-100 hover:bg-blue-200
+            text-center py-2 rounded-lg
+            cursor-grab text-sm
+        `;
+
+        div.innerText = name;
+        div.draggable = true;
+        div.dataset.name = name;
+
+        div.ondragstart = drag;
+
+        list.appendChild(div);
+    });
+}
+
+/* 수동 배치 토글 */
+function toggleManual() {
+    if (isManualMode) {
+        finishManual();
+    } else {
+        initManual();
+    }
+}
+
+function initManual() {
+    isManualMode = true;
+    const seatedStudents = layout.filter(v => v && v !== "");
+    students = [...students, ...seatedStudents]; // 기존 대기목록 + 자리에서 빼낸 학생 합산
+    layout = layout.map(v => v === "" ? "" : null);
+    updateManualBtn();
+    render();
+}
+
+function finishManual() {
+    isManualMode = false;
+    updateManualBtn();
+    render();
+}
+
+function updateManualBtn() {
+    const btn = document.getElementById("manualBtn");
+    if (isManualMode) {
+        btn.innerHTML = "✅ 완료";
+        btn.className = "px-4 py-2 bg-orange-500 text-white rounded-lg shadow hover:bg-orange-600";
+    } else {
+        btn.innerHTML = "✏️ 수동 배치";
+        btn.className = "px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600";
+    }
+    setOtherBtnsDisabled(isManualMode ? "manualBtn" : null);
+}
+
+function setOtherBtnsDisabled(activeId) {
+    ["manualBtn", "shuffleBtn", "assignBtn"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn || id === activeId) return;
+        btn.disabled = !!activeId;
+        btn.style.opacity = activeId ? "0.4" : "";
+        btn.style.cursor  = activeId ? "not-allowed" : "";
+    });
+}
+
+/* 드래그 */
+function drag(ev) {
+    ev.dataTransfer.setData("name", ev.target.dataset.name);
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+/* 자리로 */
+function dropToSeat(ev) {
+    ev.preventDefault();
+
+    const name = ev.dataTransfer.getData("name");
+    const index = ev.target.dataset.index;
+
+    if (layout[index]) return;
+
+    layout[index] = name;
+    students = students.filter(n => n !== name);
+
+    render();
+}
+
+/* 리스트로 */
+function dropToList(ev) {
+    ev.preventDefault();
+
+    const name = ev.dataTransfer.getData("name");
+    if (!name) return;
+
+    students.push(name);
+
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] === name) {
+            layout[i] = null;
+        }
+    }
+
+    render();
+}
+
+
+
+/* 대기자 랜덤 배치: 대기목록 학생을 빈 자리에 랜덤으로 채움 */
+function assignWaiting() {
+    if (students.length === 0) return;
+
+    const emptySeats = layout.map((v, i) => (!v && fixedLayout[i] !== "") ? i : null).filter(i => i !== null);
+    if (emptySeats.length === 0) return;
+
+    const shuffledStudents = [...students].sort(() => Math.random() - 0.5);
+    const shuffledSeats   = [...emptySeats].sort(() => Math.random() - 0.5);
+
+    const toPlace = Math.min(shuffledStudents.length, shuffledSeats.length);
+    const placed = new Set();
+
+    for (let i = 0; i < toPlace; i++) {
+        layout[shuffledSeats[i]] = shuffledStudents[i];
+        placed.add(shuffledStudents[i]);
+    }
+
+    students = students.filter(n => !placed.has(n));
+    render();
+}
+
+/* 랜덤: 자리에 앉은 학생들을 전체 좌석 중 랜덤 위치에 배치, 대기목록 유지 */
+function shuffleSeats() {
+    const seatedNames = layout.filter(v => v && v !== "");
+    seatedNames.sort(() => Math.random() - 0.5);
+
+    // 전체 좌석 위치 수집 후 모두 비우기
+    const allSeatIndices = [];
+    layout = layout.map((v, i) => {
+        if (v === "") return "";
+        allSeatIndices.push(i);
+        return null;
+    });
+
+    // 전체 좌석 중 랜덤으로 선택해서 배치
+    allSeatIndices.sort(() => Math.random() - 0.5);
+    seatedNames.forEach((name, i) => {
+        layout[allSeatIndices[i]] = name;
+    });
+
+    render();
+}
+
+render();
+</script>
+
+</body>
+</html>
