@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>자리 배치도 (완성)</title>
+<title>자리 배치도 (저장)</title>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -19,7 +19,7 @@
 <div class="max-w-7xl mx-auto p-6">
 
     <!-- 버튼 -->
-    <div class="flex gap-3 mb-6 items-center">
+    <div class="flex gap-3 mb-6 items-center flex-wrap">
         <button id="manualBtn" onclick="toggleManual()" class="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition">✏️ 수동 배치</button>
         <div class="flex gap-1 items-center">
             <button id="shuffleBtn" onclick="shuffleSeats()" class="px-4 py-2 bg-green-500 text-white rounded-xl shadow hover:bg-green-600 transition">🎲 랜덤 배치</button>
@@ -28,6 +28,15 @@
         <button id="renameBtn" onclick="toggleRenameMode()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition">🔤 이름 변경</button>
         <button id="bulkBtn" onclick="openBulkModal()" class="px-4 py-2 bg-orange-400 text-white rounded-xl shadow hover:bg-orange-500 transition">📋 일괄 입력</button>
         <button id="assignBtn" onclick="assignWaiting()" class="px-4 py-2 bg-teal-500 text-white rounded-xl shadow hover:bg-teal-600 transition">🪑 대기자 배치</button>
+
+        <!-- 우측 저장/복원 그룹 -->
+        <div class="flex gap-2 items-center ml-auto border-l pl-3">
+            <button id="saveBtn" onclick="saveCurrentLayout()" title="현재 배치를 저장" class="px-4 py-2 bg-rose-500 text-white rounded-xl shadow hover:bg-rose-600 transition">💾 저장</button>
+            <button id="resetBtn" onclick="restoreInitial()" title="일괄 입력한 초기 명부로 되돌림" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">🔄 초기화</button>
+            <button id="prevBtn" onclick="restorePrevious()" title="직전 저장된 배치로 되돌림" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">⏪ 이전배치</button>
+            <button id="currBtn" onclick="restoreCurrent()" title="최근 저장된 배치로 복원" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">📍 현재배치</button>
+            <button id="historyBtn" onclick="openHistoryModal()" title="저장 히스토리 보기" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">📚 히스토리</button>
+        </div>
     </div>
 
     <div class="flex gap-6">
@@ -66,7 +75,7 @@
         <p class="text-sm text-gray-400 mb-3">직전 배치를 기준으로 제약을 적용합니다</p>
         <label class="flex items-start gap-2 py-2 cursor-pointer">
             <input type="checkbox" id="optAvoidFirstRow" class="mt-1 w-4 h-4"
-                onchange="shuffleOptions.avoidFirstRow = this.checked">
+                onchange="shuffleOptions.avoidFirstRow = this.checked; saveSettings()">
             <span>
                 <span class="font-semibold">첫줄 반복 방지</span>
                 <span class="block text-xs text-gray-400">첫줄(맨 윗줄)에 앉았던 사람은 다음 배치에서 첫줄 제외</span>
@@ -74,10 +83,18 @@
         </label>
         <label class="flex items-start gap-2 py-2 cursor-pointer">
             <input type="checkbox" id="optAvoidLastRow" class="mt-1 w-4 h-4"
-                onchange="shuffleOptions.avoidLastRow = this.checked">
+                onchange="shuffleOptions.avoidLastRow = this.checked; saveSettings()">
             <span>
                 <span class="font-semibold">끝줄 반복 방지</span>
                 <span class="block text-xs text-gray-400">끝줄(강사 행)에 앉았던 사람은 다음 배치에서 끝줄 제외</span>
+            </span>
+        </label>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="checkbox" id="optAvoidSameSeat" class="mt-1 w-4 h-4"
+                onchange="shuffleOptions.avoidSameSeat = this.checked; saveSettings()">
+            <span>
+                <span class="font-semibold">같은자리 금지</span>
+                <span class="block text-xs text-gray-400">직전 배치와 동일한 좌석에는 다시 앉지 않음</span>
             </span>
         </label>
         <div class="flex justify-end gap-2 mt-4">
@@ -97,6 +114,19 @@
         <div class="flex justify-end gap-2 mt-4">
             <button onclick="closeBulkModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
             <button onclick="applyBulkInput()" class="px-4 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-500 transition text-sm">적용</button>
+        </div>
+    </div>
+</div>
+
+<!-- 히스토리 모달 -->
+<div id="historyModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[520px] max-h-[80vh] flex flex-col">
+        <h3 class="font-bold text-lg mb-1">📚 저장 히스토리</h3>
+        <p class="text-sm text-gray-400 mb-3">💾 저장 시점마다 자동으로 보관됩니다 (최신순)</p>
+        <div id="historyList" class="overflow-y-auto flex-1 -mx-2 px-2"></div>
+        <div class="flex justify-between items-center gap-2 mt-4 pt-3 border-t">
+            <button onclick="clearAllHistory()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 전체 삭제</button>
+            <button onclick="closeHistoryModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">닫기</button>
         </div>
     </div>
 </div>
@@ -135,6 +165,7 @@ const seatNumbers = {};
 const shuffleOptions = {
     avoidFirstRow: false,
     avoidLastRow:  false,
+    avoidSameSeat: false,
 };
 
 function render() {
@@ -272,6 +303,16 @@ function applyBulkInput() {
     const names = input.split(/[,\n\r]+/).map(v => v.trim()).filter(v => v);
     if (names.length === 0) return;
 
+    applyRoster(names);
+
+    // 일괄 입력 시점의 명부를 '초기값'으로 저장
+    saveInitialRoster(names);
+
+    closeBulkModal();
+}
+
+/* 이름 배열을 번호 순서대로 좌석에 배치(공통 로직) */
+function applyRoster(names) {
     // 좌석 번호(1=우측 하단) 오름차순 — 입력 순서대로 1번부터 채움
     const seatIndices = Object.keys(seatNumbers)
         .map(Number)
@@ -286,7 +327,6 @@ function applyBulkInput() {
         if (i < names.length) layout[seatIdx] = names[i];
     });
 
-    closeBulkModal();
     render();
 }
 
@@ -303,7 +343,8 @@ function updateManualBtn() {
 }
 
 function setOtherBtnsDisabled(activeId) {
-    ["manualBtn", "shuffleBtn", "shuffleSettingsBtn", "renameBtn", "bulkBtn", "assignBtn"].forEach(id => {
+    ["manualBtn", "shuffleBtn", "shuffleSettingsBtn", "renameBtn", "bulkBtn", "assignBtn",
+     "saveBtn", "resetBtn", "prevBtn", "currBtn", "historyBtn"].forEach(id => {
         const btn = document.getElementById(id);
         if (!btn || id === activeId) return;
         btn.disabled = !!activeId;
@@ -395,6 +436,7 @@ function assignWaiting() {
 function openShuffleSettings() {
     document.getElementById("optAvoidFirstRow").checked = shuffleOptions.avoidFirstRow;
     document.getElementById("optAvoidLastRow").checked  = shuffleOptions.avoidLastRow;
+    document.getElementById("optAvoidSameSeat").checked = shuffleOptions.avoidSameSeat;
     document.getElementById("shuffleSettingsModal").classList.remove("hidden");
 }
 
@@ -404,14 +446,18 @@ function closeShuffleSettings() {
 
 /* 제약 만족 배치: 성공 시 새 layout 반환, 실패 시 null */
 function placeWithConstraints(names, seatIndices, basisLayout) {
-    if (!shuffleOptions.avoidFirstRow && !shuffleOptions.avoidLastRow) return null;
+    if (!shuffleOptions.avoidFirstRow && !shuffleOptions.avoidLastRow && !shuffleOptions.avoidSameSeat) return null;
 
     const prevRow = {};
+    const prevSeat = {};
     basisLayout.forEach((name, i) => {
-        if (name) prevRow[name] = rowOfIndex(i);
+        if (name) {
+            prevRow[name] = rowOfIndex(i);
+            prevSeat[name] = i;
+        }
     });
 
-    function forbidden(name) {
+    function forbiddenRows(name) {
         const f = new Set();
         const r = prevRow[name];
         if (shuffleOptions.avoidFirstRow && r === FIRST_ROW) f.add(FIRST_ROW);
@@ -419,22 +465,36 @@ function placeWithConstraints(names, seatIndices, basisLayout) {
         return f;
     }
 
-    const entries = names.map(name => ({ name, f: forbidden(name) }));
+    function forbiddenSeat(name) {
+        if (shuffleOptions.avoidSameSeat && prevSeat[name] !== undefined) return prevSeat[name];
+        return -1;
+    }
+
+    const entries = names.map(name => ({
+        name,
+        f: forbiddenRows(name),
+        fs: forbiddenSeat(name),
+    }));
 
     // 재시도: 제약 많은 사람을 먼저 앉히는 그리디 + 랜덤
     for (let attempt = 0; attempt < 200; attempt++) {
         const students = [...entries].sort(() => Math.random() - 0.5);
-        students.sort((a, b) => b.f.size - a.f.size); // 제약 많은 순서 우선
+        students.sort((a, b) => {
+            const ac = a.f.size + (a.fs >= 0 ? 1 : 0);
+            const bc = b.f.size + (b.fs >= 0 ? 1 : 0);
+            return bc - ac; // 제약 많은 순서 우선
+        });
         const seatPool = [...seatIndices].sort(() => Math.random() - 0.5);
         const used = new Set();
         const assign = {};
         let ok = true;
 
-        for (const { name, f } of students) {
+        for (const { name, f, fs } of students) {
             let placed = false;
             for (const s of seatPool) {
                 if (used.has(s)) continue;
                 if (f.has(rowOfIndex(s))) continue;
+                if (s === fs) continue;
                 assign[name] = s;
                 used.add(s);
                 placed = true;
@@ -538,6 +598,226 @@ function triggerFireworks() {
         setTimeout(() => particle.remove(), 1000);
     }
 }
+
+/* ───────── 저장/복원 (localStorage) ───────── */
+const STORAGE_KEY = "sesacSeat.v1";
+
+function loadStore() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function writeStore(patch) {
+    const s = loadStore();
+    Object.assign(s, patch);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+function saveSettings() {
+    writeStore({ settings: { ...shuffleOptions } });
+}
+
+function saveInitialRoster(names) {
+    // 초기 명부만 저장. 현재/이전 배치는 건드리지 않음
+    writeStore({ initial: [...names] });
+    flashSaved("초기 명부 저장됨");
+}
+
+/* 💾 저장: 현재 배치를 '현재값'으로 저장하고, 기존 '현재값'은 '이전값'으로 밀어넣음
+   동시에 히스토리에 타임스탬프와 함께 누적 저장 */
+function saveCurrentLayout() {
+    const hasAnyStudent = layout.some(v => v && v !== "");
+    if (!hasAnyStudent) {
+        alert("저장할 배치가 비어있습니다.");
+        return;
+    }
+    const store = loadStore();
+    if (Array.isArray(store.current)) {
+        store.previous = store.current;
+    }
+    store.current = [...layout];
+
+    if (!Array.isArray(store.history)) store.history = [];
+    store.history.push({
+        id: Date.now(),
+        savedAt: new Date().toISOString(),
+        layout: [...layout],
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    flashSaved("💾 현재 배치 저장됨");
+}
+
+/* 🔄 초기화: 저장된 초기 명부로 번호 순서 재배치 */
+function restoreInitial() {
+    const store = loadStore();
+    if (!Array.isArray(store.initial) || store.initial.length === 0) {
+        alert("저장된 초기 명부가 없습니다.\n먼저 '📋 일괄 입력'으로 명부를 등록해주세요.");
+        return;
+    }
+    applyRoster(store.initial);
+}
+
+/* ⏪ 이전배치 */
+function restorePrevious() {
+    const store = loadStore();
+    if (!Array.isArray(store.previous)) {
+        alert("저장된 이전 배치가 없습니다.");
+        return;
+    }
+    applyLayoutFromStore(store.previous);
+}
+
+/* 📍 현재배치 */
+function restoreCurrent() {
+    const store = loadStore();
+    if (!Array.isArray(store.current)) {
+        alert("저장된 배치가 없습니다. 먼저 '💾 저장'을 눌러주세요.");
+        return;
+    }
+    applyLayoutFromStore(store.current);
+}
+
+function applyLayoutFromStore(savedLayout) {
+    // fixedLayout 길이와 다르면 무시(안전)
+    if (savedLayout.length !== fixedLayout.length) {
+        alert("저장 데이터 형식이 맞지 않아 복원할 수 없습니다.");
+        return;
+    }
+    layout = savedLayout.map((v, i) => fixedLayout[i] === "" ? "" : (v ?? null));
+    students = [];
+    isManualMode = false;
+    updateManualBtn();
+    render();
+}
+
+/* ───────── 히스토리 ───────── */
+function openHistoryModal() {
+    renderHistoryList();
+    document.getElementById("historyModal").classList.remove("hidden");
+}
+
+function closeHistoryModal() {
+    document.getElementById("historyModal").classList.add("hidden");
+}
+
+function formatHistoryDate(iso) {
+    const dt = new Date(iso);
+    const pad = n => String(n).padStart(2, "0");
+    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+}
+
+function renderHistoryList() {
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+
+    const store = loadStore();
+    const history = Array.isArray(store.history) ? store.history : [];
+
+    if (history.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-center text-gray-400 py-8 text-sm";
+        empty.textContent = "저장된 히스토리가 없습니다";
+        list.appendChild(empty);
+        return;
+    }
+
+    [...history].reverse().forEach(entry => {
+        const count = (entry.layout || []).filter(v => v && v !== "").length;
+
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-2 py-3 border-b border-gray-100 last:border-0";
+
+        const info = document.createElement("div");
+        info.className = "flex-1 min-w-0";
+        const dateEl = document.createElement("div");
+        dateEl.className = "text-sm font-semibold text-gray-700";
+        dateEl.textContent = formatHistoryDate(entry.savedAt);
+        const metaEl = document.createElement("div");
+        metaEl.className = "text-xs text-gray-400";
+        metaEl.textContent = `${count}명`;
+        info.appendChild(dateEl);
+        info.appendChild(metaEl);
+
+        const restoreBtn = document.createElement("button");
+        restoreBtn.className = "px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs hover:bg-blue-600 transition";
+        restoreBtn.textContent = "복원";
+        restoreBtn.onclick = () => restoreFromHistory(entry.id);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 transition";
+        delBtn.textContent = "삭제";
+        delBtn.onclick = () => deleteFromHistory(entry.id);
+
+        row.appendChild(info);
+        row.appendChild(restoreBtn);
+        row.appendChild(delBtn);
+        list.appendChild(row);
+    });
+}
+
+function restoreFromHistory(id) {
+    const store = loadStore();
+    const entry = (store.history || []).find(e => e.id === id);
+    if (!entry) {
+        alert("해당 히스토리를 찾을 수 없습니다.");
+        return;
+    }
+    applyLayoutFromStore(entry.layout);
+    closeHistoryModal();
+    flashSaved("📚 히스토리에서 복원됨");
+}
+
+function deleteFromHistory(id) {
+    const store = loadStore();
+    const entry = (store.history || []).find(e => e.id === id);
+    if (!entry) return;
+    if (!confirm(`이 히스토리를 삭제하시겠습니까?\n${formatHistoryDate(entry.savedAt)}`)) return;
+    store.history = (store.history || []).filter(e => e.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    renderHistoryList();
+}
+
+function clearAllHistory() {
+    const store = loadStore();
+    if (!Array.isArray(store.history) || store.history.length === 0) return;
+    if (!confirm(`전체 히스토리(${store.history.length}건)를 모두 삭제하시겠습니까?`)) return;
+    store.history = [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    renderHistoryList();
+}
+
+/* 버튼 위에 잠깐 뜨는 토스트 */
+function flashSaved(msg) {
+    let t = document.getElementById("saveToast");
+    if (!t) {
+        t = document.createElement("div");
+        t.id = "saveToast";
+        t.className = "fixed top-6 right-6 bg-gray-800 text-white text-sm px-4 py-2 rounded-xl shadow-lg opacity-0 transition z-50";
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(flashSaved._tid);
+    flashSaved._tid = setTimeout(() => { t.style.opacity = "0"; }, 1400);
+}
+
+/* ───────── 초기 로드 ───────── */
+(function init() {
+    const store = loadStore();
+    if (store.settings) {
+        if (typeof store.settings.avoidFirstRow === "boolean") shuffleOptions.avoidFirstRow = store.settings.avoidFirstRow;
+        if (typeof store.settings.avoidLastRow  === "boolean") shuffleOptions.avoidLastRow  = store.settings.avoidLastRow;
+        if (typeof store.settings.avoidSameSeat === "boolean") shuffleOptions.avoidSameSeat = store.settings.avoidSameSeat;
+    }
+    // 저장된 현재 배치가 있으면 로드, 없으면 fixedLayout 그대로
+    if (Array.isArray(store.current) && store.current.length === fixedLayout.length) {
+        layout = store.current.map((v, i) => fixedLayout[i] === "" ? "" : (v ?? null));
+    }
+})();
 
 render();
 </script>

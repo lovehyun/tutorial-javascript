@@ -13,9 +13,6 @@
 - `text-transparent`: 투명 텍스트.
 - `text-white`, `text-black`: 흰색 및 검정색 텍스트.
 
-### **테두리 색상**
-- `border-{color}-{number}`: 테두리 색상 지정 (e.g., `border-blue-500`).
-
 ---
 
 ## **2. 여백 및 패딩**
@@ -50,6 +47,9 @@
 - `border`: 기본 테두리.
 - `border-0`, `border-t`, `border-b`, `border-l`, `border-r`: 특정 방향의 테두리만 적용.
 - `rounded`, `rounded-lg`, `rounded-full`: 모서리 둥글게.
+
+### **테두리 색상**
+- `border border-{color}-{number}`: 테두리 색상 지정 (e.g., `border-blue-500`).
 
 ### **그림자**
 - `shadow`, `shadow-md`, `shadow-lg`: 그림자 크기.
@@ -122,3 +122,12 @@
 ---
 
 이 가이드는 **Tailwind CSS**에서 자주 사용하는 클래스들을 체계적으로 정리한 자료입니다. 필요에 따라 조합하여 커스터마이징된 UI를 쉽게 구현할 수 있습니다.
+
+---
+
+Tailwind 순정 문법    : 공식 docs
+완성 UI (버튼/alert)	: Tailwind UI (유료)
+무료 컴포넌트         : DaisyUI / Flowbite
+
+https://daisyui.com/components/button/
+https://flowbite.com/docs/components/alerts/
