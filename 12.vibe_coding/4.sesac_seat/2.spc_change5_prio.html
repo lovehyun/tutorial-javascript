@@ -20,15 +20,23 @@
 
     <!-- 버튼 -->
     <div class="flex gap-3 mb-6 items-center flex-wrap">
-        <button id="manualBtn" onclick="toggleManual()" class="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition">✏️ 수동 배치</button>
-        <!-- 🎲 랜덤 배치 + ⚙️ 설정: 시각적으로 하나의 split-button -->
+        <!-- ✏️ 수동 배치 + ⚙️ 설정 -->
+        <div class="inline-flex rounded-xl shadow overflow-hidden">
+            <button id="manualBtn" onclick="toggleManual()" class="px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 transition">✏️ 수동 배치</button>
+            <button id="manualSettingsBtn" onclick="openManualSettings()" title="수동 배치 설정 / 취소" class="px-3 py-2 bg-blue-500 text-white hover:bg-blue-600 transition border-l border-blue-400">⚙️</button>
+        </div>
+        <!-- 🎲 랜덤 배치 + ⚙️ 설정 -->
         <div class="inline-flex rounded-xl shadow overflow-hidden">
             <button id="shuffleBtn" onclick="shuffleSeats()" class="px-4 py-2 bg-green-500 text-white hover:bg-green-600 transition">🎲 랜덤 배치</button>
             <button id="shuffleSettingsBtn" onclick="openShuffleSettings()" title="랜덤 배치 설정" class="px-3 py-2 bg-green-500 text-white hover:bg-green-600 transition border-l border-green-400">⚙️</button>
         </div>
         <button id="renameBtn" onclick="toggleRenameMode()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition">🔤 이름 변경</button>
         <button id="bulkBtn" onclick="openBulkModal()" class="px-4 py-2 bg-orange-400 text-white rounded-xl shadow hover:bg-orange-500 transition">📋 일괄 입력</button>
-        <button id="assignBtn" onclick="assignWaiting()" class="px-4 py-2 bg-teal-500 text-white rounded-xl shadow hover:bg-teal-600 transition">🪑 대기자 배치</button>
+        <!-- 🪑 대기자 배치 + ⚙️ 설정 -->
+        <div class="inline-flex rounded-xl shadow overflow-hidden">
+            <button id="assignBtn" onclick="assignWaiting()" class="px-4 py-2 bg-teal-500 text-white hover:bg-teal-600 transition">🪑 대기자 배치</button>
+            <button id="assignSettingsBtn" onclick="openAssignSettings()" title="대기자 배치 설정" class="px-3 py-2 bg-teal-500 text-white hover:bg-teal-600 transition border-l border-teal-400">⚙️</button>
+        </div>
 
         <!-- 우측 저장/복원 그룹 -->
         <div class="flex gap-2 items-center ml-auto border-l pl-3">
@@ -109,17 +117,105 @@
     </div>
 </div>
 
+<!-- 수동 배치 설정 모달 -->
+<div id="manualSettingsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[440px]">
+        <h3 class="font-bold text-lg mb-1">⚙️ 수동 배치 설정</h3>
+        <p class="text-sm text-gray-400 mb-3">'✏️ 수동 배치' 버튼을 눌렀을 때의 동작을 결정합니다</p>
+
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="radio" name="manualMode" value="redo-all" class="mt-1 w-4 h-4"
+                onchange="manualOptions.mode = this.value; saveSettings()">
+            <span>
+                <span class="font-semibold">모두 재배치</span>
+                <span class="block text-xs text-gray-400">모든 좌석을 비우고 학생을 대기 목록으로 이동 → 처음부터 다시 배치</span>
+            </span>
+        </label>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="radio" name="manualMode" value="individual" class="mt-1 w-4 h-4"
+                onchange="manualOptions.mode = this.value; saveSettings()">
+            <span>
+                <span class="font-semibold">개별 수정</span>
+                <span class="block text-xs text-gray-400">현재 배치는 유지한 채 모드만 활성화 → 드래그로 개별 학생만 옮김</span>
+            </span>
+        </label>
+
+        <div class="mt-4 pt-3 border-t">
+            <button id="manualUndoBtn" onclick="undoManualRedoAll()"
+                class="w-full px-3 py-2 bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-200 transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                ↶ 직전 '모두 재배치' 취소 — <span id="manualUndoStatus" class="text-xs">사용 가능한 취소 없음</span>
+            </button>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="closeManualSettings()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 대기자 배치 설정 모달 -->
+<div id="assignSettingsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[440px]">
+        <h3 class="font-bold text-lg mb-1">⚙️ 대기자 배치 설정</h3>
+        <p class="text-sm text-gray-400 mb-3">'🪑 대기자 배치'를 눌렀을 때 빈 자리를 채우는 방식</p>
+
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="radio" name="assignMode" value="random" class="mt-1 w-4 h-4"
+                onchange="assignOptions.mode = this.value; saveSettings()">
+            <span>
+                <span class="font-semibold">잔여자리 랜덤</span>
+                <span class="block text-xs text-gray-400">우선순위 학생 먼저 → 나머지는 빈 자리에 무작위로 배치</span>
+            </span>
+        </label>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="radio" name="assignMode" value="sequential" class="mt-1 w-4 h-4"
+                onchange="assignOptions.mode = this.value; saveSettings()">
+            <span>
+                <span class="font-semibold">잔여자리 순차</span>
+                <span class="block text-xs text-gray-400">우선순위 학생 먼저 → 나머지는 좌석 번호 1번부터 순서대로, 대기 목록 순서대로 채움</span>
+            </span>
+        </label>
+
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="closeAssignSettings()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">닫기</button>
+        </div>
+    </div>
+</div>
+
 <!-- 일괄 입력 모달 -->
 <div id="bulkModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
-    <div class="bg-white p-6 rounded-2xl shadow-xl w-[480px]">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[600px]">
         <h3 class="font-bold text-lg mb-1">📋 일괄 이름 입력</h3>
-        <p class="text-sm text-gray-400 mb-3">쉼표(,) 또는 줄바꿈으로 구분 · 최대 30명 · 입력 순서대로 좌석 배치</p>
+        <p class="text-sm text-gray-400 mb-3">쉼표(,) 또는 줄바꿈으로 구분 · 입력 순서대로 빈 좌석부터 배치</p>
         <textarea id="bulkInput"
-            class="w-full border rounded-xl p-3 text-sm h-36 resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
-            placeholder="홍길동, 김철수, 이영희&#10;또는&#10;홍길동&#10;김철수&#10;이영희"></textarea>
-        <div class="flex justify-end gap-2 mt-4">
-            <button onclick="closeBulkModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
-            <button onclick="applyBulkInput()" class="px-4 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-500 transition text-sm">적용</button>
+            class="w-full border rounded-xl p-3 text-sm h-44 resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
+            placeholder="홍길동, 김철수, 이영희&#10;또는&#10;홍길동&#10;김철수&#10;이영희"
+            oninput="saveBulkDraft()"></textarea>
+
+        <!-- 입력 방식 선택 (기본: 기존 인력에 추가) -->
+        <div class="border rounded-lg p-3 mt-3 bg-gray-50">
+            <label class="flex items-start gap-2 py-1 cursor-pointer">
+                <input type="radio" name="bulkMode" value="append" class="mt-0.5 w-4 h-4" checked>
+                <span class="text-sm">
+                    <span class="font-semibold">기존 인력에 추가</span> <span class="text-xs text-gray-500">(기본)</span>
+                    <span class="block text-xs text-gray-500">빈 좌석부터 순서대로 채우고, 자리 부족 시 대기 목록으로 (이미 있는 이름은 스킵)</span>
+                </span>
+            </label>
+            <label class="flex items-start gap-2 py-1 cursor-pointer">
+                <input type="radio" name="bulkMode" value="replace" class="mt-0.5 w-4 h-4">
+                <span class="text-sm">
+                    <span class="font-semibold">초기화 후 신규 입력</span>
+                    <span class="block text-xs text-gray-500">기존 좌석/대기 목록을 모두 비우고 새 명단으로 처음부터 배치 (초기 명부 갱신)</span>
+                </span>
+            </label>
+        </div>
+
+        <div class="flex justify-between gap-2 mt-4">
+            <button onclick="clearBulkDraft()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 명단 초기화</button>
+            <div class="flex gap-2">
+                <button onclick="closeBulkModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
+                <button onclick="applyBulkInput()" class="px-4 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-500 transition text-sm">적용</button>
+            </div>
         </div>
     </div>
 </div>
@@ -211,8 +307,11 @@
         <p class="text-sm text-gray-400 mb-3">랜덤 배치 시 이 학생이 앉을 수 있는 줄을 지정합니다</p>
         <div id="priorityRowChecks" class="space-y-1 mb-2"></div>
         <p class="text-xs text-gray-400 mt-3">※ 1행 = 강사 가까이 (맨 앞줄), 5행 = 맨 뒷줄. 체크된 줄에만 배치됩니다.</p>
-        <div class="flex justify-between gap-2 mt-4 pt-3 border-t">
-            <button onclick="clearPriority()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 설정 삭제</button>
+        <div class="flex justify-between gap-2 mt-4 pt-3 border-t flex-wrap">
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="clearPriority()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 우선순위 삭제</button>
+                <button onclick="deleteStudent()" class="px-3 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition text-sm">❌ 학생 삭제 (중도하차)</button>
+            </div>
             <div class="flex gap-2">
                 <button onclick="closePriorityModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
                 <button onclick="savePriority()" class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition text-sm">저장</button>
@@ -286,6 +385,19 @@ const shuffleOptions = {
     avoidLastRow:  false, // 직전 학생 맨 앞줄(row 4) 사람은 다시 맨 앞줄 금지
     avoidSameSeat: false, // 직전과 동일한 좌석 인덱스 금지
 };
+
+// 대기자 배치 옵션
+const assignOptions = {
+    mode: "random",   // "random" = 잔여자리 랜덤, "sequential" = 좌석 번호 1번부터 순차
+};
+
+// 수동 배치 옵션
+const manualOptions = {
+    mode: "redo-all", // "redo-all" = 모두 비우고 처음부터, "individual" = 현재 유지하고 모드만 활성
+};
+
+// 수동 '모두 재배치' 직전 스냅샷 (취소용, 메모리에만 보관)
+let manualUndoSnapshot = null;
 
 // 개별 학생별 우선순위
 //   priorityMap[name] = [userRow, ...]   사용자 표기 1~5 중 허용 행 목록
@@ -403,14 +515,40 @@ function toggleManual() {
     else              initManual();
 }
 
-// 수동 배치 시작: 좌석 비우고 학생들을 대기 목록으로 이동
+// 수동 배치 시작
+//   mode === "redo-all"   : 모든 좌석 비우고 학생들을 대기로 → 처음부터 다시 배치
+//   mode === "individual" : 현재 배치 그대로 유지, 모드만 켜서 드래그로 개별 수정
 function initManual() {
+    if (manualOptions.mode === "redo-all") {
+        // 직전 상태를 스냅샷으로 보관 (취소용)
+        manualUndoSnapshot = {
+            layout: [...layout],
+            students: [...students],
+        };
+        const seatedStudents = layout.filter(v => v && v !== "");
+        students = [...students, ...seatedStudents];
+        layout = layout.map(v => v === "" ? "" : null);
+    }
+    // individual 모드는 layout/students 손대지 않음
     isManualMode = true;
-    const seatedStudents = layout.filter(v => v && v !== "");
-    students = [...students, ...seatedStudents];
-    layout = layout.map(v => v === "" ? "" : null);
     updateManualBtn();
     render();
+}
+
+// '모두 재배치' 직후의 상태로 되돌림
+function undoManualRedoAll() {
+    if (!manualUndoSnapshot) {
+        alert("취소할 수 있는 직전 '모두 재배치'가 없습니다.");
+        return;
+    }
+    layout   = [...manualUndoSnapshot.layout];
+    students = [...manualUndoSnapshot.students];
+    manualUndoSnapshot = null;
+    isManualMode = false;
+    updateManualBtn();
+    closeManualSettings();
+    render();
+    flashSaved("↶ 모두 재배치 취소됨");
 }
 
 // 수동 배치 종료
@@ -469,6 +607,12 @@ function transferPriority(oldName, newName) {
 
 function openBulkModal() {
     document.getElementById("bulkModal").classList.remove("hidden");
+    // 매번 기본값(기존 인력에 추가)으로 리셋
+    const appendRadio = document.querySelector('input[name="bulkMode"][value="append"]');
+    if (appendRadio) appendRadio.checked = true;
+    // 저장된 명단 draft 복원 (적용 후에도 유지됨, 명단 초기화 누르면 비움)
+    const store = loadStore();
+    document.getElementById("bulkInput").value = store.bulkDraft || "";
     document.getElementById("bulkInput").focus();
 }
 
@@ -476,13 +620,73 @@ function closeBulkModal() {
     document.getElementById("bulkModal").classList.add("hidden");
 }
 
+// 텍스트 입력 시마다 localStorage 에 저장 → 페이지 새로고침/모달 재오픈 시 복원
+function saveBulkDraft() {
+    writeStore({ bulkDraft: document.getElementById("bulkInput").value });
+}
+
+// 🗑️ 명단 초기화: 텍스트 영역 + 저장된 draft 모두 비움 (실제 좌석/대기 목록은 손대지 않음)
+function clearBulkDraft() {
+    if (!confirm("입력된 명단 텍스트를 모두 지우시겠습니까?\n(좌석/대기 목록의 학생은 그대로 유지됩니다)")) return;
+    document.getElementById("bulkInput").value = "";
+    writeStore({ bulkDraft: "" });
+}
+
+// 일괄 입력 적용 (라디오 모드에 따라 분기)
 function applyBulkInput() {
     const input = document.getElementById("bulkInput").value;
     const names = input.split(/[,\n\r]+/).map(v => v.trim()).filter(v => v);
     if (names.length === 0) return;
-    applyRoster(names);
-    saveInitialRoster(names);
+
+    const radio = document.querySelector('input[name="bulkMode"]:checked');
+    const mode = radio ? radio.value : "replace";
+
+    if (mode === "append") {
+        appendBulkInput(names);
+    } else {
+        // 기존 동작: 모두 비우고 처음부터 배치 + 초기 명부 갱신
+        applyRoster(names);
+        saveInitialRoster(names);
+    }
     closeBulkModal();
+}
+
+// 기존 인력에 추가: 빈 좌석부터 좌석 번호 오름차순으로 채우고, 모자라면 대기 목록으로
+//   이미 좌석/대기에 있는 이름은 중복 방지를 위해 스킵
+function appendBulkInput(names) {
+    // 이미 존재하는 이름 수집
+    const existing = new Set();
+    layout.forEach(v => { if (v && v !== "") existing.add(v); });
+    students.forEach(n => existing.add(n));
+
+    const newNames = names.filter(n => !existing.has(n));
+    const dupCount = names.length - newNames.length;
+
+    if (newNames.length === 0) {
+        flashSaved(`추가할 이름 없음 (${dupCount}명 모두 중복)`);
+        return;
+    }
+
+    // 빈 좌석 (좌석 번호 작은 순)
+    const emptySeats = layout
+        .map((v, i) => (!v && fixedLayout[i] !== "" && i !== TEACHER_INDEX) ? i : null)
+        .filter(i => i !== null)
+        .sort((a, b) => seatNumbers[a] - seatNumbers[b]);
+
+    let seatedCount = 0;
+    for (let i = 0; i < newNames.length && i < emptySeats.length; i++) {
+        layout[emptySeats[i]] = newNames[i];
+        seatedCount++;
+    }
+    // 자리 부족 시 나머지는 대기 목록으로
+    for (let i = seatedCount; i < newNames.length; i++) {
+        students.push(newNames[i]);
+    }
+
+    render();
+    let msg = `+ ${newNames.length}명 추가 (좌석 ${seatedCount}, 대기 ${newNames.length - seatedCount})`;
+    if (dupCount > 0) msg += ` · 중복 ${dupCount}명 스킵`;
+    flashSaved(msg);
 }
 
 // 명부 배열을 좌석 번호 1번부터 순서대로 채움
@@ -506,23 +710,32 @@ function applyRoster(names) {
 /* ───── 버튼 상태 ───── */
 
 function updateManualBtn() {
-    const btn = document.getElementById("manualBtn");
+    // split-button 내부 버튼이므로 rounded-xl/shadow 는 주지 않음 (부모 컨테이너가 처리)
+    // ⚙ 설정 버튼도 함께 색을 맞춰서 split-button 시각적 일체성 유지
+    const btn  = document.getElementById("manualBtn");
+    const gear = document.getElementById("manualSettingsBtn");
     if (isManualMode) {
-        btn.innerHTML = "✅ 완료";
-        btn.className = "px-4 py-2 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition";
+        btn.innerHTML  = "✅ 배치 완료";
+        btn.className  = "px-4 py-2 bg-emerald-500 text-white hover:bg-emerald-600 transition";
+        gear.className = "px-3 py-2 bg-emerald-500 text-white hover:bg-emerald-600 transition border-l border-emerald-400";
     } else {
-        btn.innerHTML = "✏️ 수동 배치";
-        btn.className = "px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition";
+        btn.innerHTML  = "✏️ 수동 배치";
+        btn.className  = "px-4 py-2 bg-blue-500 text-white hover:bg-blue-600 transition";
+        gear.className = "px-3 py-2 bg-blue-500 text-white hover:bg-blue-600 transition border-l border-blue-400";
     }
     setOtherBtnsDisabled(isManualMode ? "manualBtn" : null);
 }
 
 // 활성 버튼 외 나머지 버튼 비활성화 토글
+//   예외: 수동 모드 중에는 ⚙ 수동 설정 버튼은 살려둠 (취소 기능 접근용)
 function setOtherBtnsDisabled(activeId) {
-    ["manualBtn", "shuffleBtn", "shuffleSettingsBtn", "renameBtn", "bulkBtn", "assignBtn",
-     "saveBtn", "resetBtn", "prevBtn", "currBtn", "historyBtn"].forEach(id => {
+    ["manualBtn", "manualSettingsBtn", "shuffleBtn", "shuffleSettingsBtn", "renameBtn", "bulkBtn",
+     "assignBtn", "assignSettingsBtn", "saveBtn", "resetBtn", "prevBtn", "currBtn", "historyBtn",
+     "layoutConfigBtn"].forEach(id => {
         const btn = document.getElementById(id);
         if (!btn || id === activeId) return;
+        // 수동 배치 활성 중에도 ⚙ 설정은 열 수 있게 (취소 기능 접근)
+        if (activeId === "manualBtn" && id === "manualSettingsBtn") return;
         btn.disabled = !!activeId;
         btn.style.opacity = activeId ? "0.4" : "";
         btn.style.cursor  = activeId ? "not-allowed" : "";
@@ -573,9 +786,10 @@ function dropToList(ev) {
 }
 
 /* ───── 대기자 빈 자리 배치 ─────
-   대기 목록의 학생을 빈 자리에 배치.
-   우선순위 학생은 자신의 허용 행 안에서만 배치하고,
-   나머지는 남은 자리에 무작위로 배치.
+   1) 우선순위 학생을 자신의 허용 행 안에서 배치 (좌석은 무작위 또는 번호 오름차순)
+   2) 나머지 학생을 잔여 좌석에 배치
+       · assignOptions.mode === "random"     : 학생/좌석 모두 무작위
+       · assignOptions.mode === "sequential" : 좌석 번호 1번부터, 대기 목록 순서대로
 */
 function assignWaiting() {
     if (students.length === 0) return;
@@ -584,33 +798,103 @@ function assignWaiting() {
         .filter(i => i !== null);
     if (emptySeats.length === 0) return;
 
+    const isSequential = assignOptions.mode === "sequential";
     const remainingSeats = [...emptySeats];
     const placed = new Set();
 
     // 1) 우선순위 학생 먼저
+    //    sequential 모드면 허용 행 내에서 좌석 번호 작은 쪽 먼저, random 모드면 무작위
     const priorityStudents = students.filter(n => priorityMap[n] && priorityMap[n].length > 0);
-    [...priorityStudents].sort(() => Math.random() - 0.5).forEach(name => {
+    const priorityOrder = isSequential
+        ? priorityStudents
+        : [...priorityStudents].sort(() => Math.random() - 0.5);
+    priorityOrder.forEach(name => {
         const allowedCodeRows = priorityMap[name].map(codeRowFromUser);
         const candidates = remainingSeats.filter(i => allowedCodeRows.includes(rowOfIndex(i)));
         if (candidates.length === 0) return; // 적합한 자리 없음 → 대기 유지
-        const seat = candidates[Math.floor(Math.random() * candidates.length)];
+        const seat = isSequential
+            ? candidates.sort((a, b) => seatNumbers[a] - seatNumbers[b])[0]
+            : candidates[Math.floor(Math.random() * candidates.length)];
         layout[seat] = name;
         placed.add(name);
         remainingSeats.splice(remainingSeats.indexOf(seat), 1);
     });
 
-    // 2) 나머지 학생 무작위
+    // 2) 나머지 학생을 잔여 좌석에 배치
     const restStudents = students.filter(n => !placed.has(n));
-    const shuffled     = [...restStudents].sort(() => Math.random() - 0.5);
-    const shuffledSeat = [...remainingSeats].sort(() => Math.random() - 0.5);
-    const toPlace = Math.min(shuffled.length, shuffledSeat.length);
+    const orderedStudents = isSequential
+        ? restStudents
+        : [...restStudents].sort(() => Math.random() - 0.5);
+    const orderedSeats = isSequential
+        ? remainingSeats.slice().sort((a, b) => seatNumbers[a] - seatNumbers[b])
+        : [...remainingSeats].sort(() => Math.random() - 0.5);
+
+    const toPlace = Math.min(orderedStudents.length, orderedSeats.length);
     for (let i = 0; i < toPlace; i++) {
-        layout[shuffledSeat[i]] = shuffled[i];
-        placed.add(shuffled[i]);
+        layout[orderedSeats[i]] = orderedStudents[i];
+        placed.add(orderedStudents[i]);
     }
 
     students = students.filter(n => !placed.has(n));
     render();
+}
+
+/* ───── 대기자 배치 / 수동 배치 설정 모달 ───── */
+
+function openAssignSettings() {
+    document.querySelectorAll('input[name="assignMode"]').forEach(r => {
+        r.checked = (r.value === assignOptions.mode);
+    });
+    document.getElementById("assignSettingsModal").classList.remove("hidden");
+}
+
+function closeAssignSettings() {
+    document.getElementById("assignSettingsModal").classList.add("hidden");
+}
+
+function openManualSettings() {
+    document.querySelectorAll('input[name="manualMode"]').forEach(r => {
+        r.checked = (r.value === manualOptions.mode);
+    });
+    // 취소 버튼 활성/비활성 + 안내문 갱신
+    const undoBtn = document.getElementById("manualUndoBtn");
+    const undoStatus = document.getElementById("manualUndoStatus");
+    if (manualUndoSnapshot) {
+        undoBtn.disabled = false;
+        undoStatus.textContent = "직전 상태로 복원 가능";
+    } else {
+        undoBtn.disabled = true;
+        undoStatus.textContent = "사용 가능한 취소 없음";
+    }
+    document.getElementById("manualSettingsModal").classList.remove("hidden");
+}
+
+function closeManualSettings() {
+    document.getElementById("manualSettingsModal").classList.add("hidden");
+}
+
+/* ───── 학생 삭제 (중도하차) ─────
+   현재 우선순위 모달이 가리키는 학생을 좌석/대기/우선순위맵 모두에서 제거.
+   되돌리려면 일괄 입력 또는 수동 추가 필요.
+*/
+function deleteStudent() {
+    if (!priorityTarget) return;
+    const name = priorityTarget;
+    if (!confirm(`'${name}' 학생을 삭제하시겠습니까?\n좌석/대기 목록/우선순위 설정 모두 제거됩니다.\n(되돌리려면 일괄 입력 또는 수동 추가가 필요합니다)`)) return;
+
+    // 좌석에서 제거
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] === name) layout[i] = null;
+    }
+    // 대기 목록에서 제거
+    students = students.filter(n => n !== name);
+    // 우선순위 제거
+    delete priorityMap[name];
+
+    saveSettings();
+    closePriorityModal();
+    render();
+    flashSaved(`❌ '${name}' 삭제됨 (중도하차)`);
 }
 
 /* ───── 랜덤 배치 설정 모달 ───── */
@@ -1302,11 +1586,13 @@ function writeStore(patch) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 }
 
-// 셔플 옵션 + 우선순위 맵 저장
+// 셔플 옵션 + 우선순위 맵 + 대기자/수동 옵션 저장
 function saveSettings() {
     writeStore({
         settings: { ...shuffleOptions },
         priority: { ...priorityMap },
+        assignOptions: { ...assignOptions },
+        manualOptions: { ...manualOptions },
     });
 }
 
@@ -1610,6 +1896,20 @@ function migrate_from_v4() {
             const arr = store.priority[name];
             if (Array.isArray(arr) && arr.length > 0) priorityMap[name] = arr.slice();
         });
+    }
+
+    // 대기자 배치 옵션 복원
+    if (store.assignOptions && typeof store.assignOptions === "object") {
+        if (store.assignOptions.mode === "random" || store.assignOptions.mode === "sequential") {
+            assignOptions.mode = store.assignOptions.mode;
+        }
+    }
+
+    // 수동 배치 옵션 복원
+    if (store.manualOptions && typeof store.manualOptions === "object") {
+        if (store.manualOptions.mode === "redo-all" || store.manualOptions.mode === "individual") {
+            manualOptions.mode = store.manualOptions.mode;
+        }
     }
 
     // 저장된 현재 배치 복원
