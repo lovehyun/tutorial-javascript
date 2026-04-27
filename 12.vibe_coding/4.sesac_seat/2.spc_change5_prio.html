@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>자리 배치도 (개인 우선순위)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+@keyframes explode {
+    0% { transform: translate(0,0) scale(1); opacity:1; }
+    100% { transform: translate(var(--x), var(--y)) scale(0.5); opacity:0; }
+}
+</style>
+
+</head>
+
+<body class="bg-gradient-to-br from-gray-100 to-gray-200">
+
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 버튼 -->
+    <div class="flex gap-3 mb-6 items-center flex-wrap">
+        <button id="manualBtn" onclick="toggleManual()" class="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition">✏️ 수동 배치</button>
+        <!-- 🎲 랜덤 배치 + ⚙️ 설정: 시각적으로 하나의 split-button -->
+        <div class="inline-flex rounded-xl shadow overflow-hidden">
+            <button id="shuffleBtn" onclick="shuffleSeats()" class="px-4 py-2 bg-green-500 text-white hover:bg-green-600 transition">🎲 랜덤 배치</button>
+            <button id="shuffleSettingsBtn" onclick="openShuffleSettings()" title="랜덤 배치 설정" class="px-3 py-2 bg-green-500 text-white hover:bg-green-600 transition border-l border-green-400">⚙️</button>
+        </div>
+        <button id="renameBtn" onclick="toggleRenameMode()" class="px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition">🔤 이름 변경</button>
+        <button id="bulkBtn" onclick="openBulkModal()" class="px-4 py-2 bg-orange-400 text-white rounded-xl shadow hover:bg-orange-500 transition">📋 일괄 입력</button>
+        <button id="assignBtn" onclick="assignWaiting()" class="px-4 py-2 bg-teal-500 text-white rounded-xl shadow hover:bg-teal-600 transition">🪑 대기자 배치</button>
+
+        <!-- 우측 저장/복원 그룹 -->
+        <div class="flex gap-2 items-center ml-auto border-l pl-3">
+            <button id="saveBtn" onclick="saveCurrentLayout()" title="현재 배치를 저장" class="px-4 py-2 bg-rose-500 text-white rounded-xl shadow hover:bg-rose-600 transition">💾 저장</button>
+            <button id="resetBtn" onclick="restoreInitial()" title="일괄 입력한 초기 명부로 되돌림" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">🔄 초기화</button>
+            <button id="prevBtn" onclick="restorePrevious()" title="직전 저장된 배치로 되돌림" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">⏪ 이전배치</button>
+            <button id="currBtn" onclick="restoreCurrent()" title="최근 저장된 배치로 복원" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">📍 현재배치</button>
+            <button id="historyBtn" onclick="openHistoryModal()" title="저장 히스토리 보기" class="px-3 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300 transition">📚 히스토리</button>
+        </div>
+
+        <!-- 자리 배치도 자체를 편집하는 설정 (우측 끝) -->
+        <div class="flex gap-2 items-center border-l pl-3">
+            <button id="layoutConfigBtn" onclick="openLayoutConfigModal()" title="자리 배치도 편집 (강사 위치 / 좌석 활성화)" class="px-3 py-2 bg-slate-700 text-white rounded-xl shadow hover:bg-slate-800 transition">📐 배치도</button>
+        </div>
+    </div>
+
+    <div class="flex gap-6">
+
+        <!-- 대기 리스트 -->
+        <div class="w-64 bg-white rounded-2xl shadow-lg p-4">
+            <h2 class="font-bold mb-3">대기 목록</h2>
+            <div id="studentList" class="grid grid-cols-2 gap-2 min-h-[400px] content-start"
+                ondragover="allowDrop(event)"
+                ondrop="dropToList(event)"></div>
+        </div>
+
+        <!-- 교실 -->
+        <div id="classroom" class="grid grid-cols-10 gap-x-1 gap-y-3 flex-1"></div>
+
+    </div>
+
+</div>
+
+<!-- 스피너 -->
+<div id="spinnerOverlay" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center gap-2">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-400 border-t-transparent"></div>
+        <p id="spinnerStatus" class="text-sm text-gray-500">섞는 중...</p>
+        <p id="spinnerCountdown" class="text-3xl font-bold text-blue-500"></p>
+    </div>
+</div>
+
+<!-- 스파클 -->
+<div id="sparkleContainer" class="pointer-events-none fixed inset-0"></div>
+
+<!-- 랜덤 배치 설정 모달 -->
+<div id="shuffleSettingsModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[420px]">
+        <h3 class="font-bold text-lg mb-1">⚙️ 랜덤 배치 설정</h3>
+        <p class="text-sm text-gray-400 mb-3">직전 배치를 기준으로 제약을 적용합니다</p>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="checkbox" id="optAvoidFirstRow" class="mt-1 w-4 h-4"
+                onchange="shuffleOptions.avoidFirstRow = this.checked; saveSettings()">
+            <span>
+                <span class="font-semibold">첫줄 반복 방지</span>
+                <span class="block text-xs text-gray-400">첫줄(맨 윗줄)에 앉았던 사람은 다음 배치에서 첫줄 제외</span>
+            </span>
+        </label>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="checkbox" id="optAvoidLastRow" class="mt-1 w-4 h-4"
+                onchange="shuffleOptions.avoidLastRow = this.checked; saveSettings()">
+            <span>
+                <span class="font-semibold">끝줄 반복 방지</span>
+                <span class="block text-xs text-gray-400">끝줄(강사 행)에 앉았던 사람은 다음 배치에서 끝줄 제외</span>
+            </span>
+        </label>
+        <label class="flex items-start gap-2 py-2 cursor-pointer">
+            <input type="checkbox" id="optAvoidSameSeat" class="mt-1 w-4 h-4"
+                onchange="shuffleOptions.avoidSameSeat = this.checked; saveSettings()">
+            <span>
+                <span class="font-semibold">같은자리 금지</span>
+                <span class="block text-xs text-gray-400">직전 배치와 동일한 좌석에는 다시 앉지 않음</span>
+            </span>
+        </label>
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="closeShuffleSettings()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 일괄 입력 모달 -->
+<div id="bulkModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[480px]">
+        <h3 class="font-bold text-lg mb-1">📋 일괄 이름 입력</h3>
+        <p class="text-sm text-gray-400 mb-3">쉼표(,) 또는 줄바꿈으로 구분 · 최대 30명 · 입력 순서대로 좌석 배치</p>
+        <textarea id="bulkInput"
+            class="w-full border rounded-xl p-3 text-sm h-36 resize-none focus:outline-none focus:ring-2 focus:ring-orange-300"
+            placeholder="홍길동, 김철수, 이영희&#10;또는&#10;홍길동&#10;김철수&#10;이영희"></textarea>
+        <div class="flex justify-end gap-2 mt-4">
+            <button onclick="closeBulkModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
+            <button onclick="applyBulkInput()" class="px-4 py-2 bg-orange-400 text-white rounded-xl hover:bg-orange-500 transition text-sm">적용</button>
+        </div>
+    </div>
+</div>
+
+<!-- 히스토리 모달 -->
+<div id="historyModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[520px] max-h-[80vh] flex flex-col">
+        <h3 class="font-bold text-lg mb-1">📚 저장 히스토리</h3>
+        <p class="text-sm text-gray-400 mb-3">💾 저장 시점마다 자동으로 보관됩니다 (최신순)</p>
+        <div id="historyList" class="overflow-y-auto flex-1 -mx-2 px-2"></div>
+        <div class="flex justify-between items-center gap-2 mt-4 pt-3 border-t">
+            <button onclick="clearAllHistory()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 전체 삭제</button>
+            <button onclick="closeHistoryModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">닫기</button>
+        </div>
+    </div>
+</div>
+
+<!-- 배치도 설정 모달 -->
+<div id="layoutConfigModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[880px] max-h-[92vh] flex flex-col">
+        <h3 class="font-bold text-lg mb-1">📐 자리 배치도 편집</h3>
+        <p class="text-sm text-gray-400 mb-3">셀 클릭으로 학생석/비활성을 토글합니다. 강사 위치는 [강사 지정] 모드로 전환 후 셀 클릭.</p>
+
+        <!-- 툴바 -->
+        <div class="flex items-center gap-3 mb-3 flex-wrap">
+            <button id="teacherPaintBtn" onclick="toggleTeacherPaintMode()" class="px-3 py-1.5 rounded-lg text-sm transition">👨‍🏫 강사 위치 지정</button>
+            <button onclick="resetLayoutConfig()" class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200 transition">↺ 기본값</button>
+            <label class="flex items-center gap-1.5 px-2 py-1 cursor-pointer text-sm bg-gray-50 rounded-lg hover:bg-gray-100">
+                <input type="checkbox" id="showStudentsToggle" class="w-4 h-4" onchange="toggleShowStudentsInConfig(this.checked)">
+                <span>👥 학생 보기</span>
+            </label>
+            <span id="layoutConfigStatus" class="text-xs text-gray-500 ml-auto"></span>
+        </div>
+
+        <!-- 그리드 + 대기 패널 (학생 보기 토글 시 우측 패널 표시) -->
+        <div class="flex gap-4 mb-3 flex-1 min-h-0">
+            <div id="layoutConfigGrid" class="grid grid-cols-10 gap-1 flex-1 self-start"></div>
+            <div id="layoutConfigWaitingPanel" class="w-44 bg-gray-50 rounded-lg p-3 hidden overflow-y-auto">
+                <p class="text-xs font-semibold mb-2 text-gray-700">
+                    대기 목록 <span id="layoutConfigWaitingCount" class="text-gray-400"></span>
+                </p>
+                <div id="layoutConfigWaitingList" class="space-y-1"></div>
+                <p class="text-[10px] text-gray-400 mt-3 leading-snug">
+                    <span class="inline-block w-2 h-2 bg-orange-300 rounded-full align-middle"></span>
+                    적용 시 새로 대기로 이동
+                </p>
+            </div>
+        </div>
+
+        <!-- 학생 처리 방식 선택 (마이그레이션 전략) -->
+        <div class="border rounded-lg p-3 mb-3 bg-gray-50">
+            <p class="font-semibold text-sm mb-2">학생 처리 방식</p>
+            <label class="flex items-start gap-2 py-1 cursor-pointer">
+                <input type="radio" name="layoutMigrate" value="auto" class="mt-0.5 w-4 h-4" checked onchange="onMigrateStrategyChange()">
+                <span class="text-sm">
+                    <span class="font-semibold">자동 이동</span> <span class="text-xs text-gray-500">(기본)</span>
+                    <span class="block text-xs text-gray-500">활성 좌석의 학생은 그대로, 비활성/강사 셀의 학생만 대기 목록으로</span>
+                </span>
+            </label>
+            <label class="flex items-start gap-2 py-1 cursor-pointer">
+                <input type="radio" name="layoutMigrate" value="clear" class="mt-0.5 w-4 h-4" onchange="onMigrateStrategyChange()">
+                <span class="text-sm">
+                    <span class="font-semibold">전체 대기로 이동</span>
+                    <span class="block text-xs text-gray-500">모든 좌석 비우고 학생들을 대기 목록으로 — 새 배치도에서 처음부터 배치</span>
+                </span>
+            </label>
+            <label class="flex items-start gap-2 py-1 cursor-pointer">
+                <input type="radio" name="layoutMigrate" value="delete" class="mt-0.5 w-4 h-4" onchange="onMigrateStrategyChange()">
+                <span class="text-sm">
+                    <span class="font-semibold">학생 데이터 모두 삭제</span>
+                    <span class="block text-xs text-gray-500">좌석/대기 목록 둘 다 비우고 이름 데이터까지 제거 — 일괄 입력으로 새로 시작</span>
+                </span>
+            </label>
+        </div>
+
+        <p class="text-xs text-gray-400 mb-1">· 좌석 번호는 활성 좌석 중 우측 하단부터 1번으로 자동 부여됩니다.</p>
+        <p class="text-xs text-gray-400 mb-3">💡 적용 후 메인 화면에서 드래그앤드롭으로 자리 이동, 🔤 이름 변경으로 개별 수정이 가능합니다. 저장된 히스토리는 그대로 유지됩니다.</p>
+        <div class="flex justify-end gap-2 pt-3 border-t">
+            <button onclick="closeLayoutConfigModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
+            <button onclick="applyLayoutConfig()" class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition text-sm">적용</button>
+        </div>
+    </div>
+</div>
+
+<!-- 우선순위 설정 모달 -->
+<div id="priorityModal" class="fixed inset-0 bg-black/40 flex items-center justify-center hidden z-50">
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-[420px]">
+        <h3 class="font-bold text-lg mb-1">🎯 우선순위 설정 — <span id="priorityTargetName" class="text-blue-500"></span></h3>
+        <p class="text-sm text-gray-400 mb-3">랜덤 배치 시 이 학생이 앉을 수 있는 줄을 지정합니다</p>
+        <div id="priorityRowChecks" class="space-y-1 mb-2"></div>
+        <p class="text-xs text-gray-400 mt-3">※ 1행 = 강사 가까이 (맨 앞줄), 5행 = 맨 뒷줄. 체크된 줄에만 배치됩니다.</p>
+        <div class="flex justify-between gap-2 mt-4 pt-3 border-t">
+            <button onclick="clearPriority()" class="px-3 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition text-sm">🗑️ 설정 삭제</button>
+            <div class="flex gap-2">
+                <button onclick="closePriorityModal()" class="px-4 py-2 bg-gray-200 rounded-xl hover:bg-gray-300 transition text-sm">취소</button>
+                <button onclick="savePriority()" class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition text-sm">저장</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ───── 좌석 배치도 정의 ─────
+   6행 × 10열 = 60셀, 학생 좌석 30개 + 강사석 + 통로
+   - 코드 기준 row 0(맨 뒷줄) ~ row 4(학생 맨 앞줄)는 학생 영역
+   - 코드 기준 row 5는 강사석 전용 (TEACHER_INDEX 만 강사로 렌더링)
+   - 사용자 표기 1행 = 강사 가까이(코드 row 4), 5행 = 맨 뒷줄(코드 row 0)
+   - fixedLayout/TEACHER_INDEX 는 📐 배치도 모달에서 사용자가 변경 가능 (가변 상태)
+*/
+const COLS = 10;
+const ROWS = 6;
+const STUDENT_ROWS = 5;         // 학생 줄 수 (코드 row 0 ~ 4)
+const FIRST_ROW = 0;            // 코드 기준 맨 뒷줄
+const LAST_ROW  = 4;            // 코드 기준 학생 맨 앞줄 (강사 옆)
+
+// 기본 배치도 (사용자가 별도 저장 안 했을 때 쓰는 초기값)
+const DEFAULT_FIXED_LAYOUT = [
+    "", "S", "S", "", "S", "S", "S", "", "S", "S", // row 0 (사용자 5행, 맨 뒤)
+    "", "S", "S", "", "S", "S", "S", "", "S", "S", // row 1 (사용자 4행)
+    "", "",  "S", "", "S", "S", "S", "", "S", "S", // row 2 (사용자 3행)
+    "", "",  "S", "", "S", "S", "S", "", "S", "S", // row 3 (사용자 2행)
+    "", "",  "",  "", "",  "S", "S", "", "S", "S", // row 4 (사용자 1행, 학생 맨 앞)
+    "", "",  "",  "", "",  "",  "",  "", "",  ""   // row 5 (강사석 전용)
+];
+const DEFAULT_TEACHER_INDEX = 53; // row 5 의 col 3
+
+// 가변 상태: fixedLayout[i] === "S" → 학생석, "" → 비활성/통로/강사 셀
+let fixedLayout    = DEFAULT_FIXED_LAYOUT.slice();
+let TEACHER_INDEX  = DEFAULT_TEACHER_INDEX;
+let seatNumbers    = {}; // 인덱스 → 좌석 번호 (1 = 우측 하단, N = 좌상단). regenerateSeatNumbers() 로 재생성
+
+// layout: "":비활성/통로/강사셀, null:빈 좌석(좌석번호 표시), name:배정된 학생
+let layout = fixedLayout.map(v => v === "" ? "" : null);
+let students = [];
+let isManualMode = false;
+let isRenameMode = false;
+let priorityTarget = null;     // 우선순위 모달이 가리키는 학생 이름
+let configEditState = null;    // 배치도 모달의 임시 편집 상태
+
+// 인덱스 → 코드 행
+function rowOfIndex(i) { return Math.floor(i / COLS); }
+
+// 사용자 표기 ↔ 코드 행 변환
+//   사용자 1행 = 코드 row 4 (강사 옆)
+//   사용자 5행 = 코드 row 0 (맨 뒤)
+//   변환식: userRow + codeRow = STUDENT_ROWS
+function userRowFromCode(codeRow) { return STUDENT_ROWS - codeRow; }
+function codeRowFromUser(userRow) { return STUDENT_ROWS - userRow; }
+
+// 좌석 번호 재생성: 활성 학생석만 골라서 우측 하단(=뒤에서부터)부터 1번 부여
+function regenerateSeatNumbers() {
+    seatNumbers = {};
+    fixedLayout
+        .map((v, i) => (v !== "" && i !== TEACHER_INDEX) ? i : null)
+        .filter(i => i !== null)
+        .reverse()
+        .forEach((idx, i) => { seatNumbers[idx] = i + 1; });
+}
+regenerateSeatNumbers(); // 페이지 진입 시 1회 (이후 init/배치도 적용 시마다 재호출)
+
+// 셔플 옵션
+const shuffleOptions = {
+    avoidFirstRow: false, // 직전 맨 뒷줄(row 0) 사람은 다시 맨 뒷줄 금지
+    avoidLastRow:  false, // 직전 학생 맨 앞줄(row 4) 사람은 다시 맨 앞줄 금지
+    avoidSameSeat: false, // 직전과 동일한 좌석 인덱스 금지
+};
+
+// 개별 학생별 우선순위
+//   priorityMap[name] = [userRow, ...]   사용자 표기 1~5 중 허용 행 목록
+//   키 없음 또는 빈 배열 = 제약 없음
+const priorityMap = {};
+
+/* ───── 렌더링 ───── */
+
+// 화면 전체 갱신
+function render() {
+    renderClassroom();
+    renderList();
+}
+
+// 교실 좌석 그리드 그리기
+function renderClassroom() {
+    const classroom = document.getElementById("classroom");
+    classroom.innerHTML = "";
+
+    layout.forEach((name, index) => {
+        const div = document.createElement("div");
+
+        if (index === TEACHER_INDEX) {
+            // 강사석
+            div.className = "h-16 flex items-center justify-center rounded-2xl text-sm font-bold bg-blue-500 text-white shadow-lg";
+            div.innerText = "강사";
+        } else if (fixedLayout[index] === "") {
+            // 통로/빈 영역 (강사 행의 빈 칸 포함)
+            div.className = "h-16 flex items-center justify-center";
+            div.innerHTML = '<div class="w-3 h-16"></div>';
+        } else {
+            // 학생 좌석 (이름 있음/없음 모두)
+            const isPriority = !!(name && priorityMap[name] && priorityMap[name].length > 0);
+            const baseClass  = "group relative h-16 flex items-center justify-center text-center leading-tight px-1 rounded-2xl text-sm font-semibold transition transform hover:scale-105";
+            const fillClass  = !name
+                ? "bg-gray-200 shadow-inner text-gray-400 font-normal"
+                : isPriority
+                    ? "bg-gradient-to-br from-yellow-400 to-yellow-500 shadow-lg ring-2 ring-yellow-600"
+                    : "bg-gradient-to-br from-yellow-200 to-yellow-300 shadow-lg ring-1 ring-yellow-400";
+            div.className = `${baseClass} ${fillClass}`;
+
+            div.innerText = name || (seatNumbers[index] != null ? String(seatNumbers[index]) : "");
+            div.dataset.index = index;
+
+            if (isRenameMode && name) {
+                div.className += " cursor-pointer ring-2 ring-purple-400";
+                div.title = "클릭하여 이름 변경";
+                div.onclick = () => renameSeat(name, index);
+            } else {
+                div.ondragover = allowDrop;
+                div.ondrop = dropToSeat;
+                if (name) {
+                    div.draggable = true;
+                    div.dataset.name = name;
+                    div.ondragstart = drag;
+                }
+            }
+
+            // 이름이 있는 좌석에는 우선순위 톱니바퀴 버튼 표시
+            if (name) div.appendChild(createGearButton(name));
+        }
+
+        classroom.appendChild(div);
+    });
+}
+
+// 대기 목록 그리기
+function renderList() {
+    const list = document.getElementById("studentList");
+    list.innerHTML = "";
+
+    students.forEach(name => {
+        const div = document.createElement("div");
+        const isPriority = !!(priorityMap[name] && priorityMap[name].length > 0);
+
+        if (isRenameMode) {
+            div.className = "group relative bg-purple-100 hover:bg-purple-200 transition text-center py-2 rounded-xl cursor-pointer text-sm shadow ring-1 ring-purple-300";
+            div.title = "클릭하여 이름 변경";
+            div.onclick = () => renameFromList(name);
+        } else {
+            div.className = `group relative bg-blue-100 hover:bg-blue-200 transition text-center py-2 rounded-xl cursor-grab text-sm shadow ${isPriority ? "ring-2 ring-yellow-500" : ""}`;
+            div.draggable = true;
+            div.dataset.name = name;
+            div.ondragstart = drag;
+        }
+        div.innerText = name;
+        div.appendChild(createGearButton(name));
+        list.appendChild(div);
+    });
+}
+
+// 우선순위 설정용 톱니바퀴 버튼 (좌석/대기목록 공용)
+//   평소엔 보이지 않고 pointer-events-none → 항목 어디든 드래그 가능
+//   부모(.group) hover 시에만 보이고 클릭 가능 → 우선순위 모달 열림
+function createGearButton(name) {
+    const btn = document.createElement("button");
+    btn.className = "absolute top-0.5 right-0.5 text-[10px] leading-none w-4 h-4 flex items-center justify-center rounded-full bg-white/70 transition opacity-0 pointer-events-none group-hover:opacity-80 group-hover:pointer-events-auto hover:!opacity-100 hover:bg-white";
+    btn.textContent = "⚙";
+    btn.title = "우선순위 설정";
+    btn.draggable = false;
+    btn.onmousedown = (e) => e.stopPropagation();
+    btn.ondragstart = (e) => { e.preventDefault(); e.stopPropagation(); };
+    btn.onclick = (e) => {
+        e.stopPropagation();
+        openPriorityModal(name);
+    };
+    return btn;
+}
+
+/* ───── 수동 배치 모드 ───── */
+
+// 수동 배치 토글
+function toggleManual() {
+    if (isManualMode) finishManual();
+    else              initManual();
+}
+
+// 수동 배치 시작: 좌석 비우고 학생들을 대기 목록으로 이동
+function initManual() {
+    isManualMode = true;
+    const seatedStudents = layout.filter(v => v && v !== "");
+    students = [...students, ...seatedStudents];
+    layout = layout.map(v => v === "" ? "" : null);
+    updateManualBtn();
+    render();
+}
+
+// 수동 배치 종료
+function finishManual() {
+    isManualMode = false;
+    updateManualBtn();
+    render();
+}
+
+/* ───── 이름 변경 모드 ───── */
+
+function toggleRenameMode() {
+    isRenameMode = !isRenameMode;
+    const btn = document.getElementById("renameBtn");
+    if (isRenameMode) {
+        btn.innerHTML = "✅ 변경 완료";
+        btn.className = "px-4 py-2 bg-purple-700 text-white rounded-xl shadow hover:bg-purple-800 transition";
+    } else {
+        btn.innerHTML = "🔤 이름 변경";
+        btn.className = "px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition";
+    }
+    setOtherBtnsDisabled(isRenameMode ? "renameBtn" : null);
+    render();
+}
+
+// 좌석에서 이름 변경 (우선순위 키도 함께 이전)
+function renameSeat(oldName, index) {
+    const newName = prompt(`이름 변경\n현재: ${oldName}`, oldName);
+    if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+    const trimmed = newName.trim();
+    layout[index] = trimmed;
+    transferPriority(oldName, trimmed);
+    render();
+}
+
+// 대기 목록에서 이름 변경
+function renameFromList(oldName) {
+    const newName = prompt(`이름 변경\n현재: ${oldName}`, oldName);
+    if (!newName || newName.trim() === "" || newName.trim() === oldName) return;
+    const trimmed = newName.trim();
+    students = students.map(n => n === oldName ? trimmed : n);
+    transferPriority(oldName, trimmed);
+    render();
+}
+
+// 우선순위 키 이전: 이름 변경 시 기존 설정 유지
+function transferPriority(oldName, newName) {
+    if (priorityMap[oldName]) {
+        priorityMap[newName] = priorityMap[oldName];
+        delete priorityMap[oldName];
+        saveSettings();
+    }
+}
+
+/* ───── 일괄 입력 ───── */
+
+function openBulkModal() {
+    document.getElementById("bulkModal").classList.remove("hidden");
+    document.getElementById("bulkInput").focus();
+}
+
+function closeBulkModal() {
+    document.getElementById("bulkModal").classList.add("hidden");
+}
+
+function applyBulkInput() {
+    const input = document.getElementById("bulkInput").value;
+    const names = input.split(/[,\n\r]+/).map(v => v.trim()).filter(v => v);
+    if (names.length === 0) return;
+    applyRoster(names);
+    saveInitialRoster(names);
+    closeBulkModal();
+}
+
+// 명부 배열을 좌석 번호 1번부터 순서대로 채움
+function applyRoster(names) {
+    const seatIndices = Object.keys(seatNumbers)
+        .map(Number)
+        .sort((a, b) => seatNumbers[a] - seatNumbers[b]);
+
+    students = [];
+    isManualMode = false;
+    updateManualBtn();
+
+    layout = fixedLayout.map(v => v === "" ? "" : null);
+    seatIndices.forEach((seatIdx, i) => {
+        if (i < names.length) layout[seatIdx] = names[i];
+    });
+
+    render();
+}
+
+/* ───── 버튼 상태 ───── */
+
+function updateManualBtn() {
+    const btn = document.getElementById("manualBtn");
+    if (isManualMode) {
+        btn.innerHTML = "✅ 완료";
+        btn.className = "px-4 py-2 bg-orange-500 text-white rounded-xl shadow hover:bg-orange-600 transition";
+    } else {
+        btn.innerHTML = "✏️ 수동 배치";
+        btn.className = "px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition";
+    }
+    setOtherBtnsDisabled(isManualMode ? "manualBtn" : null);
+}
+
+// 활성 버튼 외 나머지 버튼 비활성화 토글
+function setOtherBtnsDisabled(activeId) {
+    ["manualBtn", "shuffleBtn", "shuffleSettingsBtn", "renameBtn", "bulkBtn", "assignBtn",
+     "saveBtn", "resetBtn", "prevBtn", "currBtn", "historyBtn"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (!btn || id === activeId) return;
+        btn.disabled = !!activeId;
+        btn.style.opacity = activeId ? "0.4" : "";
+        btn.style.cursor  = activeId ? "not-allowed" : "";
+    });
+}
+
+/* ───── 드래그 앤 드롭 ───── */
+
+function drag(ev) {
+    ev.dataTransfer.setData("name", ev.target.dataset.name);
+    ev.dataTransfer.setData("fromIndex", ev.target.dataset.index ?? "");
+}
+
+function allowDrop(ev) { ev.preventDefault(); }
+
+// 좌석에 드롭: 좌석↔좌석 교환 또는 대기 목록→좌석 이동
+function dropToSeat(ev) {
+    ev.preventDefault();
+    const name = ev.dataTransfer.getData("name");
+    const fromIndexRaw = ev.dataTransfer.getData("fromIndex");
+    const toIndex = Number(ev.currentTarget.dataset.index);
+    if (Number.isNaN(toIndex)) return;
+
+    if (fromIndexRaw !== "") {
+        const fromIndex = Number(fromIndexRaw);
+        if (fromIndex === toIndex) return;
+        const tmp = layout[toIndex];
+        layout[toIndex] = layout[fromIndex];
+        layout[fromIndex] = tmp;
+    } else {
+        if (layout[toIndex]) students.push(layout[toIndex]);
+        layout[toIndex] = name;
+        students = students.filter(n => n !== name);
+    }
+    render();
+}
+
+// 대기 목록에 드롭: 좌석에서 빼서 대기로
+function dropToList(ev) {
+    ev.preventDefault();
+    const name = ev.dataTransfer.getData("name");
+    if (!name) return;
+    if (!students.includes(name)) students.push(name);
+    for (let i = 0; i < layout.length; i++) {
+        if (layout[i] === name) layout[i] = null;
+    }
+    render();
+}
+
+/* ───── 대기자 빈 자리 배치 ─────
+   대기 목록의 학생을 빈 자리에 배치.
+   우선순위 학생은 자신의 허용 행 안에서만 배치하고,
+   나머지는 남은 자리에 무작위로 배치.
+*/
+function assignWaiting() {
+    if (students.length === 0) return;
+    const emptySeats = layout
+        .map((v, i) => (!v && fixedLayout[i] !== "") ? i : null)
+        .filter(i => i !== null);
+    if (emptySeats.length === 0) return;
+
+    const remainingSeats = [...emptySeats];
+    const placed = new Set();
+
+    // 1) 우선순위 학생 먼저
+    const priorityStudents = students.filter(n => priorityMap[n] && priorityMap[n].length > 0);
+    [...priorityStudents].sort(() => Math.random() - 0.5).forEach(name => {
+        const allowedCodeRows = priorityMap[name].map(codeRowFromUser);
+        const candidates = remainingSeats.filter(i => allowedCodeRows.includes(rowOfIndex(i)));
+        if (candidates.length === 0) return; // 적합한 자리 없음 → 대기 유지
+        const seat = candidates[Math.floor(Math.random() * candidates.length)];
+        layout[seat] = name;
+        placed.add(name);
+        remainingSeats.splice(remainingSeats.indexOf(seat), 1);
+    });
+
+    // 2) 나머지 학생 무작위
+    const restStudents = students.filter(n => !placed.has(n));
+    const shuffled     = [...restStudents].sort(() => Math.random() - 0.5);
+    const shuffledSeat = [...remainingSeats].sort(() => Math.random() - 0.5);
+    const toPlace = Math.min(shuffled.length, shuffledSeat.length);
+    for (let i = 0; i < toPlace; i++) {
+        layout[shuffledSeat[i]] = shuffled[i];
+        placed.add(shuffled[i]);
+    }
+
+    students = students.filter(n => !placed.has(n));
+    render();
+}
+
+/* ───── 랜덤 배치 설정 모달 ───── */
+
+function openShuffleSettings() {
+    document.getElementById("optAvoidFirstRow").checked = shuffleOptions.avoidFirstRow;
+    document.getElementById("optAvoidLastRow").checked  = shuffleOptions.avoidLastRow;
+    document.getElementById("optAvoidSameSeat").checked = shuffleOptions.avoidSameSeat;
+    document.getElementById("shuffleSettingsModal").classList.remove("hidden");
+}
+
+function closeShuffleSettings() {
+    document.getElementById("shuffleSettingsModal").classList.add("hidden");
+}
+
+/* ───── 우선순위 모달 ───── */
+
+// 대상 학생의 우선순위 모달 열기
+function openPriorityModal(name) {
+    priorityTarget = name;
+    document.getElementById("priorityTargetName").textContent = name;
+
+    const container = document.getElementById("priorityRowChecks");
+    container.innerHTML = "";
+
+    const current = priorityMap[name] || [];
+    const labels = {
+        1: "1행 — 강사 가까이 (맨 앞줄)",
+        2: "2행",
+        3: "3행 (가운데)",
+        4: "4행",
+        5: "5행 — 맨 뒷줄",
+    };
+
+    // 위에서 아래로 5행(맨 뒤) → 1행(강사 옆) 순서로 표시 → 교실 화면과 같은 방향
+    for (let r = STUDENT_ROWS; r >= 1; r--) {
+        const label = document.createElement("label");
+        label.className = "flex items-center gap-2 py-1.5 cursor-pointer hover:bg-gray-50 rounded px-2";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.className = "w-4 h-4";
+        cb.dataset.userRow = String(r);
+        cb.checked = current.includes(r);
+        const text = document.createElement("span");
+        text.className = "text-sm";
+        text.textContent = labels[r];
+        label.appendChild(cb);
+        label.appendChild(text);
+        container.appendChild(label);
+    }
+
+    document.getElementById("priorityModal").classList.remove("hidden");
+}
+
+function closePriorityModal() {
+    document.getElementById("priorityModal").classList.add("hidden");
+    priorityTarget = null;
+}
+
+// 체크된 행 목록을 priorityMap 에 저장
+function savePriority() {
+    if (!priorityTarget) return;
+    const checks = document.querySelectorAll("#priorityRowChecks input[type=checkbox]");
+    const allowed = [];
+    checks.forEach(cb => {
+        if (cb.checked) allowed.push(Number(cb.dataset.userRow));
+    });
+    if (allowed.length === 0) {
+        delete priorityMap[priorityTarget]; // 모두 해제 = 설정 삭제
+    } else {
+        priorityMap[priorityTarget] = allowed.sort((a, b) => a - b);
+    }
+    saveSettings();
+    closePriorityModal();
+    render();
+}
+
+// 우선순위 설정 삭제
+function clearPriority() {
+    if (!priorityTarget) return;
+    delete priorityMap[priorityTarget];
+    saveSettings();
+    closePriorityModal();
+    render();
+}
+
+/* ───── 배치도 편집 모달 ─────
+   사용자가 6×10 그리드의 각 셀을 학생석/비활성으로 토글하거나, 강사 위치를
+   임의의 셀로 옮길 수 있습니다. 적용 시 fixedLayout/TEACHER_INDEX 가 바뀌고
+   비활성/강사 셀에 있던 학생은 대기 목록으로 이동합니다.
+
+   configEditState = {
+       fixedLayout: 60칸 배열 ("S" 또는 ""),
+       teacherIndex: 강사 위치 인덱스,
+       paintMode: "seat" | "teacher"  // 클릭 시 작동 모드
+   }
+*/
+
+// 모달 열기: 현재 fixedLayout/TEACHER_INDEX 를 임시 편집 상태로 복사
+function openLayoutConfigModal() {
+    configEditState = {
+        fixedLayout: fixedLayout.map(v => v === "" ? "" : "S"),
+        teacherIndex: TEACHER_INDEX,
+        paintMode: "seat",
+        showStudents: false, // 학생 보기 토글 — 켜면 셀에 이름 + 우측에 대기 목록 미리보기
+    };
+    // 토글 체크박스도 기본값으로
+    const toggle = document.getElementById("showStudentsToggle");
+    if (toggle) toggle.checked = false;
+    // 라디오 기본값: auto
+    const autoRadio = document.querySelector('input[name="layoutMigrate"][value="auto"]');
+    if (autoRadio) autoRadio.checked = true;
+
+    redrawConfigUI();
+    document.getElementById("layoutConfigModal").classList.remove("hidden");
+}
+
+// 모달 UI 통합 갱신
+function redrawConfigUI() {
+    if (!configEditState) return;
+    renderLayoutConfigGrid();
+    updateTeacherPaintBtn();
+    updateLayoutConfigStatus();
+    renderLayoutConfigWaiting();
+}
+
+function closeLayoutConfigModal() {
+    document.getElementById("layoutConfigModal").classList.add("hidden");
+    configEditState = null;
+}
+
+// 기본값으로 되돌리기 (적용 누르기 전까지는 미반영)
+function resetLayoutConfig() {
+    if (!configEditState) return;
+    configEditState.fixedLayout  = DEFAULT_FIXED_LAYOUT.slice();
+    configEditState.teacherIndex = DEFAULT_TEACHER_INDEX;
+    configEditState.paintMode    = "seat";
+    redrawConfigUI();
+}
+
+// 👥 학생 보기 토글 변경
+function toggleShowStudentsInConfig(checked) {
+    if (!configEditState) return;
+    configEditState.showStudents = checked;
+    redrawConfigUI();
+}
+
+// 학생 처리 방식(라디오) 변경 — 학생 보기 켜져 있으면 미리보기 갱신
+function onMigrateStrategyChange() {
+    if (configEditState && configEditState.showStudents) redrawConfigUI();
+}
+
+// 현재 모달 상태로 적용했을 때의 결과를 미리 계산 (실제 layout/students 는 변경 안 함)
+//   반환: { layout: 미리보기 좌석 배열, waiting: 미리보기 대기 목록 }
+function computeConfigPreview() {
+    const ti = configEditState.teacherIndex;
+    const newFixed = configEditState.fixedLayout.slice();
+    newFixed[ti] = ""; // 강사 셀은 학생석 배제
+
+    const strategy = getSelectedMigrateStrategy();
+    const previewLayout = new Array(newFixed.length);
+    let previewWaiting;
+
+    if (strategy === "delete") {
+        for (let i = 0; i < newFixed.length; i++) {
+            previewLayout[i] = newFixed[i] === "" ? "" : null;
+        }
+        previewWaiting = [];
+    } else if (strategy === "clear") {
+        for (let i = 0; i < newFixed.length; i++) {
+            previewLayout[i] = newFixed[i] === "" ? "" : null;
+        }
+        previewWaiting = [...students];
+        layout.forEach(v => {
+            if (v && v !== "" && !previewWaiting.includes(v)) previewWaiting.push(v);
+        });
+    } else {
+        // auto
+        previewWaiting = [...students];
+        for (let i = 0; i < newFixed.length; i++) {
+            const isActive = newFixed[i] !== "" && i !== ti;
+            if (isActive) {
+                previewLayout[i] = (layout[i] && layout[i] !== "") ? layout[i] : null;
+            } else {
+                if (layout[i] && layout[i] !== "" && !previewWaiting.includes(layout[i])) {
+                    previewWaiting.push(layout[i]);
+                }
+                previewLayout[i] = "";
+            }
+        }
+    }
+
+    return { layout: previewLayout, waiting: previewWaiting };
+}
+
+function getSelectedMigrateStrategy() {
+    const radio = document.querySelector('input[name="layoutMigrate"]:checked');
+    return radio ? radio.value : "auto";
+}
+
+// 강사 지정 모드 토글
+function toggleTeacherPaintMode() {
+    if (!configEditState) return;
+    configEditState.paintMode = configEditState.paintMode === "teacher" ? "seat" : "teacher";
+    updateTeacherPaintBtn();
+}
+
+function updateTeacherPaintBtn() {
+    const btn = document.getElementById("teacherPaintBtn");
+    if (configEditState.paintMode === "teacher") {
+        btn.textContent = "✋ 강사 지정 모드 (클릭으로 위치 선택)";
+        btn.className = "px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition";
+    } else {
+        btn.textContent = "👨‍🏫 강사 위치 지정";
+        btn.className = "px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition";
+    }
+}
+
+// 우측 상단 카운트 표시
+function updateLayoutConfigStatus() {
+    if (!configEditState) return;
+    const cnt = configEditState.fixedLayout
+        .filter((v, i) => v !== "" && i !== configEditState.teacherIndex)
+        .length;
+    document.getElementById("layoutConfigStatus").textContent = `학생석 ${cnt}개 / 강사석 1개`;
+}
+
+// 임시 좌석 번호 미리보기 (활성 학생석을 우측 하단부터 1번)
+function previewSeatNumbers() {
+    const nums = {};
+    const active = [];
+    for (let i = 0; i < configEditState.fixedLayout.length; i++) {
+        if (configEditState.fixedLayout[i] !== "" && i !== configEditState.teacherIndex) {
+            active.push(i);
+        }
+    }
+    active.reverse().forEach((idx, i) => { nums[idx] = i + 1; });
+    return nums;
+}
+
+// 그리드 렌더링: 강사/학생석/비활성 색상 구분 + (학생 보기 ON 일 때) 이름 표시
+function renderLayoutConfigGrid() {
+    const grid = document.getElementById("layoutConfigGrid");
+    grid.innerHTML = "";
+    const nums = previewSeatNumbers();
+    const showStudents = !!configEditState.showStudents;
+    const preview = showStudents ? computeConfigPreview() : null;
+
+    for (let i = 0; i < configEditState.fixedLayout.length; i++) {
+        const cell = document.createElement("button");
+        cell.className = "h-10 rounded text-[11px] font-semibold transition truncate px-0.5";
+
+        if (i === configEditState.teacherIndex) {
+            // 강사 셀
+            cell.className += " bg-blue-500 text-white shadow ring-1 ring-blue-700";
+            cell.textContent = "강사";
+        } else if (configEditState.fixedLayout[i] !== "") {
+            // 활성 학생석
+            const name = preview ? preview.layout[i] : null;
+            const isAssigned = name && name !== "";
+            const isPriority = isAssigned && priorityMap[name] && priorityMap[name].length > 0;
+
+            if (isAssigned && isPriority) {
+                cell.className += " bg-yellow-400 text-gray-900 ring-2 ring-yellow-600 hover:bg-yellow-500";
+                cell.textContent = name;
+            } else if (isAssigned) {
+                cell.className += " bg-yellow-200 text-gray-800 ring-1 ring-yellow-400 hover:bg-yellow-300";
+                cell.textContent = name;
+            } else {
+                cell.className += " bg-yellow-100 text-gray-400 ring-1 ring-yellow-300 hover:bg-yellow-200";
+                cell.textContent = nums[i] != null ? String(nums[i]) : "";
+            }
+        } else {
+            // 비활성/통로 셀
+            cell.className += " bg-gray-100 text-gray-300 hover:bg-gray-200";
+            cell.textContent = "·";
+        }
+        cell.onclick = () => onConfigCellClick(i);
+        grid.appendChild(cell);
+    }
+}
+
+// 우측 대기 목록 미리보기 (학생 보기 ON 일 때만 노출)
+//   기존 대기자(회색) + 적용 시 새로 대기로 이동될 학생(주황) 시각적 구분
+function renderLayoutConfigWaiting() {
+    const panel = document.getElementById("layoutConfigWaitingPanel");
+    if (!configEditState || !configEditState.showStudents) {
+        panel.classList.add("hidden");
+        return;
+    }
+    panel.classList.remove("hidden");
+
+    const preview = computeConfigPreview();
+    const list = document.getElementById("layoutConfigWaitingList");
+    const countEl = document.getElementById("layoutConfigWaitingCount");
+    countEl.textContent = `(${preview.waiting.length}명)`;
+    list.innerHTML = "";
+
+    if (preview.waiting.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-xs text-gray-400 text-center py-2";
+        empty.textContent = "비어있음";
+        list.appendChild(empty);
+        return;
+    }
+
+    preview.waiting.forEach(name => {
+        const isNewlyDisplaced = !students.includes(name);
+        const item = document.createElement("div");
+        if (isNewlyDisplaced) {
+            item.className = "px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs ring-1 ring-orange-300";
+            item.title = "이번 적용으로 새로 대기로 이동";
+        } else {
+            item.className = "px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs";
+        }
+        item.textContent = name;
+        list.appendChild(item);
+    });
+}
+
+// 셀 클릭: paintMode 에 따라 동작
+function onConfigCellClick(i) {
+    if (!configEditState) return;
+    if (configEditState.paintMode === "teacher") {
+        configEditState.teacherIndex = i;       // 새 강사 위치 지정
+        configEditState.paintMode = "seat";     // 한 번 지정 후 자동 일반 모드 복귀
+    } else {
+        if (i === configEditState.teacherIndex) return; // 강사 셀은 일반 모드에서 변경 불가
+        configEditState.fixedLayout[i] = configEditState.fixedLayout[i] === "" ? "S" : "";
+    }
+    redrawConfigUI();
+}
+
+// 적용: 선택한 전략에 따라 학생 데이터 마이그레이션 + 가변 상태 갱신 + 영구 저장
+//   strategy="auto"   : 활성 좌석 그대로, 비활성/강사 셀 학생만 대기로
+//   strategy="clear"  : 모든 좌석 비우고 전체 학생을 대기로
+//   strategy="delete" : 좌석/대기/이름 데이터 모두 삭제 (초기화)
+function applyLayoutConfig() {
+    if (!configEditState) return;
+
+    // 라디오 버튼에서 선택된 전략 읽기
+    const radio = document.querySelector('input[name="layoutMigrate"]:checked');
+    const strategy = radio ? radio.value : "auto";
+
+    // 강사 셀은 fixedLayout 에서 항상 "" 로 통일 (학생석 배제)
+    const newFixed = configEditState.fixedLayout.slice();
+    newFixed[configEditState.teacherIndex] = "";
+
+    fixedLayout   = newFixed;
+    TEACHER_INDEX = configEditState.teacherIndex;
+    regenerateSeatNumbers();
+
+    let movedCount = 0;
+
+    if (strategy === "delete") {
+        // 학생 데이터 전체 제거: 좌석도 대기도 깨끗
+        students = [];
+        layout = fixedLayout.map(v => v === "" ? "" : null);
+    } else if (strategy === "clear") {
+        // 좌석에 있던 모든 학생을 대기 목록으로 이동, 좌석은 비움
+        const seated = layout.filter(v => v && v !== "");
+        seated.forEach(name => {
+            if (!students.includes(name)) students.push(name);
+        });
+        layout = fixedLayout.map(v => v === "" ? "" : null);
+        movedCount = seated.length;
+    } else {
+        // auto: 활성 좌석은 이름 유지, 비활성/강사 셀의 이름만 대기로
+        const newLayout = new Array(fixedLayout.length);
+        for (let i = 0; i < fixedLayout.length; i++) {
+            const isActive = fixedLayout[i] !== "" && i !== TEACHER_INDEX;
+            if (isActive) {
+                newLayout[i] = (layout[i] && layout[i] !== "") ? layout[i] : null;
+            } else {
+                if (layout[i] && layout[i] !== "") {
+                    if (!students.includes(layout[i])) students.push(layout[i]);
+                    movedCount++;
+                }
+                newLayout[i] = "";
+            }
+        }
+        layout = newLayout;
+    }
+
+    // 영구 저장
+    writeStore({
+        layoutConfig: {
+            fixedLayout: fixedLayout.slice(),
+            teacherIndex: TEACHER_INDEX,
+        },
+    });
+
+    // 토스트 메시지
+    let msg = "📐 배치도 적용됨";
+    if (strategy === "delete")          msg += " · 학생 데이터 전체 삭제";
+    else if (strategy === "clear")      msg += ` · ${movedCount}명 대기로 이동`;
+    else if (movedCount > 0)            msg += ` · ${movedCount}명 대기로 이동`;
+
+    closeLayoutConfigModal();
+    flashSaved(msg);
+    render();
+}
+
+/* ───── 좌석 배치 핵심 로직 (제약 + 우선순위) ─────
+
+   배치 단계 (앞 단계의 결과가 뒤 단계의 가용 좌석에 영향):
+
+     [1단계] 우선순위가 설정된 학생 먼저 배치
+              · priorityMap[name] 의 허용 행 안에서만 좌석 선택
+              · 모든 옵션(avoidFirstRow / avoidLastRow / avoidSameSeat) 함께 검사
+
+     [2단계] 학생 맨 앞줄(LAST_ROW = 4, 강사 옆) 좌석 채우기
+              · avoidLastRow 켜져 있으면 직전에 맨 앞줄에 있던 사람 제외
+              · 가장 제약 많은 행을 먼저 채워 막힘 가능성을 줄임
+
+     [3단계] 학생 맨 뒷줄(FIRST_ROW = 0) 좌석 채우기
+              · avoidFirstRow 켜져 있으면 직전에 맨 뒷줄에 있던 사람 제외
+
+     [4단계] 가운데 3줄(row 1, 2, 3) 좌석 채우기
+              · avoidSameSeat 켜져 있으면 직전과 동일한 좌석 금지
+
+   각 단계에서 적합한 사람을 못 찾으면 null 반환 → 상위에서 200회까지 재시도.
+   200회 모두 실패 시 일반 랜덤으로 폴백(shuffleSeats 안에서 처리).
+*/
+
+// 한 번의 시도로 배치 결과를 만들어보고 성공/실패 반환
+//   성공: { layout: [...], stepLog: [{step, label, placed}, ...] }
+//   실패: { failed: true, step, label, name?, seat? }   (실패한 단계 정보)
+function tryPlaceOnce(names, allSeatIndices, basisLayout) {
+    // 직전 배치 정보 (옵션 검사용)
+    const prevSeat = {}; // 사람 → 직전 좌석 인덱스
+    const prevRow  = {}; // 사람 → 직전 좌석 코드 행
+    basisLayout.forEach((nm, i) => {
+        if (nm) {
+            prevSeat[nm] = i;
+            prevRow[nm]  = rowOfIndex(i);
+        }
+    });
+
+    const seatsAvailable = new Set(allSeatIndices); // 남은 좌석 풀
+    const assignment     = {};                       // 결과: name → seat
+    const stepLog        = [];                       // 단계별 배치 기록
+
+    // 어떤 사람이 어떤 좌석에 앉을 수 있는지 모든 제약을 한 곳에서 검사
+    function canSit(name, seat) {
+        // (a) 우선순위: 허용된 사용자 행 안에 있어야 함
+        const pri = priorityMap[name];
+        if (pri && pri.length > 0) {
+            const userRow = userRowFromCode(rowOfIndex(seat));
+            if (!pri.includes(userRow)) return false;
+        }
+        // (b) avoidSameSeat: 직전과 동일 좌석 금지
+        if (shuffleOptions.avoidSameSeat && prevSeat[name] === seat) return false;
+        // (c) avoidFirstRow: 직전 맨 뒷줄 → 다시 맨 뒷줄 금지
+        if (shuffleOptions.avoidFirstRow && prevRow[name] === FIRST_ROW && rowOfIndex(seat) === FIRST_ROW) return false;
+        // (d) avoidLastRow: 직전 학생 맨 앞줄 → 다시 맨 앞줄 금지
+        if (shuffleOptions.avoidLastRow  && prevRow[name] === LAST_ROW  && rowOfIndex(seat) === LAST_ROW)  return false;
+        return true;
+    }
+
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function shuffleArr(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+    function takeSeat(name, seat) {
+        assignment[name] = seat;
+        seatsAvailable.delete(seat);
+    }
+
+    // [1단계] 우선순위 학생을 자신의 허용 행 안에 먼저 배치
+    const step1Placed = [];
+    const priorityNames = names.filter(n => priorityMap[n] && priorityMap[n].length > 0);
+    for (const name of shuffleArr(priorityNames)) {
+        const candidates = [...seatsAvailable].filter(i => canSit(name, i));
+        if (candidates.length === 0) {
+            return { failed: true, step: 1, label: "우선순위 학생 배치", name };
+        }
+        takeSeat(name, pickRandom(candidates));
+        step1Placed.push(name);
+    }
+    stepLog.push({ step: 1, label: "우선순위 학생 배치", placed: step1Placed });
+
+    // [2단계] 학생 맨 앞줄(LAST_ROW, 강사 옆) 채우기
+    const step2Placed = [];
+    const frontSeats = [...seatsAvailable].filter(i => rowOfIndex(i) === LAST_ROW);
+    for (const seat of shuffleArr(frontSeats)) {
+        const eligible = names.filter(n => !(n in assignment) && canSit(n, seat));
+        if (eligible.length === 0) {
+            return { failed: true, step: 2, label: "맨 앞줄 (강사 옆) 배치", seat };
+        }
+        const picked = pickRandom(eligible);
+        takeSeat(picked, seat);
+        step2Placed.push(picked);
+    }
+    stepLog.push({ step: 2, label: "맨 앞줄 (강사 옆) 배치", placed: step2Placed });
+
+    // [3단계] 맨 뒷줄(FIRST_ROW) 채우기
+    const step3Placed = [];
+    const backSeats = [...seatsAvailable].filter(i => rowOfIndex(i) === FIRST_ROW);
+    for (const seat of shuffleArr(backSeats)) {
+        const eligible = names.filter(n => !(n in assignment) && canSit(n, seat));
+        if (eligible.length === 0) {
+            return { failed: true, step: 3, label: "맨 뒷줄 배치", seat };
+        }
+        const picked = pickRandom(eligible);
+        takeSeat(picked, seat);
+        step3Placed.push(picked);
+    }
+    stepLog.push({ step: 3, label: "맨 뒷줄 배치", placed: step3Placed });
+
+    // [4단계] 가운데 3줄 채우기
+    const step4Placed = [];
+    const middleSeats = [...seatsAvailable];
+    for (const seat of shuffleArr(middleSeats)) {
+        const eligible = names.filter(n => !(n in assignment) && canSit(n, seat));
+        if (eligible.length === 0) {
+            return { failed: true, step: 4, label: "가운데 3줄 배치", seat };
+        }
+        const picked = pickRandom(eligible);
+        takeSeat(picked, seat);
+        step4Placed.push(picked);
+    }
+    stepLog.push({ step: 4, label: "가운데 3줄 배치", placed: step4Placed });
+
+    // 결과 layout 구성
+    const newLayout = layout.map(v => v === "" ? "" : null);
+    for (const [name, seat] of Object.entries(assignment)) {
+        newLayout[seat] = name;
+    }
+    return { layout: newLayout, stepLog };
+}
+
+// 제약/우선순위 적용 배치를 200회까지 시도
+//   성공: { layout, stepLog, attempts }
+//   전부 실패: { allFailed: true, attempts, lastFail }
+//   제약 자체가 없음: null   (호출 측에서 일반 랜덤 사용)
+function placeWithConstraints(names, allSeatIndices, basisLayout) {
+    const hasOptionalConstraint =
+        shuffleOptions.avoidFirstRow ||
+        shuffleOptions.avoidLastRow  ||
+        shuffleOptions.avoidSameSeat;
+    const hasPriority = Object.keys(priorityMap).length > 0;
+    if (!hasOptionalConstraint && !hasPriority) return null;
+
+    let lastFail = null;
+    for (let attempt = 0; attempt < 200; attempt++) {
+        const result = tryPlaceOnce(names, allSeatIndices, basisLayout);
+        if (result.layout) {
+            return { layout: result.layout, stepLog: result.stepLog, attempts: attempt + 1 };
+        }
+        lastFail = result;
+    }
+    return { allFailed: true, attempts: 200, lastFail };
+}
+
+/* ───── 배치 단계별 콘솔 로그 ───── */
+
+// 성공 시: 단계별 배치 인원 목록을 그룹화해서 출력
+function logPlacement(result) {
+    console.group(`%c🎯 자리 배치 완료 (${result.attempts}회 시도만에 성공)`,
+        "color:#16a34a; font-weight:bold; font-size:13px");
+    result.stepLog.forEach(s => {
+        const names = s.placed.length > 0 ? s.placed.join(", ") : "(해당 없음)";
+        console.log(
+            `%c${s.step}. ${s.label} — ${s.placed.length}명%c\n   배치: ${names}`,
+            "color:#2563eb; font-weight:bold",
+            "color:#374151"
+        );
+    });
+    console.groupEnd();
+}
+
+// 폴백 시: 마지막 시도가 어디서 막혔는지 표시
+function logFallback(result) {
+    const f = result.lastFail || {};
+    console.warn(`%c⚠️ 제약 만족 실패 (${result.attempts}회 시도) — 일반 랜덤으로 폴백`,
+        "color:#dc2626; font-weight:bold; font-size:13px");
+    if (f.step) {
+        let detail = `   마지막 실패 단계: ${f.step}단계 (${f.label})`;
+        if (f.name) {
+            detail += `\n   원인: "${f.name}" 의 우선순위/제약 조건에 맞는 빈 자리가 없음`;
+        }
+        if (f.seat != null) {
+            const seatNo = seatNumbers[f.seat];
+            const seatLabel = seatNo ? `#${seatNo}` : `(idx ${f.seat})`;
+            detail += `\n   원인: 좌석 ${seatLabel} 에 들어갈 수 있는 사람이 남아있지 않음`;
+        }
+        console.warn(detail);
+    }
+    console.warn(`   → 모든 제약(우선순위 / 첫줄 방지 / 끝줄 방지 / 같은자리 금지) 무시하고 무작위 배치합니다.`);
+}
+
+/* ───── 셔플(스피너) ───── */
+
+function shuffleSeats() {
+    const spinner     = document.getElementById("spinnerOverlay");
+    const statusEl    = document.getElementById("spinnerStatus");
+    const countdownEl = document.getElementById("spinnerCountdown");
+
+    spinner.classList.remove("hidden");
+    statusEl.textContent = "섞는 중...";
+    countdownEl.textContent = "";
+
+    const seatedNames    = layout.filter(v => v && v !== "");
+    const allSeatIndices = fixedLayout.map((v, i) => (v !== "" ? i : null)).filter(i => i !== null);
+
+    // 제약 적용 기준: 이번 셔플 시작 직전 배치
+    const basisLayout = [...layout];
+
+    // 한 번의 셔플 동작 (애니메이션 단계는 제약 미적용, 마지막에만 적용)
+    function doShuffle(applyConstraints = false) {
+        if (applyConstraints) {
+            const result = placeWithConstraints(seatedNames, allSeatIndices, basisLayout);
+            if (result && result.layout) {
+                // 제약 만족 성공 → 단계별 진행 로그 출력
+                layout = result.layout;
+                logPlacement(result);
+                render();
+                return;
+            }
+            if (result && result.allFailed) {
+                // 200회 재시도 실패 → 폴백 안내 후 아래 일반 랜덤으로 진행
+                logFallback(result);
+            }
+            // result === null 인 경우는 제약 자체가 없는 상태 → 일반 랜덤 (로그 생략)
+        }
+        const shuffled = [...seatedNames].sort(() => Math.random() - 0.5);
+        const picked   = [...allSeatIndices].sort(() => Math.random() - 0.5);
+        layout = layout.map(v => v === "" ? "" : null);
+        shuffled.forEach((name, i) => { layout[picked[i]] = name; });
+        render();
+    }
+
+    const shuffleInterval = setInterval(() => doShuffle(false), 120);
+
+    let sec = 3;
+    statusEl.textContent = "🔥 마지막 찬스!";
+    countdownEl.textContent = sec + "초";
+
+    const countdownInterval = setInterval(() => {
+        sec--;
+        if (sec <= 0) {
+            clearInterval(shuffleInterval);
+            clearInterval(countdownInterval);
+            doShuffle(true); // 최종: 제약 적용
+            countdownEl.textContent = "끝!";
+            statusEl.textContent = "자리 확정!";
+            setTimeout(() => {
+                spinner.classList.add("hidden");
+                triggerFireworks();
+            }, 600);
+        } else {
+            countdownEl.textContent = sec + "초";
+        }
+    }, 1000);
+}
+
+// 폭죽 애니메이션
+function triggerFireworks() {
+    const container = document.getElementById("sparkleContainer");
+    for (let i = 0; i < 80; i++) {
+        const particle = document.createElement("div");
+        const angle    = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * 150 + 50;
+        const x = Math.cos(angle) * distance + 'px';
+        const y = Math.sin(angle) * distance + 'px';
+        particle.className = "absolute w-2 h-2 rounded-full";
+        particle.style.background = `hsl(${Math.random()*360}, 100%, 60%)`;
+        particle.style.left = window.innerWidth / 2 + 'px';
+        particle.style.top  = window.innerHeight / 2 + 'px';
+        particle.style.setProperty('--x', x);
+        particle.style.setProperty('--y', y);
+        particle.style.animation = "explode 1s ease-out forwards";
+        container.appendChild(particle);
+        setTimeout(() => particle.remove(), 1000);
+    }
+}
+
+/* ───── 저장/복원 (localStorage) ───── */
+const STORAGE_KEY = "sesacSeat.v2"; // change5 전용 (change4 의 v1 과 분리)
+
+function loadStore() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch (e) { return {}; }
+}
+
+function writeStore(patch) {
+    const s = loadStore();
+    Object.assign(s, patch);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+}
+
+// 셔플 옵션 + 우선순위 맵 저장
+function saveSettings() {
+    writeStore({
+        settings: { ...shuffleOptions },
+        priority: { ...priorityMap },
+    });
+}
+
+function saveInitialRoster(names) {
+    writeStore({ initial: [...names] });
+    flashSaved("초기 명부 저장됨");
+}
+
+// 💾 현재 배치 저장 + 히스토리 누적
+function saveCurrentLayout() {
+    const hasAnyStudent = layout.some(v => v && v !== "");
+    if (!hasAnyStudent) {
+        alert("저장할 배치가 비어있습니다.");
+        return;
+    }
+    const store = loadStore();
+    if (Array.isArray(store.current)) {
+        store.previous = store.current;
+    }
+    store.current = [...layout];
+
+    if (!Array.isArray(store.history)) store.history = [];
+    store.history.push({
+        id: Date.now(),
+        savedAt: new Date().toISOString(),
+        layout: [...layout],
+    });
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    flashSaved("💾 현재 배치 저장됨");
+}
+
+// 🔄 초기 명부로 재배치
+function restoreInitial() {
+    const store = loadStore();
+    if (!Array.isArray(store.initial) || store.initial.length === 0) {
+        alert("저장된 초기 명부가 없습니다.\n먼저 '📋 일괄 입력'으로 명부를 등록해주세요.");
+        return;
+    }
+    applyRoster(store.initial);
+}
+
+// ⏪ 이전 배치로 복원
+function restorePrevious() {
+    const store = loadStore();
+    if (!Array.isArray(store.previous)) {
+        alert("저장된 이전 배치가 없습니다.");
+        return;
+    }
+    applyLayoutFromStore(store.previous);
+}
+
+// 📍 최근 배치로 복원
+function restoreCurrent() {
+    const store = loadStore();
+    if (!Array.isArray(store.current)) {
+        alert("저장된 배치가 없습니다. 먼저 '💾 저장'을 눌러주세요.");
+        return;
+    }
+    applyLayoutFromStore(store.current);
+}
+
+// 저장된 layout 을 화면에 적용
+function applyLayoutFromStore(savedLayout) {
+    if (savedLayout.length !== fixedLayout.length) {
+        alert("저장 데이터 형식이 맞지 않아 복원할 수 없습니다.");
+        return;
+    }
+    layout = savedLayout.map((v, i) => fixedLayout[i] === "" ? "" : (v ?? null));
+    students = [];
+    isManualMode = false;
+    updateManualBtn();
+    render();
+}
+
+/* ───── 히스토리 ───── */
+
+function openHistoryModal() {
+    renderHistoryList();
+    document.getElementById("historyModal").classList.remove("hidden");
+}
+
+function closeHistoryModal() {
+    document.getElementById("historyModal").classList.add("hidden");
+}
+
+function formatHistoryDate(iso) {
+    const dt = new Date(iso);
+    const pad = n => String(n).padStart(2, "0");
+    return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
+}
+
+// 히스토리 목록 렌더링 (최신순)
+function renderHistoryList() {
+    const list = document.getElementById("historyList");
+    list.innerHTML = "";
+
+    const store = loadStore();
+    const history = Array.isArray(store.history) ? store.history : [];
+
+    if (history.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-center text-gray-400 py-8 text-sm";
+        empty.textContent = "저장된 히스토리가 없습니다";
+        list.appendChild(empty);
+        return;
+    }
+
+    [...history].reverse().forEach(entry => {
+        const count = (entry.layout || []).filter(v => v && v !== "").length;
+
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-2 py-3 border-b border-gray-100 last:border-0";
+
+        const info = document.createElement("div");
+        info.className = "flex-1 min-w-0";
+        const dateEl = document.createElement("div");
+        dateEl.className = "text-sm font-semibold text-gray-700";
+        dateEl.textContent = formatHistoryDate(entry.savedAt);
+        const metaEl = document.createElement("div");
+        metaEl.className = "text-xs text-gray-400";
+        metaEl.textContent = `${count}명`;
+        info.appendChild(dateEl);
+        info.appendChild(metaEl);
+
+        const restoreBtn = document.createElement("button");
+        restoreBtn.className = "px-3 py-1.5 bg-blue-500 text-white rounded-lg text-xs hover:bg-blue-600 transition";
+        restoreBtn.textContent = "복원";
+        restoreBtn.onclick = () => restoreFromHistory(entry.id);
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "px-3 py-1.5 bg-red-100 text-red-600 rounded-lg text-xs hover:bg-red-200 transition";
+        delBtn.textContent = "삭제";
+        delBtn.onclick = () => deleteFromHistory(entry.id);
+
+        row.appendChild(info);
+        row.appendChild(restoreBtn);
+        row.appendChild(delBtn);
+        list.appendChild(row);
+    });
+}
+
+function restoreFromHistory(id) {
+    const store = loadStore();
+    const entry = (store.history || []).find(e => e.id === id);
+    if (!entry) {
+        alert("해당 히스토리를 찾을 수 없습니다.");
+        return;
+    }
+    applyLayoutFromStore(entry.layout);
+    closeHistoryModal();
+    flashSaved("📚 히스토리에서 복원됨");
+}
+
+function deleteFromHistory(id) {
+    const store = loadStore();
+    const entry = (store.history || []).find(e => e.id === id);
+    if (!entry) return;
+    if (!confirm(`이 히스토리를 삭제하시겠습니까?\n${formatHistoryDate(entry.savedAt)}`)) return;
+    store.history = (store.history || []).filter(e => e.id !== id);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    renderHistoryList();
+}
+
+function clearAllHistory() {
+    const store = loadStore();
+    if (!Array.isArray(store.history) || store.history.length === 0) return;
+    if (!confirm(`전체 히스토리(${store.history.length}건)를 모두 삭제하시겠습니까?`)) return;
+    store.history = [];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    renderHistoryList();
+}
+
+/* ───── 토스트 ───── */
+function flashSaved(msg) {
+    let t = document.getElementById("saveToast");
+    if (!t) {
+        t = document.createElement("div");
+        t.id = "saveToast";
+        t.className = "fixed top-6 right-6 bg-gray-800 text-white text-sm px-4 py-2 rounded-xl shadow-lg opacity-0 transition z-50";
+        document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(flashSaved._tid);
+    flashSaved._tid = setTimeout(() => { t.style.opacity = "0"; }, 1400);
+}
+
+/* ───── v4(change4) → v5(change5) 수동 마이그레이션 ─────
+   브라우저 콘솔에서 직접 호출하는 함수. 원본 v1 키는 보존하고 v2 키가
+   비어있을 때만 복사. 같은 페이지(change5)에서만 동작합니다.
+
+   사용법:
+     1. change5 페이지를 연 상태에서 F12 → Console 탭
+     2. migrate_from_v4()  입력 후 엔터
+     3. "[migrate_from_v4] 완료" 메시지 확인 후 페이지 새로고침
+
+   변환 규칙:
+     - layout 배열 길이를 50 → 60 으로 확장 (끝에 빈 칸 10개 = 강사 행)
+     - current / previous / history[].layout / initial / settings 모두 이전
+     - priority 는 v4 에 없던 항목이므로 비워둠
+
+   안전장치:
+     - v2(현재 키)에 의미있는 데이터가 이미 있으면 건너뜀
+     - v1 원본은 절대 수정/삭제하지 않음
+*/
+function migrate_from_v4() {
+    const SRC_KEY = "sesacSeat.v1"; // change4 의 저장 키
+    const DST_KEY = STORAGE_KEY;    // change5 의 저장 키 ("sesacSeat.v2")
+
+    // 1. 원본 읽기
+    const srcRaw = localStorage.getItem(SRC_KEY);
+    if (!srcRaw) {
+        console.warn(`[migrate_from_v4] 원본 ${SRC_KEY} 이 비어있습니다.`);
+        return false;
+    }
+    let src;
+    try { src = JSON.parse(srcRaw); }
+    catch (e) {
+        console.error(`[migrate_from_v4] 원본 JSON 파싱 실패:`, e);
+        return false;
+    }
+
+    // 2. 대상이 이미 채워져 있으면 덮어쓰지 않음
+    const dst = loadStore();
+    const hasMeaningful = (Array.isArray(dst.current)  && dst.current.length  > 0)
+                       || (Array.isArray(dst.previous) && dst.previous.length > 0)
+                       || (Array.isArray(dst.history)  && dst.history.length  > 0)
+                       || (Array.isArray(dst.initial)  && dst.initial.length  > 0);
+    if (hasMeaningful) {
+        console.warn(`[migrate_from_v4] ${DST_KEY} 에 이미 데이터가 있어 건너뜁니다.`);
+        console.warn(`  강제 재실행을 원하면 먼저 콘솔에서:`);
+        console.warn(`  localStorage.removeItem("${DST_KEY}")`);
+        return false;
+    }
+
+    // 3. layout 배열 50 → 60 변환 함수 (끝에 빈 칸 10개 추가)
+    const OLD_LEN = 50;
+    const NEW_LEN = fixedLayout.length; // 60
+    const PAD     = NEW_LEN - OLD_LEN;
+    function expandLayout(arr) {
+        if (!Array.isArray(arr)) return arr;
+        if (arr.length === NEW_LEN) return arr.slice(); // 이미 60
+        if (arr.length !== OLD_LEN) {
+            console.warn(`[migrate_from_v4] 예기치 않은 layout 길이(${arr.length}) — 원본 유지`);
+            return arr.slice();
+        }
+        return arr.concat(new Array(PAD).fill(""));
+    }
+
+    // 4. 항목별 복사
+    const next = { ...dst };
+    if (Array.isArray(src.current))  next.current  = expandLayout(src.current);
+    if (Array.isArray(src.previous)) next.previous = expandLayout(src.previous);
+    if (Array.isArray(src.initial))  next.initial  = src.initial.slice();
+    if (src.settings && typeof src.settings === "object") {
+        next.settings = { ...(dst.settings || {}), ...src.settings };
+    }
+    if (Array.isArray(src.history)) {
+        next.history = src.history.map(entry => ({
+            ...entry,
+            layout: expandLayout(entry.layout),
+        }));
+    }
+
+    // 5. 저장 (v1 은 그대로 둠)
+    localStorage.setItem(DST_KEY, JSON.stringify(next));
+
+    const histCnt = Array.isArray(next.history) ? next.history.length : 0;
+    console.log(`[migrate_from_v4] 완료 — 히스토리 ${histCnt}건 포함, ${SRC_KEY} → ${DST_KEY}`);
+    console.log(`[migrate_from_v4] 페이지를 새로고침하면 적용됩니다.`);
+    return true;
+}
+
+/* ───── 초기 로드 ───── */
+(function init() {
+    const store = loadStore();
+
+    // 배치도(fixedLayout/TEACHER_INDEX) 복원: 이후 single source of truth 가 되므로 가장 먼저
+    if (store.layoutConfig
+        && Array.isArray(store.layoutConfig.fixedLayout)
+        && store.layoutConfig.fixedLayout.length === fixedLayout.length
+        && typeof store.layoutConfig.teacherIndex === "number") {
+        fixedLayout   = store.layoutConfig.fixedLayout.slice();
+        TEACHER_INDEX = store.layoutConfig.teacherIndex;
+        regenerateSeatNumbers();
+        // 새 fixedLayout 에 맞춰 layout 도 초기화
+        layout = fixedLayout.map(v => v === "" ? "" : null);
+    }
+
+    // 셔플 옵션 복원
+    if (store.settings) {
+        if (typeof store.settings.avoidFirstRow === "boolean") shuffleOptions.avoidFirstRow = store.settings.avoidFirstRow;
+        if (typeof store.settings.avoidLastRow  === "boolean") shuffleOptions.avoidLastRow  = store.settings.avoidLastRow;
+        if (typeof store.settings.avoidSameSeat === "boolean") shuffleOptions.avoidSameSeat = store.settings.avoidSameSeat;
+    }
+
+    // 우선순위 맵 복원
+    if (store.priority && typeof store.priority === "object") {
+        Object.keys(store.priority).forEach(name => {
+            const arr = store.priority[name];
+            if (Array.isArray(arr) && arr.length > 0) priorityMap[name] = arr.slice();
+        });
+    }
+
+    // 저장된 현재 배치 복원
+    if (Array.isArray(store.current) && store.current.length === fixedLayout.length) {
+        layout = store.current.map((v, i) => fixedLayout[i] === "" ? "" : (v ?? null));
+    }
+})();
+
+render();
+</script>
+
+</body>
+</html>
