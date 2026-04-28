@@ -1,0 +1,125 @@
+html, body { height: 100%; margin: 0; }
+
+#game-canvas {
+    display: block;
+    background: #0a0f18;
+    cursor: none;
+    transition: transform 0.18s ease-out;
+}
+
+/* ─── HUD overlay ─────────────────────────────── */
+.hud-top {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    pointer-events: none;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 22px;
+    text-shadow: 0 0 6px black, 0 0 6px black;
+    font-weight: bold;
+}
+
+#leaderboard {
+    pointer-events: none;
+}
+#leaderboard .lb-title {
+    color: #aaccff;
+    font-size: 11px;
+    margin-bottom: 4px;
+}
+#leaderboard .lb-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1.1;
+    padding: 2px 0;
+}
+#leaderboard .lb-row .rank  { color: #ffaa66; min-width: 30px; }
+#leaderboard .lb-row .nick  { font-weight: bold; }
+#leaderboard .lb-row .score { color: #ffd700; }
+
+#leaderboard .lb-row.r0 { font-size: 26px; }
+#leaderboard .lb-row.r1 { font-size: 18px; }
+#leaderboard .lb-row.r2 { font-size: 14px; }
+
+/* ─── Center info ─────────────────────────────── */
+#info-center {
+    text-align: center;
+    color: #aaccff;
+    font-size: 13px;
+}
+#info-center .stage  { color: #ff9966; font-size: 18px; font-weight: bold; }
+#info-center .topscore { color: #ffd700; font-weight: bold; }
+
+/* ─── Right HUD ─────────────────────────────── */
+#hud-right {
+    text-align: right;
+    color: #aaffaa;
+    font-size: 13px;
+}
+
+#scoreTable {
+    position: fixed;
+    top: 70px;
+    right: 18px;
+    z-index: 6;
+    font-size: 11px;
+    color: #888;
+    background: rgba(0,0,0,0.5);
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    text-shadow: 0 0 4px black;
+    pointer-events: none;
+}
+#scoreTable .title {
+    color: #aaccff;
+    margin-bottom: 4px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 4px;
+}
+#scoreTable .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+#scoreTable .row.active {
+    color: #00ff66;
+    font-weight: bold;
+    background: rgba(0,255,102,0.12);
+}
+
+/* ─── Top bar buttons ─────────────────────────── */
+#topbar {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 7;
+    display: flex;
+    gap: 8px;
+}
+#topbar button { pointer-events: auto; padding: 4px 12px; font-size: 12px; }
+
+/* ─── Wind indicator (canvas-drawn) ─────────────  */
+/* — drawn directly on canvas in JS — */
+
+/* ─── Disconnect overlay ─────────────────────── */
+#overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    color: #fff;
+    text-align: center;
+    flex-direction: column;
+    gap: 16px;
+}
+#overlay.show { display: flex; }

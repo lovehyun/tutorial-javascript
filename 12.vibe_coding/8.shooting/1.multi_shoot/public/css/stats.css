@@ -1,0 +1,106 @@
+body { overflow: auto; }
+
+.stats {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 28px;
+}
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #333;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+}
+.stats-header h1 {
+    color: #ffd700;
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: 2px;
+}
+
+.dashboards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: linear-gradient(180deg, #1c2838 0%, #0c1420 100%);
+    border: 1px solid #2a4a6a;
+    border-radius: 8px;
+    padding: 18px;
+}
+.card h2 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #aaccff;
+    letter-spacing: 1px;
+}
+
+/* Overview */
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+.metric {
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    padding: 10px 14px;
+}
+.metric .label { color: #888; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.metric .value { color: #ffd700; font-size: 24px; font-weight: bold; }
+.metric .value.green { color: #66ff88; }
+.metric .value.blue  { color: #88ccff; }
+.metric .value.red   { color: #ff8866; }
+
+/* Tables */
+table.stat-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+table.stat-table th {
+    text-align: left;
+    color: #aaccff;
+    padding: 6px 8px;
+    border-bottom: 1px solid #2a4a6a;
+}
+table.stat-table td {
+    color: #ddd;
+    padding: 5px 8px;
+    border-bottom: 1px dashed #2a3848;
+}
+table.stat-table tr:hover td { background: rgba(255,255,255,0.04); }
+table.stat-table .num { text-align: right; color: #ffd700; font-weight: bold; }
+
+/* Bar chart (CSS only) */
+.bars { display: flex; flex-direction: column; gap: 4px; }
+.bar-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 50px;
+    gap: 8px;
+    align-items: center;
+    font-size: 11px;
+}
+.bar-row .label { color: #aaa; }
+.bar-row .bar-track {
+    background: #1a2330;
+    height: 14px;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+.bar-row .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2a4a6a, #88ccff);
+    border-radius: 2px;
+}
+.bar-row .num {
+    color: #ffd700;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}

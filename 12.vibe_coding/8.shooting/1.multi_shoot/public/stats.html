@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Shoot — 통계</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/stats.css">
+</head>
+<body>
+
+<div class="stats">
+    <header class="stats-header">
+        <h1>📊 통계 대시보드</h1>
+        <a href="index.html" class="btn">← 로비로</a>
+    </header>
+
+    <div class="dashboards">
+        <div class="card">
+            <h2>📈 전체 개요</h2>
+            <div id="dash-overview" class="overview-grid"></div>
+        </div>
+
+        <div class="card">
+            <h2>🌐 IP 별 활동 TOP 10</h2>
+            <div id="dash-ips"></div>
+        </div>
+
+        <div class="card">
+            <h2>📅 일별 플레이 수 (최근 30일)</h2>
+            <div id="dash-days"></div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 점수 분포</h2>
+            <div id="dash-scores"></div>
+        </div>
+
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>🚀 도달 스테이지 분포</h2>
+            <div id="dash-stages"></div>
+        </div>
+    </div>
+</div>
+
+<script src="js/socket.js"></script>
+<script src="js/stats.js"></script>
+</body>
+</html>

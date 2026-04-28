@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Shoot — 로비</title>
+<link rel="stylesheet" href="css/common.css">
+<link rel="stylesheet" href="css/lobby.css">
+</head>
+<body>
+
+<div class="lobby">
+    <header class="lobby-header">
+        <h1>🎯 MULTI-SHOOT</h1>
+        <div class="me">
+            <span>닉네임: <strong id="nickname-label">…</strong></span>
+            <button id="change-nickname">변경</button>
+            <button id="solo-btn">🎮 나홀로하기</button>
+            <button id="stats-btn">📊 통계</button>
+        </div>
+    </header>
+
+    <section class="rooms">
+        <h2>게임 룸 (방당 5명)</h2>
+        <div id="room-list" class="room-grid"></div>
+    </section>
+
+    <aside class="sidebar">
+        <div class="hall-of-fame">
+            <h2>🏆 명예의 전당</h2>
+            <div class="hof-tabs">
+                <button data-mode="score" class="active">점수순</button>
+                <button data-mode="stage">스테이지순</button>
+            </div>
+            <ol id="hof-list"></ol>
+        </div>
+    </aside>
+
+    <section class="chat">
+        <h2>💬 대기실 채팅 <span id="lobby-count" class="muted">(0명 대기)</span></h2>
+        <div id="chat-log" class="scrollable"></div>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." maxlength="200" autocomplete="off">
+            <button type="submit">전송</button>
+        </form>
+    </section>
+</div>
+
+<script src="socket.io/socket.io.js"></script>
+<script src="js/socket.js"></script>
+<script src="js/nickname.js"></script>
+<script src="js/lobby.js"></script>
+</body>
+</html>
