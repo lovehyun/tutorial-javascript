@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>슈팅 갤러리 (3열 과녁 · 진짜/가짜)</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #0a0a0a;
+    color: white;
+    font-family: 'Courier New', monospace;
+    user-select: none;
+}
+
+canvas {
+    display: block;
+    transition: transform 0.18s ease-out;
+    cursor: none;
+}
+
+#hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 0 0 6px black, 0 0 6px black;
+    font-weight: bold;
+}
+
+#score   { color: #ffd700; font-size: 22px; }
+#stats   { color: #aaffaa; font-size: 14px; }
+#info    { color: #cccccc; font-size: 12px; font-weight: normal; text-align: center; }
+.real    { color: #ff8888; }
+.fake    { color: #88ff88; }
+
+#scoreTable {
+    position: fixed;
+    top: 60px;
+    right: 24px;
+    z-index: 10;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #888888;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    text-shadow: 0 0 4px black;
+    pointer-events: none;
+}
+#scoreTable .title {
+    color: #aaccff;
+    font-size: 11px;
+    margin-bottom: 4px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 4px;
+}
+#scoreTable .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+#scoreTable .row.active {
+    color: #00ff66;
+    font-weight: bold;
+    background: rgba(0, 255, 102, 0.12);
+}
+</style>
+</head>
+<body>
+
+<div id="hud">
+    <div id="score">SCORE 0</div>
+    <div id="info">⏵ 클릭=발사 · 1초 이상 누르면 줌인 · <span class="real">빨간 과녁</span>은 +점수, <span class="fake">녹색 가짜</span>는 -5점</div>
+    <div id="stats">HIT 0/0 (0%)</div>
+</div>
+
+<div id="scoreTable">
+    <div class="title">정확도별 배점</div>
+    <div class="row" data-tier="0"><span>≥ 80%</span><span>10/7/5/3/1</span></div>
+    <div class="row" data-tier="1"><span>≥ 60%</span><span>8/6/5/3/1</span></div>
+    <div class="row" data-tier="2"><span>≥ 40%</span><span>6/5/3/2/1</span></div>
+    <div class="row" data-tier="3"><span>≥ 30%</span><span>4/3/1/1/1</span></div>
+    <div class="row" data-tier="4"><span>≥ 20%</span><span>3/1/1/1/1</span></div>
+    <div class="row" data-tier="5"><span>&lt; 20%</span><span>1/1/1/1/1</span></div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+// ============================================================
+// Setup
+// ============================================================
+const canvas   = document.getElementById("canvas");
+const ctx      = canvas.getContext("2d");
+const scoreEl  = document.getElementById("score");
+const statsEl  = document.getElementById("stats");
+
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// ============================================================
+// 🎯 Config
+// ============================================================
+const ROW_CONFIGS = [
+    { yRatio: 0.28, speed: 3.2, direction:  1, spawnInterval: 5000 },
+    { yRatio: 0.48, speed: 4.5, direction: -1, spawnInterval: 4500 },
+    { yRatio: 0.65, speed: 3.6, direction:  1, spawnInterval: 5500 },
+];
+
+const TARGET_RADIUS    = 55;
+const BULLET_SPEED     = 18;
+const FAKE_PROBABILITY = 0.35;
+const FLIP_DURATION    = 450;   // 회전(앞↔뒤) 애니메이션 시간(ms)
+const ZOOM_HOLD_TIME   = 1000;  // 줌인 발동까지 누르는 시간(ms)
+const ZOOM_SCALE       = 2;
+
+// ============================================================
+// 🎮 State
+// ============================================================
+let targets         = [];
+let bullets         = [];
+let floatingTexts   = [];
+let nextTargetId    = 1;
+let lastSpawnTimes  = ROW_CONFIGS.map((cfg, i) => -cfg.spawnInterval + i * 1200);
+
+let score       = 0;
+let shotsFired  = 0;
+let shotsHit    = 0;
+
+let mouse           = { x: canvas.width / 2, y: canvas.height / 2 };
+let isMouseDown     = false;
+let isZoomed        = false;
+let zoomTimer       = null;
+let mouseDownClient = null;
+
+// ============================================================
+// 🎯 Spawn
+// ============================================================
+function spawnTarget(rowIndex) {
+    const cfg     = ROW_CONFIGS[rowIndex];
+    const startX  = cfg.direction > 0 ? -120 : canvas.width + 120;
+    // 화면 가운데 50% 영역 안에서 멈출 위치 결정
+    const revealX = canvas.width * (0.25 + Math.random() * 0.5);
+
+    targets.push({
+        id:              nextTargetId++,
+        row:             rowIndex,
+        x:               startX,
+        y:               canvas.height * cfg.yRatio,
+        speed:           cfg.speed,
+        direction:       cfg.direction,
+        revealX:         revealX,
+        revealDuration:  2500 + Math.random() * 1800,  // 2.5~4.3초 노출
+        radius:          TARGET_RADIUS,
+        isReal:          Math.random() > FAKE_PROBABILITY,
+        phase:           'incoming',  // incoming → turning → revealed → turning_back → leaving
+        flip:            0,            // 0 = 뒷면, 1 = 앞면
+        phaseStartTime:  0,
+        hits:            [],
+    });
+}
+
+function maybeSpawn(now) {
+    ROW_CONFIGS.forEach((cfg, i) => {
+        if (now - lastSpawnTimes[i] < cfg.spawnInterval) return;
+        const inRow = targets.filter(t => t.row === i).length;
+        if (inRow >= 2) return;
+        spawnTarget(i);
+        lastSpawnTimes[i] = now;
+    });
+}
+
+// ============================================================
+// 🎯 Update
+// ============================================================
+function updateTargets(now) {
+    targets.forEach(t => {
+        switch (t.phase) {
+            case 'incoming':
+                t.x += t.speed * t.direction;
+                if ((t.direction > 0 && t.x >= t.revealX) ||
+                    (t.direction < 0 && t.x <= t.revealX)) {
+                    t.x = t.revealX;
+                    t.phase = 'turning';
+                    t.phaseStartTime = now;
+                }
+                break;
+
+            case 'turning': {
+                const e = (now - t.phaseStartTime) / FLIP_DURATION;
+                t.flip = Math.min(1, e);
+                if (e >= 1) {
+                    t.phase = 'revealed';
+                    t.phaseStartTime = now;
+                    t.flip = 1;
+                }
+                break;
+            }
+
+            case 'revealed':
+                if (now - t.phaseStartTime >= t.revealDuration) {
+                    t.phase = 'turning_back';
+                    t.phaseStartTime = now;
+                }
+                break;
+
+            case 'turning_back': {
+                const e = (now - t.phaseStartTime) / FLIP_DURATION;
+                t.flip = Math.max(0, 1 - e);
+                if (e >= 1) {
+                    t.phase = 'leaving';
+                    t.flip = 0;
+                }
+                break;
+            }
+
+            case 'leaving':
+                t.x += t.speed * t.direction;
+                break;
+        }
+    });
+
+    // 화면 밖으로 나간 과녁 제거
+    targets = targets.filter(t => {
+        if (t.direction > 0 && t.x > canvas.width + 150) return false;
+        if (t.direction < 0 && t.x < -150) return false;
+        return true;
+    });
+}
+
+// ============================================================
+// 🔫 Bullets
+// ============================================================
+function fireBullet(targetX, targetY) {
+    const startX = canvas.width / 2;
+    const startY = canvas.height - 60;
+    const dx = targetX - startX;
+    const dy = targetY - startY;
+    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+    bullets.push({
+        x:    startX,
+        y:    startY,
+        vx:   dx / dist * BULLET_SPEED,
+        vy:   dy / dist * BULLET_SPEED,
+        aimX: targetX,   // 클릭한 조준점 (명중점 보정에 사용)
+        aimY: targetY,
+    });
+    shotsFired++;
+    updateStats();
+}
+
+function updateBullets() {
+    bullets.forEach(b => {
+        b.x += b.vx;
+        b.y += b.vy;
+    });
+
+    // 화면 밖 / 조준점 도달 / 과녁 충돌 시 제거
+    bullets = bullets.filter(b => {
+        if (b.x < -50 || b.x > canvas.width + 50 ||
+            b.y < -50 || b.y > canvas.height + 50) return false;
+
+        // 🎯 조준점(클릭 좌표)에 도달하면 사라짐 — 빈 공간이면 그냥 소멸
+        const aimDx2 = b.aimX - b.x;
+        const aimDy2 = b.aimY - b.y;
+        if (aimDx2*aimDx2 + aimDy2*aimDy2 < BULLET_SPEED * BULLET_SPEED) return false;
+
+        for (const t of targets) {
+            // 🎯 다른 행의 과녁은 통과 (조준한 행과 Y 차이가 크면 무시)
+            if (Math.abs(t.y - b.aimY) > t.radius * 1.5) continue;
+
+            const dx = b.x - t.x;
+            const dy = b.y - t.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist <= t.radius) {
+                // 🎯 클릭 좌표가 과녁 안이면 그 좌표를 명중점으로 사용
+                //    (가장자리에서 멈추는 게 아니라 실제 조준한 위치에 X)
+                const aimDx   = b.aimX - t.x;
+                const aimDy   = b.aimY - t.y;
+                const aimDist = Math.sqrt(aimDx*aimDx + aimDy*aimDy);
+
+                if (aimDist <= t.radius) {
+                    handleHit(t, aimDx, aimDy, aimDist);
+                } else {
+                    handleHit(t, dx, dy, dist);
+                }
+                return false;
+            }
+        }
+        return true;
+    });
+}
+
+function handleHit(t, dx, dy, dist) {
+    const isFront = t.flip > 0.5;  // 앞면일 때만 점수 인정
+    let pts   = 0;
+    let color = "#888888";
+    let label = "방어됨";
+
+    if (isFront) {
+        if (t.isReal) {
+            // 명중 카운트 먼저 반영 → 정확도 등급에 이번 발사 결과를 포함시킴
+            shotsHit++;
+            pts = getHitScore(dist, t.radius);
+            color = pts >= 8 ? "#ffd700" :
+                    pts >= 4 ? "#aaffaa" :
+                               "#ffaa66";
+            label = `+${pts}`;
+        } else {
+            pts   = -5;
+            color = "#ff3344";
+            label = "-5 가짜!";
+        }
+    }
+
+    score = Math.max(0, score + pts);
+    scoreEl.textContent = `SCORE ${score}`;
+
+    // 명중점은 과녁 좌표 기준(상대) 으로 저장 → 과녁이 움직이면 함께 이동
+    t.hits.push({ dx, dy, color });
+
+    floatingTexts.push({
+        x:     t.x + dx,
+        y:     t.y + dy,
+        text:  label,
+        color: color,
+        life:  50,
+        vy:    -1.2,
+    });
+
+    updateStats();
+}
+
+// 정확도 등급별 배점표 (안→밖 순서로 5단계)
+const SCORE_TABLE = [
+    [10, 7, 5, 3, 1],  // tier 0 : ≥90%
+    [ 8, 6, 5, 3, 1],  // tier 1 : ≥80%
+    [ 6, 5, 3, 2, 1],  // tier 2 : ≥70%
+    [ 4, 3, 1, 1, 1],  // tier 3 : ≥60%
+    [ 3, 1, 1, 1, 1],  // tier 4 : ≥50%
+    [ 1, 1, 1, 1, 1],  // tier 5 : <50%
+];
+
+function getAccuracyTier() {
+    if (shotsFired === 0) return 0;  // 아직 안 쏨 → 만점 등급
+    const acc = (shotsHit / shotsFired) * 100;
+    if (acc >= 80) return 0;
+    if (acc >= 60) return 1;
+    if (acc >= 40) return 2;
+    if (acc >= 30) return 3;
+    if (acc >= 20) return 4;
+    return 5;
+}
+
+function getHitScore(dist, radius) {
+    const tbl  = SCORE_TABLE[getAccuracyTier()];
+    const step = radius / 5;
+    if (dist <= step)     return tbl[0];  // 불스아이
+    if (dist <= step * 2) return tbl[1];
+    if (dist <= step * 3) return tbl[2];
+    if (dist <= step * 4) return tbl[3];
+    if (dist <= step * 5) return tbl[4];
+    return 0;
+}
+
+const scoreTableRows = document.querySelectorAll('#scoreTable .row');
+function updateScoreTable() {
+    const tier = getAccuracyTier();
+    scoreTableRows.forEach((r, i) => {
+        r.classList.toggle('active', i === tier);
+    });
+}
+
+function updateStats() {
+    const acc = shotsFired ? Math.round((shotsHit / shotsFired) * 100) : 0;
+    statsEl.textContent = `HIT ${shotsHit}/${shotsFired} (${acc}%)`;
+    updateScoreTable();
+}
+
+updateScoreTable();  // 초기 하이라이트
+
+// ============================================================
+// 🎨 Drawing
+// ============================================================
+function drawBackground() {
+    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    g.addColorStop(0, "#2a3848");
+    g.addColorStop(1, "#0c1018");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 각 행의 바닥선(레일)
+    ROW_CONFIGS.forEach(cfg => {
+        const y = canvas.height * cfg.yRatio + TARGET_RADIUS + 35;
+        ctx.fillStyle = "#1a2330";
+        ctx.fillRect(0, y, canvas.width, 4);
+    });
+}
+
+function drawPole(t) {
+    ctx.fillStyle = "#222";
+    ctx.fillRect(t.x - 3, t.y, 6, t.radius + 35);
+}
+
+function drawBackContent(t) {
+    const r = t.radius;
+
+    // 갈색 나무 판자
+    ctx.fillStyle = "#5a3a1f";
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 결무늬
+    ctx.strokeStyle = "#3a2410";
+    ctx.lineWidth = 2;
+    for (let i = -r + 8; i < r; i += 11) {
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.95, i);
+        ctx.lineTo( r * 0.95, i);
+        ctx.stroke();
+    }
+
+    // X자 보강
+    ctx.strokeStyle = "#2a1808";
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.7, -r * 0.7); ctx.lineTo( r * 0.7,  r * 0.7);
+    ctx.moveTo( r * 0.7, -r * 0.7); ctx.lineTo(-r * 0.7,  r * 0.7);
+    ctx.stroke();
+
+    // 외곽
+    ctx.strokeStyle = "#1a0a00";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function drawFrontContent(t) {
+    const r = t.radius;
+
+    if (t.isReal) {
+        // 진짜: 표준 불스아이
+        const colors = ["#ffffff", "#ffcccc", "#ff5555", "#cc0000", "#660000"];
+        for (let i = 5; i > 0; i--) {
+            ctx.beginPath();
+            ctx.arc(0, 0, r * (i / 5), 0, Math.PI * 2);
+            ctx.fillStyle = colors[i - 1];
+            ctx.fill();
+        }
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+    } else {
+        // 가짜: 녹색 스마일 (민간인)
+        ctx.fillStyle = "#3a8a3a";
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#ffeb3b";
+        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.18, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc( r * 0.32, -r * 0.18, 5, 0, Math.PI * 2); ctx.fill();
+
+        ctx.strokeStyle = "#ffeb3b";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(0, r * 0.05, r * 0.4, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#1a4a1a";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+}
+
+function drawTarget(t) {
+    drawPole(t);
+
+    // 회전: cos(flip*π) 으로 -1 ~ +1 변화 → 가로 스케일로 사용
+    const sx = Math.cos(t.flip * Math.PI);
+    if (Math.abs(sx) >= 0.03) {
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.scale(Math.abs(sx), 1);
+        if (sx > 0) drawBackContent(t);
+        else        drawFrontContent(t);
+        ctx.restore();
+    }
+
+    // 명중점 X 마커(과녁과 함께 이동)
+    t.hits.forEach(h => {
+        const x = t.x + h.dx;
+        const y = t.y + h.dy;
+        ctx.strokeStyle = h.color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(x - 7, y - 7); ctx.lineTo(x + 7, y + 7);
+        ctx.moveTo(x + 7, y - 7); ctx.lineTo(x - 7, y + 7);
+        ctx.stroke();
+    });
+}
+
+function drawBullets() {
+    bullets.forEach(b => {
+        // 잔상
+        ctx.strokeStyle = "rgba(255, 235, 59, 0.45)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(b.x - b.vx * 2.5, b.y - b.vy * 2.5);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        // 탄두
+        ctx.fillStyle = "#ffeb3b";
+        ctx.shadowColor = "#ffeb3b";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+}
+
+function drawShooter() {
+    const cx    = canvas.width / 2;
+    const baseY = canvas.height - 5;
+
+    // 모래주머니 받침
+    ctx.fillStyle = "#5a4a3a";
+    ctx.fillRect(cx - 60, baseY - 30, 120, 30);
+    ctx.strokeStyle = "#2a1f10";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx - 60, baseY - 30, 120, 30);
+
+    // 총열
+    ctx.fillStyle = "#222";
+    ctx.fillRect(cx - 5, baseY - 65, 10, 38);
+    ctx.fillStyle = "#444";
+    ctx.fillRect(cx - 8, baseY - 30, 16, 8);
+}
+
+function drawCrosshair() {
+    ctx.strokeStyle = isZoomed ? "#ff3333" : "#e0e0e0";
+    ctx.lineWidth = 1.5;
+    const out = isZoomed ? 28 : 18;
+    const inn = 5;
+    ctx.beginPath();
+    ctx.moveTo(mouse.x - out, mouse.y); ctx.lineTo(mouse.x - inn, mouse.y);
+    ctx.moveTo(mouse.x + inn, mouse.y); ctx.lineTo(mouse.x + out, mouse.y);
+    ctx.moveTo(mouse.x, mouse.y - out); ctx.lineTo(mouse.x, mouse.y - inn);
+    ctx.moveTo(mouse.x, mouse.y + inn); ctx.lineTo(mouse.x, mouse.y + out);
+    ctx.stroke();
+
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawFloatingTexts() {
+    ctx.font = "bold 18px 'Courier New', monospace";
+    ctx.textAlign = "center";
+    floatingTexts.forEach(f => {
+        ctx.globalAlpha = Math.min(1, f.life / 25);
+        ctx.fillStyle = f.color;
+        ctx.fillText(f.text, f.x, f.y);
+    });
+    ctx.globalAlpha = 1;
+    ctx.textAlign = "left";
+
+    floatingTexts.forEach(f => {
+        f.y    += f.vy;
+        f.life -= 1;
+    });
+    floatingTexts = floatingTexts.filter(f => f.life > 0);
+}
+
+// ============================================================
+// 🎮 Game loop
+// ============================================================
+function loop(now) {
+    drawBackground();
+
+    maybeSpawn(now);
+    updateTargets(now);
+    updateBullets();
+
+    targets.forEach(drawTarget);
+    drawBullets();
+    drawShooter();
+    drawFloatingTexts();
+    drawCrosshair();
+
+    requestAnimationFrame(loop);
+}
+
+// ============================================================
+// 🖱️ Input
+// ============================================================
+function clientToCanvas(clientX, clientY) {
+    // 줌 상태든 아니든 정확하게 캔버스 좌표로 환산
+    const rect  = canvas.getBoundingClientRect();
+    const scale = rect.width / canvas.width;
+    return {
+        x: (clientX - rect.left) / scale,
+        y: (clientY - rect.top)  / scale,
+    };
+}
+
+canvas.addEventListener("mousemove", (e) => {
+    const p = clientToCanvas(e.clientX, e.clientY);
+    mouse.x = p.x;
+    mouse.y = p.y;
+});
+
+canvas.addEventListener("mousedown", (e) => {
+    isMouseDown     = true;
+    mouseDownClient = { x: e.clientX, y: e.clientY };
+
+    zoomTimer = setTimeout(() => {
+        if (isMouseDown) {
+            isZoomed = true;
+            // 클릭한 지점이 줌의 고정점이 되도록 origin 설정
+            canvas.style.transformOrigin = `${mouseDownClient.x}px ${mouseDownClient.y}px`;
+            canvas.style.transform       = `scale(${ZOOM_SCALE})`;
+        }
+    }, ZOOM_HOLD_TIME);
+});
+
+canvas.addEventListener("mouseup", (e) => {
+    clearTimeout(zoomTimer);
+    isMouseDown = false;
+
+    // 줌이 풀리기 전에 좌표를 먼저 환산해야 정확함
+    const p = clientToCanvas(e.clientX, e.clientY);
+
+    if (isZoomed) {
+        canvas.style.transform = "scale(1)";
+        isZoomed = false;
+    }
+
+    fireBullet(p.x, p.y);
+});
+
+canvas.addEventListener("mouseleave", () => {
+    clearTimeout(zoomTimer);
+    isMouseDown = false;
+    if (isZoomed) {
+        canvas.style.transform = "scale(1)";
+        isZoomed = false;
+    }
+});
+
+window.addEventListener("resize", () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
+// ============================================================
+// Boot
+// ============================================================
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>슈팅 갤러리 — 캐논 / 바람 / 스테이지 / 스코프</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #0a0a0a;
+    color: white;
+    font-family: 'Courier New', monospace;
+    user-select: none;
+}
+
+canvas {
+    display: block;
+    transition: transform 0.18s ease-out;
+    cursor: none;
+}
+
+#hud {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 10;
+    text-shadow: 0 0 6px black, 0 0 6px black;
+    font-weight: bold;
+}
+
+#score   { color: #ffd700; font-size: 22px; }
+#stage   { color: #ff9966; font-size: 14px; margin-top: 4px; }
+#stats   { color: #aaffaa; font-size: 14px; }
+#info    { color: #cccccc; font-size: 12px; font-weight: normal; text-align: center; pointer-events: none; }
+.real    { color: #ff8888; }
+.fake    { color: #88ff88; }
+
+#scoreTable {
+    position: fixed;
+    top: 60px;
+    right: 24px;
+    z-index: 10;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #888888;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    text-shadow: 0 0 4px black;
+    pointer-events: none;
+}
+#scoreTable .title {
+    color: #aaccff;
+    font-size: 11px;
+    margin-bottom: 4px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 4px;
+}
+#scoreTable .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+#scoreTable .row.active {
+    color: #00ff66;
+    font-weight: bold;
+    background: rgba(0, 255, 102, 0.12);
+}
+</style>
+</head>
+<body>
+
+<div id="hud">
+    <div>
+        <div id="score">SCORE 0</div>
+        <div id="stage">STAGE 1 · WIND 0 m/s</div>
+    </div>
+    <div id="info">⏵ 클릭=발사 · 1초 이상 누르면 스코프 줌 · <span class="real">빨간 과녁</span> +점수, <span class="fake">녹색</span> -5점 · 100점마다 스테이지 ↑</div>
+    <div id="stats">HIT 0/0 (0%)</div>
+</div>
+
+<div id="scoreTable">
+    <div class="title">정확도별 배점</div>
+    <div class="row" data-tier="0"><span>≥ 80%</span><span>10/7/5/3/1</span></div>
+    <div class="row" data-tier="1"><span>≥ 60%</span><span>8/6/5/3/1</span></div>
+    <div class="row" data-tier="2"><span>≥ 40%</span><span>6/5/3/2/1</span></div>
+    <div class="row" data-tier="3"><span>≥ 30%</span><span>4/3/1/1/1</span></div>
+    <div class="row" data-tier="4"><span>≥ 20%</span><span>3/1/1/1/1</span></div>
+    <div class="row" data-tier="5"><span>&lt; 20%</span><span>1/1/1/1/1</span></div>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+// ============================================================
+// Setup
+// ============================================================
+const canvas   = document.getElementById("canvas");
+const ctx      = canvas.getContext("2d");
+const scoreEl  = document.getElementById("score");
+const stageEl  = document.getElementById("stage");
+const statsEl  = document.getElementById("stats");
+
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// ============================================================
+// 🎯 Config
+// ============================================================
+const ROW_CONFIGS = [
+    { yRatio: 0.30, speed: 3.2, direction:  1, spawnInterval: 5000 },
+    { yRatio: 0.48, speed: 4.5, direction: -1, spawnInterval: 4500 },
+    { yRatio: 0.65, speed: 3.6, direction:  1, spawnInterval: 5500 },
+];
+
+const TARGET_RADIUS    = 55;
+const BULLET_SPEED     = 18;
+const FLIP_DURATION    = 450;
+const ZOOM_HOLD_TIME   = 1000;
+const ZOOM_SCALE       = 2;
+const SCOPE_RADIUS     = 130;       // 캔버스 좌표상 스코프 반지름 (실제 화면에선 ZOOM_SCALE 배)
+const WIND_ACCEL       = 0.03;      // 바람 1 단위당 px/frame² 가속
+const STAGE_THRESHOLD  = 100;       // 100점 단위 스테이지 상승
+const CANNON_LENGTH    = 45;
+const CLOUD_COUNT      = 6;
+
+// ============================================================
+// 🎮 State
+// ============================================================
+let targets       = [];
+let bullets       = [];
+let floatingTexts = [];
+let clouds        = [];
+let nextTargetId  = 1;
+let lastSpawnTimes = ROW_CONFIGS.map((cfg, i) => -cfg.spawnInterval + i * 1200);
+
+let score      = 0;
+let shotsFired = 0;
+let shotsHit   = 0;
+let lastStage  = 1;
+
+let mouse           = { x: canvas.width / 2, y: canvas.height / 2 };
+let isMouseDown     = false;
+let isZoomed        = false;
+let zoomTimer       = null;
+let mouseDownClient = null;
+
+let cannonAngle     = -Math.PI / 2;   // -π/2 = 위쪽
+let muzzleFlashLife = 0;
+
+let wind = 0;                          // signed: +오른쪽, -왼쪽 (단위: m/s)
+let stageBanner = null;                // {text, life}
+
+// ============================================================
+// 🎚️ Stage / 난이도
+// ============================================================
+function getStage() {
+    return 1 + Math.floor(score / STAGE_THRESHOLD);
+}
+function getSpeedMultiplier() {
+    return 1 + (getStage() - 1) * 0.15;
+}
+function getFakeProbability() {
+    return Math.min(0.7, 0.35 + (getStage() - 1) * 0.04);
+}
+function getMaxWind() {
+    return Math.max(0, getStage() - 1);  // L1=0, L2=1, L3=2 ...
+}
+function getTargetRadius() {
+    const s = getStage();
+    if (s >= 10) return TARGET_RADIUS / 4;
+    if (s >= 5)  return TARGET_RADIUS / 2;
+    return TARGET_RADIUS;
+}
+
+function checkStageChange() {
+    const cur = getStage();
+    if (cur !== lastStage) {
+        lastStage = cur;
+        stageBanner = { text: `STAGE ${cur}`, sub: getMaxWind() > 0 ? `WIND ±${getMaxWind()} m/s` : "", life: 110 };
+    }
+    stageEl.textContent = `STAGE ${cur} · WIND ${wind.toFixed(1)} m/s`;
+}
+
+// ============================================================
+// 🌬️ Wind
+// ============================================================
+function updateWind(now) {
+    const max = getMaxWind();
+    if (max === 0) {
+        wind = 0;
+        return;
+    }
+    // 스테이지가 올라갈수록 변화 주기도 빨라짐
+    const speedFactor = 0.4 + (getStage() - 1) * 0.08;
+    const t = now / 1000 * speedFactor;
+    // 세 개의 사인파 합성 → 자연스러운 변화
+    const w = Math.sin(t)              * 0.5
+            + Math.sin(t * 2.3 + 1.3)  * 0.3
+            + Math.sin(t * 3.7 + 2.5)  * 0.2;
+    wind = w * max;
+}
+
+// ============================================================
+// ☁️ Clouds
+// ============================================================
+function initClouds() {
+    clouds = [];
+    for (let i = 0; i < CLOUD_COUNT; i++) {
+        clouds.push({
+            x:       Math.random() * canvas.width,
+            y:       40 + Math.random() * (canvas.height * 0.45),
+            scale:   0.6 + Math.random() * 0.7,
+            opacity: 0.06 + Math.random() * 0.10,
+        });
+    }
+}
+
+function updateClouds() {
+    clouds.forEach(c => {
+        // 바람 방향대로 이동 — 큰 구름은 가까이 있어 빠르게,
+        //  작은 구름은 멀리 있어 느리게 (parallax)
+        c.x += (wind * 0.6 + 0.08) * c.scale;
+        const margin = 100 * c.scale;
+        if (c.x > canvas.width + margin) c.x = -margin;
+        if (c.x < -margin)               c.x = canvas.width + margin;
+    });
+}
+
+function drawClouds() {
+    clouds.forEach(c => {
+        ctx.globalAlpha = c.opacity;
+        ctx.fillStyle = "#ffffff";
+        const r = 30 * c.scale;
+        ctx.beginPath();
+        ctx.arc(c.x,             c.y,            r,        0, Math.PI * 2);
+        ctx.arc(c.x + r * 0.85,  c.y - r * 0.3,  r * 0.78, 0, Math.PI * 2);
+        ctx.arc(c.x + r * 1.6,   c.y,            r * 0.92, 0, Math.PI * 2);
+        ctx.arc(c.x + r * 0.5,   c.y + r * 0.3,  r * 0.7,  0, Math.PI * 2);
+        ctx.arc(c.x - r * 0.5,   c.y + r * 0.15, r * 0.6,  0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+}
+
+// ============================================================
+// 🎯 Spawn
+// ============================================================
+function spawnTarget(rowIndex) {
+    const cfg     = ROW_CONFIGS[rowIndex];
+    const startX  = cfg.direction > 0 ? -120 : canvas.width + 120;
+    const revealX = canvas.width * (0.25 + Math.random() * 0.5);
+
+    targets.push({
+        id:              nextTargetId++,
+        row:             rowIndex,
+        x:               startX,
+        y:               canvas.height * cfg.yRatio,
+        speed:           cfg.speed * getSpeedMultiplier(),
+        direction:       cfg.direction,
+        revealX:         revealX,
+        revealDuration:  2500 + Math.random() * 1800,
+        radius:          getTargetRadius(),
+        isReal:          Math.random() > getFakeProbability(),
+        phase:           'incoming',
+        flip:            0,
+        phaseStartTime:  0,
+        hits:            [],
+    });
+}
+
+function maybeSpawn(now) {
+    ROW_CONFIGS.forEach((cfg, i) => {
+        // 스테이지 빨라지면 스폰 간격도 짧아짐
+        const interval = cfg.spawnInterval / getSpeedMultiplier();
+        if (now - lastSpawnTimes[i] < interval) return;
+        if (targets.filter(t => t.row === i).length >= 2) return;
+        spawnTarget(i);
+        lastSpawnTimes[i] = now;
+    });
+}
+
+// ============================================================
+// 🎯 Update targets
+// ============================================================
+function updateTargets(now) {
+    targets.forEach(t => {
+        switch (t.phase) {
+            case 'incoming':
+                t.x += t.speed * t.direction;
+                if ((t.direction > 0 && t.x >= t.revealX) ||
+                    (t.direction < 0 && t.x <= t.revealX)) {
+                    t.x = t.revealX;
+                    t.phase = 'turning';
+                    t.phaseStartTime = now;
+                }
+                break;
+
+            case 'turning': {
+                const e = (now - t.phaseStartTime) / FLIP_DURATION;
+                t.flip = Math.min(1, e);
+                if (e >= 1) {
+                    t.phase = 'revealed';
+                    t.phaseStartTime = now;
+                    t.flip = 1;
+                }
+                break;
+            }
+
+            case 'revealed':
+                if (now - t.phaseStartTime >= t.revealDuration) {
+                    t.phase = 'turning_back';
+                    t.phaseStartTime = now;
+                }
+                break;
+
+            case 'turning_back': {
+                const e = (now - t.phaseStartTime) / FLIP_DURATION;
+                t.flip = Math.max(0, 1 - e);
+                if (e >= 1) {
+                    t.phase = 'leaving';
+                    t.flip = 0;
+                }
+                break;
+            }
+
+            case 'leaving':
+                t.x += t.speed * t.direction;
+                break;
+        }
+    });
+
+    targets = targets.filter(t => {
+        if (t.direction > 0 && t.x > canvas.width + 150) return false;
+        if (t.direction < 0 && t.x < -150)               return false;
+        return true;
+    });
+}
+
+// ============================================================
+// 🔫 Bullets
+// ============================================================
+function fireBullet(targetX, targetY) {
+    const pivotX = canvas.width / 2;
+    const pivotY = canvas.height - 35;
+
+    const dxRaw = targetX - pivotX;
+    const dyRaw = targetY - pivotY;
+    const dist  = Math.sqrt(dxRaw*dxRaw + dyRaw*dyRaw) || 1;
+
+    // 발사 시 캐논을 클릭 방향으로 스냅(위쪽으로 클램프)
+    const dyClamped = Math.min(-1, dyRaw);
+    cannonAngle = Math.atan2(dyClamped, dxRaw);
+
+    // 캐논 끝점에서 발사
+    const startX = pivotX + (dxRaw / dist) * CANNON_LENGTH;
+    const startY = pivotY + (dyRaw / dist) * CANNON_LENGTH;
+
+    bullets.push({
+        x:       startX,
+        y:       startY,
+        vx:      (dxRaw / dist) * BULLET_SPEED,
+        vy:      (dyRaw / dist) * BULLET_SPEED,
+        aimX:    targetX,
+        aimY:    targetY,
+        maxLife: Math.ceil((dist - CANNON_LENGTH) / BULLET_SPEED) + 4,
+        life:    0,
+    });
+
+    muzzleFlashLife = 6;
+    shotsFired++;
+    updateStats();
+}
+
+function updateBullets() {
+    bullets.forEach(b => {
+        // 🌬️ 바람의 영향 (가로축 가속) — 시간이 지날수록 더 휨
+        b.vx += wind * WIND_ACCEL;
+        b.x  += b.vx;
+        b.y  += b.vy;
+        b.life++;
+    });
+
+    bullets = bullets.filter(b => {
+        if (b.x < -50 || b.x > canvas.width + 50 ||
+            b.y < -50 || b.y > canvas.height + 50) return false;
+
+        // 비행 시간 한도(원래 거리만큼) 도달 → 소멸
+        if (b.life >= b.maxLife) return false;
+
+        // 조준점 근처 도달
+        const aimDx2 = b.aimX - b.x;
+        const aimDy2 = b.aimY - b.y;
+        if (aimDx2*aimDx2 + aimDy2*aimDy2 < BULLET_SPEED * BULLET_SPEED) return false;
+
+        // 충돌 검사 (조준한 행만)
+        for (const t of targets) {
+            if (Math.abs(t.y - b.aimY) > TARGET_RADIUS * 1.5) continue;
+
+            const dx   = b.x - t.x;
+            const dy   = b.y - t.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist <= t.radius) {
+                const aimDx   = b.aimX - t.x;
+                const aimDy   = b.aimY - t.y;
+                const aimDist = Math.sqrt(aimDx*aimDx + aimDy*aimDy);
+
+                if (aimDist <= t.radius) {
+                    handleHit(t, aimDx, aimDy, aimDist);
+                } else {
+                    handleHit(t, dx, dy, dist);
+                }
+                return false;
+            }
+        }
+        return true;
+    });
+}
+
+// ============================================================
+// 💥 Hit / Score
+// ============================================================
+function handleHit(t, dx, dy, dist) {
+    const isFront = t.flip > 0.5;
+    let pts   = 0;
+    let color = "#888888";
+    let label = "방어됨";
+
+    if (isFront) {
+        if (t.isReal) {
+            // 명중 카운트 먼저 반영 → 정확도 등급에 이번 발사 결과를 포함시킴
+            shotsHit++;
+            pts = getHitScore(dist, t.radius);
+            color = pts >= 8 ? "#ffd700" :
+                    pts >= 4 ? "#aaffaa" :
+                               "#ffaa66";
+            label = `+${pts}`;
+        } else {
+            pts   = -5;
+            color = "#ff3344";
+            label = "-5 가짜!";
+        }
+    }
+
+    score = Math.max(0, score + pts);
+    scoreEl.textContent = `SCORE ${score}`;
+    checkStageChange();
+
+    t.hits.push({ dx, dy, color });
+
+    floatingTexts.push({
+        x:     t.x + dx,
+        y:     t.y + dy,
+        text:  label,
+        color: color,
+        life:  50,
+        vy:    -1.2,
+    });
+
+    updateStats();
+}
+
+// 정확도 등급별 배점표 (안→밖 순서로 5단계)
+const SCORE_TABLE = [
+    [10, 7, 5, 3, 1],  // tier 0 : ≥90%
+    [ 8, 6, 5, 3, 1],  // tier 1 : ≥80%
+    [ 6, 5, 3, 2, 1],  // tier 2 : ≥70%
+    [ 4, 3, 1, 1, 1],  // tier 3 : ≥60%
+    [ 3, 1, 1, 1, 1],  // tier 4 : ≥50%
+    [ 1, 1, 1, 1, 1],  // tier 5 : <50%
+];
+
+function getAccuracyTier() {
+    if (shotsFired === 0) return 0;
+    const acc = (shotsHit / shotsFired) * 100;
+    if (acc >= 80) return 0;
+    if (acc >= 60) return 1;
+    if (acc >= 40) return 2;
+    if (acc >= 30) return 3;
+    if (acc >= 20) return 4;
+    return 5;
+}
+
+function getHitScore(dist, radius) {
+    const tbl  = SCORE_TABLE[getAccuracyTier()];
+    const step = radius / 5;
+    if (dist <= step)     return tbl[0];
+    if (dist <= step * 2) return tbl[1];
+    if (dist <= step * 3) return tbl[2];
+    if (dist <= step * 4) return tbl[3];
+    if (dist <= step * 5) return tbl[4];
+    return 0;
+}
+
+const scoreTableRows = document.querySelectorAll('#scoreTable .row');
+function updateScoreTable() {
+    const tier = getAccuracyTier();
+    scoreTableRows.forEach((r, i) => {
+        r.classList.toggle('active', i === tier);
+    });
+}
+
+function updateStats() {
+    const acc = shotsFired ? Math.round((shotsHit / shotsFired) * 100) : 0;
+    statsEl.textContent = `HIT ${shotsHit}/${shotsFired} (${acc}%)`;
+    updateScoreTable();
+}
+
+// ============================================================
+// 🎨 Drawing
+// ============================================================
+function drawBackground() {
+    const g = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    g.addColorStop(0, "#2a3848");
+    g.addColorStop(1, "#0c1018");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawClouds();
+
+    // 행 베이스라인
+    ROW_CONFIGS.forEach(cfg => {
+        const y = canvas.height * cfg.yRatio + TARGET_RADIUS + 35;
+        ctx.fillStyle = "#1a2330";
+        ctx.fillRect(0, y, canvas.width, 4);
+    });
+}
+
+function drawPole(t) {
+    // 폴은 항상 바닥선까지 — 작은 과녁이어도 통과해서 바닥에 닿는 형태
+    ctx.fillStyle = "#222";
+    ctx.fillRect(t.x - 3, t.y, 6, TARGET_RADIUS + 35);
+}
+
+function drawBackContent(t) {
+    const r = t.radius;
+    ctx.fillStyle = "#5a3a1f";
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "#3a2410";
+    ctx.lineWidth = 2;
+    for (let i = -r + 8; i < r; i += Math.max(8, r * 0.2)) {
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.95, i);
+        ctx.lineTo( r * 0.95, i);
+        ctx.stroke();
+    }
+
+    ctx.strokeStyle = "#2a1808";
+    ctx.lineWidth = Math.max(3, r * 0.11);
+    ctx.beginPath();
+    ctx.moveTo(-r * 0.7, -r * 0.7); ctx.lineTo( r * 0.7,  r * 0.7);
+    ctx.moveTo( r * 0.7, -r * 0.7); ctx.lineTo(-r * 0.7,  r * 0.7);
+    ctx.stroke();
+
+    ctx.strokeStyle = "#1a0a00";
+    ctx.lineWidth = Math.max(2, r * 0.05);
+    ctx.beginPath();
+    ctx.arc(0, 0, r, 0, Math.PI * 2);
+    ctx.stroke();
+}
+
+function drawFrontContent(t) {
+    const r = t.radius;
+
+    if (t.isReal) {
+        const colors = ["#ffffff", "#ffcccc", "#ff5555", "#cc0000", "#660000"];
+        for (let i = 5; i > 0; i--) {
+            ctx.beginPath();
+            ctx.arc(0, 0, r * (i / 5), 0, Math.PI * 2);
+            ctx.fillStyle = colors[i - 1];
+            ctx.fill();
+        }
+        ctx.strokeStyle = "#222";
+        ctx.lineWidth = Math.max(1, r * 0.04);
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+    } else {
+        ctx.fillStyle = "#3a8a3a";
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 작은 과녁에서도 인식되게 비율로
+        ctx.fillStyle = "#ffeb3b";
+        const eyeR = Math.max(2, r * 0.09);
+        ctx.beginPath(); ctx.arc(-r * 0.32, -r * 0.18, eyeR, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc( r * 0.32, -r * 0.18, eyeR, 0, Math.PI * 2); ctx.fill();
+
+        ctx.strokeStyle = "#ffeb3b";
+        ctx.lineWidth = Math.max(2, r * 0.08);
+        ctx.beginPath();
+        ctx.arc(0, r * 0.05, r * 0.4, 0.15 * Math.PI, 0.85 * Math.PI);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#1a4a1a";
+        ctx.lineWidth = Math.max(1, r * 0.04);
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+}
+
+function drawTarget(t) {
+    drawPole(t);
+
+    const sx = Math.cos(t.flip * Math.PI);
+    if (Math.abs(sx) >= 0.03) {
+        ctx.save();
+        ctx.translate(t.x, t.y);
+        ctx.scale(Math.abs(sx), 1);
+        if (sx > 0) drawBackContent(t);
+        else        drawFrontContent(t);
+        ctx.restore();
+    }
+
+    // 명중 마커(과녁 함께 이동, 과녁 크기 비례)
+    const markSize = Math.max(4, t.radius * 0.13);
+    t.hits.forEach(h => {
+        const x = t.x + h.dx;
+        const y = t.y + h.dy;
+        ctx.strokeStyle = h.color;
+        ctx.lineWidth = Math.max(1.5, t.radius * 0.045);
+        ctx.beginPath();
+        ctx.moveTo(x - markSize, y - markSize); ctx.lineTo(x + markSize, y + markSize);
+        ctx.moveTo(x + markSize, y - markSize); ctx.lineTo(x - markSize, y + markSize);
+        ctx.stroke();
+    });
+}
+
+function drawBullets() {
+    bullets.forEach(b => {
+        // 잔상
+        ctx.strokeStyle = "rgba(255, 235, 59, 0.45)";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(b.x - b.vx * 2.5, b.y - b.vy * 2.5);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffeb3b";
+        ctx.shadowColor = "#ffeb3b";
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    });
+}
+
+function drawShooter() {
+    const cx     = canvas.width / 2;
+    const baseY  = canvas.height - 5;
+    const pivotX = cx;
+    const pivotY = canvas.height - 35;
+
+    // 모래주머니 받침
+    ctx.fillStyle = "#5a4a3a";
+    ctx.fillRect(cx - 60, baseY - 30, 120, 30);
+    ctx.strokeStyle = "#2a1f10";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx - 60, baseY - 30, 120, 30);
+
+    // 회전 캐논
+    ctx.save();
+    ctx.translate(pivotX, pivotY);
+    ctx.rotate(cannonAngle + Math.PI / 2);  // -π/2(위)에서 회전 0
+
+    // 본체
+    ctx.fillStyle = "#222";
+    ctx.fillRect(-6, -CANNON_LENGTH, 12, CANNON_LENGTH);
+    // 머즐
+    ctx.fillStyle = "#444";
+    ctx.fillRect(-9, -CANNON_LENGTH - 6, 18, 8);
+    // 피벗
+    ctx.fillStyle = "#333";
+    ctx.beginPath();
+    ctx.arc(0, 0, 11, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 머즐 플래시
+    if (muzzleFlashLife > 0) {
+        const a = muzzleFlashLife / 6;
+        ctx.fillStyle = `rgba(255, 220, 100, ${a})`;
+        ctx.beginPath();
+        ctx.arc(0, -CANNON_LENGTH - 4, 13 * a + 4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    ctx.restore();
+}
+
+function drawCrosshair() {
+    ctx.strokeStyle = isZoomed ? "#ff3333" : "#e0e0e0";
+    ctx.lineWidth = 1.5;
+    const out = isZoomed ? 28 : 18;
+    const inn = 5;
+    ctx.beginPath();
+    ctx.moveTo(mouse.x - out, mouse.y); ctx.lineTo(mouse.x - inn, mouse.y);
+    ctx.moveTo(mouse.x + inn, mouse.y); ctx.lineTo(mouse.x + out, mouse.y);
+    ctx.moveTo(mouse.x, mouse.y - out); ctx.lineTo(mouse.x, mouse.y - inn);
+    ctx.moveTo(mouse.x, mouse.y + inn); ctx.lineTo(mouse.x, mouse.y + out);
+    ctx.stroke();
+
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawFloatingTexts() {
+    ctx.font = "bold 18px 'Courier New', monospace";
+    ctx.textAlign = "center";
+    floatingTexts.forEach(f => {
+        ctx.globalAlpha = Math.min(1, f.life / 25);
+        ctx.fillStyle = f.color;
+        ctx.fillText(f.text, f.x, f.y);
+    });
+    ctx.globalAlpha = 1;
+    ctx.textAlign = "left";
+
+    floatingTexts.forEach(f => {
+        f.y    += f.vy;
+        f.life -= 1;
+    });
+    floatingTexts = floatingTexts.filter(f => f.life > 0);
+}
+
+// 🌬️ 바람 표시기 (상단 중앙)
+function drawWindIndicator() {
+    const cx  = canvas.width / 2;
+    const cy  = 70;
+    const max = getMaxWind();
+
+    // 패널
+    ctx.fillStyle   = "rgba(0, 0, 0, 0.45)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.lineWidth   = 1;
+    ctx.fillRect(cx - 110, cy - 26, 220, 52);
+    ctx.strokeRect(cx - 110, cy - 26, 220, 52);
+
+    // 라벨
+    ctx.fillStyle = wind === 0 ? "#888888" :
+                    Math.abs(wind) < max * 0.5 ? "#aaccff" : "#ff8855";
+    ctx.font = "bold 12px 'Courier New', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(`WIND  ${wind >= 0 ? "+" : ""}${wind.toFixed(1)} m/s`, cx, cy - 9);
+
+    // 화살표
+    const maxArrowLen = 95;
+    const arrowLen    = max > 0 ? (wind / max) * maxArrowLen : 0;
+    const ay          = cy + 9;
+
+    // 0 표시 라인
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, ay - 8);
+    ctx.lineTo(cx, ay + 8);
+    ctx.stroke();
+
+    if (Math.abs(arrowLen) > 2) {
+        const dir = arrowLen > 0 ? 1 : -1;
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx, ay);
+        ctx.lineTo(cx + arrowLen, ay);
+        // 화살촉
+        ctx.lineTo(cx + arrowLen - 9 * dir, ay - 5);
+        ctx.moveTo(cx + arrowLen, ay);
+        ctx.lineTo(cx + arrowLen - 9 * dir, ay + 5);
+        ctx.stroke();
+    }
+
+    ctx.textAlign = "left";
+}
+
+// 🔭 스코프 효과(줌 시 주변 어둡게)
+function drawScopeOverlay() {
+    if (!isZoomed || !mouseDownClient) return;
+
+    const cx = mouseDownClient.x;
+    const cy = mouseDownClient.y;
+    const R  = SCOPE_RADIUS;
+
+    // 어두운 마스크 (스코프 원 바깥)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.clip("evenodd");
+    ctx.fillStyle = "rgba(0, 0, 0, 0.88)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+
+    // 스코프 외곽 두꺼운 링
+    ctx.strokeStyle = "#0a0a0a";
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 내측 얇은 빛
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R - 5, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 레티클 틱
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    const tick = 14;
+    ctx.moveTo(cx - R + 5,  cy);          ctx.lineTo(cx - R + 5 + tick,  cy);
+    ctx.moveTo(cx + R - 5,  cy);          ctx.lineTo(cx + R - 5 - tick,  cy);
+    ctx.moveTo(cx,          cy - R + 5);  ctx.lineTo(cx,                 cy - R + 5 + tick);
+    ctx.moveTo(cx,          cy + R - 5);  ctx.lineTo(cx,                 cy + R - 5 - tick);
+    ctx.stroke();
+}
+
+// 🪧 스테이지 배너
+function drawStageBanner() {
+    if (!stageBanner) return;
+    const fadeIn  = stageBanner.life > 80 ? (110 - stageBanner.life) / 30 : 1;
+    const fadeOut = stageBanner.life < 30 ? stageBanner.life / 30 : 1;
+    const a = Math.min(fadeIn, fadeOut);
+
+    ctx.save();
+    ctx.globalAlpha = a;
+
+    // 배경 막대
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, canvas.height/2 - 70, canvas.width, 140);
+
+    ctx.fillStyle = "#ffd700";
+    ctx.font = "bold 64px 'Courier New', monospace";
+    ctx.textAlign = "center";
+    ctx.fillText(stageBanner.text, canvas.width/2, canvas.height/2 + 8);
+
+    if (stageBanner.sub) {
+        ctx.fillStyle = "#ffaa66";
+        ctx.font = "bold 22px 'Courier New', monospace";
+        ctx.fillText(stageBanner.sub, canvas.width/2, canvas.height/2 + 50);
+    }
+
+    ctx.textAlign = "left";
+    ctx.restore();
+
+    stageBanner.life--;
+    if (stageBanner.life <= 0) stageBanner = null;
+}
+
+// ============================================================
+// 🎯 Cannon control
+// ============================================================
+function updateCannon() {
+    const baseX = canvas.width / 2;
+    const baseY = canvas.height - 35;
+    const dx    = mouse.x - baseX;
+    const dy    = Math.min(-1, mouse.y - baseY);  // 항상 위쪽 조준
+    const desired = Math.atan2(dy, dx);
+    cannonAngle += (desired - cannonAngle) * 0.2;
+}
+
+// ============================================================
+// 🎮 Loop
+// ============================================================
+function loop(now) {
+    updateWind(now);
+    updateClouds();
+    drawBackground();
+
+    maybeSpawn(now);
+    updateTargets(now);
+    updateBullets();
+    updateCannon();
+
+    targets.forEach(drawTarget);
+    drawBullets();
+    drawShooter();
+    drawFloatingTexts();
+    drawWindIndicator();
+    drawScopeOverlay();
+    drawCrosshair();
+    drawStageBanner();
+
+    if (muzzleFlashLife > 0) muzzleFlashLife--;
+
+    checkStageChange();
+
+    requestAnimationFrame(loop);
+}
+
+// ============================================================
+// 🖱️ Input
+// ============================================================
+function clientToCanvas(clientX, clientY) {
+    const rect  = canvas.getBoundingClientRect();
+    const scale = rect.width / canvas.width;
+    return {
+        x: (clientX - rect.left) / scale,
+        y: (clientY - rect.top)  / scale,
+    };
+}
+
+canvas.addEventListener("mousemove", (e) => {
+    const p = clientToCanvas(e.clientX, e.clientY);
+    mouse.x = p.x;
+    mouse.y = p.y;
+});
+
+canvas.addEventListener("mousedown", (e) => {
+    isMouseDown     = true;
+    mouseDownClient = { x: e.clientX, y: e.clientY };
+
+    zoomTimer = setTimeout(() => {
+        if (isMouseDown) {
+            isZoomed = true;
+            canvas.style.transformOrigin = `${mouseDownClient.x}px ${mouseDownClient.y}px`;
+            canvas.style.transform       = `scale(${ZOOM_SCALE})`;
+        }
+    }, ZOOM_HOLD_TIME);
+});
+
+canvas.addEventListener("mouseup", (e) => {
+    clearTimeout(zoomTimer);
+    isMouseDown = false;
+
+    const p = clientToCanvas(e.clientX, e.clientY);
+
+    if (isZoomed) {
+        canvas.style.transform = "scale(1)";
+        isZoomed = false;
+    }
+
+    fireBullet(p.x, p.y);
+});
+
+canvas.addEventListener("mouseleave", () => {
+    clearTimeout(zoomTimer);
+    isMouseDown = false;
+    if (isZoomed) {
+        canvas.style.transform = "scale(1)";
+        isZoomed = false;
+    }
+});
+
+window.addEventListener("resize", () => {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initClouds();
+});
+
+// ============================================================
+// Boot
+// ============================================================
+initClouds();
+checkStageChange();
+updateScoreTable();
+requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>
