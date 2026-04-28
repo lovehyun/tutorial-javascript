@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>마우스 이벤트 연습</title>
+<style>
+body {
+    margin: 0;
+    background: #111;
+    overflow: hidden;
+}
+canvas {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// 🎯 상태
+let isMouseDown = false;
+let isScoped = false;
+let timer = null;
+
+let mouse = { x: 0, y: 0 };
+
+// 🎯 고정 과녁
+const target = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    radius: 80
+};
+
+// 🎯 과녁 그리기
+function drawTarget() {
+    const colors = ["#fff","#fcc","#f66","#f00","#900"];
+
+    for (let i = 5; i > 0; i--) {
+        ctx.beginPath();
+        ctx.arc(
+            target.x,
+            target.y,
+            target.radius * (i / 5),
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = colors[i - 1];
+        ctx.fill();
+    }
+}
+
+// 🎯 스코프
+function drawScope() {
+
+    // 주변 어둡게
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 원형 영역
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 120, 0, Math.PI * 2);
+    ctx.clip();
+
+    // 내부 다시 그리기
+    drawTarget();
+
+    ctx.restore();
+
+    // 스코프 테두리
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, 120, 0, Math.PI * 2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+
+    // 조준선
+    ctx.beginPath();
+    ctx.moveTo(mouse.x - 20, mouse.y);
+    ctx.lineTo(mouse.x + 20, mouse.y);
+    ctx.moveTo(mouse.x, mouse.y - 20);
+    ctx.lineTo(mouse.x, mouse.y + 20);
+    ctx.strokeStyle = "white";
+    ctx.stroke();
+}
+
+// 🎮 루프
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!isScoped) {
+        drawTarget();
+    } else {
+        drawScope();
+    }
+
+    requestAnimationFrame(loop);
+}
+
+// 🖱️ 이벤트
+
+// 마우스 이동
+canvas.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+// 누름
+canvas.addEventListener("mousedown", () => {
+    isMouseDown = true;
+
+    timer = setTimeout(() => {
+        if (isMouseDown) {
+            isScoped = true;
+        }
+    }, 1000); // 1초
+});
+
+// 뗌
+canvas.addEventListener("mouseup", () => {
+    isMouseDown = false;
+    clearTimeout(timer);
+
+    isScoped = false;
+});
+
+loop();
+</script>
+
+</body>
+</html>

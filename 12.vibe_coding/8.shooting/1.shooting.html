@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사격 게임</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: #111;
+        color: white;
+        font-family: Arial;
+    }
+    canvas {
+        display: block;
+        transition: transform 0.2s;
+    }
+    #scoreBoard {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 28px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="scoreBoard">점수: 0</div>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreBoard = document.getElementById("scoreBoard");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let target = {
+    x: canvas.width + 100,
+    y: canvas.height / 2,
+    radius: 100,
+    speed: 3
+};
+
+let score = 0;
+
+// 🎯 과녁 (색상 개선 버전)
+function drawTarget() {
+    const colors = [
+        "#ffffff", // 1점 (바깥)
+        "#ffcccc",
+        "#ff6666",
+        "#ff0000",
+        "#990000"  // 5점 (중앙)
+    ];
+
+    // 바깥 → 안쪽
+    for (let i = 5; i > 0; i--) {
+        ctx.beginPath();
+        ctx.arc(
+            target.x,
+            target.y,
+            target.radius * (i / 5),
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = colors[i - 1];
+        ctx.fill();
+    }
+}
+
+// 🎯 점수 계산
+function getScore(clickX, clickY) {
+    const dx = clickX - target.x;
+    const dy = clickY - target.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const step = target.radius / 5;
+
+    if (dist <= step) return 5;
+    if (dist <= step * 2) return 4;
+    if (dist <= step * 3) return 3;
+    if (dist <= step * 4) return 2;
+    if (dist <= step * 5) return 1;
+
+    return 0;
+}
+
+// 🔫 발사
+function shoot(x, y) {
+    const point = getScore(x, y);
+    score += point;
+
+    scoreBoard.textContent = `점수: ${score}`;
+}
+
+// 🎮 게임 루프
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    target.x -= target.speed;
+
+    if (target.x < -100) {
+        target.x = canvas.width + 100;
+        target.y = Math.random() * canvas.height;
+    }
+
+    drawTarget();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// 🖱️ 이벤트
+canvas.addEventListener("mousedown", () => {
+    canvas.style.transform = "scale(2)";
+});
+
+canvas.addEventListener("mouseup", (e) => {
+    canvas.style.transform = "scale(1)";
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / 2;
+    const y = (e.clientY - rect.top) / 2;
+
+    shoot(x, y);
+});
+
+gameLoop();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사격 게임 (최종 - 속도보정)</title>
+<style>
+body {
+    margin: 0;
+    background: #111;
+    overflow: hidden;
+    color: white;
+}
+
+#scoreBoard {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 24px;
+    z-index: 10;
+}
+
+canvas {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<div id="scoreBoard">점수: 0</div>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const scoreBoard = document.getElementById("scoreBoard");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// 🎯 상태
+let isMouseDown = false;
+let isScoped = false;
+let scopeTimer = null;
+
+let mouse = { x: 0, y: 0 };
+
+// 🎯 영역
+const margin = 120;
+const playArea = {
+    top: margin,
+    bottom: canvas.height - margin
+};
+
+// 🎯 과녁
+let target = {
+    id: 1,
+    x: canvas.width + 100,
+    y: randomY(),
+    radius: 50,
+    speed: 3
+};
+
+let bullets = [];
+let holes = [];
+let misses = [];
+let score = 0;
+
+// 🎯 랜덤 Y
+function randomY(){
+    return Math.random() * (playArea.bottom - playArea.top) + playArea.top;
+}
+
+// 🎯 바운딩 박스
+function drawBoundingBox(){
+    ctx.strokeStyle = "lime";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(
+        0,
+        playArea.top,
+        canvas.width,
+        playArea.bottom - playArea.top
+    );
+}
+
+// 🎯 과녁
+function drawTarget(){
+    const scale = isScoped ? 2 : 1;
+    const colors = ["#fff","#fcc","#f66","#f00","#900"];
+
+    for(let i=5;i>0;i--){
+        ctx.beginPath();
+        ctx.arc(
+            target.x,
+            target.y,
+            target.radius * (i/5) * scale,
+            0, Math.PI*2
+        );
+        ctx.fillStyle = colors[i-1];
+        ctx.fill();
+    }
+}
+
+// 🎯 점수 계산
+function getScore(x,y,tx,ty){
+    const dx = x-tx;
+    const dy = y-ty;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    const step = target.radius/5;
+
+    if(dist<=step) return 5;
+    if(dist<=step*2) return 4;
+    if(dist<=step*3) return 3;
+    if(dist<=step*4) return 2;
+    if(dist<=step*5) return 1;
+    return 0;
+}
+
+// 🔫 발사 (속도보정용 데이터 저장)
+function shoot(x,y){
+
+    bullets.push({
+        x: canvas.width/2,
+        y: canvas.height,
+
+        clickX: x,
+        clickY: y,
+
+        startTargetX: target.x,
+        startTargetY: target.y,
+
+        targetId: target.id,
+
+        // 🎯 과녁 사라진 순간의 보정값을 동결하기 위한 캐시
+        lastMoveX: 0,
+        lastMoveY: 0,
+
+        holeDx: x - target.x,
+        holeDy: y - target.y,
+
+        speed: 12
+    });
+}
+
+// 🔫 총알 이동 (🔥 핵심: 속도 보정)
+function updateBullets(){
+    bullets.forEach((b,i)=>{
+
+        // 🎯 과녁이 살아있을 때만 보정값 갱신,
+        //    과녁이 교체되면 마지막 보정값을 그대로 사용 (궤적 동결)
+        if(b.targetId === target.id){
+            b.lastMoveX = target.x - b.startTargetX;
+            b.lastMoveY = target.y - b.startTargetY;
+        }
+
+        const tx = b.clickX + b.lastMoveX;
+        const ty = b.clickY + b.lastMoveY;
+
+        const dx = tx - b.x;
+        const dy = ty - b.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist < 10){
+
+            if(b.targetId === target.id){
+                const point = getScore(tx, ty, target.x, target.y);
+
+                if(point > 0){
+                    score += point;
+                    scoreBoard.textContent = `점수: ${score}`;
+
+                    holes.push({
+                        dx: b.holeDx,
+                        dy: b.holeDy
+                    });
+                } else {
+                    misses.push({
+                        x: tx,
+                        y: ty,
+                        life: 30
+                    });
+                }
+            } else {
+                misses.push({
+                    x: tx,
+                    y: ty,
+                    life: 30
+                });
+            }
+
+            bullets.splice(i,1);
+            return;
+        }
+
+        b.x += dx/dist * b.speed;
+        b.y += dy/dist * b.speed;
+    });
+}
+
+// 🔫 총알
+function drawBullets(){
+    ctx.fillStyle="yellow";
+    bullets.forEach(b=>{
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,5,0,Math.PI*2);
+        ctx.fill();
+    });
+}
+
+// 💥 구멍
+function drawHoles(){
+    holes.forEach(h=>{
+        const x = target.x + h.dx;
+        const y = target.y + h.dy;
+
+        ctx.beginPath();
+        ctx.arc(x,y,5,0,Math.PI*2);
+        ctx.fillStyle="black";
+        ctx.fill();
+    });
+}
+
+// ❌ MISS
+function drawMiss(){
+    misses.forEach((m,i)=>{
+        ctx.fillStyle="white";
+        ctx.font="18px Arial";
+        ctx.fillText("MISS",m.x,m.y);
+
+        m.life--;
+        if(m.life<=0) misses.splice(i,1);
+    });
+}
+
+// 🎯 스코프
+function drawScope(){
+
+    // 어둡게
+    ctx.fillStyle="rgba(0,0,0,0.75)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    // 클리핑
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(mouse.x,mouse.y,120,0,Math.PI*2);
+    ctx.clip();
+
+    drawBoundingBox();
+    drawTarget();
+    drawHoles();
+    drawBullets();
+    drawMiss();
+
+    ctx.restore();
+
+    // 테두리
+    ctx.beginPath();
+    ctx.arc(mouse.x,mouse.y,120,0,Math.PI*2);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle="white";
+    ctx.stroke();
+
+    // 조준선
+    ctx.beginPath();
+    ctx.moveTo(mouse.x-20,mouse.y);
+    ctx.lineTo(mouse.x+20,mouse.y);
+    ctx.moveTo(mouse.x,mouse.y-20);
+    ctx.lineTo(mouse.x,mouse.y+20);
+    ctx.stroke();
+}
+
+// 🎮 루프
+function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const speed = isScoped ? 1 : 3;
+    target.x -= speed;
+
+    if(target.x < -100){
+        target.id++;
+        target.x = canvas.width + 100;
+        target.y = randomY();
+        holes = [];
+    }
+
+    updateBullets();
+
+    if(isScoped){
+        drawScope();
+    } else {
+        drawBoundingBox();
+        drawTarget();
+        drawHoles();
+        drawBullets();
+        drawMiss();
+    }
+
+    requestAnimationFrame(loop);
+}
+
+// 🖱️ 이벤트
+canvas.addEventListener("mousemove",(e)=>{
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+canvas.addEventListener("mousedown",()=>{
+    isMouseDown = true;
+
+    scopeTimer = setTimeout(()=>{
+        if(isMouseDown){
+            isScoped = true;
+        }
+    },1000);
+});
+
+canvas.addEventListener("mouseup",(e)=>{
+    isMouseDown = false;
+    clearTimeout(scopeTimer);
+
+    shoot(e.clientX, e.clientY);
+    isScoped = false;
+});
+
+loop();
+</script>
+
+</body>
+</html>

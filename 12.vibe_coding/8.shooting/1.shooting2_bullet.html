@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사격 게임</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: #111;
+        color: white;
+        font-family: Arial;
+    }
+    canvas {
+        display: block;
+        transition: transform 0.2s;
+    }
+    #scoreBoard {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 28px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+<div id="scoreBoard">점수: 0</div>
+<canvas id="gameCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const scoreBoard = document.getElementById("scoreBoard");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// 🎯 과녁
+let target = {
+    x: canvas.width + 100,
+    y: canvas.height / 2,
+    radius: 100,
+    speed: 3
+};
+
+let score = 0;
+
+// 🔫 총알 리스트
+let bullets = [];
+
+// 🎯 히트 마커
+let hits = [];
+
+// 🎯 과녁 그리기
+function drawTarget() {
+    const colors = ["#ffffff", "#ffcccc", "#ff6666", "#ff0000", "#990000"];
+
+    for (let i = 5; i > 0; i--) {
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, target.radius * (i / 5), 0, Math.PI * 2);
+        ctx.fillStyle = colors[i - 1];
+        ctx.fill();
+    }
+}
+
+// 🎯 점수 계산
+function getScore(x, y) {
+    const dx = x - target.x;
+    const dy = y - target.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const step = target.radius / 5;
+
+    if (dist <= step) return 5;
+    if (dist <= step * 2) return 4;
+    if (dist <= step * 3) return 3;
+    if (dist <= step * 4) return 2;
+    if (dist <= step * 5) return 1;
+
+    return 0;
+}
+
+// 🔫 총알 생성
+function shoot(targetX, targetY) {
+    bullets.push({
+        x: canvas.width / 2,
+        y: canvas.height,
+        tx: targetX,
+        ty: targetY,
+        speed: 10
+    });
+}
+
+// 🔫 총알 이동
+function updateBullets() {
+    bullets.forEach((b, index) => {
+        const dx = b.tx - b.x;
+        const dy = b.ty - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 10) {
+            // 도착 → 점수 계산
+            const point = getScore(b.tx, b.ty);
+            score += point;
+            scoreBoard.textContent = `점수: ${score}`;
+
+            // 히트 마커 추가
+            hits.push({
+                x: b.tx,
+                y: b.ty,
+                life: 30
+            });
+
+            bullets.splice(index, 1);
+            return;
+        }
+
+        b.x += dx / dist * b.speed;
+        b.y += dy / dist * b.speed;
+    });
+}
+
+// 🔫 총알 그리기
+function drawBullets() {
+    ctx.fillStyle = "yellow";
+    bullets.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+// 💥 히트 마커
+function drawHits() {
+    hits.forEach((h, index) => {
+        ctx.strokeStyle = "cyan";
+        ctx.beginPath();
+        ctx.moveTo(h.x - 10, h.y - 10);
+        ctx.lineTo(h.x + 10, h.y + 10);
+        ctx.moveTo(h.x + 10, h.y - 10);
+        ctx.lineTo(h.x - 10, h.y + 10);
+        ctx.stroke();
+
+        h.life--;
+
+        if (h.life <= 0) {
+            hits.splice(index, 1);
+        }
+    });
+}
+
+// 🎮 루프
+function gameLoop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    target.x -= target.speed;
+
+    if (target.x < -100) {
+        target.x = canvas.width + 100;
+        target.y = Math.random() * canvas.height;
+    }
+
+    drawTarget();
+
+    updateBullets();
+    drawBullets();
+    drawHits();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// 🖱️ 이벤트
+canvas.addEventListener("mousedown", (e) => {
+    // 클릭한 지점을 고정점으로 줌인 → 줌아웃해도 그 지점은 화면상 같은 위치에 머무름
+    canvas.style.transformOrigin = `${e.clientX}px ${e.clientY}px`;
+    canvas.style.transform = "scale(2)";
+});
+
+canvas.addEventListener("mouseup", (e) => {
+    // 줌 상태의 rect를 먼저 읽어야 클릭 좌표를 정확히 캔버스 좌표로 환산할 수 있음
+    const rect = canvas.getBoundingClientRect();
+    const scale = rect.width / canvas.width;
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
+
+    canvas.style.transform = "scale(1)";
+
+    shoot(x, y);
+});
+
+gameLoop();
+</script>
+
+</body>
+</html>

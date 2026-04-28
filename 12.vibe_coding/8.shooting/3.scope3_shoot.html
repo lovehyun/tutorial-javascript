@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사격 게임 - 좌표 보정 완성</title>
+<style>
+body {
+    margin: 0;
+    background: #111;
+    overflow: hidden;
+}
+canvas {
+    display: block;
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// 상태
+let isMouseDown = false;
+let isScoped = false;
+let timer = null;
+
+let mouse = { x: 0, y: 0 };
+
+// 과녁
+const target = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    baseRadius: 80
+};
+
+const normalScale = 1/3;
+let zoomScale = normalScale;
+const maxZoomScale = 1;
+const scopeRadius = 120;
+
+// 총알 & 구멍
+let bullets = [];
+let holes = [];
+
+// 🎯 과녁
+function drawTarget(scale) {
+    const colors = ["#fff","#fcc","#f66","#f00","#900"];
+
+    for (let i = 5; i > 0; i--) {
+        ctx.beginPath();
+        ctx.arc(
+            target.x,
+            target.y,
+            target.baseRadius * (i/5) * scale,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = colors[i-1];
+        ctx.fill();
+    }
+}
+
+// 🎯 구멍
+function drawHoles() {
+    holes.forEach(h => {
+        const x = target.x + h.dx;
+        const y = target.y + h.dy;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI*2);
+        ctx.fillStyle = "black";
+        ctx.fill();
+    });
+}
+
+// 🔫 좌표 보정 (🔥 핵심)
+function getCorrectedClick(x, y) {
+
+    if (!isScoped) return { x, y };
+
+    const dx = x - mouse.x;
+    const dy = y - mouse.y;
+
+    return {
+        x: mouse.x + dx / zoomScale,
+        y: mouse.y + dy / zoomScale
+    };
+}
+
+// 🔫 발사
+function shoot(x, y) {
+
+    const dx = x - target.x;
+    const dy = y - target.y;
+
+    bullets.push({
+        x: canvas.width / 2,
+        y: canvas.height,
+        tx: x,
+        ty: y,
+        dx: dx,
+        dy: dy
+    });
+}
+
+// 🔫 총알 이동
+function updateBullets() {
+    bullets.forEach((b, i) => {
+
+        const dx = b.tx - b.x;
+        const dy = b.ty - b.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+
+        if (dist < 10) {
+
+            holes.push({
+                dx: b.dx,
+                dy: b.dy
+            });
+
+            bullets.splice(i,1);
+            return;
+        }
+
+        b.x += dx/dist * 10;
+        b.y += dy/dist * 10;
+    });
+}
+
+// 🔫 총알
+function drawBullets() {
+    ctx.fillStyle = "yellow";
+    bullets.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 5, 0, Math.PI*2);
+        ctx.fill();
+    });
+}
+
+// 🎯 스코프
+function drawScope() {
+
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, scopeRadius, 0, Math.PI*2);
+    ctx.clip();
+
+    drawTarget(zoomScale);
+    drawHoles();
+
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(mouse.x, mouse.y, scopeRadius, 0, Math.PI*2);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 조준선
+    ctx.beginPath();
+    ctx.moveTo(mouse.x-20,mouse.y);
+    ctx.lineTo(mouse.x+20,mouse.y);
+    ctx.moveTo(mouse.x,mouse.y-20);
+    ctx.lineTo(mouse.x,mouse.y+20);
+    ctx.stroke();
+}
+
+// 🎯 줌
+function updateZoom() {
+    if (isScoped && zoomScale < maxZoomScale) {
+        zoomScale += 0.03;
+    }
+}
+
+// 🎮 루프
+function loop() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    updateZoom();
+    updateBullets();
+
+    // 기본 과녁
+    drawTarget(normalScale);
+    drawHoles();
+    drawBullets();
+
+    if (isScoped) {
+        drawScope();
+    }
+
+    requestAnimationFrame(loop);
+}
+
+// 🖱️ 이벤트
+canvas.addEventListener("mousemove", e => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+canvas.addEventListener("mousedown", () => {
+    isMouseDown = true;
+
+    timer = setTimeout(() => {
+        if (isMouseDown) {
+            isScoped = true;
+            zoomScale = normalScale;
+        }
+    }, 1000);
+});
+
+canvas.addEventListener("mouseup", e => {
+    isMouseDown = false;
+    clearTimeout(timer);
+
+    const corrected = getCorrectedClick(e.clientX, e.clientY);
+
+    shoot(corrected.x, corrected.y);
+
+    isScoped = false;
+    zoomScale = normalScale;
+});
+
+loop();
+</script>
+
+</body>
+</html>

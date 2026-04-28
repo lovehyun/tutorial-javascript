@@ -52,6 +52,11 @@
         // 페이지 로드 시 실행
         updateSizeInfo();
 
+        // 브라우저 초기화 시 window 정보 못가져오는것을 delay를 통해 해결
+        // window.addEventListener('load', () => {
+        //     setTimeout(updateWindowInfo, 50);
+        // });
+
         // 창 크기 조절 시 실시간 업데이트
         window.addEventListener('resize', updateSizeInfo);
     </script>
