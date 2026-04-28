@@ -1,6 +1,7 @@
 const Room   = require('./room');
 const config = require('./config');
 const { getSocketIP } = require('./utils');
+const log    = require('./logger');
 
 class Lobby {
     constructor(io, db) {
@@ -26,19 +27,23 @@ class Lobby {
         socket.data.nickname = '익명';
         socket.data.roomId   = null;
 
-        // 처음 접속 시 로비에 등록
+        log.log('CONN', `connect  socket=${socket.id}  ip=${ip}`);
+
         socket.join('lobby');
         this.lobbyClients.set(socket.id, { nickname: '익명', ip });
 
         socket.on('lobby:hello', ({ nickname }) => {
+            const old = socket.data.nickname;
             socket.data.nickname = sanitizeNick(nickname);
             const entry = this.lobbyClients.get(socket.id);
             if (entry) entry.nickname = socket.data.nickname;
+            log.log('HELLO', `socket=${socket.id}  nick="${socket.data.nickname}"  (was "${old}")`);
             socket.emit('lobby:state', this.snapshot());
             this.broadcastLobby();
         });
 
         socket.on('lobby:nick', ({ nickname }) => {
+            const old = socket.data.nickname;
             socket.data.nickname = sanitizeNick(nickname);
             const entry = this.lobbyClients.get(socket.id);
             if (entry) entry.nickname = socket.data.nickname;
@@ -46,28 +51,32 @@ class Lobby {
                 const r = this.rooms.get(socket.data.roomId);
                 if (r) r.updatePlayerNickname(socket.id, socket.data.nickname);
             }
+            log.log('NICK',  `"${old}" → "${socket.data.nickname}"  socket=${socket.id}`);
             this.broadcastLobby();
         });
 
         socket.on('lobby:chat', ({ text }) => {
             const t = (text || '').toString().trim().slice(0, 200);
             if (!t) return;
-            const msg = {
-                from: socket.data.nickname,
-                text: t,
-                time: Date.now(),
-            };
+            const msg = { from: socket.data.nickname, text: t, time: Date.now() };
             this.chatHistory.push(msg);
             if (this.chatHistory.length > config.CHAT_HISTORY) this.chatHistory.shift();
+            log.log('CHAT',  `${msg.from}: ${msg.text}`);
             this.io.to('lobby').emit('lobby:chat', msg);
         });
 
         socket.on('room:join', ({ roomId }) => {
             const id = parseInt(roomId, 10);
             const room = this.rooms.get(id);
-            if (!room) return socket.emit('error:msg', '존재하지 않는 룸');
-            if (room.isFull()) return socket.emit('error:msg', '룸이 가득 찼습니다');
-            if (socket.data.roomId) this.exitRoom(socket); // 다른 룸에 있으면 먼저 나감
+            if (!room) {
+                log.warn('JOIN', `invalid room ${id}  socket=${socket.id}`);
+                return socket.emit('error:msg', '존재하지 않는 룸');
+            }
+            if (room.isFull()) {
+                log.warn('JOIN', `room ${id} full  socket=${socket.id}`);
+                return socket.emit('error:msg', '룸이 가득 찼습니다');
+            }
+            if (socket.data.roomId) this.exitRoom(socket);
 
             socket.leave('lobby');
             this.lobbyClients.delete(socket.id);
@@ -75,10 +84,14 @@ class Lobby {
             room.addPlayer(socket);
             socket.data.roomId = room.id;
 
+            log.log('JOIN',  `room=${room.id}  nick="${socket.data.nickname}"  ip=${ip}  count=${room.players.size}/${config.MAX_PER_ROOM}`);
             this.broadcastLobby();
         });
 
         socket.on('room:leave', () => {
+            if (socket.data.roomId) {
+                log.log('LEAVE', `room=${socket.data.roomId}  nick="${socket.data.nickname}"  (manual)`);
+            }
             this.exitRoom(socket);
         });
 
@@ -88,12 +101,16 @@ class Lobby {
             if (r) r.handleFire(socket.id, data || {});
         });
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', (reason) => {
             if (socket.data.roomId) {
                 const r = this.rooms.get(socket.data.roomId);
-                if (r) r.removePlayer(socket.id);
+                if (r) {
+                    log.log('LEAVE', `room=${socket.data.roomId}  nick="${socket.data.nickname}"  (disconnect: ${reason})`);
+                    r.removePlayer(socket.id);
+                }
             }
             this.lobbyClients.delete(socket.id);
+            log.log('CONN', `disconnect  socket=${socket.id}  ip=${ip}  reason=${reason}`);
             this.broadcastLobby();
         });
     }

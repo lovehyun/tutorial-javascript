@@ -1,5 +1,6 @@
 const config = require('./config');
 const { clamp } = require('./utils');
+const log    = require('./logger');
 
 const ROW_CONFIGS = [
     { yRatio: 0.30, speed: 3.2, direction:  1, spawnInterval: 5000 },
@@ -55,6 +56,7 @@ class Room {
         this.startTime    = Date.now();
         this.tickHandle   = null;
         this.lastBroadcast = 0;
+        this.lastLoggedStage = 1;
     }
 
     isFull() {
@@ -103,7 +105,8 @@ class Room {
         const slot = free[Math.floor(Math.random() * free.length)];
 
         const cannonX = config.WORLD.width  * (slot + 1) / (config.MAX_PER_ROOM + 1);
-        const cannonY = config.WORLD.height - 35;
+        // 캐논 아래에 닉네임/점수 텍스트 그릴 공간(약 70px) 확보
+        const cannonY = config.WORLD.height - 100;
 
         const player = {
             id:           socket.id,
@@ -144,6 +147,7 @@ class Room {
         // 의미있는 플레이만 DB 저장
         if (p.shotsFired > 0 || p.score > 0) {
             const now = Date.now();
+            const acc = p.shotsFired ? Math.round(p.shotsHit * 100 / p.shotsFired) : 0;
             try {
                 this.db.insertPlay({
                     nickname:    p.nickname,
@@ -156,8 +160,9 @@ class Room {
                     ended_at:    now,
                     duration_ms: now - p.startedAt,
                 });
+                log.log('STAT', `saved  nick="${p.nickname}"  score=${p.score}  stage=${p.maxStage}  acc=${acc}%  duration=${Math.round((now-p.startedAt)/1000)}s`);
             } catch (e) {
-                console.error('[db] insertPlay failed:', e.message);
+                log.error('DB', 'insertPlay failed:', e.message);
             }
         }
 
@@ -244,6 +249,7 @@ class Room {
         this.lastSpawnAt = ROW_CONFIGS.map((cfg, i) => Date.now() - cfg.spawnInterval + i * 1200);
         const tickMs = 1000 / config.TICK_RATE;
         this.tickHandle = setInterval(() => this.tick(), tickMs);
+        log.log('ROOM', `room ${this.id} game loop started`);
     }
 
     stop() {
@@ -251,6 +257,7 @@ class Room {
         this.tickHandle = null;
         this.targets = [];
         this.bullets = [];
+        log.log('ROOM', `room ${this.id} game loop stopped (empty)`);
     }
 
     tick() {
@@ -264,6 +271,12 @@ class Room {
         for (const p of this.players.values()) {
             const st = 1 + Math.floor(p.score / STAGE_THRESHOLD);
             if (st > p.maxStage) p.maxStage = st;
+        }
+
+        // 룸 단위 스테이지 변화 로깅
+        if (this.stage !== this.lastLoggedStage) {
+            log.log('STAGE', `room=${this.id}  ${this.lastLoggedStage} → ${this.stage}  (top=${this.topScore})`);
+            this.lastLoggedStage = this.stage;
         }
 
         if (now - this.lastBroadcast >= 1000 / config.BROADCAST_RATE) {
@@ -449,6 +462,8 @@ class Room {
         const targets = this.targets.map(t => ({
             id: t.id, x: t.x, y: t.y, radius: t.radius, isReal: t.isReal,
             flip: t.flip, phase: t.phase, hits: t.hits,
+            // 정지 중인 phase 에선 vx=0, 이동 중에만 클라이언트 보간용으로 속도 전달
+            vx: (t.phase === 'incoming' || t.phase === 'leaving') ? t.speed * t.direction : 0,
         }));
 
         const bullets = this.bullets.map(b => ({

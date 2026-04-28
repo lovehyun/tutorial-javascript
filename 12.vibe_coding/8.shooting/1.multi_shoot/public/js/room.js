@@ -285,8 +285,8 @@
         }
     }
 
-    function drawBullets() {
-        snapshot.bullets.forEach(b => {
+    function drawBullets(bullets) {
+        bullets.forEach(b => {
             const isMine = b.ownerId === selfId;
             ctx.globalAlpha = isMine ? 1 : 0.45;
 
@@ -392,7 +392,7 @@
 
     function drawWindIndicator() {
         const cx = world.width / 2;
-        const cy = 70;
+        const cy = 130;   // 상단 HUD/topbar 와 겹치지 않게 아래로
         const max = Math.max(0, snapshot.stage - 1);
 
         ctx.fillStyle = 'rgba(0,0,0,0.45)';
@@ -499,12 +499,23 @@
     }
 
     // ─── Loop ───────────────────────────────────
+    const SERVER_TICK_RATE = 30;  // server/config.js 의 TICK_RATE 와 일치
+
     function loop() {
+        // 마지막 스냅샷 이후 경과시간만큼 extrapolation (서버 brodcast 사이를 부드럽게)
+        const dtSec      = (performance.now() - lastSnapshotTime) / 1000;
+        const ticksAhead = Math.min(dtSec * SERVER_TICK_RATE, 5);  // 5틱 이상 보간 안 함 (네트워크 끊김 방어)
+
+        const renderTargets = snapshot.targets.map(t =>
+            t.vx ? { ...t, x: t.x + t.vx * ticksAhead } : t);
+        const renderBullets = snapshot.bullets.map(b =>
+            ({ ...b, x: b.x + b.vx * ticksAhead, y: b.y + b.vy * ticksAhead }));
+
         ctx.clearRect(0, 0, world.width, world.height);
         drawBackground();
 
-        snapshot.targets.forEach(drawTarget);
-        drawBullets();
+        renderTargets.forEach(drawTarget);
+        drawBullets(renderBullets);
         snapshot.players.forEach(drawCannon);
 
         // 머즐 플래시 감쇠

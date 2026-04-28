@@ -2,12 +2,16 @@ const Database = require('better-sqlite3');
 const fs       = require('fs');
 const path     = require('path');
 const config   = require('./config');
+const log      = require('./logger');
 
-const dbPath = path.resolve(config.DB_PATH);
+const dbPath    = path.resolve(config.DB_PATH);
+const existed   = fs.existsSync(dbPath);
 fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
+
+log.log('DB', `${existed ? 'opened' : 'created'}: ${dbPath}`);
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS plays (
@@ -101,6 +105,9 @@ const stmt = {
         ORDER BY stage
     `),
 };
+
+const totalPlays = db.prepare('SELECT COUNT(*) AS c FROM plays').get().c;
+log.log('DB', `journal_mode=WAL  total_plays=${totalPlays}`);
 
 module.exports = {
     insertPlay:    (data)        => stmt.insert.run(data),

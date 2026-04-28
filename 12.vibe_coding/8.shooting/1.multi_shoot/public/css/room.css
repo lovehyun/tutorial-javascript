@@ -15,7 +15,8 @@ html, body { height: 100%; margin: 0; }
     z-index: 5;
     display: flex;
     justify-content: space-between;
-    padding: 14px 22px;
+    /* 상단의 topbar(버튼들) 가 차지하는 ~40px 공간만큼 padding-top */
+    padding: 50px 22px 14px;
     text-shadow: 0 0 6px black, 0 0 6px black;
     font-weight: bold;
 }
@@ -61,7 +62,7 @@ html, body { height: 100%; margin: 0; }
 
 #scoreTable {
     position: fixed;
-    top: 70px;
+    top: 110px;
     right: 18px;
     z-index: 6;
     font-size: 11px;
@@ -96,10 +97,10 @@ html, body { height: 100%; margin: 0; }
 /* ─── Top bar buttons ─────────────────────────── */
 #topbar {
     position: fixed;
-    top: 14px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 7;
+    z-index: 8;            /* hud 보다 위에 */
     display: flex;
     gap: 8px;
 }

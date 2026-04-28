@@ -1,0 +1,21 @@
+# docker-compose 1.x (예: 1.8.0) 호환 버전
+# 사용:  docker-compose -f docker-compose.legacy.yml up -d --build
+#
+# 차이점:
+#   - profiles 미지원 → nginx 서비스 제거 (필요시 호스트 nginx 사용 권장)
+#   - version 명시 필수 (안 쓰면 1.x 가 v1 레거시 포맷으로 해석)
+
+version: '2'
+
+services:
+  multi-shoot:
+    build: .
+    container_name: multi-shoot
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_PATH=/app/data/multi-shoot.db
+    volumes:
+      - ./data:/app/data
