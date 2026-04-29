@@ -53,88 +53,61 @@
     </div>
 
     <script>
-        let startTime; // 스톱워치 시작 시간
-        let updatedTime; // 업데이트된 시간
-        let difference; // 경과 시간
-        let timerInterval; // 타이머 인터벌
-        let running = false; // 스톱워치 실행 여부
+        const display = document.getElementById('display');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const resetButton = document.getElementById('resetButton');
 
-        const display = document.getElementById('display'); // 스톱워치 표시 요소
-        const startButton = document.getElementById('startButton'); // 시작 버튼
-        const stopButton = document.getElementById('stopButton'); // 정지 버튼
-        const resetButton = document.getElementById('resetButton'); // 리셋 버튼
+        let elapsed = 0;      // 누적 경과 시간(ms)
+        let startTime = 0;    // 이번 실행 시작 시각
+        let timerId = null;   // setInterval ID (null이면 정지 상태)
 
-        function startTimer() {
-            if (!running) { // 스톱워치가 실행 중이 아닐 때
-                // new Date()	새로운 Date 객체 생성	Date 객체 (예: Wed Apr 09 2025 17:23:10 GMT+0900)
-                // Date()	함수처럼 호출됨	현재 시간의 문자열 (예: "Wed Apr 09 2025 17:23:10 GMT+0900")
-                // startTime = Date() 로 문자열만 반환하면, getTime() 등의 추가적인 메소드 호출 불가, 객체를 생성하여 getTtime() 사용
-
-                startTime = new Date().getTime() - (difference || 0); // 시작 시간 설정
-                timerInterval = setInterval(updateTimer, 10); // 10밀리초마다 updateTimer 호출
-                running = true; // 스톱워치 실행 상태로 변경
-
-                // 버튼 상태 업데이트
-                startButton.disabled = true; // Start 비활성화
-                stopButton.disabled = false; // Stop 활성화
-            }
+        // ms를 "MM:SS.cc" 형식으로 변환 (cc = 1/100초)
+        function format(ms) {
+            const m  = String(Math.floor(ms / 60000)).padStart(2, '0');
+            const s  = String(Math.floor(ms / 1000) % 60).padStart(2, '0');
+            const cs = String(Math.floor(ms / 10) % 100).padStart(2, '0');
+            return `${m}:${s}.${cs}`;
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval); // 타이머 인터벌 중지
-            running = false; // 스톱워치 실행 상태 해제
-
-            // 버튼 상태 업데이트
-            startButton.disabled = false; // Start 활성화
-            stopButton.disabled = true; // Stop 비활성화
+        // 실행 중이면 Stop만, 정지 상태면 Start만 활성화
+        function setRunning(isRunning) {
+            startButton.disabled = isRunning;
+            stopButton.disabled = !isRunning;
         }
 
-        function resetTimer() {
-            clearInterval(timerInterval); // 타이머 인터벌 중지
-            running = false; // 스톱워치 실행 상태 해제
-            difference = 0; // 경과 시간 초기화
-            display.textContent = '00:00.00'; // 표시 초기화
-
-            // 버튼 상태 업데이트
-            startButton.disabled = false; // Start 활성화
-            stopButton.disabled = true; // Stop 비활성화
+        function tick() {
+            display.textContent = format(Date.now() - startTime);
         }
 
-        function updateTimer() {
-            // new Date().getTime()은 현재 시각을 매번 새로 측정해서 시작시간(startTime) 과의 연산 수행
-            updatedTime = new Date().getTime(); // 현재 시간
-            difference = updatedTime - startTime; // 경과 시간 계산
-
-            let minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)); // 분 계산 (시간(1000*60*60)을 뺀 나머지에서 분(1000*60) 계산)
-            let seconds = Math.floor((difference % (1000 * 60)) / 1000); // 초 계산 (분을 뺀 나머지에서 초 계산)
-            let milliseconds = Math.floor((difference % 1000) / 10); // 밀리초 계산 (초빼고 밀리초 계산)
-
-            // 모든 하드코딩은 상수로 정의
-            // const HOUR_MS = 1000 * 60 * 60;
-            // const MINUTE_MS = 1000 * 60;
-            // let minutes = Math.floor((difference % HOUR_MS) / MINUTE_MS);
-
-            // 계산된 시간을 00:00.00 형식으로 표시
-            display.textContent = 
-                (minutes < 10 ? '0' + minutes : minutes) + ':' +
-                (seconds < 10 ? '0' + seconds : seconds) + '.' +
-                (milliseconds < 10 ? '0' + milliseconds : milliseconds);
-
-            // 또는 패딩 함수 사용
-            // display.textContent = 
-            //     String(minutes).padStart(2, '0') + ':' +
-            //     String(seconds).padStart(2, '0') + '.' +
-            //     String(milliseconds).padStart(2, '0');
+        function start() {
+            if (timerId) return;
+            startTime = Date.now() - elapsed; // 이전 경과 시간 이어서 시작
+            timerId = setInterval(tick, 10);
+            setRunning(true);
         }
 
-        // 초기 버튼 상태 설정
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        resetButton.disabled = false;
+        function stop() {
+            if (!timerId) return;
+            elapsed = Date.now() - startTime;
+            clearInterval(timerId);
+            timerId = null;
+            setRunning(false);
+        }
 
-        startButton.addEventListener('click', startTimer); // 시작 버튼 클릭 시 startTimer 호출
-        stopButton.addEventListener('click', stopTimer); // 정지 버튼 클릭 시 stopTimer 호출
-        resetButton.addEventListener('click', resetTimer); // 리셋 버튼 클릭 시 resetTimer 호출
+        function reset() {
+            clearInterval(timerId);
+            timerId = null;
+            elapsed = 0;
+            display.textContent = format(0);
+            setRunning(false);
+        }
+
+        startButton.addEventListener('click', start);
+        stopButton.addEventListener('click', stop);
+        resetButton.addEventListener('click', reset);
+
+        setRunning(false); // 초기 버튼 상태
     </script>
 </body>
 </html>
