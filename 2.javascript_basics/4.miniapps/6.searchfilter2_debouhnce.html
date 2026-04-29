@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Search Filter</title>
+    <style>
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Filter</h1>
+    <input type="text" id="searchInput" placeholder="Search...">
+    <ul id="itemsList">
+        <li>Apple</li>
+        <li>Banana</li>
+        <li>Orange</li>
+        <li>Grape</li>
+        <li>Mango</li>
+        <li>Pineapple</li>
+        <li>Strawberry</li>
+        <li>Blueberry</li>
+        <li>Watermelon</li>
+        <li>Peach</li>
+        <li>Cherry</li>
+        <li>Kiwi</li>
+        <li>Pear</li>
+        <li>Lemon</li>
+        <li>Lime</li>
+        <li>Papaya</li>
+        <li>Plum</li>
+        <li>Raspberry</li>
+        <li>Coconut</li>
+        <li>Pomegranate</li>
+    </ul>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const items = document.querySelectorAll('#itemsList li'); // NodeList 타입
+        let timer; // 타이머 저장용
+
+        // 검색 및 요소 숨기기
+        searchInput.addEventListener('keyup', () => {
+            clearTimeout(timer); // 이전 예약 취소
+
+            timer = setTimeout(() => {
+                const filter = searchInput.value.toLowerCase();
+
+                items.forEach(item => {
+                    const text = item.textContent;
+                    item.style.display =
+                        text.toLowerCase().includes(filter) ? '' : 'none';
+                });
+
+            }, 300); // 300ms 지연
+        });
+        
+
+        // 방법2. 코드 구조화 -->
+        /*
+        // debounce 함수
+        function debounce(fn, delay) {
+            let timer;
+            return function () {
+                clearTimeout(timer);
+                timer = setTimeout(fn, delay);
+            };
+        }
+
+        // 실제 필터 함수 분리
+        function filterItems() {
+            const filter = searchInput.value.toLowerCase();
+
+            Array.from(items).forEach((item) => {
+                const text = item.textContent || item.innerText;
+                item.style.display = text.toLowerCase().includes(filter) ? '' : 'none';
+            });
+        }
+
+        // debounce 적용 (300ms)
+        searchInput.addEventListener('keyup', debounce(filterItems, 300));
+        */
+        // 방법2. 코드 구조화 <--
+    </script>
+</body>
+</html>

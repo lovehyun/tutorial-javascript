@@ -48,57 +48,67 @@
     </div>
 
     <script>
-        const images = document.querySelectorAll('.slider img');
-        let currentIndex = 0;
-        updateFilename(currentIndex); // 최초 로딩시 파일명 업데이트
+        const imgs = document.querySelectorAll('.slider img');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const filename = document.getElementById('filename'); // 파일명 처리
 
-        function updateFilename(index) {
-            const filename = document.getElementById('filename');
-            // filename.textContent = images[index].src
-            filename.textContent = images[index].src.split('/').pop(); // 파일명만 표시
+        let i = 0;
+
+        // 방법1. 무한 반복 1-2-3-1-2-3
+        function show(direction) {
+            imgs[index].classList.remove('active');
+            index += direction;
+            
+            if (index >= imgs.length) index = 0;
+            if (index < 0) index = imgs.length - 1;
+
+            imgs[index].classList.add('active');
+
+            filename.textContent = imgs[index].src.split('/').slice(-2).join('/');
         }
-        
-        // 방법1. 3항연산자로 비교후 앞뒤 이동 -->
-        document.getElementById('prevBtn').addEventListener('click', () => {
-            images[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
-            images[currentIndex].classList.add('active');
-            updateFilename(currentIndex);
-        });
 
-        document.getElementById('nextBtn').addEventListener('click', () => {
-            images[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
-            images[currentIndex].classList.add('active');
-            updateFilename(currentIndex);
-        });
-        // 방법1. 3항연산자로 비교후 앞뒤 이동 <--
+        prevBtn.addEventListener('click', () => show(1));
+        nextBtn.addEventListener('click', () => show(-1));
+        // 방법1. <--
 
 
-        // 방법2. 현재 위치를 active로 가져와서, % 모듈러 연산으로 처리 -->
-        // function getCurrentIndex() {
-        //     return [...images].findIndex(img => img.classList.contains('active'));
-        // }
+        // 방법2. 무한반복 간단한 구조 -->
+        function show(n) {
+            imgs[i].classList.remove('active');
+            i = (n + imgs.length) % imgs.length;
+            imgs[i].classList.add('active');
 
-        // document.getElementById('prevBtn').addEventListener('click', () => {
-        //     const currentIndex = getCurrentIndex();
-        //     const nextIndex = (currentIndex - 1 + images.length) % images.length;
+            filename.textContent = imgs[i].src.split('/').pop(); // 파일명 처리
+        }
+        // 방법2. 무한 반복 <--
 
-        //     images[currentIndex].classList.remove('active');
-        //     images[nextIndex].classList.add('active');
-        //     updateFilename(nextIndex);
-        // });
+        prevBtn.addEventListener('click', () => show(i - 1));
+        nextBtn.addEventListener('click', () => show(i + 1));
 
-        // document.getElementById('nextBtn').addEventListener('click', () => {
-        //     const currentIndex = getCurrentIndex();
-        //     const nextIndex = (currentIndex + 1) % images.length;
+        // document.getElementById('prevBtn').onclick = () => show(i - 1);
+        // document.getElementById('nextBtn').onclick = () => show(i + 1); // 함수를 등록 O
+        // document.getElementById('prevBtn').onclick = show(i - 1); // 함수를 즉시 실행 X
 
-        //     images[currentIndex].classList.remove('active');
-        //     images[nextIndex].classList.add('active');
-        //     updateFilename(nextIndex);
-        // });
-        // 방법2. 현재 위치를 active로 가져와서, % 모듈러 연산으로 처리 <--
 
+        // 방법3. 유한 반복 버전 1-2-3 -->
+        function show(n) {
+            imgs[i].classList.remove('active');
+
+            // 추가 (범위 제한)
+            if (n < 0) n = 0;
+            if (n > imgs.length - 1) n = imgs.length - 1;
+
+            i = n;
+            imgs[i].classList.add('active');
+
+            filename.textContent = imgs[i].src.split('/').pop();
+
+            // 추가 (버튼 상태)
+            prevBtn.disabled = (i === 0);
+            nextBtn.disabled = (i === imgs.length - 1);
+        }
+        // 방법3. 유한 반복 <--
     </script>
 </body>
 </html>
