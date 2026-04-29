@@ -9,12 +9,17 @@ class Lobby {
         this.db = db;
 
         this.rooms = new Map();
+        const onPlaySaved = () => this.broadcastHallOfFame();
         for (let i = 1; i <= config.MAX_ROOMS; i++) {
-            this.rooms.set(i, new Room(i, io, db));
+            this.rooms.set(i, new Room(i, io, db, onPlaySaved));
         }
 
         this.lobbyClients = new Map();   // socket.id → { nickname, ip }
         this.chatHistory  = [];
+
+        // 로비 카드(점수/스테이지/플레이어 목록)와 명예의 전당이 게임 중에도
+        // 갱신되도록 주기적으로 푸시 — 이벤트 기반만으로는 정지되어 보임
+        this.lobbyTickHandle = setInterval(() => this.broadcastLobby(), 1500);
     }
 
     attach() {
@@ -141,9 +146,19 @@ class Lobby {
     }
 
     broadcastLobby() {
+        if (this.lobbyClients.size === 0) return; // 로비에 아무도 없으면 스킵
         this.io.to('lobby').emit('lobby:update', {
             rooms:      this.roomsSummary(),
             lobbyCount: this.lobbyClients.size,
+        });
+    }
+
+    // 게임이 끝나서 DB에 기록될 때 호출 — HOF만 갱신
+    broadcastHallOfFame() {
+        if (this.lobbyClients.size === 0) return;
+        this.io.to('lobby').emit('lobby:hof', {
+            hallOfFame: this.db.topByScore(10),
+            byStage:    this.db.topByStage(10),
         });
     }
 }

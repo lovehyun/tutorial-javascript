@@ -40,10 +40,11 @@ function accuracyTier(shotsHit, shotsFired) {
 }
 
 class Room {
-    constructor(id, io, db) {
+    constructor(id, io, db, onPlaySaved) {
         this.id = id;
         this.io = io;
         this.db = db;
+        this.onPlaySaved = onPlaySaved || (() => {}); // 게임 종료(DB 저장) 알림 콜백
 
         this.players       = new Map();
         this.targets       = [];
@@ -161,6 +162,7 @@ class Room {
                     duration_ms: now - p.startedAt,
                 });
                 log.log('STAT', `saved  nick="${p.nickname}"  score=${p.score}  stage=${p.maxStage}  acc=${acc}%  duration=${Math.round((now-p.startedAt)/1000)}s`);
+                this.onPlaySaved(); // 로비에 HOF 갱신 알림
             } catch (e) {
                 log.error('DB', 'insertPlay failed:', e.message);
             }

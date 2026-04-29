@@ -43,6 +43,11 @@
         document.getElementById('lobby-count').textContent = `(${u.lobbyCount}명 대기)`;
     });
 
+    // 누군가의 게임 종료(DB 저장)될 때만 명예의 전당 갱신
+    socket.on('lobby:hof', (u) => {
+        renderHallOfFame(u.hallOfFame, u.byStage);
+    });
+
     socket.on('lobby:chat', (msg) => appendChat(msg));
 
     socket.on('error:msg', (m) => alert(m));
