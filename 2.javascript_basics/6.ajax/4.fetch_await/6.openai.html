@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatGPT Demo</title>
+</head>
+<body>
+
+    <input type="text" id="prompt" placeholder="질문 입력">
+    <button id="sendBtn">전송</button>
+
+    <pre id="result"></pre>
+
+    <script>
+        const API_KEY = "YOUR_OPENAI_API_KEY"; // 이건 데모 코드일뿐, 절대로 API키를 이렇게 입력하지 않는다.
+
+        document.getElementById("sendBtn").addEventListener("click", async () => {
+            const prompt = document.getElementById("prompt").value;
+            const response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o-mini",
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt
+                        }
+                    ]
+                })
+            });
+
+            const data = await response.json();
+
+            document.getElementById("result").textContent =
+                data.choices[0].message.content;
+        });
+    </script>
+
+</body>
+</html>
