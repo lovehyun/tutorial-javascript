@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Modern Pacman</title>
+<style>
+    html, body {
+        margin: 0;
+        height: 100%;
+        background: radial-gradient(ellipse at center, #14143a 0%, #05050f 70%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: ui-monospace, Menlo, Consolas, monospace;
+        color: #e8e8ff;
+        overflow: hidden;
+    }
+    #wrap {
+        text-align: center;
+    }
+    #hud {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        margin-bottom: 8px;
+        text-shadow: 0 0 8px #6af;
+    }
+    #hud span b { color: #ffe24f; }
+    canvas {
+        display: block;
+        border-radius: 12px;
+        box-shadow: 0 0 40px rgba(80, 120, 255, 0.35), inset 0 0 30px rgba(0,0,0,0.6);
+        background: #06061a;
+    }
+    #msg {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background: rgba(0,0,0,0.55);
+        backdrop-filter: blur(4px);
+        font-size: 28px;
+        text-shadow: 0 0 16px #6af;
+    }
+    #msg small { font-size: 14px; opacity: 0.8; margin-top: 12px; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+    <div id="hud">
+        <span>SCORE <b id="score">0</b></span>
+        <span>LV <b id="level">1</b></span>
+        <span>LIFE <b id="lives">3</b></span>
+    </div>
+    <canvas id="canvas"></canvas>
+</div>
+<div id="msg"><div id="msgText"></div><small>R 키로 다시 시작</small></div>
+
+<script>
+// ─── 1) 미로 정의 ────────────────────────────────
+//   # = 벽,  . = 펠릿,  o = 파워펠릿,  G = 유령 시작,  P = 팩맨 시작,  ' ' = 빈 통로
+const MAZE = [
+    '###############',
+    '#......#......#',
+    '#o####.#.####o#',
+    '#.............#',
+    '#.##.##.##.##.#',
+    ' .....#.#..... ', // ★ 좌우 터널 (양 끝이 열려서 wrap)
+    '####.# - #.####',
+    '####.# G #.####',
+    '####.#GGG#.####',
+    '####.# G #.####',
+    '####.#####.####',
+    '#......#......#',
+    '#.####.#.####.#',
+    '#o....P......o#',
+    '##.#.#####.#.##',
+    '#....#####....#',
+    '#.###########.#',
+    '#.............#',
+    '###############',
+];
+console.assert(MAZE.every(r => r.length === MAZE[0].length), 'maze rows must have equal length');
+
+const COLS = MAZE[0].length;
+const ROWS = MAZE.length;
+const TILE = 30;          // 한 칸 픽셀 크기
+const W    = COLS * TILE;
+const H    = ROWS * TILE;
+
+// ─── 2) 캔버스 셋업 ───────────────────────────────
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+canvas.width  = W;
+canvas.height = H;
+
+const scoreEl = document.getElementById('score');
+const livesEl = document.getElementById('lives');
+const levelEl = document.getElementById('level');
+const msgEl   = document.getElementById('msg');
+const msgText = document.getElementById('msgText');
+
+// ─── 3) 미로 파싱 ─────────────────────────────────
+const walls   = [];          // [row][col] = true/false
+const pellets = new Set();   // "row,col"
+const powers  = new Set();   // "row,col"
+let pacStart  = null;        // {col,row}
+const ghostStarts = [];      // [{col,row}, ...]
+
+for (let r = 0; r < ROWS; r++) {
+    walls.push([]);
+    for (let c = 0; c < COLS; c++) {
+        const ch = MAZE[r][c];
+        walls[r].push(ch === '#');
+        if      (ch === '.') pellets.add(`${r},${c}`);
+        else if (ch === 'o') powers.add(`${r},${c}`);
+        else if (ch === 'P') pacStart = { col: c, row: r };
+        else if (ch === 'G') ghostStarts.push({ col: c, row: r });
+    }
+}
+
+const TOTAL_PELLETS = pellets.size + powers.size;
+const key = (r, c) => `${r},${c}`;
+
+function isWall(c, r) {
+    if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return true;
+    return walls[r][c];
+}
+
+// 터널 인식 벽 체크: 좌우 경계는 반대편으로 wrap해서 검사
+function isWallWrapped(c, r) {
+    if (c < 0)     c = COLS - 1;
+    if (c >= COLS) c = 0;
+    return isWall(c, r);
+}
+
+// 그리드 좌표 → 픽셀 중심
+const tileCenter = (col, row) => ({ x: col * TILE + TILE / 2, y: row * TILE + TILE / 2 });
+
+// ─── 4) 게임 상태 ─────────────────────────────────
+const DIRS = {
+    left:  { dx: -1, dy:  0, angle:  Math.PI },
+    right: { dx:  1, dy:  0, angle:  0 },
+    up:    { dx:  0, dy: -1, angle: -Math.PI / 2 },
+    down:  { dx:  0, dy:  1, angle:  Math.PI / 2 },
+};
+const DIR_NAMES = Object.keys(DIRS);
+const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' };
+
+// 속도는 TILE(30)을 정수로 나눠 떨어지는 값을 사용 → 타일 중심 정렬이 매번 정확히 맞음
+const PAC_SPEED       = 2.5;     // 30/2.5 = 12프레임/타일
+const GHOST_SPEED     = 2.0;     // 30/2.0 = 15프레임/타일
+const FRIGHT_SPEED    = 1.5;     // 30/1.5 = 20프레임/타일
+const FRIGHT_DURATION = 7 * 60;  // 7초 (60fps 가정)
+const POPUP_DURATION  = 60;      // 1초
+
+const GHOST_COLORS = ['#ff3050', '#ffb0e0', '#50e0ff', '#ffa040'];
+
+let game;
+
+function newGame() {
+    const p = tileCenter(pacStart.col, pacStart.row);
+    game = {
+        score: 0,
+        lives: 3,
+        level: 1,
+        pacman: { x: p.x, y: p.y, dir: 'left', nextDir: 'left', mouth: 0 },
+        ghosts: ghostStarts.slice(0, 4).map((g, i) => {
+            const c = tileCenter(g.col, g.row);
+            return {
+                x: c.x, y: c.y,
+                home: { x: c.x, y: c.y },
+                dir: ['up', 'down', 'left', 'right'][i % 4],
+                color: GHOST_COLORS[i % GHOST_COLORS.length],
+                mode: 'chase',     // chase | frightened | eaten
+                respawnTimer: 0,
+            };
+        }),
+        pellets: new Set(pellets),
+        powers:  new Set(powers),
+        frightTimer: 0,
+        ghostsEatenInChain: 0,
+        popups: [],
+        state: 'play',             // play | dead | win | over
+        deadTimer: 0,
+        particles: [],
+    };
+    updateHUD();
+    hideMsg();
+}
+
+function nextLevel() {
+    game.level++;
+    game.pellets = new Set(pellets);
+    game.powers  = new Set(powers);
+    game.frightTimer = 0;
+    game.ghostsEatenInChain = 0;
+    resetPositions();
+    showMsg(`LEVEL ${game.level}`, 90);
+    updateHUD();
+}
+
+function resetPositions() {
+    const p = tileCenter(pacStart.col, pacStart.row);
+    game.pacman.x = p.x; game.pacman.y = p.y;
+    game.pacman.dir = 'left'; game.pacman.nextDir = 'left';
+    game.ghosts.forEach((g, i) => {
+        g.x = g.home.x; g.y = g.home.y;
+        g.mode = 'chase';
+        g.dir = ['up', 'down', 'left', 'right'][i % 4];
+        g.respawnTimer = 0;
+    });
+}
+
+function updateHUD() {
+    scoreEl.textContent = game.score;
+    livesEl.textContent = game.lives;
+    levelEl.textContent = game.level;
+}
+
+function showMsg(text, autoHide = 0) {
+    msgText.textContent = text;
+    msgEl.style.display = 'flex';
+    if (autoHide > 0) setTimeout(hideMsg, autoHide * 16);
+}
+function hideMsg() { msgEl.style.display = 'none'; }
+
+// ─── 5) 입력 ──────────────────────────────────────
+const KEY_TO_DIR = {
+    ArrowLeft: 'left',  a: 'left',  A: 'left',
+    ArrowRight:'right', d: 'right', D: 'right',
+    ArrowUp:   'up',    w: 'up',    W: 'up',
+    ArrowDown: 'down',  s: 'down',  S: 'down',
+};
+window.addEventListener('keydown', (e) => {
+    if (KEY_TO_DIR[e.key]) {
+        game.pacman.nextDir = KEY_TO_DIR[e.key];
+        e.preventDefault();
+    }
+    if (e.key === 'r' || e.key === 'R') newGame();
+});
+
+// ─── 6) 이동 헬퍼 ──────────────────────────────────
+// 엔티티가 타일 중심에 정렬되어 있는지 (방향 전환 가능 시점)
+function atTileCenter(ent) {
+    // 부동소수점 드리프트 대응: 타일 중심까지의 양방향 거리 중 최소값으로 비교
+    const cx = (ent.x - TILE / 2) % TILE;
+    const cy = (ent.y - TILE / 2) % TILE;
+    const ax = Math.min(Math.abs(cx), TILE - Math.abs(cx));
+    const ay = Math.min(Math.abs(cy), TILE - Math.abs(cy));
+    return ax < 0.5 && ay < 0.5;
+}
+function snapToCenter(ent) {
+    ent.x = Math.round((ent.x - TILE / 2) / TILE) * TILE + TILE / 2;
+    ent.y = Math.round((ent.y - TILE / 2) / TILE) * TILE + TILE / 2;
+}
+function tileOf(ent) {
+    return { col: Math.floor(ent.x / TILE), row: Math.floor(ent.y / TILE) };
+}
+function canMoveDir(ent, dir) {
+    const { col, row } = tileOf(ent);
+    const d = DIRS[dir];
+    return !isWallWrapped(col + d.dx, row + d.dy);
+}
+
+// ─── 7) 팩맨 업데이트 ─────────────────────────────
+function updatePacman() {
+    const p = game.pacman;
+
+    // 타일 중심에서 방향 전환 시도
+    if (atTileCenter(p)) {
+        snapToCenter(p);
+        if (canMoveDir(p, p.nextDir)) p.dir = p.nextDir;
+        if (!canMoveDir(p, p.dir))    return; // 막힘
+    }
+
+    const d = DIRS[p.dir];
+    p.x += d.dx * PAC_SPEED;
+    p.y += d.dy * PAC_SPEED;
+
+    // 좌우 터널 (한 줄짜리 통로 양 끝이 통로면 wraparound)
+    // 터널: 위치 오프셋을 보존하며 반대편으로 wrap
+    if (p.x < 0)  p.x += W;
+    if (p.x >= W) p.x -= W;
+
+    p.mouth += 0.25;
+
+    // 펠릿 먹기
+    const t = tileOf(p);
+    const k = key(t.row, t.col);
+    if (game.pellets.has(k)) {
+        game.pellets.delete(k);
+        game.score += 10;
+        spawnParticles(p.x, p.y, '#ffe24f', 6);
+    }
+    if (game.powers.has(k)) {
+        game.powers.delete(k);
+        game.score += 50;
+        game.frightTimer = FRIGHT_DURATION;
+        game.ghostsEatenInChain = 0;
+        game.ghosts.forEach(g => { if (g.mode !== 'eaten') g.mode = 'frightened'; });
+        spawnParticles(p.x, p.y, '#aaffff', 16);
+    }
+    updateHUD();
+
+    // 클리어
+    if (game.pellets.size === 0 && game.powers.size === 0) {
+        game.state = 'win';
+        setTimeout(nextLevel, 1500);
+    }
+}
+
+// ─── 8) 유령 AI ───────────────────────────────────
+function chooseGhostDir(g, target) {
+    // 교차로(타일 중심)에서만 결정. 기본은 후진 금지, 막다른 길에서만 후진 허용.
+    const { col, row } = tileOf(g);
+    const back = OPPOSITE[g.dir];
+    let options = DIR_NAMES.filter(d => d !== back && !isWallWrapped(col + DIRS[d].dx, row + DIRS[d].dy));
+    if (options.length === 0) {
+        options = DIR_NAMES.filter(d => !isWallWrapped(col + DIRS[d].dx, row + DIRS[d].dy));
+        if (options.length === 0) return g.dir; // 사방이 벽 (이론상 발생 안 함)
+    }
+
+    if (g.mode === 'frightened') {
+        // 무작위 — 단, 갈 수 있는 후보 중에서
+        return options[Math.floor(Math.random() * options.length)];
+    }
+    // 타깃 칸과 거리가 최소인 방향
+    let best = options[0], bestDist = Infinity;
+    for (const dir of options) {
+        const tx = (col + DIRS[dir].dx) * TILE + TILE / 2;
+        const ty = (row + DIRS[dir].dy) * TILE + TILE / 2;
+        const d  = (tx - target.x) ** 2 + (ty - target.y) ** 2;
+        if (d < bestDist) { bestDist = d; best = dir; }
+    }
+    return best;
+}
+
+function updateGhost(g, idx) {
+    // 먹힌 상태: 집으로 돌아가기 (간단하게 직선이동 + 도착 시 부활)
+    if (g.mode === 'eaten') {
+        const dx = g.home.x - g.x, dy = g.home.y - g.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 3) {
+            g.x = g.home.x; g.y = g.home.y;
+            g.mode = 'chase';
+            g.dir  = 'up';
+        } else {
+            const sp = 4;
+            g.x += (dx / d) * sp;
+            g.y += (dy / d) * sp;
+        }
+        return;
+    }
+
+    // 타일 중심에서 방향 결정
+    if (atTileCenter(g)) {
+        snapToCenter(g);
+        // 각 유령마다 다른 타깃 (개성 부여)
+        const p = game.pacman;
+        let target = { x: p.x, y: p.y };
+        if (idx === 1) {
+            // 4칸 앞 예측
+            const d = DIRS[p.dir];
+            target = { x: p.x + d.dx * 4 * TILE, y: p.y + d.dy * 4 * TILE };
+        } else if (idx === 2) {
+            // 일정 확률로 도망 (변덕)
+            if (Math.random() < 0.2) target = { x: 0, y: H };
+        } else if (idx === 3) {
+            // 거리 멀면 추격, 가까우면 도주
+            const dist = Math.hypot(p.x - g.x, p.y - g.y);
+            if (dist < 5 * TILE) target = { x: W, y: H };
+        }
+        g.dir = chooseGhostDir(g, target);
+    }
+
+    const speed = (g.mode === 'frightened') ? FRIGHT_SPEED : GHOST_SPEED;
+    const d = DIRS[g.dir];
+    g.x += d.dx * speed;
+    g.y += d.dy * speed;
+
+    // 터널: 위치 오프셋을 보존하며 반대편으로 wrap
+    if (g.x < 0)  g.x += W;
+    if (g.x >= W) g.x -= W;
+}
+
+function updateGhosts() {
+    if (game.frightTimer > 0) {
+        game.frightTimer--;
+        if (game.frightTimer === 0) {
+            game.ghosts.forEach(g => { if (g.mode === 'frightened') g.mode = 'chase'; });
+            game.ghostsEatenInChain = 0;
+        }
+    }
+    game.ghosts.forEach(updateGhost);
+}
+
+// ─── 9) 충돌 ──────────────────────────────────────
+function checkGhostCollisions() {
+    const p = game.pacman;
+    for (const g of game.ghosts) {
+        if (g.mode === 'eaten') continue;
+        const dist = Math.hypot(g.x - p.x, g.y - p.y);
+        if (dist < TILE * 0.6) {
+            if (g.mode === 'frightened') {
+                game.ghostsEatenInChain++;
+                const pts = 200 * (2 ** (game.ghostsEatenInChain - 1)); // 200/400/800/1600
+                game.score += pts;
+                game.popups.push({ x: g.x, y: g.y, text: `+${pts}`, life: POPUP_DURATION });
+                g.mode = 'eaten';
+                spawnParticles(g.x, g.y, '#aaffff', 18);
+                updateHUD();
+            } else {
+                // 사망
+                game.lives--;
+                game.state = 'dead';
+                game.deadTimer = 90;
+                spawnParticles(p.x, p.y, '#ffe24f', 30);
+                updateHUD();
+                return;
+            }
+        }
+    }
+}
+
+// ─── 10) 파티클 ──────────────────────────────────
+function spawnParticles(x, y, color, count) {
+    for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const sp = 1 + Math.random() * 3;
+        game.particles.push({
+            x, y,
+            vx: Math.cos(a) * sp,
+            vy: Math.sin(a) * sp,
+            life: 30 + Math.random() * 20,
+            color,
+        });
+    }
+}
+function updateParticles() {
+    for (let i = game.particles.length - 1; i >= 0; i--) {
+        const p = game.particles[i];
+        p.x += p.vx; p.y += p.vy;
+        p.vx *= 0.94; p.vy *= 0.94;
+        p.life--;
+        if (p.life <= 0) game.particles.splice(i, 1);
+    }
+}
+
+// ─── 11) 렌더링 ──────────────────────────────────
+function drawWalls() {
+    // 벽: 둥근 사각형 + 글로우
+    ctx.save();
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = 'rgba(80, 140, 255, 0.7)';
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            if (!walls[r][c]) continue;
+            const x = c * TILE, y = r * TILE;
+            const grad = ctx.createLinearGradient(x, y, x, y + TILE);
+            grad.addColorStop(0, '#3060ff');
+            grad.addColorStop(1, '#0830a0');
+            ctx.fillStyle = grad;
+            roundRect(x + 1, y + 1, TILE - 2, TILE - 2, 6);
+            ctx.fill();
+        }
+    }
+    ctx.restore();
+}
+function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+}
+
+function drawPellets() {
+    ctx.save();
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = 'rgba(255,255,255,0.6)';
+    ctx.fillStyle = '#ffeebb';
+    for (const k of game.pellets) {
+        const [r, c] = k.split(',').map(Number);
+        const { x, y } = tileCenter(c, r);
+        ctx.beginPath();
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    // 파워 펠릿: 펄스
+    const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 180);
+    ctx.shadowBlur = 16;
+    ctx.shadowColor = 'rgba(255,255,255,1)';
+    ctx.fillStyle = '#ffffff';
+    for (const k of game.powers) {
+        const [r, c] = k.split(',').map(Number);
+        const { x, y } = tileCenter(c, r);
+        ctx.beginPath();
+        ctx.arc(x, y, 5 + pulse * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
+function drawPacman() {
+    const p = game.pacman;
+    const r = TILE * 0.45;
+    // 입 벌림 (방향에 맞춰 회전)
+    const open = 0.05 + 0.25 * Math.abs(Math.sin(p.mouth));
+    const a    = DIRS[p.dir].angle;
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(a);
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = 'rgba(255,220,80,0.9)';
+    const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 2, 0, 0, r * 1.2);
+    grad.addColorStop(0, '#fff8b0');
+    grad.addColorStop(0.6, '#ffd83a');
+    grad.addColorStop(1, '#e89000');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, r, open * Math.PI, (2 - open) * Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawGhost(g) {
+    const r = TILE * 0.45;
+    const flash = (g.mode === 'frightened' && game.frightTimer < 120 && Math.floor(game.frightTimer / 10) % 2);
+    const body  = g.mode === 'frightened' ? (flash ? '#ffffff' : '#3050ff')
+                : g.mode === 'eaten'      ? null
+                : g.color;
+
+    ctx.save();
+    if (body) {
+        // 본체 (둥근 위 + 물결 아래)
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = body + 'cc';
+        ctx.fillStyle = body;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y - r * 0.15, r, Math.PI, 0); // 위쪽 반원
+        ctx.lineTo(g.x + r, g.y + r * 0.65);
+        // 아래 물결 (3개 톱니)
+        const wn = 4;
+        const wave = (performance.now() / 200) % 1;
+        for (let i = wn; i > 0; i--) {
+            const x1 = g.x + (-r) + (i - 0.5) * (2 * r / wn);
+            const y1 = g.y + r * 0.65 + (i % 2 === Math.floor(wave * 2) ? -3 : 3);
+            const x2 = g.x + (-r) + (i - 1) * (2 * r / wn);
+            ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, g.y + r * 0.65);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 눈 (eaten은 눈만 둥둥)
+    ctx.shadowBlur = 0;
+    const eyeOff = 0.22 * r;
+    const dir = DIRS[g.dir];
+    drawEye(g.x - eyeOff, g.y - r * 0.1, dir, g.mode === 'frightened' && !flash);
+    drawEye(g.x + eyeOff, g.y - r * 0.1, dir, g.mode === 'frightened' && !flash);
+    ctx.restore();
+}
+function drawEye(cx, cy, dir, fright) {
+    const er = 4.5;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(cx, cy, er, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = fright ? '#ff5050' : '#1020a0';
+    ctx.beginPath();
+    ctx.arc(cx + dir.dx * 1.6, cy + dir.dy * 1.6, fright ? 2.8 : 2.2, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawParticles() {
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of game.particles) {
+        const a = Math.min(1, p.life / 30);
+        ctx.globalAlpha = a;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
+function drawPopups() {
+    ctx.save();
+    ctx.font = 'bold 16px ui-monospace, Menlo, Consolas, monospace';
+    ctx.textAlign = 'center';
+    for (let i = game.popups.length - 1; i >= 0; i--) {
+        const p = game.popups[i];
+        const a = p.life / POPUP_DURATION;
+        ctx.globalAlpha = a;
+        ctx.fillStyle = '#aaffff';
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#aaffff';
+        ctx.fillText(p.text, p.x, p.y - (POPUP_DURATION - p.life) * 0.4);
+        p.life--;
+        if (p.life <= 0) game.popups.splice(i, 1);
+    }
+    ctx.restore();
+}
+
+function render() {
+    // 배경
+    ctx.fillStyle = '#06061a';
+    ctx.fillRect(0, 0, W, H);
+    drawWalls();
+    drawPellets();
+    drawParticles();
+    drawPacman();
+    game.ghosts.forEach(drawGhost);
+    drawPopups();
+}
+
+// ─── 12) 메인 루프 ────────────────────────────────
+function loop() {
+    if (game.state === 'play') {
+        updatePacman();
+        updateGhosts();
+        checkGhostCollisions();
+    } else if (game.state === 'dead') {
+        if (--game.deadTimer <= 0) {
+            if (game.lives > 0) {
+                resetPositions();
+                game.state = 'play';
+            } else {
+                game.state = 'over';
+                showMsg('GAME OVER');
+            }
+        }
+    }
+    updateParticles();
+    render();
+    requestAnimationFrame(loop);
+}
+
+newGame();
+loop();
+</script>
+</body>
+</html>

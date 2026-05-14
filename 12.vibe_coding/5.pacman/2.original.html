@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pacman (Original Style)</title>
+<style>
+    html, body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Courier New", monospace;
+        color: #ffea00;
+        overflow: hidden;
+    }
+    #wrap { text-align: center; }
+    #hud {
+        display: flex;
+        justify-content: space-between;
+        font-size: 16px;
+        margin-bottom: 6px;
+        letter-spacing: 2px;
+    }
+    #hud b { color: #fff; }
+    canvas {
+        display: block;
+        background: #000;
+        image-rendering: pixelated;
+    }
+    #msg {
+        position: absolute; inset: 0;
+        display: none;
+        align-items: center; justify-content: center;
+        flex-direction: column;
+        background: rgba(0,0,0,0.7);
+        font-size: 28px;
+        letter-spacing: 4px;
+    }
+    #msg small { font-size: 14px; opacity: 0.8; margin-top: 12px; color: #fff; }
+</style>
+</head>
+<body>
+<div id="wrap">
+    <div id="hud">
+        <span>SCORE <b id="score">0</b></span>
+        <span>LV <b id="level">1</b></span>
+        <span>LIFE <b id="lives">3</b></span>
+    </div>
+    <canvas id="canvas"></canvas>
+</div>
+<div id="msg"><div id="msgText"></div><small>R 키로 다시 시작</small></div>
+
+<script>
+// ─── 1) 미로 (오리지널 28×31 클래식 레이아웃) ────────
+//   # 벽,  . 펠릿,  o 파워펠릿,  - 유령집 도어,  G 유령 시작,  P 팩맨 시작,  ' ' 빈 통로(터널)
+const MAZE = [
+    '############################', //  0
+    '#............##............#', //  1
+    '#.####.#####.##.#####.####.#', //  2
+    '#o####.#####.##.#####.####o#', //  3  파워펠릿 좌상/우상
+    '#.####.#####.##.#####.####.#', //  4
+    '#..........................#', //  5
+    '#.####.##.########.##.####.#', //  6
+    '#.####.##.########.##.####.#', //  7
+    '#......##....##....##......#', //  8
+    '######.##### ## #####.######', //  9
+    '     #.##### ## #####.#     ', // 10
+    '     #.##          ##.#     ', // 11
+    '     #.## ###--### ##.#     ', // 12  유령집 도어
+    '######.## #      # ##.######', // 13
+    '      .   #GG  GG#   .      ', // 14  ★ 좌우 터널 + 유령 4마리
+    '######.## #      # ##.######', // 15
+    '     #.## ######## ##.#     ', // 16
+    '     #.##          ##.#     ', // 17
+    '     #.## ######## ##.#     ', // 18
+    '######.## ######## ##.######', // 19
+    '#............##............#', // 20
+    '#.####.#####.##.#####.####.#', // 21
+    '#.####.#####.##.#####.####.#', // 22
+    '#o..##........P.......##..o#', // 23  파워펠릿 좌하/우하 + 팩맨
+    '###.##.##.########.##.##.###', // 24
+    '###.##.##.########.##.##.###', // 25
+    '#......##....##....##......#', // 26
+    '#.##########.##.##########.#', // 27
+    '#.##########.##.##########.#', // 28
+    '#..........................#', // 29
+    '############################', // 30
+];
+console.assert(MAZE.every(r => r.length === MAZE[0].length), 'maze rows must have equal length');
+
+const COLS = MAZE[0].length;
+const ROWS = MAZE.length;
+const TILE = 22;                  // 28×22 = 616px wide, 31×22 = 682px tall
+const W    = COLS * TILE;
+const H    = ROWS * TILE;
+
+const canvas  = document.getElementById('canvas');
+const ctx     = canvas.getContext('2d');
+canvas.width  = W;
+canvas.height = H;
+
+const scoreEl = document.getElementById('score');
+const livesEl = document.getElementById('lives');
+const levelEl = document.getElementById('level');
+const msgEl   = document.getElementById('msg');
+const msgText = document.getElementById('msgText');
+
+// ─── 2) 미로 파싱 ─────────────────────────────────
+const walls   = [];
+const pellets = new Set();
+const powers  = new Set();
+let pacStart  = null;
+const ghostStarts = [];
+
+for (let r = 0; r < ROWS; r++) {
+    walls.push([]);
+    for (let c = 0; c < COLS; c++) {
+        const ch = MAZE[r][c];
+        walls[r].push(ch === '#');
+        if      (ch === '.') pellets.add(`${r},${c}`);
+        else if (ch === 'o') powers.add(`${r},${c}`);
+        else if (ch === 'P') pacStart = { col: c, row: r };
+        else if (ch === 'G') ghostStarts.push({ col: c, row: r });
+    }
+}
+
+const key = (r, c) => `${r},${c}`;
+const tileCenter = (col, row) => ({ x: col * TILE + TILE / 2, y: row * TILE + TILE / 2 });
+const isWall = (c, r) => (c < 0 || c >= COLS || r < 0 || r >= ROWS) ? true : walls[r][c];
+
+// 터널 인식 벽 체크: 좌우 경계는 반대편으로 wrap해서 검사
+function isWallWrapped(c, r) {
+    if (c < 0)      c = COLS - 1;
+    if (c >= COLS)  c = 0;
+    return isWall(c, r);
+}
+
+// ─── 3) 게임 상태 ─────────────────────────────────
+const DIRS = {
+    left:  { dx: -1, dy:  0, angle:  Math.PI },
+    right: { dx:  1, dy:  0, angle:  0 },
+    up:    { dx:  0, dy: -1, angle: -Math.PI / 2 },
+    down:  { dx:  0, dy:  1, angle:  Math.PI / 2 },
+};
+const DIR_NAMES = Object.keys(DIRS);
+const OPPOSITE  = { left: 'right', right: 'left', up: 'down', down: 'up' };
+
+// 속도는 TILE(22)을 정수로 나눠 떨어지는 값을 사용 → 타일 중심 정렬이 매번 정확히 맞음
+const PAC_SPEED       = 2.0;     // 22/2.0   = 11프레임/타일
+const GHOST_SPEED     = 1.375;   // 22/1.375 = 16프레임/타일 (1.375 = 11/8, 정확표현)
+const FRIGHT_SPEED    = 1.0;     // 22/1.0   = 22프레임/타일
+const FRIGHT_DURATION = 7 * 60;
+
+// 클래식 색상: Blinky(빨강), Pinky(분홍), Inky(시안), Clyde(주황)
+const GHOST_COLORS = ['#ff0000', '#ffb8de', '#00ffff', '#ffb852'];
+
+let game;
+
+function newGame() {
+    const p = tileCenter(pacStart.col, pacStart.row);
+    game = {
+        score: 0, lives: 3, level: 1,
+        pacman: { x: p.x, y: p.y, dir: 'left', nextDir: 'left', mouth: 0 },
+        ghosts: ghostStarts.slice(0, 4).map((g, i) => {
+            const c = tileCenter(g.col, g.row);
+            return {
+                x: c.x, y: c.y, home: { x: c.x, y: c.y },
+                dir: ['up', 'down', 'left', 'right'][i % 4],
+                color: GHOST_COLORS[i % 4],
+                mode: 'chase', respawnTimer: 0,
+            };
+        }),
+        pellets: new Set(pellets),
+        powers:  new Set(powers),
+        frightTimer: 0,
+        ghostsEatenInChain: 0,
+        state: 'play', deadTimer: 0,
+    };
+    updateHUD();
+    hideMsg();
+}
+
+function nextLevel() {
+    game.level++;
+    game.pellets = new Set(pellets);
+    game.powers  = new Set(powers);
+    game.frightTimer = 0;
+    game.ghostsEatenInChain = 0;
+    resetPositions();
+    showMsg(`LEVEL ${game.level}`, 90);
+    updateHUD();
+}
+
+function resetPositions() {
+    const p = tileCenter(pacStart.col, pacStart.row);
+    game.pacman.x = p.x; game.pacman.y = p.y;
+    game.pacman.dir = 'left'; game.pacman.nextDir = 'left';
+    game.ghosts.forEach((g, i) => {
+        g.x = g.home.x; g.y = g.home.y;
+        g.mode = 'chase';
+        g.dir  = ['up', 'down', 'left', 'right'][i % 4];
+    });
+}
+
+function updateHUD() {
+    scoreEl.textContent = game.score;
+    livesEl.textContent = game.lives;
+    levelEl.textContent = game.level;
+}
+
+function showMsg(text, autoHide = 0) {
+    msgText.textContent = text;
+    msgEl.style.display = 'flex';
+    if (autoHide > 0) setTimeout(hideMsg, autoHide * 16);
+}
+function hideMsg() { msgEl.style.display = 'none'; }
+
+// ─── 4) 입력 ──────────────────────────────────────
+const KEY_TO_DIR = {
+    ArrowLeft: 'left',  a: 'left',  A: 'left',
+    ArrowRight:'right', d: 'right', D: 'right',
+    ArrowUp:   'up',    w: 'up',    W: 'up',
+    ArrowDown: 'down',  s: 'down',  S: 'down',
+};
+window.addEventListener('keydown', (e) => {
+    if (KEY_TO_DIR[e.key]) { game.pacman.nextDir = KEY_TO_DIR[e.key]; e.preventDefault(); }
+    if (e.key === 'r' || e.key === 'R') newGame();
+});
+
+// ─── 5) 이동 헬퍼 ─────────────────────────────────
+function atTileCenter(ent) {
+    // 부동소수점 드리프트 대응: 타일 중심까지의 양방향 거리 중 최소값으로 비교
+    // (예: 1.4 누적 시 28이 아닌 27.99999가 나오는 케이스를 잡음)
+    const cx = (ent.x - TILE / 2) % TILE;
+    const cy = (ent.y - TILE / 2) % TILE;
+    const ax = Math.min(Math.abs(cx), TILE - Math.abs(cx));
+    const ay = Math.min(Math.abs(cy), TILE - Math.abs(cy));
+    return ax < 0.5 && ay < 0.5;
+}
+function snapToCenter(ent) {
+    ent.x = Math.round((ent.x - TILE / 2) / TILE) * TILE + TILE / 2;
+    ent.y = Math.round((ent.y - TILE / 2) / TILE) * TILE + TILE / 2;
+}
+function tileOf(ent) {
+    return { col: Math.floor(ent.x / TILE), row: Math.floor(ent.y / TILE) };
+}
+function canMoveDir(ent, dir) {
+    const { col, row } = tileOf(ent);
+    const d = DIRS[dir];
+    return !isWallWrapped(col + d.dx, row + d.dy);
+}
+
+// ─── 6) 팩맨 ──────────────────────────────────────
+function updatePacman() {
+    const p = game.pacman;
+    if (atTileCenter(p)) {
+        snapToCenter(p);
+        if (canMoveDir(p, p.nextDir)) p.dir = p.nextDir;
+        if (!canMoveDir(p, p.dir))    return;
+    }
+    const d = DIRS[p.dir];
+    p.x += d.dx * PAC_SPEED;
+    p.y += d.dy * PAC_SPEED;
+    // 터널: 위치 오프셋을 보존하며 반대편으로 wrap
+    if (p.x < 0)  p.x += W;
+    if (p.x >= W) p.x -= W;
+    p.mouth += 0.3;
+
+    const t = tileOf(p);
+    const k = key(t.row, t.col);
+    if (game.pellets.has(k)) {
+        game.pellets.delete(k);
+        game.score += 10;
+    }
+    if (game.powers.has(k)) {
+        game.powers.delete(k);
+        game.score += 50;
+        game.frightTimer = FRIGHT_DURATION;
+        game.ghostsEatenInChain = 0;
+        game.ghosts.forEach(g => { if (g.mode !== 'eaten') g.mode = 'frightened'; });
+    }
+    updateHUD();
+
+    if (game.pellets.size === 0 && game.powers.size === 0) {
+        game.state = 'win';
+        setTimeout(nextLevel, 1500);
+    }
+}
+
+// ─── 7) 유령 AI ───────────────────────────────────
+function chooseGhostDir(g, target) {
+    const { col, row } = tileOf(g);
+    const back = OPPOSITE[g.dir];
+    let options = DIR_NAMES.filter(d => d !== back && !isWallWrapped(col + DIRS[d].dx, row + DIRS[d].dy));
+    if (options.length === 0) {
+        options = DIR_NAMES.filter(d => !isWallWrapped(col + DIRS[d].dx, row + DIRS[d].dy));
+        if (options.length === 0) return g.dir;
+    }
+    if (g.mode === 'frightened') return options[Math.floor(Math.random() * options.length)];
+    let best = options[0], bestDist = Infinity;
+    for (const dir of options) {
+        const tx = (col + DIRS[dir].dx) * TILE + TILE / 2;
+        const ty = (row + DIRS[dir].dy) * TILE + TILE / 2;
+        const d  = (tx - target.x) ** 2 + (ty - target.y) ** 2;
+        if (d < bestDist) { bestDist = d; best = dir; }
+    }
+    return best;
+}
+
+function updateGhost(g, idx) {
+    if (g.mode === 'eaten') {
+        const dx = g.home.x - g.x, dy = g.home.y - g.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 3) { g.x = g.home.x; g.y = g.home.y; g.mode = 'chase'; g.dir = 'up'; }
+        else { g.x += (dx / d) * 4; g.y += (dy / d) * 4; }
+        return;
+    }
+    if (atTileCenter(g)) {
+        snapToCenter(g);
+        const p = game.pacman;
+        let target = { x: p.x, y: p.y };
+        if (idx === 1) {
+            const d = DIRS[p.dir];
+            target = { x: p.x + d.dx * 4 * TILE, y: p.y + d.dy * 4 * TILE };
+        } else if (idx === 2) {
+            if (Math.random() < 0.2) target = { x: 0, y: H };
+        } else if (idx === 3) {
+            const dist = Math.hypot(p.x - g.x, p.y - g.y);
+            if (dist < 5 * TILE) target = { x: W, y: H };
+        }
+        g.dir = chooseGhostDir(g, target);
+    }
+    const speed = (g.mode === 'frightened') ? FRIGHT_SPEED : GHOST_SPEED;
+    const d = DIRS[g.dir];
+    g.x += d.dx * speed;
+    g.y += d.dy * speed;
+    // 터널: 위치 오프셋을 보존하며 반대편으로 wrap
+    if (g.x < 0)  g.x += W;
+    if (g.x >= W) g.x -= W;
+}
+function updateGhosts() {
+    if (game.frightTimer > 0) {
+        game.frightTimer--;
+        if (game.frightTimer === 0) {
+            game.ghosts.forEach(g => { if (g.mode === 'frightened') g.mode = 'chase'; });
+            game.ghostsEatenInChain = 0;
+        }
+    }
+    game.ghosts.forEach(updateGhost);
+}
+
+// ─── 8) 충돌 ──────────────────────────────────────
+function checkGhostCollisions() {
+    const p = game.pacman;
+    for (const g of game.ghosts) {
+        if (g.mode === 'eaten') continue;
+        if (Math.hypot(g.x - p.x, g.y - p.y) < TILE * 0.6) {
+            if (g.mode === 'frightened') {
+                game.ghostsEatenInChain++;
+                game.score += 200 * (2 ** (game.ghostsEatenInChain - 1));
+                g.mode = 'eaten';
+                updateHUD();
+            } else {
+                game.lives--;
+                game.state = 'dead';
+                game.deadTimer = 90;
+                updateHUD();
+                return;
+            }
+        }
+    }
+}
+
+// ─── 9) 렌더링 (클래식 스타일) ────────────────────
+function drawWalls() {
+    // 솔리드 파란 벽 (오리지널 색상: #2121ff 같은 진청색)
+    ctx.fillStyle = '#2121de';
+    ctx.strokeStyle = '#2121de';
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            if (!walls[r][c]) continue;
+            // 단순 사각형 (오리지널 픽셀 느낌)
+            ctx.fillRect(c * TILE + 4, r * TILE + 4, TILE - 8, TILE - 8);
+        }
+    }
+}
+
+function drawPellets() {
+    ctx.fillStyle = '#ffb897';
+    for (const k of game.pellets) {
+        const [r, c] = k.split(',').map(Number);
+        const { x, y } = tileCenter(c, r);
+        ctx.fillRect(x - 2, y - 2, 4, 4);
+    }
+    // 파워 펠릿: 깜빡임
+    if (Math.floor(performance.now() / 250) % 2 === 0) {
+        ctx.fillStyle = '#ffb897';
+        for (const k of game.powers) {
+            const [r, c] = k.split(',').map(Number);
+            const { x, y } = tileCenter(c, r);
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
+function drawPacman() {
+    const p = game.pacman;
+    const r = TILE * 0.45;
+    const open = 0.05 + 0.3 * Math.abs(Math.sin(p.mouth));
+    const a    = DIRS[p.dir].angle;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(a);
+    ctx.fillStyle = '#ffea00'; // 오리지널 노랑
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, r, open * Math.PI, (2 - open) * Math.PI);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
+function drawGhost(g) {
+    const r = TILE * 0.45;
+    const flash = (g.mode === 'frightened' && game.frightTimer < 120 && Math.floor(game.frightTimer / 10) % 2);
+    const body  = g.mode === 'frightened' ? (flash ? '#ffffff' : '#2121ff')
+                : g.mode === 'eaten'      ? null
+                : g.color;
+
+    if (body) {
+        ctx.fillStyle = body;
+        // 위쪽 둥근 부분
+        ctx.beginPath();
+        ctx.arc(g.x, g.y - r * 0.15, r, Math.PI, 0);
+        ctx.lineTo(g.x + r, g.y + r * 0.7);
+        // 톱니 4개 (오리지널은 3~4개의 sharp wave)
+        const wn = 4;
+        const step = (2 * r) / wn;
+        for (let i = 0; i < wn; i++) {
+            const x0 = g.x + r - i * step;
+            ctx.lineTo(x0 - step / 2, g.y + r * 0.4);
+            ctx.lineTo(x0 - step,     g.y + r * 0.7);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 눈 (오리지널: 흰자 + 파란 눈동자, frightened면 분홍 눈)
+    const eyeOff = 0.22 * r;
+    const dir    = DIRS[g.dir];
+    const fright = (g.mode === 'frightened' && !flash);
+    drawEye(g.x - eyeOff, g.y - r * 0.1, dir, fright);
+    drawEye(g.x + eyeOff, g.y - r * 0.1, dir, fright);
+}
+function drawEye(cx, cy, dir, fright) {
+    if (!fright) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(cx - 3, cy - 4, 6, 7);
+        ctx.fillStyle = '#2121ff';
+        ctx.fillRect(cx - 1 + dir.dx * 2, cy - 1 + dir.dy * 2, 3, 3);
+    } else {
+        ctx.fillStyle = '#ffb8de';
+        ctx.fillRect(cx - 2, cy - 2, 4, 4);
+    }
+}
+
+function render() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, W, H);
+    drawWalls();
+    drawPellets();
+    drawPacman();
+    game.ghosts.forEach(drawGhost);
+}
+
+// ─── 10) 메인 루프 ────────────────────────────────
+function loop() {
+    if (game.state === 'play') {
+        updatePacman();
+        updateGhosts();
+        checkGhostCollisions();
+    } else if (game.state === 'dead') {
+        if (--game.deadTimer <= 0) {
+            if (game.lives > 0) { resetPositions(); game.state = 'play'; }
+            else { game.state = 'over'; showMsg('GAME OVER'); }
+        }
+    }
+    render();
+    requestAnimationFrame(loop);
+}
+
+newGame();
+loop();
+</script>
+</body>
+</html>
